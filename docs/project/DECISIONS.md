@@ -46,3 +46,16 @@ Tres decisiones menores:
 3. La fase 2 del roadmap incluye el formato completo (`cerca_de`, `valor:`,
    `no_contiene`) y no solo la robustez de SSH: sin esas tres primitivas no se
    puede ejecutar un examen real del curso, que es su condición de salida.
+
+### 2026-09-19 · T001 · Toolchain Go
+
+El módulo existe y compila. Tres decisiones operativas, ninguna arquitectónica:
+
+1. **Go 1.27.1 del tarball oficial**, extraído en
+   `/mnt/datos/Applications/Claude/toolchains/go`. `apt` ofrece 1.22 —justo el
+   mínimo—, exige root e instala en `/usr`, fuera del árbol del proyecto.
+2. **`go.mod` declara `go 1.22`, no la versión instalada.** El mínimo del
+   proyecto es lo que debe compilar en cualquier equipo, no lo que hay aquí.
+3. **El exit code 1 queda sin significado**, reservado como fallo no
+   especificado, y hay un test que lo protege junto a los otros cuatro. La GUI
+   distingue configuración inválida (2) de ejecución parcial (3) por el número.
