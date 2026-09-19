@@ -59,3 +59,15 @@ El módulo existe y compila. Tres decisiones operativas, ninguna arquitectónica
 3. **El exit code 1 queda sin significado**, reservado como fallo no
    especificado, y hay un test que lo protege junto a los otros cuatro. La GUI
    distingue configuración inválida (2) de ejecución parcial (3) por el número.
+
+### 2026-09-19 · T002 · Serialización canónica sin escape HTML
+
+El artefacto se escribe con un `MarshalCanonical` propio (sangría de dos
+espacios, `SetEscapeHTML(false)`) en lugar de `json.Marshal`. Motivo: la salida
+de `ip address show` y cualquier comando con `<`, `>` o `&` debe leerse en el
+artefacto tal como se envió a la máquina, no como secuencias escapadas. Es una
+elección local y reversible; no cambia el modelo.
+
+El golden del round-trip vive en `internal/model/testdata/`, no en el
+`testdata/` raíz que cita `architecture.md`: `go test` lo lee por ruta relativa
+al paquete. El raíz queda para exámenes e inventarios de prueba.

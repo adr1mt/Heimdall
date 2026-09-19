@@ -1,0 +1,394 @@
+{
+  "schema_version": 1,
+  "run_id": "01K5T9QW3XW4Y8R2N6ZB7MHV0C",
+  "engine_version": "0.1.0",
+  "started_at": "2026-09-19T11:02:14+02:00",
+  "finished_at": "2026-09-19T11:02:41+02:00",
+  "status": "PARTIAL",
+  "exam": {
+    "path": "examen.yaml",
+    "sha256": "9f2ca71b",
+    "version": "3"
+  },
+  "inventory": {
+    "path": "aula.yaml",
+    "sha256": "4d810e33",
+    "version": "2"
+  },
+  "plan_hash": "c0aa5512",
+  "plan": {
+    "check_count": 4,
+    "total_weight": 5,
+    "check_ids": [
+      "red-ip-servidor",
+      "kea-servicio",
+      "dns-activo",
+      "q-puerto-https"
+    ],
+    "concurrency": 8
+  },
+  "students": [
+    {
+      "student_id": "alumne01",
+      "name": "Ana Ferrer",
+      "moodle_id": "ana.ferrer@elpuig.xeill.net",
+      "status": "OK",
+      "started_at": "2026-09-19T11:02:14+02:00",
+      "finished_at": "2026-09-19T11:02:19+02:00",
+      "score": {
+        "obtained": 4,
+        "evaluable": 5,
+        "total": 5,
+        "unevaluated": 0,
+        "provisional_score": 80,
+        "final_score": 80,
+        "status": "COMPLETE"
+      },
+      "checks": [
+        {
+          "check_id": "red-ip-servidor",
+          "group": "Red y DHCP",
+          "description": "El servidor tiene 10.0.0.1/8 en enp2s0",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "192.168.1.20:22",
+            "user": "usuario",
+            "transport": "ssh",
+            "command": [
+              "ip",
+              "address",
+              "show",
+              "dev",
+              "enp2s0"
+            ],
+            "started_at": "2026-09-19T11:02:15+02:00",
+            "duration_ms": 142,
+            "completed": true,
+            "exit_code": 0,
+            "stdout": {
+              "text": "2: enp2s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500\n    inet 10.0.0.1/8 scope global enp2s0\n",
+              "bytes": 104,
+              "bytes_total": 104,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "contains",
+            "expected": "10.0.0.1/8",
+            "found": "10.0.0.1/8",
+            "matched": true,
+            "where": "stdout línea 2"
+          }
+        },
+        {
+          "check_id": "kea-servicio",
+          "group": "Red y DHCP",
+          "description": "El servicio kea-dhcp4 está activo",
+          "weight": 2,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "192.168.1.20:22",
+            "user": "usuario",
+            "transport": "ssh",
+            "command": [
+              "systemctl",
+              "is-active",
+              "kea-dhcp4-server"
+            ],
+            "started_at": "2026-09-19T11:02:16+02:00",
+            "duration_ms": 95,
+            "completed": true,
+            "exit_code": 0,
+            "stdout": {
+              "text": "active\n",
+              "bytes": 7,
+              "bytes_total": 7,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "active",
+            "found": "active",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "dns-activo",
+          "group": "DNS",
+          "description": "named responde",
+          "weight": 1,
+          "status": "FAIL",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "192.168.1.20:22",
+            "user": "usuario",
+            "transport": "ssh",
+            "command": [
+              "dig",
+              "+short",
+              "+time=3",
+              "@127.0.0.1",
+              "pc1.examen.local"
+            ],
+            "started_at": "2026-09-19T11:02:17+02:00",
+            "duration_ms": 3120,
+            "completed": true,
+            "exit_code": 9,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": ";; connection timed out; no servers could be reached\n",
+              "bytes": 54,
+              "bytes_total": 54,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "10.1.1.100",
+            "found": "",
+            "matched": false
+          }
+        },
+        {
+          "check_id": "q-puerto-https",
+          "group": "Cuestionario",
+          "description": "Puerto por defecto de HTTPS",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "",
+            "address": "",
+            "user": "",
+            "transport": "inventory",
+            "command": [],
+            "started_at": "2026-09-19T11:02:19+02:00",
+            "duration_ms": 0,
+            "completed": true,
+            "exit_code": 0,
+            "stdout": {
+              "text": "443",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 0,
+            "command_attempts": 0,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "443",
+            "found": "443",
+            "matched": true
+          }
+        }
+      ]
+    },
+    {
+      "student_id": "alumne02",
+      "name": "Marc Oliva",
+      "moodle_id": "marc.oliva@elpuig.xeill.net",
+      "status": "PARTIAL",
+      "started_at": "2026-09-19T11:02:14+02:00",
+      "finished_at": "2026-09-19T11:02:41+02:00",
+      "score": {
+        "obtained": 1,
+        "evaluable": 1,
+        "total": 5,
+        "unevaluated": 4,
+        "provisional_score": 100,
+        "final_score": null,
+        "status": "INCOMPLETE"
+      },
+      "checks": [
+        {
+          "check_id": "red-ip-servidor",
+          "group": "Red y DHCP",
+          "description": "El servidor tiene 10.0.0.1/8 en enp2s0",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "192.168.1.21:22",
+            "user": "marc",
+            "transport": "ssh",
+            "command": [
+              "ip",
+              "address",
+              "show",
+              "dev",
+              "enp2s0"
+            ],
+            "started_at": "2026-09-19T11:02:15+02:00",
+            "duration_ms": 188,
+            "completed": true,
+            "exit_code": 0,
+            "stdout": {
+              "text": "    inet 10.0.0.1/8 scope global enp2s0\n",
+              "bytes": 41,
+              "bytes_total": 41,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "contains",
+            "expected": "10.0.0.1/8",
+            "found": "10.0.0.1/8",
+            "matched": true,
+            "where": "stdout línea 1"
+          }
+        },
+        {
+          "check_id": "kea-servicio",
+          "group": "Red y DHCP",
+          "description": "El servicio kea-dhcp4 está activo",
+          "weight": 2,
+          "status": "UNEVALUATED",
+          "cause": "TIMEOUT",
+          "detail": "El comando no terminó en 20s; el canal SSH se cerró",
+          "execution": {
+            "host": "host1",
+            "address": "192.168.1.21:22",
+            "user": "marc",
+            "transport": "ssh",
+            "command": [
+              "systemctl",
+              "is-active",
+              "kea-dhcp4-server"
+            ],
+            "started_at": "2026-09-19T11:02:16+02:00",
+            "duration_ms": 20004,
+            "completed": false,
+            "exit_code": null,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "KILLED_REMOTE"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "dns-activo",
+          "group": "DNS",
+          "description": "named responde",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "CONNECTION_LOST",
+          "detail": "La sesión SSH se cerró inesperadamente (EOF) al enviar el comando",
+          "execution": {
+            "host": "host1",
+            "address": "192.168.1.21:22",
+            "user": "marc",
+            "transport": "ssh",
+            "command": [
+              "dig",
+              "+short",
+              "+time=3",
+              "@127.0.0.1",
+              "pc1.examen.local"
+            ],
+            "started_at": "2026-09-19T11:02:36+02:00",
+            "duration_ms": 412,
+            "completed": false,
+            "exit_code": null,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "UNKNOWN"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "q-puerto-https",
+          "group": "Cuestionario",
+          "description": "Puerto por defecto de HTTPS",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "NOT_RUN",
+          "detail": "Se agotó el presupuesto de tiempo del alumno (10m)",
+          "execution": null,
+          "assertion": null
+        }
+      ]
+    }
+  ],
+  "warnings": [
+    {
+      "scope": "student:alumne02",
+      "code": "REMOTE_PROCESS_UNKNOWN",
+      "message": "No se puede garantizar que el comando de dns-activo terminara en 192.168.1.21"
+    }
+  ]
+}
