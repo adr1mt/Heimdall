@@ -71,3 +71,21 @@ elección local y reversible; no cambia el modelo.
 El golden del round-trip vive en `internal/model/testdata/`, no en el
 `testdata/` raíz que cita `architecture.md`: `go test` lo lee por ruta relativa
 al paquete. El raíz queda para exámenes e inventarios de prueba.
+
+### 2026-09-19 · T003 · Holgura al comparar pesos y errores del motor explícitos
+
+Dos elecciones locales dentro del cálculo de la nota:
+
+1. Los pesos acumulados se comparan con cero con una holgura de `1e-9`. Un
+   examen de 0,1 + 0,2 + 0,7 deja un residuo de coma flotante del orden de
+   `1e-16` en `total - evaluable`; sin la holgura ese residuo se leería como
+   «queda algo sin evaluar» y negaría la nota final a un alumno que la merece.
+   Cualquier peso real está muchos órdenes de magnitud por encima.
+2. `Classify` con causa `NONE` pero sin ejecución completa, sin código de
+   salida o sin aserción devuelve `UNEVALUATED` con causa `ENGINE_ERROR`, no un
+   `PASS` ni un `FAIL`. Es una contradicción del motor, y el principio 2 pide
+   que se vea.
+
+`Classify` devuelve además un `detail` por defecto para cada causa. El motor
+puede sustituirlo por uno más concreto, nunca por vacío: una comprobación
+`UNEVALUATED` sin explicación deja al profesor sin saber qué hacer.

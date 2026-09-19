@@ -70,7 +70,7 @@
       "id": "T003",
       "title": "Classify y ComputeScore puros",
       "phase": 0,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": ["T002"],
       "goal": "Cerrar por construccion el camino de un error tecnico hacia la nota, con tests exhaustivos.",
