@@ -17,6 +17,8 @@ repositorios originales.**
 | [KEEP-DROP-CHANGE.md](KEEP-DROP-CHANGE.md) | Conservar / eliminar / cambiar, y la taxonomía de estados |
 | [PROPOSAL.md](PROPOSAL.md) | Contraste de la dirección preliminar, arquitectura, riesgos, primer prototipo |
 
+Diseño posterior: [`../design/`](../design/) y [`../adr/`](../adr/).
+
 `evidence/` contiene los proyectos de prueba, el `Containerfile` del laboratorio
 SSH y las salidas representativas.
 
