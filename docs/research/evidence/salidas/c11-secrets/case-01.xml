@@ -1,0 +1,41 @@
+<teuton version='2.10.6'>
+  <head>
+    <tt_testname>c11-secrets</tt_testname>
+    <admin_token>TEUTON_SECRET_GLOBAL_12345</admin_token>
+    <tt_sequence>false</tt_sequence>
+    <tt_members>alumno-secreto</tt_members>
+    <host1_ip>127.0.0.1</host1_ip>
+    <host1_username>alumno</host1_username>
+    <host1_password>TEUTON_SECRET_TEST_12345</host1_password>
+    <db_password>TEUTON_SECRET_DB_12345</db_password>
+    <tt_skip>false</tt_skip>
+  </head>
+  <lines>
+    <line>
+      <id>1</id>
+      <description>comando que lleva la password en argv</description>
+      <command tempfile='var/c11-secrets/tmp/01/teuton.tmp'>echo mysql -u root -pTEUTON_SECRET_INLINE_12345</command>
+      <check>true</check>
+      <weigth>1.0</weigth>
+    </line>
+    <line>
+      <id>2</id>
+      <description>salida remota que contiene un secreto</description>
+      <command tempfile='var/c11-secrets/tmp/01/teuton.tmp'>echo 'leaked=TEUTON_SECRET_STDOUT_12345'</command>
+      <check>true</check>
+      <weigth>1.0</weigth>
+    </line>
+  </lines>
+  <tail>
+    <case_id>01</case_id>
+    <start_time>2026-09-19 20:04:14 +0200</start_time>
+    <finish_time>2026-09-19 20:04:14 +0200</finish_time>
+    <duration>0.002498567</duration>
+    <unique_fault>0</unique_fault>
+    <max_weight>2.0</max_weight>
+    <good_weight>2.0</good_weight>
+    <fail_weight>0.0</fail_weight>
+    <fail_counter>0</fail_counter>
+    <grade>100</grade>
+  </tail>
+</teuton>

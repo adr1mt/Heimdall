@@ -1,0 +1,7 @@
+---
+global:
+  tt_testname: c10-isolation
+cases:
+- tt_members: alumno-A
+- tt_members: alumno-BOOM
+- tt_members: alumno-C

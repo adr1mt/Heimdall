@@ -1,0 +1,24 @@
+---
+:config:
+  :tt_title: Teuton (2.10.6)
+  :tt_scriptname: c11-secrets/start.rb
+  :tt_configfile: c11-secrets/config.yaml
+  :tt_pwd: "/mnt/datos/Applications/Claude/Evalon/workspace/lab"
+  :tt_uses: ''
+  :tt_testname: c11-secrets
+  :admin_token: TEUTON_SECRET_GLOBAL_12345
+  :tt_sequence: false
+:cases:
+- :skip: false
+  :id: '01'
+  :letter: "✔"
+  :grade: 100.0
+  :members: alumno-secreto
+  :conn_status: {}
+  :moodle_id: NODATA
+  :moodle_feedback: '"Filename: case-01. Date: 2026-09-19 20:04:14 +0200"'
+:results:
+  :start_time: 2026-09-19 20:04:14.260106753 +02:00
+  :finish_time: 2026-09-19 20:04:14.263286732 +02:00
+  :duration: 0.003179979
+:hall_of_fame: {}

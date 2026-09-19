@@ -1,0 +1,5 @@
+---
+global:
+  tt_testname: c01-normal
+cases:
+- tt_members: alumno-uno

@@ -1,0 +1,89 @@
+CONFIGURATION
++-------------+------------+
+| tt_members  | alumno-uno |
+| tt_sequence | false      |
+| tt_skip     | false      |
+| tt_testname | c01-normal |
++-------------+------------+
+
+
+GROUPS
+- normal
+    01 (1.0/1.0)
+        Description : exit 0 + stdout
+        Command     : echo HELLO_STDOUT
+        Output      : HELLO_STDOUT
+        Duration    : 0.001 (local)
+        Alterations : find(HELLO_STDOUT) & count
+        Expected    : Greater than 0
+        Result      : 1
+    02 (1.0/1.0)
+        Description : exit code 0
+        Command     : true
+        Output      : 
+        Duration    : 0.001 (local)
+        Alterations : Read exit code
+        Expected    : 0
+        Result      : 0
+    03 (1.0/1.0)
+        Description : exit code 3
+        Command     : sh -c 'exit 3'
+        Output      : 
+        Duration    : 0.001 (local)
+        Alterations : Read exit code
+        Expected    : 3
+        Result      : 3
+    04 (1.0/1.0)
+        Description : stderr only, exit 0
+        Command     : sh -c 'echo ONLY_STDERR >&2'
+        Output      : ONLY_STDERR
+        Duration    : 0.001 (local)
+        Alterations : find(ONLY_STDERR) & count
+        Expected    : Greater than 0
+        Result      : 1
+    05 (1.0/1.0)
+        Description : stderr captured but exit nonzero
+        Command     : sh -c 'echo BOOM >&2; exit 7'
+        Output      : BOOM
+        Duration    : 0.001 (local)
+        Alterations : Read exit code
+        Expected    : 7
+        Result      : 7
+    06 (1.0/1.0)
+        Description : empty output
+        Command     : true
+        Output      : 
+        Duration    : 0.001 (local)
+        Alterations : count
+        Expected    : 0
+        Result      : 0
+    07 (10.0/10.0)
+        Description : weighted heavy
+        Command     : echo WEIGHTED
+        Output      : WEIGHTED
+        Duration    : 0.001 (local)
+        Alterations : find(WEIGHTED) & count
+        Expected    : Greater than 0
+        Result      : 1
+    08 (0.0/10.0)
+        Description : weighted heavy fail
+        Command     : echo WEIGHTED
+        Output      : WEIGHTED
+        Duration    : 0.001 (local)
+        Alterations : find(NOPE_NOT_HERE) & count
+        Expected    : Greater than 0
+        Result      : 0
+
+RESULTS
++--------------+---------------------------+
+| case_id      | 01                        |
+| start_time   | 2026-09-19 20:03:30 +0200 |
+| finish_time  | 2026-09-19 20:03:30 +0200 |
+| duration     | 0.008512223               |
+| unique_fault | 0                         |
+| max_weight   | 26.0                      |
+| good_weight  | 16.0                      |
+| fail_weight  | 10.0                      |
+| fail_counter | 1                         |
+| grade        | 62                        |
++--------------+---------------------------+

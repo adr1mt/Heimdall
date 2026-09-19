@@ -1,0 +1,46 @@
+CONFIGURATION
++----------------+----------------------------+
+| admin_token    | TEUTON_SECRET_GLOBAL_12345 |
+| db_password    | TEUTON_SECRET_DB_12345     |
+| host1_ip       | 127.0.0.1                  |
+| host1_password | TEUTON_SECRET_TEST_12345   |
+| host1_username | alumno                     |
+| tt_members     | alumno-secreto             |
+| tt_sequence    | false                      |
+| tt_skip        | false                      |
+| tt_testname    | c11-secrets                |
++----------------+----------------------------+
+
+
+GROUPS
+- secretos
+    01 (1.0/1.0)
+        Description : comando que lleva la password en argv
+        Command     : echo mysql -u root -pTEUTON_SECRET_INLINE_12345
+        Output      : mysql -u root -pTEUTON_SECRET_INLINE_12345
+        Duration    : 0.001 (local)
+        Alterations : find(mysql) & count
+        Expected    : Greater than 0
+        Result      : 1
+    02 (1.0/1.0)
+        Description : salida remota que contiene un secreto
+        Command     : echo 'leaked=TEUTON_SECRET_STDOUT_12345'
+        Output      : leaked=TEUTON_SECRET_STDOUT_12345
+        Duration    : 0.001 (local)
+        Alterations : find(leaked) & count
+        Expected    : Greater than 0
+        Result      : 1
+
+RESULTS
++--------------+---------------------------+
+| case_id      | 01                        |
+| start_time   | 2026-09-19 20:04:14 +0200 |
+| finish_time  | 2026-09-19 20:04:14 +0200 |
+| duration     | 0.002498567               |
+| unique_fault | 0                         |
+| max_weight   | 2.0                       |
+| good_weight  | 2.0                       |
+| fail_weight  | 0.0                       |
+| fail_counter | 0                         |
+| grade        | 100                       |
++--------------+---------------------------+

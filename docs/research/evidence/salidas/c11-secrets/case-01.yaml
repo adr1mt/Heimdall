@@ -1,0 +1,51 @@
+---
+:config:
+  :tt_testname: c11-secrets
+  :admin_token: TEUTON_SECRET_GLOBAL_12345
+  :tt_sequence: false
+  :tt_members: alumno-secreto
+  :host1_ip: 127.0.0.1
+  :host1_username: alumno
+  :host1_password: TEUTON_SECRET_TEST_12345
+  :db_password: TEUTON_SECRET_DB_12345
+  :tt_skip: false
+:logs: []
+:groups:
+- :title: secretos
+  :targets:
+  - :target_id: '01'
+    :check: true
+    :score: 1.0
+    :weight: 1.0
+    :description: comando que lleva la password en argv
+    :conn_type: :local
+    :duration: 0.001
+    :command: echo mysql -u root -pTEUTON_SECRET_INLINE_12345
+    :output: mysql -u root -pTEUTON_SECRET_INLINE_12345
+    :alterations: find(mysql) & count
+    :expected: Greater than 0
+    :result: 1
+  - :target_id: '02'
+    :check: true
+    :score: 1.0
+    :weight: 1.0
+    :description: salida remota que contiene un secreto
+    :conn_type: :local
+    :duration: 0.001
+    :command: echo 'leaked=TEUTON_SECRET_STDOUT_12345'
+    :output: leaked=TEUTON_SECRET_STDOUT_12345
+    :alterations: find(leaked) & count
+    :expected: Greater than 0
+    :result: 1
+:results:
+  :case_id: '01'
+  :start_time: 2026-09-19 20:04:14.260657673 +02:00
+  :finish_time: 2026-09-19 20:04:14.263156240 +02:00
+  :duration: 0.002498567
+  :unique_fault: 0
+  :max_weight: 2.0
+  :good_weight: 2.0
+  :fail_weight: 0.0
+  :fail_counter: 0
+  :grade: 100
+:hall_of_fame: {}

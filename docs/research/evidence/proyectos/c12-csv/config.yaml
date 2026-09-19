@@ -1,0 +1,8 @@
+---
+global:
+  tt_testname: c12-csv
+cases:
+- tt_members: "alumno, con coma"
+  tt_moodle_id: "=cmd|' /C calc'!A1"
+- tt_members: 'alumno "con comillas"'
+  tt_moodle_id: "uno@x.com,dos@x.com"

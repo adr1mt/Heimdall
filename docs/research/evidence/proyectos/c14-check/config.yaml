@@ -1,0 +1,8 @@
+---
+global:
+  tt_testname: c14-check
+cases:
+- tt_members: alumno-nivel3
+  nivel: 3
+- tt_members: alumno-nivel1
+  nivel: 1

@@ -1,0 +1,15 @@
+---
+global:
+  tt_testname: s04-none
+  tt_sequence: true
+cases:
+- tt_members: alumno-ok
+  host1_ip: 127.1.2.3
+  host1_port: 2201
+  host1_username: alumno
+  host1_password: TEUTON_SECRET_TEST_12345
+- tt_members: alumno-caido
+  host1_ip: 127.1.2.3
+  host1_port: 2299
+  host1_username: alumno
+  host1_password: TEUTON_SECRET_TEST_12345

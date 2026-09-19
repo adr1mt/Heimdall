@@ -1,0 +1,9 @@
+---
+global:
+  tt_testname: s10-concurrent
+cases:
+- tt_members: ssh-real
+  host1_ip: 127.1.2.3
+  host1_port: 2201
+  host1_username: alumno
+  host1_password: TEUTON_SECRET_TEST_12345

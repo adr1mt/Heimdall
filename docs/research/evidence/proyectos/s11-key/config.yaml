@@ -1,0 +1,8 @@
+---
+global:
+  tt_testname: s11-key
+cases:
+- tt_members: solo-clave
+  host1_ip: 127.1.2.3
+  host1_port: 2201
+  host1_username: alumno

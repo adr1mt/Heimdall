@@ -1,0 +1,10 @@
+---
+global:
+  tt_testname: c11-secrets
+  admin_token: TEUTON_SECRET_GLOBAL_12345
+cases:
+- tt_members: alumno-secreto
+  host1_ip: 127.0.0.1
+  host1_username: alumno
+  host1_password: TEUTON_SECRET_TEST_12345
+  db_password: TEUTON_SECRET_DB_12345

@@ -1,0 +1,5 @@
+---
+global:
+  tt_testname: c02-fail
+cases:
+- tt_members: alumno-dos

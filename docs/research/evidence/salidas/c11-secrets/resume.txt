@@ -1,0 +1,25 @@
+CONFIGURATION
++---------------+-----------------------------------------------------+
+| tt_title      | Teuton (2.10.6)                                     |
+| tt_scriptname | c11-secrets/start.rb                                |
+| tt_configfile | c11-secrets/config.yaml                             |
+| tt_pwd        | /mnt/datos/Applications/Claude/Evalon/workspace/lab |
+| tt_uses       |                                                     |
+| tt_testname   | c11-secrets                                         |
+| admin_token   | TEUTON_SECRET_GLOBAL_12345                          |
+| tt_sequence   | false                                               |
++---------------+-----------------------------------------------------+
+
+CASES
++------+----------------+-------+-------+
+| CASE | MEMBERS        | GRADE | STATE |
+| 01   | alumno-secreto |   100 | ✔     |
++------+----------------+-------+-------+
+
+RESULTS
++-------------+---------------------------+
+| start_time  | 2026-09-19 20:04:14 +0200 |
+| finish_time | 2026-09-19 20:04:14 +0200 |
+| duration    | 0.003179979               |
++-------------+---------------------------+
+

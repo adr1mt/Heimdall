@@ -1,0 +1,10 @@
+---
+global:
+  tt_testname: s06-drop
+  tt_sequence: true
+cases:
+- tt_members: conexion-cortada
+  host1_ip: 127.1.2.3
+  host1_port: 2201
+  host1_username: alumno
+  host1_password: TEUTON_SECRET_TEST_12345

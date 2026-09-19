@@ -1,0 +1,24 @@
+CONFIGURATION
++---------------+-----------------------------------------------------+
+| tt_title      | Teuton (2.10.6)                                     |
+| tt_scriptname | c01-normal/start.rb                                 |
+| tt_configfile | c01-normal/config.yaml                              |
+| tt_pwd        | /mnt/datos/Applications/Claude/Evalon/workspace/lab |
+| tt_uses       |                                                     |
+| tt_testname   | c01-normal                                          |
+| tt_sequence   | false                                               |
++---------------+-----------------------------------------------------+
+
+CASES
++------+------------+-------+-------+
+| CASE | MEMBERS    | GRADE | STATE |
+| 01   | alumno-uno |    62 |       |
++------+------------+-------+-------+
+
+RESULTS
++-------------+---------------------------+
+| start_time  | 2026-09-19 20:03:30 +0200 |
+| finish_time | 2026-09-19 20:03:30 +0200 |
+| duration    | 0.009153608               |
++-------------+---------------------------+
+

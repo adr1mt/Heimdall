@@ -1,0 +1,78 @@
+<teuton version='2.10.6'>
+  <head>
+    <tt_testname>c01-normal</tt_testname>
+    <tt_sequence>false</tt_sequence>
+    <tt_members>alumno-uno</tt_members>
+    <tt_skip>false</tt_skip>
+  </head>
+  <lines>
+    <line>
+      <id>1</id>
+      <description>exit 0 + stdout</description>
+      <command tempfile='var/c01-normal/tmp/01/teuton.tmp'>echo HELLO_STDOUT</command>
+      <check>true</check>
+      <weigth>1.0</weigth>
+    </line>
+    <line>
+      <id>2</id>
+      <description>exit code 0</description>
+      <command tempfile='var/c01-normal/tmp/01/teuton.tmp'>true</command>
+      <check>true</check>
+      <weigth>1.0</weigth>
+    </line>
+    <line>
+      <id>3</id>
+      <description>exit code 3</description>
+      <command tempfile='var/c01-normal/tmp/01/teuton.tmp'>sh -c 'exit 3'</command>
+      <check>true</check>
+      <weigth>1.0</weigth>
+    </line>
+    <line>
+      <id>4</id>
+      <description>stderr only, exit 0</description>
+      <command tempfile='var/c01-normal/tmp/01/teuton.tmp'>sh -c 'echo ONLY_STDERR >&2'</command>
+      <check>true</check>
+      <weigth>1.0</weigth>
+    </line>
+    <line>
+      <id>5</id>
+      <description>stderr captured but exit nonzero</description>
+      <command tempfile='var/c01-normal/tmp/01/teuton.tmp'>sh -c 'echo BOOM >&2; exit 7'</command>
+      <check>true</check>
+      <weigth>1.0</weigth>
+    </line>
+    <line>
+      <id>6</id>
+      <description>empty output</description>
+      <command tempfile='var/c01-normal/tmp/01/teuton.tmp'>true</command>
+      <check>true</check>
+      <weigth>1.0</weigth>
+    </line>
+    <line>
+      <id>7</id>
+      <description>weighted heavy</description>
+      <command tempfile='var/c01-normal/tmp/01/teuton.tmp'>echo WEIGHTED</command>
+      <check>true</check>
+      <weigth>10.0</weigth>
+    </line>
+    <line>
+      <id>8</id>
+      <description>weighted heavy fail</description>
+      <command tempfile='var/c01-normal/tmp/01/teuton.tmp'>echo WEIGHTED</command>
+      <check>false</check>
+      <weigth>10.0</weigth>
+    </line>
+  </lines>
+  <tail>
+    <case_id>01</case_id>
+    <start_time>2026-09-19 20:03:30 +0200</start_time>
+    <finish_time>2026-09-19 20:03:30 +0200</finish_time>
+    <duration>0.008512223</duration>
+    <unique_fault>0</unique_fault>
+    <max_weight>26.0</max_weight>
+    <good_weight>16.0</good_weight>
+    <fail_weight>10.0</fail_weight>
+    <fail_counter>1</fail_counter>
+    <grade>62</grade>
+  </tail>
+</teuton>

@@ -1,0 +1,22 @@
+---
+:config:
+  :tt_title: Teuton (2.10.6)
+  :tt_scriptname: c01-normal/start.rb
+  :tt_configfile: c01-normal/config.yaml
+  :tt_pwd: "/mnt/datos/Applications/Claude/Evalon/workspace/lab"
+  :tt_uses: ''
+  :tt_testname: c01-normal
+  :tt_sequence: false
+:cases:
+- :skip: false
+  :id: '01'
+  :grade: 62.0
+  :members: alumno-uno
+  :conn_status: {}
+  :moodle_id: NODATA
+  :moodle_feedback: '"Filename: case-01. Date: 2026-09-19 20:03:30 +0200"'
+:results:
+  :start_time: 2026-09-19 20:03:30.335152855 +02:00
+  :finish_time: 2026-09-19 20:03:30.344306463 +02:00
+  :duration: 0.009153608
+:hall_of_fame: {}

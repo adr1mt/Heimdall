@@ -1,0 +1,6 @@
+---
+global:
+  tt_testname: c03-shell
+cases:
+- tt_members: alumno-tres
+  user_input: "pepe; touch /tmp/TEUTON_INJECTED_PWNED"

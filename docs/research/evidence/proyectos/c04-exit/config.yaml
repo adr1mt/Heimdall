@@ -1,0 +1,5 @@
+---
+global:
+  tt_testname: c04-exit
+cases:
+- tt_members: alumno-cuatro

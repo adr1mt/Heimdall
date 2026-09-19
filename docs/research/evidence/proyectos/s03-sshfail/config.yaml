@@ -1,0 +1,25 @@
+---
+global:
+  tt_testname: s03-sshfail
+  tt_sequence: true
+cases:
+- tt_members: password-incorrecta
+  host1_ip: 127.1.2.3
+  host1_port: 2201
+  host1_username: alumno
+  host1_password: PASSWORD_INCORRECTA_XXX
+- tt_members: host-inaccesible
+  host1_ip: 10.255.255.1
+  host1_port: 22
+  host1_username: alumno
+  host1_password: TEUTON_SECRET_TEST_12345
+- tt_members: puerto-cerrado
+  host1_ip: 127.1.2.3
+  host1_port: 2299
+  host1_username: alumno
+  host1_password: TEUTON_SECRET_TEST_12345
+- tt_members: usuario-inexistente
+  host1_ip: 127.1.2.3
+  host1_port: 2201
+  host1_username: no_existe_este_usuario
+  host1_password: TEUTON_SECRET_TEST_12345

@@ -1,0 +1,7 @@
+---
+global:
+  tt_testname: c13-skip
+cases:
+- tt_members: normal
+- tt_members: saltado
+  tt_skip: true

@@ -1,0 +1,9 @@
+---
+global:
+  tt_testname: s01-ssh
+cases:
+- tt_members: ssh-ok
+  host1_ip: 127.0.0.1
+  host1_port: 2201
+  host1_username: alumno
+  host1_password: TEUTON_SECRET_TEST_12345
