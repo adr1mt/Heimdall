@@ -78,6 +78,13 @@ make build    # binario en bin/evalon
 make lab      # levanta el laboratorio SSH de pruebas
 ```
 
+## Cómo informar a Adrià
+
+No programa y no lee el código. Cuéntale **qué funciona, a quién afecta y qué
+falta**, no cómo está hecho: nada de nombres de paquetes, tipos, campos JSON ni
+jerga de Go salvo que lo pregunte. «Un alumno con la máquina apagada ya no saca
+un 0», no «A-3 en verde». El detalle técnico va al repositorio.
+
 ## Idioma
 
 Documentación y claves del YAML de examen: español. Código, comentarios,
