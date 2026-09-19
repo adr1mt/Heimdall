@@ -1,0 +1,48 @@
+# Registro de decisiones
+
+Bitácora ligera. **No sustituye a los ADR**: las decisiones arquitectónicas
+viven en [`../adr/`](../adr/) y las que siguen abiertas en
+[`../design/08-DECISIONES-ABIERTAS.md`](../design/08-DECISIONES-ABIERTAS.md).
+Aquí se anotan, en una o dos líneas, las decisiones tomadas durante la
+ejecución que no llegan a ADR, y los cambios de estado de las que sí.
+
+## Cuándo hace falta un ADR
+
+Si la decisión afecta a los límites del sistema, al modelo de resultados, a las
+dependencias, al contrato con la GUI o a cualquiera de los 12 principios:
+**ADR**. Si es una elección local reversible dentro de una tarea: una línea
+aquí.
+
+Para cambiar una decisión aceptada: ADR nuevo que la sustituya, con la
+evidencia. Nunca se edita un ADR aceptado en silencio.
+
+## Estado de las decisiones abiertas
+
+| # | Decisión | Se cierra en |
+|---|---|---|
+| D-2 | SSH nativo vs. delegar en el binario `ssh` | T013 (fase 1) |
+| D-3 | Política de `known_hosts` | T021 (fase 2), antes del primer examen real |
+| D-5 | Detección de valores repetidos (anticopia) | Cuando haya un caso real; no bloquea |
+| D-6 | Números de concurrencia por defecto | T031 (fase 3) |
+| D-7 | Nombre del producto | T070 (fase 7), antes de que salga un binario del equipo |
+| D-8 | Presentación de `INCOMPLETE` en la GUI | T060 (fase 6) |
+| D-9 | Formato definitivo de los eventos NDJSON | T050 (fase 5) |
+
+## Bitácora
+
+### 2026-09-19 · Estructura de proyecto persistente
+
+Se convierte la investigación y el diseño cerrados en `CLAUDE.md`,
+`.claude/rules/`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md` y `docs/project/`.
+Ninguna decisión de producto cambia: la documentación existente se indexa, no se
+reescribe.
+
+Tres decisiones menores:
+
+1. `HANDOFF.md` pasa a ser un puntero a `docs/project/PROGRESS.md`. Dos ficheros
+   con el mismo cometido producen dos estados distintos.
+2. El informe de auditoría suelto en la raíz se archiva como
+   `docs/research/00-AUDITORIA-INICIAL.md`.
+3. La fase 2 del roadmap incluye el formato completo (`cerca_de`, `valor:`,
+   `no_contiene`) y no solo la robustez de SSH: sin esas tres primitivas no se
+   puede ejecutar un examen real del curso, que es su condición de salida.

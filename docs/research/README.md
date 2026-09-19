@@ -8,6 +8,7 @@ repositorios originales.**
 
 | Fichero | Contenido |
 |---|---|
+| [00-AUDITORIA-INICIAL.md](00-AUDITORIA-INICIAL.md) | Auditoría inicial del núcleo de Teuton, previa al trabajo empírico |
 | [REPRODUCIR.md](REPRODUCIR.md) | Entorno, comandos y limitaciones. Todo lo demás sale de aquí |
 | [CURRENT-BEHAVIOR.md](CURRENT-BEHAVIOR.md) | Arquitectura, CLI, DSL, ejecución local, SSH, evaluación, informes, concurrencia |
 | [FAILURE-MODES.md](FAILURE-MODES.md) | 16 modos de fallo confirmados, ordenados por daño a la nota |

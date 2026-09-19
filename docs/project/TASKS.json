@@ -1,0 +1,524 @@
+{
+  "schema_version": 1,
+  "updated": "2026-09-19",
+  "status_values": ["BLOCKED", "READY", "IN_PROGRESS", "DONE"],
+  "rules": [
+    "Se trabaja la tarea READY de mayor prioridad con todas sus depends_on en DONE.",
+    "Una tarea por sesion. Si crece, se divide aqui antes de implementarla.",
+    "Al marcar DONE, pasar a READY las tareas cuyas dependencias queden satisfechas.",
+    "Las tareas de fase 2 en adelante son deliberadamente gruesas: se detallan al acercarse."
+  ],
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "Toolchain Go y esqueleto del modulo",
+      "phase": 0,
+      "status": "READY",
+      "priority": "P0",
+      "depends_on": [],
+      "goal": "Que exista un modulo Go que compila, se testea y se construye con un solo comando, sin logica de negocio.",
+      "scope": [
+        "Instalar Go >= 1.22 (no esta en el equipo) y dejar documentado como, en PROGRESS.md",
+        "go.mod con el modulo (nombre provisional evalon, ver D-7)",
+        "cmd/evalon/main.go con los subcomandos run, check y version (run y check solo imprimen 'no implementado' y salen con exit 2)",
+        "Tabla de exit codes como constantes: 0 ok, 2 config invalida, 3 parcial, 4 cancelado",
+        "Makefile con check, test, build, lab",
+        ".gitignore para bin/ y var/",
+        "Un test trivial que demuestre que la suite corre"
+      ],
+      "out_of_scope": [
+        "Cualquier logica de PLAN, SSH, aserciones o nota",
+        "CI remota",
+        "Dependencias externas mas alla de las permitidas"
+      ],
+      "acceptance": [
+        "make check pasa go vet y go test ./... sin errores y en menos de 10 s",
+        "make build produce bin/evalon",
+        "bin/evalon version imprime una version",
+        "bin/evalon run y bin/evalon check salen con exit 2 y mensaje explicito de no implementado",
+        "PROGRESS.md documenta la version de Go instalada y el comando exacto usado"
+      ],
+      "tests": ["go vet ./...", "go test ./...", "make build && ./bin/evalon version"],
+      "notes": "Go NO esta instalado en el equipo: es lo primero y sin ello no hay medicion posible. Preferir el tarball oficial en una ruta bajo /mnt/datos si el gestor de paquetes no ofrece >= 1.22."
+    },
+    {
+      "id": "T002",
+      "title": "Tipos canonicos de RunResult",
+      "phase": 0,
+      "status": "BLOCKED",
+      "priority": "P0",
+      "depends_on": ["T001"],
+      "goal": "Que el modelo canonico exista como tipos Go con serializacion JSON estable y verificada.",
+      "scope": [
+        "internal/model con todas las structs de design/04-MODELO-RESULTADO.md §2, nombres de campo JSON exactos",
+        "Enums como tipos string: RunStatus, StudentStatus, ScoreStatus, AcademicStatus, Cause, RemoteProcessState",
+        "Punteros donde el diseno exige null: ExitCode, Provisional, Final, Execution, Assertion",
+        "Test de round-trip contra un golden JSON en testdata/",
+        "Validacion de que los campos opcionales se omiten y los nullables salen como null, no como cero"
+      ],
+      "out_of_scope": ["Classify", "ComputeScore", "escritura a disco", "NDJSON"],
+      "acceptance": [
+        "El ejemplo de design/04-MODELO-RESULTADO.md §3 se deserializa, se vuelve a serializar y es identico campo a campo",
+        "final_score ausente de valor sale como null, nunca como 0",
+        "assertion y execution ausentes salen como null",
+        "make check en verde"
+      ],
+      "tests": ["go test ./internal/model -run TestRoundTrip"],
+      "notes": "El golden de testdata sale del ejemplo redactado a mano; se sustituira por uno real en T013."
+    },
+    {
+      "id": "T003",
+      "title": "Classify y ComputeScore puros",
+      "phase": 0,
+      "status": "BLOCKED",
+      "priority": "P0",
+      "depends_on": ["T002"],
+      "goal": "Cerrar por construccion el camino de un error tecnico hacia la nota, con tests exhaustivos.",
+      "scope": [
+        "model.Classify(exec *ExecutionResult, assertion *AssertionResult, cause Cause) -> (AcademicStatus, Cause, detail)",
+        "model.ComputeScore(plan PlanSummary, checks []CheckResult) -> Score",
+        "model.StudentStatusOf y model.RunStatusOf derivados, no almacenados",
+        "Tabla exhaustiva: para cada una de las 7 causas != NONE, el estado es UNEVALUATED",
+        "Caso frontera exit 127: FAIL con cause NONE",
+        "Peso 0: se informa, no degrada el estado del alumno ni deja INCOMPLETE a nadie"
+      ],
+      "out_of_scope": ["Red", "disco", "reloj", "os.Getenv", "conversion a la escala del profesor"],
+      "acceptance": [
+        "Test de tabla exhaustiva sobre las 8 causas: ninguna causa != NONE produce PASS ni FAIL",
+        "ComputeScore con cualquier unevaluated > 0 devuelve Final == nil y Status == INCOMPLETE",
+        "Alumno sin nada evaluable devuelve Provisional == nil y Status == NOT_EVALUATED, nunca 0",
+        "El ejemplo de design/03-ESTADOS-Y-NOTA.md §5 (2/2/10) reproduce provisional 100, final null, INCOMPLETE",
+        "Total siempre igual a plan.TotalWeight, independientemente de los checks recibidos",
+        "Ni una llamada a red, disco o reloj en el paquete (revision manual y ausencia de imports)"
+      ],
+      "tests": ["go test ./internal/model -run 'TestClassify|TestComputeScore'"],
+      "notes": "Estos son los tests que protegen los principios 1, 3 y 6. Invariantes 3 a 6 de ARCHITECTURE.md §7."
+    },
+    {
+      "id": "T004",
+      "title": "Parseo estricto de examen.yaml y aula.yaml",
+      "phase": 0,
+      "status": "BLOCKED",
+      "priority": "P0",
+      "depends_on": ["T001"],
+      "goal": "Leer los dos ficheros con claves en espanol, rechazando cualquier clave desconocida con fichero y linea.",
+      "scope": [
+        "internal/plan: structs del examen y del inventario segun design/02-FORMATO.md §3 y §4",
+        "KnownFields estricto (yaml.v3 KnownFields(true)) y error con fichero y linea",
+        "Herencia de comun: en los hosts de cada alumno",
+        "por_defecto: para peso y timeout",
+        "Parseo de duraciones (20s, 10m)",
+        "Campos libres del alumno accesibles por nombre",
+        "testdata con un examen y un aula validos y varios invalidos"
+      ],
+      "out_of_scope": [
+        "Las 9 validaciones semanticas del PLAN (van en T005)",
+        "Sustitucion de variables (T005)",
+        "cerca_de y valor: (fase 2)"
+      ],
+      "acceptance": [
+        "Una clave desconocida en cualquiera de los dos ficheros produce error con nombre de fichero y numero de linea",
+        "El examen y el aula de design/02-FORMATO.md se parsean sin perdidas (comparacion contra struct esperada)",
+        "Un timeout mal formado es error, no un valor por defecto silencioso",
+        "make check en verde"
+      ],
+      "tests": ["go test ./internal/plan -run TestParse"],
+      "notes": "El MVP acepta cerca_de y valor: en el esquema pero T004 puede rechazarlos con 'no implementado'; no deben aceptarse en silencio."
+    },
+    {
+      "id": "T005",
+      "title": "Resolucion del PLAN, sustitucion y subcomando check",
+      "phase": 0,
+      "status": "BLOCKED",
+      "priority": "P0",
+      "depends_on": ["T004", "T002"],
+      "goal": "Fijar el denominador y la lista de comprobaciones antes de tocar ninguna maquina, y poder verlo sin ejecutar nada.",
+      "scope": [
+        "Las 9 validaciones de design/02-FORMATO.md §5, cada una con su test y su mensaje",
+        "Sustitucion ${alumno.campo} y ${host.ip|puerto|usuario} en argumentos y valores esperados, con las 6 reglas del §2",
+        "Referencias ${MAYUSCULAS} solo validas en campos de autenticacion del inventario; error en cualquier otro sitio",
+        "sha256 de examen e inventario, plan_hash del PLAN resuelto",
+        "PlanSummary con check_count, total_weight, check_ids en orden y concurrency",
+        "evalon check: ejecuta solo el PLAN, imprime el resumen, exit 0 o 2, no escribe en var/ ni abre ninguna conexion"
+      ],
+      "out_of_scope": ["SSH", "ejecucion", "escritura del artefacto", "variantes de examen"],
+      "acceptance": [
+        "Las 9 validaciones tienen un test que falla por el motivo correcto, con fichero y linea",
+        "Una ${alumno.X} ausente en un solo alumno es error de PLAN, no cadena vacia",
+        "Una contrasena literal en el inventario es error de PLAN, no aviso",
+        "Un valor sustituido con espacios, comillas y ; entra tal cual como un unico argumento (test explicito)",
+        "El PLAN produce identicos check_ids, orden y total_weight para todos los alumnos (test con alumnos de datos distintos)",
+        "evalon check sobre un proyecto valido imprime check_count y total_weight exactos y sale 0",
+        "evalon check sobre un proyecto invalido sale 2 y no crea ningun fichero en var/"
+      ],
+      "tests": ["go test ./internal/plan", "bin/evalon check testdata/proto"],
+      "notes": "Arregla de raiz F-02 (typo que encoge el denominador) y c14-check (total estimado). Invariantes 1 y 2."
+    },
+    {
+      "id": "T006",
+      "title": "Laboratorio SSH reproducible",
+      "phase": 0,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": ["T001"],
+      "goal": "Levantar y tirar el laboratorio con un comando, de forma identica en cualquier sesion.",
+      "scope": [
+        "test/lab.sh con up, down y status usando el Containerfile de docs/research/evidence/",
+        "Contenedor alu1 en 127.1.2.3:2201; el alumno roto apunta a 127.1.2.3:2299 (puerto cerrado, sin segundo contenedor)",
+        "make lab invoca el script",
+        "Documentar credenciales de prueba (ficticias) y el uso de HOME aislado",
+        "Comprobacion de que el host tiene coreutils timeout"
+      ],
+      "out_of_scope": ["Mas de un contenedor", "orquestacion", "laboratorio de 100 alumnos (fase 3)"],
+      "acceptance": [
+        "make lab deja el contenedor escuchando en 127.1.2.3:2201 desde cero",
+        "ssh manual con las credenciales de prueba funciona",
+        "make lab es idempotente: ejecutarlo dos veces no falla",
+        "test/lab.sh down deja el equipo como estaba"
+      ],
+      "tests": ["make lab && ss -ltn | grep 127.1.2.3:2201"],
+      "notes": "127.1.2.3 y NO 127.0.0.1 (F-01). La imagen teutonlab-ssh ya existe en podman en este equipo, pero el script debe poder reconstruirla."
+    },
+    {
+      "id": "T007",
+      "title": "Aserciones contiene, igual_a y exit_code",
+      "phase": 1,
+      "status": "BLOCKED",
+      "priority": "P0",
+      "depends_on": ["T002"],
+      "goal": "Evaluar las tres aserciones del prototipo como funciones puras que producen AssertionResult.",
+      "scope": [
+        "internal/assert.Eval(exec ExecutionResult, spec) -> AssertionResult",
+        "contiene: subcadena en stdout, con Where indicando la linea",
+        "igual_a: stdout completo recortado de espacios",
+        "exit_code: comparacion del codigo de salida",
+        "Found con el fragmento encontrado o cadena vacia"
+      ],
+      "out_of_scope": ["no_contiene", "cerca_de", "valor:", "expresiones regulares"],
+      "acceptance": [
+        "Eval nunca devuelve un estado academico: solo AssertionResult",
+        "Eval no se invoca ni es invocable cuando Completed es false (test que lo demuestra)",
+        "igual_a ignora espacios y salto final, pero no espacios internos",
+        "Where apunta a la linea correcta en salidas multilinea",
+        "El paquete no importa net, os ni time"
+      ],
+      "tests": ["go test ./internal/assert"],
+      "notes": "Capa 2 de las cuatro. No sabe nada de notas."
+    },
+    {
+      "id": "T008",
+      "title": "Sesion SSH, exec, limites de salida y timeouts",
+      "phase": 1,
+      "status": "BLOCKED",
+      "priority": "P0",
+      "depends_on": ["T001", "T006"],
+      "goal": "Ejecutar un comando en la maquina del alumno y producir un ExecutionResult fiel, sin bloquearse nunca.",
+      "scope": [
+        "internal/ssh: sesion por alumno y host, reutilizada para todas sus comprobaciones (K-6)",
+        "exec sin pty, stdout y stderr separados siempre",
+        "Autenticacion por contrasena, con el secreto recibido en memoria",
+        "known_hosts propio del proyecto en var/known_hosts, TOFU con Warning (provisional, D-3)",
+        "Timeout de conexion 10 s y de comprobacion configurable, propagados con context.Context",
+        "Deteccion de command -v timeout una vez por host y envoltura timeout -k 5s N; remote_process FINISHED|KILLED_REMOTE|UNKNOWN",
+        "Limite de 64 kB conservados por flujo, corte duro del lector a 8 MB, bytes_total real, truncated, corte en frontera de runa",
+        "2 reintentos de conexion con espera 1 s y 3 s mas jitter; ninguno tras enviar el comando; ninguno en AUTH_FAILED",
+        "Mapeo de errores de transporte a Cause con detail de una frase, sin traza de pila",
+        "Tests de integracion con build tag integration"
+      ],
+      "out_of_scope": ["Autenticacion por clave", "ProxyJump", "ssh_config", "concurrencia", "varios hosts logicos"],
+      "acceptance": [
+        "Un comando normal contra el laboratorio produce Completed true, ExitCode correcto y los dos flujos separados",
+        "sleep 30 con timeout 3 s produce Completed false, Cause TIMEOUT, duration_ms entre 3000 y 4000 y remote_process KILLED_REMOTE",
+        "Puerto cerrado produce CONNECT_FAILED tras 3 intentos como maximo, sin colgarse",
+        "Credenciales incorrectas producen AUTH_FAILED con connect_attempts 1: no se reintenta",
+        "head -c 300000000 /dev/zero deja bytes <= 65536, bytes_total > 65536, truncated true y el RSS del proceso por debajo de 100 MB",
+        "El host sin coreutils timeout genera el Warning REMOTE_TIMEOUT_UNAVAILABLE y remote_process UNKNOWN",
+        "La contrasena no aparece en argv del proceso ni en ningun log"
+      ],
+      "tests": ["go test -tags integration ./internal/ssh"],
+      "notes": "Si la tarea crece, dividir en T008a (sesion, exec, timeouts) y T008b (limites de salida y timeout remoto). Es la candidata mas probable a division."
+    },
+    {
+      "id": "T009",
+      "title": "Escritura atomica del artefacto",
+      "phase": 1,
+      "status": "BLOCKED",
+      "priority": "P0",
+      "depends_on": ["T002"],
+      "goal": "Que ninguna ejecucion pierda resultados ni pise los de otra.",
+      "scope": [
+        "internal/report: WriteAtomic con temporal en el mismo directorio y rename",
+        "var/run-<ulid>.json definitivo; var/run-<id>.partial.json reescrito al cerrar cada alumno",
+        "var/latest.json como enlace simbolico de conveniencia",
+        "Filtro de redaccion de secretos conocidos antes de serializar, con Warning si redacta",
+        "Generacion del ULID"
+      ],
+      "out_of_scope": ["NDJSON", "HTML", "Moodle", "formato legacy"],
+      "acceptance": [
+        "Dos ejecuciones simultaneas producen dos ficheros distintos y ninguno queda a medias (test con escritura concurrente)",
+        "Un SIGKILL a mitad deja un partial.json que es JSON valido y contiene al menos un alumno completo",
+        "El artefacto se escribe tambien cuando todos los alumnos fallan",
+        "Un secreto inyectado a proposito en un stderr simulado sale como [oculto] y genera Warning"
+      ],
+      "tests": ["go test ./internal/report"],
+      "notes": "Contra F-13 (dos ejecuciones se pisan el JSON) y F-16 (la pasada muere y no queda nada)."
+    },
+    {
+      "id": "T010",
+      "title": "Motor: worker pool, presupuesto por alumno y cancelacion",
+      "phase": 1,
+      "status": "BLOCKED",
+      "priority": "P0",
+      "depends_on": ["T003", "T005", "T007", "T008", "T009"],
+      "goal": "Unir las piezas: ejecutar el PLAN sobre todos los alumnos en paralelo acotado, con aislamiento y cancelacion.",
+      "scope": [
+        "internal/engine: worker pool de 2 (valor del prototipo), un alumno por worker, un context.Context por alumno",
+        "Presupuesto de alumno de 2 min; las comprobaciones que no empiezan salen NOT_RUN con detail de presupuesto",
+        "Una sesion caida deja las pendientes de ese alumno en NOT_RUN, nunca en FAIL",
+        "SIGINT -> CANCELLED, artefacto con lo que haya, exit 4",
+        "Recuperacion de panic por alumno -> ENGINE_ERROR, nunca silencioso, nunca aborta la pasada",
+        "Exit codes: 0 todo evaluado, 3 parcial, 4 cancelado"
+      ],
+      "out_of_scope": ["Tope por host de destino (fase 3)", "NDJSON", "compat legacy", "mas de un examen por ejecucion"],
+      "acceptance": [
+        "El alumno roto no altera ningun campo del alumno correcto (comparacion del artefacto con y sin el alumno roto)",
+        "El artefacto contiene siempre a los dos alumnos",
+        "SIGINT a mitad produce exit 4, artefacto escrito y las pendientes como CANCELLED",
+        "Un panic simulado en un alumno produce ENGINE_ERROR para ese alumno y el resto termina normal",
+        "Exit code 3 y no 1 cuando la ejecucion es parcial"
+      ],
+      "tests": ["go test ./internal/engine", "go test -tags integration ./internal/engine"],
+      "notes": "Es el nucleo del principio 4. Contra F-03 (un alumno roto aborta la clase entera)."
+    },
+    {
+      "id": "T011",
+      "title": "CLI run, secretos por stdin y por env",
+      "phase": 1,
+      "status": "BLOCKED",
+      "priority": "P0",
+      "depends_on": ["T010"],
+      "goal": "Poder ejecutar el prototipo de principio a fin desde la linea de comandos, con el secreto por un canal privado.",
+      "scope": [
+        "evalon run con el directorio del proyecto",
+        "--secrets=stdin: una linea JSON {\"schema\":1,\"secrets\":{...}}, se lee, se parsea, se pone el buffer a cero y se cierra stdin; aborta a los 5 s si no llega nada",
+        "--secrets=env: solo las variables nombradas por las referencias del aula.yaml; referencia sin variable es error de PLAN",
+        "Mensajes de error de configuracion a stderr con fichero y linea",
+        "Ninguna traza de pila en la salida"
+      ],
+      "out_of_scope": ["--compat", "--case", "--export", "NDJSON", "fachada legacy"],
+      "acceptance": [
+        "El prototipo completo corre con evalon run --secrets=stdin y produce var/run-<id>.json",
+        "grep del secreto sobre var/, la salida de terminal y /proc/<pid>/cmdline con el proceso vivo: cero coincidencias",
+        "--secrets=stdin sin datos aborta a los 5 s con exit 2",
+        "Una referencia sin variable definida con --secrets=env es exit 2, no una contrasena vacia"
+      ],
+      "tests": ["go test ./cmd/evalon", "test/secrets.sh"],
+      "notes": "ADR-0009. El NDJSON saldra por stdout mas adelante, asi que stdin queda libre a proposito."
+    },
+    {
+      "id": "T012",
+      "title": "Los 14 criterios de aceptacion del vertical slice",
+      "phase": 1,
+      "status": "BLOCKED",
+      "priority": "P0",
+      "depends_on": ["T011"],
+      "goal": "Demostrar el hito con un script reproducible, no con una inspeccion a ojo.",
+      "scope": [
+        "testdata/proto con el examen.yaml y el aula.yaml exactos de design/07-PROTOTIPO.md §3 y §5",
+        "test/acceptance.sh que comprueba A-1 a A-14 con jq sobre el artefacto real y con /usr/bin/time",
+        "Salida del script: una linea por criterio, OK o FALLO, y exit != 0 si alguno falla",
+        "Los criterios que son de logica pura (A-2, A-3, A-14) tambien como test en Go"
+      ],
+      "out_of_scope": ["Criterios de fases posteriores", "medicion con 100 alumnos"],
+      "acceptance": [
+        "Los 14 criterios en verde con el laboratorio levantado",
+        "A-1, A-2, A-3, A-8 y A-14 son bloqueantes: si alguno falla, la tarea no se marca DONE y no se sigue adelante",
+        "La salida real del script queda pegada en PROGRESS.md",
+        "El run completo termina en menos de 90 s medido con /usr/bin/time"
+      ],
+      "tests": ["test/acceptance.sh"],
+      "notes": "Criterios completos en design/07-PROTOTIPO.md §6. Este es el cierre de la fase 1."
+    },
+    {
+      "id": "T013",
+      "title": "Evidencia del prototipo y cierre de D-2",
+      "phase": 1,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": ["T012"],
+      "goal": "Dejar constancia verificada de que el diseno aguanta, y cerrar la decision de SSH nativo.",
+      "scope": [
+        "Guardar un run-<id>.json real del laboratorio como ejemplo verificado y sustituir el ejemplo redactado a mano de design/04-MODELO-RESULTADO.md §3",
+        "Medir lo que ya es medible con 2 alumnos: RSS con salida grande y tiempo hasta el artefacto (PERFORMANCE.md §6 puntos 2 y 4 parciales)",
+        "ADR-0010 cerrando D-2 (SSH nativo) con las mediciones de A-5 y A-11, o abriendo la alternativa si fallaron",
+        "Actualizar docs/design/08-DECISIONES-ABIERTAS.md quitando D-2"
+      ],
+      "out_of_scope": ["Mediciones con 10/30/100 alumnos (fase 3)"],
+      "acceptance": [
+        "El ejemplo de 04-MODELO-RESULTADO.md §3 es una salida real, no redactada",
+        "ADR-0010 existe, esta fechado y cita las mediciones concretas",
+        "D-2 ya no aparece en 08-DECISIONES-ABIERTAS.md"
+      ],
+      "tests": [],
+      "notes": "Sin esta tarea, la fase 1 queda demostrada pero no registrada."
+    },
+    {
+      "id": "T020",
+      "title": "Aserciones restantes y comprobaciones sin comando",
+      "phase": 2,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": ["T013"],
+      "goal": "Cubrir las capacidades M-8, M-10 y M-11 que exigen los examenes reales del curso.",
+      "scope": ["no_contiene", "cerca_de (ancla, lineas, contiene)", "valor: contra campo del inventario, con transport inventory", "excluido: true con estado EXCLUDED"],
+      "out_of_scope": ["Expresiones regulares", "variantes de examen"],
+      "acceptance": [
+        "Los dos examenes de design/01-TRADUCCION-EXAMENES.md se parsean y planifican completos",
+        "Una anticomprobacion (no_contiene) no puede aprobar por averia: si no hubo ejecucion completa es UNEVALUATED (K-7)",
+        "Un alumno EXCLUDED no altera el denominador de los demas"
+      ],
+      "tests": ["go test ./internal/assert", "go test ./internal/plan"],
+      "notes": "Detallar al llegar."
+    },
+    {
+      "id": "T021",
+      "title": "Politica de known_hosts cerrada y autenticacion por clave",
+      "phase": 2,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": ["T013"],
+      "goal": "Cerrar D-3, que es una decision de seguridad y no puede quedar en TOFU provisional.",
+      "scope": ["ADR que cierre D-3", "implementacion de la politica elegida", "autenticacion por clave y passphrase por stdin"],
+      "out_of_scope": ["ProxyJump", "ssh_config"],
+      "acceptance": ["D-3 fuera de 08-DECISIONES-ABIERTAS.md", "Un cambio de clave de host produce un resultado explicito, nunca una nota silenciosamente distinta"],
+      "tests": [],
+      "notes": "Bloqueante antes del primer examen real. Detallar al llegar."
+    },
+    {
+      "id": "T022",
+      "title": "Ejecucion de un examen real completo contra el laboratorio",
+      "phase": 2,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": ["T020", "T021"],
+      "goal": "Cerrar la fase 2 demostrando el formato sobre material real de aula.",
+      "scope": ["Laboratorio con KEA y BIND suficientes para el examen RA2", "ejecucion completa de E2", "revision de lo que falte en el formato"],
+      "out_of_scope": ["Concurrencia alta"],
+      "acceptance": ["El examen RA2 (16 comprobaciones) se ejecuta entero y cada resultado es explicable desde el JSON"],
+      "tests": [],
+      "notes": "Detallar al llegar."
+    },
+    {
+      "id": "T030",
+      "title": "Concurrencia acotada global y por host",
+      "phase": 3,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": ["T022"],
+      "goal": "Que la propia concurrencia no produzca ceros (F-05).",
+      "scope": ["Tope global configurable", "tope por host de destino", "laboratorio de 10/30/100 alumnos"],
+      "out_of_scope": ["Reparto adaptativo"],
+      "acceptance": ["100 alumnos contra un host con MaxStartups por defecto: cero UNEVALUATED por rechazo de conexion"],
+      "tests": [],
+      "notes": "Detallar al llegar."
+    },
+    {
+      "id": "T031",
+      "title": "Mediciones de rendimiento y cierre de D-6",
+      "phase": 3,
+      "status": "BLOCKED",
+      "priority": "P2",
+      "depends_on": ["T030"],
+      "goal": "Sustituir los numeros por defecto conjeturados por numeros medidos.",
+      "scope": ["PERFORMANCE.md §6 completo: tiempo y RSS con 10/30/100 alumnos, RSS con salidas de 1/20/100/300 MB", "ADR que cierre D-6"],
+      "out_of_scope": [],
+      "acceptance": ["RSS plano respecto al tamano de la salida", "D-6 fuera de 08-DECISIONES-ABIERTAS.md"],
+      "tests": [],
+      "notes": "Detallar al llegar."
+    },
+    {
+      "id": "T040",
+      "title": "LegacyTeutonWriter completo y fachada CLI",
+      "phase": 4,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": ["T031"],
+      "goal": "Que la GUI actual funcione contra el motor nuevo sin cambiar una linea.",
+      "scope": ["resume.json, case-NN.json y moodle.csv segun design/06-LEGACY-WRITER.md", "fachada version, check y progreso por caracteres", "golden files contra salidas reales de Teuton"],
+      "out_of_scope": ["Otros formatos de exportacion (C9 devuelve error explicito)"],
+      "acceptance": ["Golden files identicos campo a campo en los campos que la GUI lee", "un INCOMPLETE sale con grade 0 y conn_status no vacio"],
+      "tests": [],
+      "notes": "Detallar al llegar. Capa temporal: no se le anade nada que la UAT no exija."
+    },
+    {
+      "id": "T041",
+      "title": "UAT: 40 escenarios e2e de la GUI contra el motor nuevo",
+      "phase": 4,
+      "status": "BLOCKED",
+      "priority": "P0",
+      "depends_on": ["T040"],
+      "goal": "Prueba de aceptacion externa del motor, con una suite que ya existe y es hostil.",
+      "scope": ["Apuntar la GUI al binario nuevo", "ejecutar los 40 escenarios", "corregir el motor, nunca la suite"],
+      "out_of_scope": ["Modificar la GUI"],
+      "acceptance": ["40 escenarios en verde sin tocar una linea de la GUI"],
+      "tests": [],
+      "notes": "npm run build ANTES o fallan las 40 con un error que no lo explica."
+    },
+    {
+      "id": "T050",
+      "title": "Contrato NDJSON motor-GUI y cierre de D-9",
+      "phase": 5,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": ["T041"],
+      "goal": "Dar a la GUI eventos legibles por maquina y borrar el andamio de progreso.",
+      "scope": ["run.start con el total exacto", "un evento por comprobacion con estado tecnico", "ADR que cierre D-9"],
+      "out_of_scope": ["Cambios en la GUI (fase 6)"],
+      "acceptance": ["El contrato esta documentado y versionado", "el motor lo emite a la vez que la capa legacy"],
+      "tests": [],
+      "notes": "Detallar al llegar."
+    },
+    {
+      "id": "T060",
+      "title": "Adaptacion de Teuton GUI y borrado de la capa legacy",
+      "phase": 6,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": ["T050"],
+      "goal": "Sustituir el andamio de la GUI modulo a modulo, con su suite en verde en cada paso.",
+      "scope": ["progress.ts a NDJSON", "results.ts al artefacto canonico", "presentacion de INCOMPLETE (D-8)", "borrado de internal/legacy en un solo commit"],
+      "out_of_scope": ["Reescribir la GUI"],
+      "acceptance": ["Ningun test de la GUI lee resume.json ni case-NN.json", "los 192 unitarios y los 40 e2e siguen en verde"],
+      "tests": [],
+      "notes": "Se divide en varias tareas al llegar, una por modulo. Solo aqui se toca el repositorio de la GUI, y en su rama."
+    },
+    {
+      "id": "T070",
+      "title": "Migrador de proyectos Teuton y empaquetado del binario",
+      "phase": 7,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": ["T060"],
+      "goal": "Que el profesor descargue la aplicacion, la ejecute y funcione.",
+      "scope": ["migrador config.yaml + start.rb a los dos YAML con informe de lo no traducible", "editor del formato nuevo en la GUI", "binario embebido para Linux y Windows", "nombre definitivo (D-7)"],
+      "out_of_scope": ["Traducir construcciones del DSL que no tengan equivalente: se informan, no se adivinan"],
+      "acceptance": ["Instalacion sin Ruby, sin gems, sin Go, sin Docker ni Podman y sin servicios externos"],
+      "tests": [],
+      "notes": "Detallar al llegar."
+    },
+    {
+      "id": "T080",
+      "title": "Hardening, comparacion de notas y release",
+      "phase": 8,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": ["T070"],
+      "goal": "Cerrar los 16 modos de fallo documentados y demostrar que no hay regresion de notas.",
+      "scope": ["repaso de FAILURE-MODES.md uno a uno", "auditoria de secretos de extremo a extremo", "comparacion nota a nota entre los dos motores como test", "documentacion de usuario y versionado"],
+      "out_of_scope": [],
+      "acceptance": ["Cada modo de fallo esta corregido o documentado como aceptado, con su motivo", "un examen real de aula corregido con el motor nuevo"],
+      "tests": [],
+      "notes": "Detallar al llegar."
+    }
+  ]
+}
