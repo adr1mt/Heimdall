@@ -388,7 +388,7 @@
       "id": "T011",
       "title": "CLI run, secretos por stdin y por env",
       "phase": 1,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "T010"
@@ -424,7 +424,7 @@
       "id": "T012",
       "title": "Los 14 criterios de aceptacion del vertical slice",
       "phase": 1,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P0",
       "depends_on": [
         "T011"

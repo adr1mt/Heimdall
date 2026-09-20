@@ -1,6 +1,6 @@
 // Command evalon evaluates systems-and-networking lab work over SSH.
 //
-// Subcommands: run, check, version. Only version is implemented so far.
+// Subcommands: run, check, version.
 package main
 
 import (
@@ -28,8 +28,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 		fmt.Fprintln(stdout, version)
 		return exitOK
 	case "run":
-		fmt.Fprintln(stderr, "evalon run: no implementado todavia")
-		return exitInvalidConfig
+		return runCmd(args[1:], stdout, stderr)
 	case "check":
 		return checkCmd(args[1:], stdout, stderr)
 	default:

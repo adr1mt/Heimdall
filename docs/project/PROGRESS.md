@@ -6,29 +6,34 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última tarea terminada
 
-**T010 (el motor completo de una pasada).** El motor ya corrige a toda la clase
-de una vez: dos alumnos a la vez, cada uno con su propia conexión, su propio
-tiempo y su propio resultado. Un alumno con la máquina apagada, con una avería
-o con un fallo interno del motor no le cambia ni un punto a los demás: sale en
-el informe con sus comprobaciones sin evaluar y explicadas, nunca suspendidas.
-Cada alumno tiene un tiempo máximo propio; lo que no dé tiempo a comprobar sale
-como no ejecutado, no como fallo. Si el profesor para la corrección a media, el
-informe se escribe igual con lo que hubiera.
+**T011 (ya se corrige desde la terminal).** Una orden corrige el prototipo de
+punta a punta. La contraseña del aula entra por un canal privado, nunca escrita
+en la orden: ningún otro usuario del equipo la ve mirando los procesos. Si el
+profesor olvida pasarla, el programa para a los cinco segundos en vez de
+quedarse colgado delante de la clase; si nombra una que no existe, para con un
+error claro en vez de entrar con la contraseña vacía y suspender a todos. Al
+acabar imprime quién se ha evaluado, quién no y dónde está el informe. Ctrl-C
+para la corrección y el informe se escribe igual.
 
 ## Estado actual
 
 - **Go 1.27.1** en `/mnt/datos/Applications/Claude/toolchains/go`; en shell no
   interactiva hay que exportar el `PATH` a mano. `go.mod`: `module evalon`,
   directiva `go 1.26`. Nombre provisional (D-7).
-- `cmd/evalon`: `check` y `version` funcionan; `run` sigue sin implementar.
-  Exit codes: 0 ok · 2 config inválida · 3 parcial · 4 cancelado; el 1 libre.
+- `cmd/evalon`: `check`, `run` y `version` funcionan. `run` acepta
+  `--secrets=stdin|env` (por defecto `env`), `--var=dir` y `--concurrency=N`.
+  Exit codes: 0 ok · 2 config inválida · 3 parcial · 4 cancelado · 1 el motor no
+  pudo ni escribir el artefacto.
+- `cmd/evalon/secrets.go`: los secretos entran por una línea JSON
+  (`{"schema":1,"secrets":{...}}`) leída byte a byte, con corte a los 5 s y el
+  buffer puesto a cero, o por las variables que nombra el `aula.yaml` y solo
+  esas. Nunca por `argv`.
 - `internal/model`: artefacto completo, `Classify`, `ComputeScore`,
-  `StudentStatusOf`, `RunStatusOf`. Puro, con test que lo comprueba.
-- `internal/plan`: los dos YAML, las nueve validaciones del §5, sustituciones y
-  hashes. `internal/assert`: `contiene`, `igual_a`, `exit_code`, puras.
-- `internal/report`: escritura atómica, parciales por alumno, `latest.json`,
-  ULID propio y filtro de redacción de secretos.
-- `internal/engine` (nuevo): `Run` recorre el PLAN, pool de 2, una sesión por
+  `StudentStatusOf`, `RunStatusOf`. Puro. `internal/plan`: los dos YAML, las
+  nueve validaciones del §5, sustituciones y hashes. `internal/assert`:
+  `contiene`, `igual_a`, `exit_code`, puras. `internal/report`: escritura
+  atómica, parciales, `latest.json`, ULID propio y redacción de secretos.
+- `internal/engine`: `Run` recorre el PLAN, pool de 2, una sesión por
   host y alumno, presupuesto por alumno, `panic` recuperado por alumno
   (`ENGINE_ERROR` + aviso), parcial tras cada alumno y `ExitCode` (0/3/4). Las
   aserciones que faltan y las comprobaciones `valor:` salen `ENGINE_ERROR`
@@ -45,15 +50,16 @@ informe se escribe igual con lo que hubiera.
 
 ## Pruebas ejecutadas
 
-`make check` verde · `gofmt -l` sin salida · `go test -race -tags=integration
-./internal/engine` verde contra el laboratorio: el prototipo da PASS/PASS/PASS,
-FAIL en el comando inexistente y UNEVALUATED/TIMEOUT en `sleep 30`; provisional
-80, sin nota final; el alumno del puerto cerrado sale entero con
-`CONNECT_FAILED` y no mueve ni un número del otro; la contraseña no aparece en
-el artefacto. 10 tests rápidos de `internal/engine` (alumno roto, panic,
-cancelación, presupuesto, sesión única, excluido, secreto sin valor).
-`go test -race -tags=integration ./internal/ssh` verde, 12 tests (timeouts,
-reintentos, 300 MB cortados, contraseña fuera de `argv`, TOFU).
+`make check` verde · `gofmt -l` sin salida · integración verde contra el
+laboratorio: el prototipo da PASS/PASS/PASS, FAIL en el comando inexistente y
+UNEVALUATED/TIMEOUT en `sleep 30`; provisional 80, sin nota final; el alumno del
+puerto cerrado sale entero con `CONNECT_FAILED` sin mover un número del otro.
+10 tests de `internal/engine` y 12 de `internal/ssh`.
+`test/secrets.sh` verde contra el laboratorio (ya en `make test`): stdin vacío y
+stdin colgado abortan con exit 2 (el segundo a los 5 s), referencia sin variable
+exit 2, el prototipo completo exit 3, y cero coincidencias del secreto en `var/`,
+en el terminal y en `/proc/<pid>/cmdline` con el proceso vivo. 7 tests nuevos en
+`cmd/evalon`.
 
 ## Problemas conocidos
 
@@ -66,6 +72,6 @@ reintentos, 300 MB cortados, contraseña fuera de `argv`, TOFU).
 
 ## Siguiente tarea recomendada
 
-**T011** (CLI `run`, secretos por stdin y por env, P0), ya `READY`. Falta
-enganchar el motor al binario: leer los secretos sin pasar por `argv`, atender
-al Ctrl-C y escribir el artefacto con el código de salida que corresponda.
+**T012** (los 14 criterios de aceptación de la rebanada vertical, P0), ya
+`READY`. Toca comprobar uno por uno los criterios A-1 a A-14 con `jq` sobre el
+artefacto real y repasar `testdata/proto/`, que hasta ahora nadie ha revisado.

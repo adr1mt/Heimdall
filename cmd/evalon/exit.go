@@ -13,4 +13,7 @@ const (
 	exitPartial = 3
 	// exitCancelled means the run was interrupted; a partial artifact exists.
 	exitCancelled = 4
+	// exitFailure is the unspecified failure of the engine itself: it could
+	// not even write the artifact. It says nothing about any student's work.
+	exitFailure = 1
 )

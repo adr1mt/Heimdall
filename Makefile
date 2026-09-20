@@ -11,9 +11,11 @@ check:
 	$(GO) vet ./...
 	$(GO) test ./...
 
-## test: check plus the SSH integration suite. Needs `make lab`.
-test: check
+## test: check plus the SSH integration suite and the acceptance scripts.
+## Needs `make lab`.
+test: check build
 	$(GO) test -tags=integration ./...
+	test/secrets.sh
 
 ## build: single binary in bin/evalon.
 build:
