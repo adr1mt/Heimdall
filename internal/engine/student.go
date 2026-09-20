@@ -319,8 +319,8 @@ func (h *hostPool) get(ctx context.Context, name string) (Session, *ssh.DialErro
 		Port:           target.Port,
 		User:           target.User,
 		Password:       password,
-		KnownHostsPath: h.r.opts.KnownHostsPath,
 		ConnectTimeout: h.r.plan.ConnectTimeout,
+		Keys:           h.r.keys,
 	})
 	if derr != nil {
 		h.failures[name] = derr

@@ -46,9 +46,10 @@ contabilizado, UTF-8 saneado y corte en frontera de runa.
 - No se usan credenciales reales en desarrollo ni en tests.
 - El laboratorio vive en `127.1.2.3`, no en `127.0.0.x`.
 - No se ejecutan operaciones remotas destructivas ni se publican datos.
-- `known_hosts`: fichero propio del proyecto (`var/known_hosts`) con TOFU y
-  aviso en `warnings`. Es provisional (D-3) y debe cerrarse **antes del primer
-  examen real**.
+- Identidad de las máquinas: se anota **por ejecución**, en memoria, con su
+  huella en `warnings`; una máquina que cambia de identidad a mitad se rechaza
+  (ADR-0011). No hay fichero `known_hosts` y jamás se lee ni se escribe el del
+  profesor.
 
 ## Datos de alumnado
 

@@ -53,8 +53,6 @@ type Options struct {
 	// used to authenticate and never leave this process.
 	Secrets map[string]string
 
-	KnownHostsPath string
-
 	// Concurrency overrides the plan's. Zero uses the plan's.
 	Concurrency int
 
@@ -99,7 +97,7 @@ func Run(ctx context.Context, p *plan.Plan, opts Options) *model.RunResult {
 	}
 	run.Plan.Concurrency = concurrency
 
-	r := &runner{plan: p, opts: opts, concurrency: concurrency}
+	r := &runner{plan: p, opts: opts, concurrency: concurrency, keys: ssh.NewHostKeys()}
 	r.evaluate(ctx, run)
 
 	run.FinishedAt = time.Now()
@@ -129,6 +127,11 @@ type runner struct {
 	plan        *plan.Plan
 	opts        Options
 	concurrency int
+
+	// keys is the identity every machine presented in this run, shared by
+	// every student: a machine that changes identity halfway through is not
+	// the machine that was being examined (ADR-0011).
+	keys *ssh.HostKeys
 
 	mu  sync.Mutex // guards the artifact while the workers fill it
 	run *model.RunResult

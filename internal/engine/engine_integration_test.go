@@ -4,7 +4,6 @@ package engine
 
 import (
 	"context"
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -28,10 +27,9 @@ func TestPrototypeAgainstTheLab(t *testing.T) {
 	}
 
 	opts := Options{
-		RunID:          "integration",
-		EngineVersion:  "test",
-		Secrets:        map[string]string{"AULA_PASSWORD": labPassword},
-		KnownHostsPath: filepath.Join(t.TempDir(), "known_hosts"),
+		RunID:         "integration",
+		EngineVersion: "test",
+		Secrets:       map[string]string{"AULA_PASSWORD": labPassword},
 	}
 	run := Run(context.Background(), p, opts)
 

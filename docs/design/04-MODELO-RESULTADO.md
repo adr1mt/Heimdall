@@ -191,10 +191,10 @@ byte.
 ```json
 {
   "schema_version": 1,
-  "run_id": "01M2YRKXB4YMCMHDHX11GBHQN6",
+  "run_id": "01M2YTEGR42NJ6MT979TMVGG2N",
   "engine_version": "0.1.0-dev",
-  "started_at": "2026-09-20T08:38:50.213185241+02:00",
-  "finished_at": "2026-09-20T08:38:55.040767881+02:00",
+  "started_at": "2026-09-20T09:10:50.628934586+02:00",
+  "finished_at": "2026-09-20T09:10:55.082942227+02:00",
   "status": "PARTIAL",
   "exam": {
     "path": "testdata/proto/examen.yaml",
@@ -219,20 +219,13 @@ byte.
     ],
     "concurrency": 2
   },
-  "warnings": [
-    {
-      "scope": "student:alumne01/host:host1",
-      "code": "HOST_KEY_TOFU",
-      "message": "primera conexion con 127.1.2.3:2201: su clave se ha aceptado y registrada en var/known_hosts"
-    }
-  ],
   "students": [
     {
       "student_id": "alumne01",
       "name": "Alumna Uno",
       "status": "PARTIAL",
-      "started_at": "2026-09-20T08:38:50.213250759+02:00",
-      "finished_at": "2026-09-20T08:38:53.390167728+02:00",
+      "started_at": "2026-09-20T09:10:50.628957577+02:00",
+      "finished_at": "2026-09-20T09:10:53.740278473+02:00",
       "score": {
         "obtained": 4,
         "evaluable": 5,
@@ -258,8 +251,8 @@ byte.
             "command": [
               "hostname"
             ],
-            "started_at": "2026-09-20T08:38:50.358782506+02:00",
-            "duration_ms": 6,
+            "started_at": "2026-09-20T09:10:50.726005482+02:00",
+            "duration_ms": 2,
             "completed": true,
             "exit_code": 0,
             "stdout": {
@@ -301,8 +294,8 @@ byte.
             "command": [
               "comando_que_no_existe"
             ],
-            "started_at": "2026-09-20T08:38:50.378898946+02:00",
-            "duration_ms": 5,
+            "started_at": "2026-09-20T09:10:50.734366468+02:00",
+            "duration_ms": 2,
             "completed": true,
             "exit_code": 127,
             "stdout": {
@@ -345,8 +338,8 @@ byte.
               "sleep",
               "30"
             ],
-            "started_at": "2026-09-20T08:38:50.384625858+02:00",
-            "duration_ms": 3005,
+            "started_at": "2026-09-20T09:10:50.73682791+02:00",
+            "duration_ms": 3003,
             "completed": false,
             "exit_code": null,
             "stdout": {
@@ -373,8 +366,8 @@ byte.
       "student_id": "alumne02",
       "name": "Alumne Dos",
       "status": "NOT_EVALUATED",
-      "started_at": "2026-09-20T08:38:50.21343074+02:00",
-      "finished_at": "2026-09-20T08:38:55.023848544+02:00",
+      "started_at": "2026-09-20T09:10:50.629068607+02:00",
+      "finished_at": "2026-09-20T09:10:55.075978385+02:00",
       "score": {
         "obtained": 0,
         "evaluable": 0,
@@ -398,6 +391,13 @@ byte.
         }
       ]
     }
+  ],
+  "warnings": [
+    {
+      "scope": "student:alumne01/host:host1",
+      "code": "HOST_KEY_ACCEPTED",
+      "message": "la identidad de 127.1.2.3:2201 se ha aceptado y anotado para esta ejecución: SHA256:EXIozDOCqGTYwDEDQt84k0c490R7Xg7Vx6/ETJK0MiE"
+    }
   ]
 }
 ```
@@ -411,6 +411,9 @@ por `CONNECT_FAILED`, con `evaluable: 0` y `unevaluated: 6` —los seis puntos
 del peso total—, y ninguna de las dos notas existe. El denominador, la lista de
 comprobaciones y los pesos son idénticos a los de `alumne01`: el PLAN no se
 movió por una máquina apagada.
+
+El aviso final anota la identidad de la máquina que sí respondió, con su huella
+(ADR-0011). Es lo que permite comprobar después contra qué máquina se corrigió.
 
 ---
 

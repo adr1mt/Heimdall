@@ -539,9 +539,9 @@
     },
     {
       "id": "T021",
-      "title": "Politica de known_hosts cerrada y autenticacion por clave",
+      "title": "Politica de identidad de las maquinas cerrada",
       "phase": 2,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T013"
@@ -549,25 +549,54 @@
       "goal": "Cerrar D-3, que es una decision de seguridad y no puede quedar en TOFU provisional.",
       "scope": [
         "ADR que cierre D-3",
-        "implementacion de la politica elegida",
-        "autenticacion por clave y passphrase por stdin"
+        "implementacion de la politica elegida: identidad por ejecucion, sin fichero known_hosts",
+        "huella de cada maquina en warnings; una identidad que cambia a mitad se rechaza"
       ],
       "out_of_scope": [
-        "ProxyJump",
-        "ssh_config"
+        "Autenticacion por clave SSH: el aula usa contrasena (T023)"
       ],
       "acceptance": [
         "D-3 fuera de 08-DECISIONES-ABIERTAS.md",
-        "Un cambio de clave de host produce un resultado explicito, nunca una nota silenciosamente distinta"
+        "Un cambio de identidad de la maquina produce un resultado explicito, nunca una nota silenciosamente distinta"
       ],
-      "tests": [],
+      "tests": [
+        "go test ./internal/ssh",
+        "go test -tags integration ./internal/ssh"
+      ],
       "notes": "Bloqueante antes del primer examen real. Detallar al llegar."
+    },
+    {
+      "id": "T023",
+      "title": "Autenticacion por clave SSH",
+      "phase": 2,
+      "status": "BLOCKED",
+      "priority": "P2",
+      "depends_on": [
+        "T021"
+      ],
+      "goal": "Entrar con clave privada cuando el aula deje de usar contrasena.",
+      "scope": [
+        "clave privada referenciada en el inventario",
+        "passphrase por el mismo canal que las contrasenas (ADR-0009)"
+      ],
+      "out_of_scope": [
+        "Agente SSH",
+        "ProxyJump"
+      ],
+      "acceptance": [
+        "La passphrase no aparece en argv, logs ni artefacto",
+        "Una clave ilegible es error de PLAN con fichero y linea"
+      ],
+      "tests": [
+        "go test ./internal/ssh"
+      ],
+      "notes": "Separada de T021 el 2026-09-20: el aula usa contrasena y no hay caso de uso todavia (principio 10). No se implementa sin el."
     },
     {
       "id": "T022",
       "title": "Ejecucion de un examen real completo contra el laboratorio",
       "phase": 2,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T020",

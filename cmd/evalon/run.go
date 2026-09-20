@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"os/signal"
-	"path/filepath"
 	"syscall"
 
 	"evalon/internal/engine"
@@ -74,11 +73,10 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 
 	var partialErr error
 	result := engine.Run(ctx, p, engine.Options{
-		RunID:          runID,
-		EngineVersion:  version,
-		Secrets:        secrets,
-		KnownHostsPath: filepath.Join(*varDir, "known_hosts"),
-		Concurrency:    *concurrency,
+		RunID:         runID,
+		EngineVersion: version,
+		Secrets:       secrets,
+		Concurrency:   *concurrency,
 		OnStudentDone: func(run *model.RunResult) error {
 			if err := writer.WritePartial(run); err != nil {
 				partialErr = err

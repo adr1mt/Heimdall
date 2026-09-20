@@ -48,8 +48,12 @@ type Config struct {
 	Port           int
 	User           string
 	Password       string
-	KnownHostsPath string // defaults to var/known_hosts
 	ConnectTimeout time.Duration
+
+	// Keys is the identity registry of the run, shared by every session.
+	// A nil registry is one private to this session, which accepts the
+	// machine it finds: only tests dial without one.
+	Keys *HostKeys
 }
 
 // Session is one authenticated connection, reused for every check of that
@@ -62,6 +66,10 @@ type Session struct {
 	mu            sync.Mutex
 	warnings      []model.Warning
 	hasRemoteKill bool // the machine has coreutils timeout
+	// identityChanged is set when the host key callback refused the machine.
+	// The handshake error that comes back has lost the cause by then, so the
+	// callback leaves it here.
+	identityChanged error
 }
 
 func (c Config) addr() string {
@@ -74,20 +82,15 @@ func Dial(ctx context.Context, cfg Config) (*Session, *DialError) {
 	if cfg.ConnectTimeout <= 0 {
 		cfg.ConnectTimeout = DefaultConnectTimeout
 	}
-	if cfg.KnownHostsPath == "" {
-		cfg.KnownHostsPath = "var/known_hosts"
+	if cfg.Keys == nil {
+		cfg.Keys = NewHostKeys()
 	}
 	s := &Session{cfg: cfg}
-
-	callback, err := hostKeyCallback(cfg.KnownHostsPath, s.warn)
-	if err != nil {
-		return nil, &DialError{Cause: model.CauseEngineError, Detail: "no se ha podido usar " + cfg.KnownHostsPath, Attempts: 0}
-	}
 
 	clientCfg := &ssh.ClientConfig{
 		User:            cfg.User,
 		Auth:            []ssh.AuthMethod{ssh.Password(cfg.Password)},
-		HostKeyCallback: callback,
+		HostKeyCallback: hostKeyCallback(cfg.Keys, cfg.addr(), s.warn, s.refuseIdentity),
 		Timeout:         cfg.ConnectTimeout,
 	}
 
@@ -101,6 +104,13 @@ func Dial(ctx context.Context, cfg Config) (*Session, *DialError) {
 			return s, nil
 		}
 		last = derr
+		if refusal := s.identity(); refusal != nil {
+			return nil, &DialError{
+				Cause:    model.CauseConnectFailed,
+				Detail:   oneLine(refusal),
+				Attempts: 1, // retrying would only ask the same impostor again
+			}
+		}
 		if isAuthFailure(derr) {
 			return nil, &DialError{
 				Cause:    model.CauseAuthFailed,
@@ -160,6 +170,20 @@ func (s *Session) Warnings() []model.Warning {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return append([]model.Warning(nil), s.warnings...)
+}
+
+// refuseIdentity records why the machine was refused, before the handshake
+// error buries it.
+func (s *Session) refuseIdentity(err error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.identityChanged = err
+}
+
+func (s *Session) identity() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.identityChanged
 }
 
 func (s *Session) warn(code, message string) {

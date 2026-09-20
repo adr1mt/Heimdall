@@ -46,7 +46,7 @@ Lo que falta para correr un examen real del curso, con la ejecución endurecida.
 
 - Aserciones `no_contiene` y `cerca_de`; comprobaciones `valor:` sin comando.
 - `excluido: true`; pesos decimales y peso 0.
-- Política de `known_hosts` cerrada (**D-3**, antes del primer examen real).
+- Política de identidad de las máquinas cerrada (**D-3**, ADR-0011).
 - Autenticación por clave y passphrase.
 - Reintentos auditados, `timeout` remoto, `remote_process` en todos los caminos.
 - Corte duro de salida verificado contra las salidas gigantes de `evidence/`.

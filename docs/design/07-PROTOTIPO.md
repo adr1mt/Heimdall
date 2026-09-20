@@ -53,7 +53,7 @@ Dependencias externas permitidas: `golang.org/x/crypto/ssh`, un parser YAML
 | `check` | Subcomando que ejecuta solo el PLAN y no toca ninguna máquina |
 | Transporte | SSH nativo, **una sesión por alumno y host**, reutilizada (K-6) |
 | Autenticación | Contraseña, con el secreto por `--secrets=stdin` y por `--secrets=env` |
-| `known_hosts` | Fichero propio del proyecto (`var/known_hosts`) con TOFU y aviso en `warnings`. Decisión provisional del prototipo, ver D-3 |
+| Identidad de las máquinas | Fichero propio del proyecto (`var/known_hosts`) con TOFU y aviso en `warnings`. Decisión provisional del prototipo, **sustituida por ADR-0011**: la identidad se anota por ejecución y no se guarda entre exámenes |
 | Timeouts | Conexión 10 s, comprobación 20 s, alumno 2 min (bajo a propósito para poder probarlo) |
 | `timeout` remoto | Detección `command -v timeout` y envoltura; `remote_process` en el resultado |
 | Reintentos | 2 de conexión con espera; ninguno de comando |

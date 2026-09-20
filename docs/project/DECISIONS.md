@@ -20,7 +20,6 @@ evidencia. Nunca se edita un ADR aceptado en silencio.
 
 | # | Decisión | Se cierra en |
 |---|---|---|
-| D-3 | Política de `known_hosts` | T021 (fase 2), antes del primer examen real |
 | D-5 | Detección de valores repetidos (anticopia) | Cuando haya un caso real; no bloquea |
 | D-6 | Números de concurrencia por defecto | T031 (fase 3) |
 | D-7 | Nombre del producto | T070 (fase 7), antes de que salga un binario del equipo |
@@ -28,6 +27,20 @@ evidencia. Nunca se edita un ADR aceptado en silencio.
 | D-9 | Formato definitivo de los eventos NDJSON | T050 (fase 5) |
 
 ## Bitácora
+
+### 2026-09-20 · D-3 cerrada: identidad por ejecución (ADR-0011)
+
+Dato nuevo del aula: el alumnado examina sobre máquinas virtuales desechables,
+una por examen. Guardar la identidad de la máquina entre exámenes no protege de
+nada y el día del examen solo puede producir un aula rechazada, que es el fallo
+que tumbó la primera investigación (F-12).
+
+El motor anota la identidad de cada máquina durante la ejecución, con su huella
+en el informe, y rechaza a la que cambie a mitad. No hay fichero `known_hosts`
+y nunca se toca el del profesor.
+
+La entrada por clave SSH sale de T021: el aula usa contraseña. Queda como T023,
+sin implementar hasta que haya un caso real.
 
 ### 2026-09-20 · D-2 cerrada: SSH nativo (ADR-0010)
 

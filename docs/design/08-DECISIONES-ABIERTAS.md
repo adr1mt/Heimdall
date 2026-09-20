@@ -4,7 +4,6 @@ Solo las que de verdad lo están. Las cerradas están en `docs/adr/`.
 
 | # | Decisión | Por qué sigue abierta | Cuándo se puede cerrar |
 |---|---|---|---|
-| **D-3** | Política de `known_hosts` | El prototipo usa TOFU con aviso y fichero propio del proyecto (`var/known_hosts`). Es una decisión de **seguridad**, no de comodidad, y en un aula las claves de host cambian cada curso. No se cierra sin decidirlo a propósito | Antes del primer examen real |
 | **D-5** | Detección de valores repetidos (anticopia) | Tiene valor pedagógico y hoy pone la nota a 0 automáticamente, cosa descartada. Falta decidir si se implementa como **marca** en el informe | Cuando haya un caso real; no bloquea nada |
 | **D-6** | Números de concurrencia | El **mecanismo** está cerrado (tope global + tope por host de destino). Los valores por defecto (8 y 4) son una conjetura: hay que medirlos con el aula real | Con 100 alumnos reales y `MaxStartups` por defecto |
 | **D-7** | Nombre del producto | Provisional `Evalon`. Afecta al módulo Go, al binario y al README | Antes del primer binario que salga del equipo |
@@ -20,5 +19,8 @@ Solo las que de verdad lo están. Las cerradas están en `docs/adr/`.
   tiene, entregadas por stdin. ADR-0009.
 - **D-2** (SSH nativo o delegar en el binario `ssh`): nativo, con
   `x/crypto/ssh`. Medido con A-5, A-6 y A-11 sobre el laboratorio. ADR-0010.
+- **D-3** (política de claves de host): la identidad se fija por ejecución y no
+  se guarda entre exámenes. El alumnado usa máquinas virtuales desechables.
+  ADR-0011.
 - **El acantilado de expresividad del YAML**: medido contra dos exámenes reales.
   Dos primitivas nuevas y ningún scripting. ADR-0003.

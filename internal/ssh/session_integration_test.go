@@ -27,12 +27,12 @@ const (
 func labConfig(t *testing.T) Config {
 	t.Helper()
 	return Config{
-		Host:           "host1",
-		Address:        labAddress,
-		Port:           labPort,
-		User:           labUser,
-		Password:       labPassword,
-		KnownHostsPath: t.TempDir() + "/known_hosts",
+		Host:     "host1",
+		Address:  labAddress,
+		Port:     labPort,
+		User:     labUser,
+		Password: labPassword,
+		Keys:     NewHostKeys(),
 	}
 }
 
@@ -70,7 +70,10 @@ func TestRunSeparatesTheTwoStreamsAndReportsTheExitCode(t *testing.T) {
 	}
 }
 
-func TestFirstSightOfAHostIsRecordedAndWarned(t *testing.T) {
+// The identity of a machine seen for the first time is accepted, reported
+// with its fingerprint, and not reported again for the rest of the run
+// (ADR-0011).
+func TestFirstSightOfAHostIsAcceptedAndReported(t *testing.T) {
 	cfg := labConfig(t)
 	s, err := Dial(context.Background(), cfg)
 	if err != nil {
@@ -78,29 +81,64 @@ func TestFirstSightOfAHostIsRecordedAndWarned(t *testing.T) {
 	}
 	defer s.Close()
 
-	var found bool
+	var fingerprint string
 	for _, w := range s.Warnings() {
-		if w.Code == "HOST_KEY_TOFU" {
-			found = true
+		if w.Code == "HOST_KEY_ACCEPTED" {
+			fingerprint = w.Message
 		}
 	}
-	if !found {
-		t.Errorf("warnings = %v, want HOST_KEY_TOFU on first sight", s.Warnings())
+	if fingerprint == "" {
+		t.Fatalf("warnings = %v, want HOST_KEY_ACCEPTED on first sight", s.Warnings())
 	}
-	if b, rerr := os.ReadFile(cfg.KnownHostsPath); rerr != nil || len(b) == 0 {
-		t.Errorf("known_hosts not written to %s", cfg.KnownHostsPath)
+	if !strings.Contains(fingerprint, "SHA256:") {
+		t.Errorf("el aviso no dice qué identidad se aceptó: %q", fingerprint)
 	}
 
-	// Second connection: already known, no new warning.
+	// Second connection to the same machine within the run: already known,
+	// no new warning.
 	s2, err := Dial(context.Background(), cfg)
 	if err != nil {
 		t.Fatalf("second Dial: %v", err.Detail)
 	}
 	defer s2.Close()
 	for _, w := range s2.Warnings() {
-		if w.Code == "HOST_KEY_TOFU" {
-			t.Error("HOST_KEY_TOFU warned again for an already known host")
+		if w.Code == "HOST_KEY_ACCEPTED" {
+			t.Error("se volvió a avisar de una identidad ya anotada en esta ejecución")
 		}
+	}
+}
+
+// A machine that answers with an identity other than the one it presented at
+// the start of the run is refused, out loud. This is the acceptance of T021:
+// what must never happen is a grade that quietly came from another machine.
+func TestAMachineThatChangesItsIdentityIsRefused(t *testing.T) {
+	cfg := labConfig(t)
+
+	// The same registry, with the address already recorded under a different
+	// identity: exactly what the engine would hold after the first student.
+	first, err := Dial(context.Background(), cfg)
+	if err != nil {
+		t.Fatalf("Dial: %v", err.Detail)
+	}
+	first.Close()
+
+	cfg.Keys.mu.Lock()
+	cfg.Keys.seen[cfg.addr()] = "SHA256:otra-maquina-distinta"
+	cfg.Keys.mu.Unlock()
+
+	s, derr := Dial(context.Background(), cfg)
+	if derr == nil {
+		s.Close()
+		t.Fatal("se aceptó una máquina con una identidad distinta de la registrada")
+	}
+	if derr.Cause != model.CauseConnectFailed {
+		t.Errorf("causa = %q, se esperaba CONNECT_FAILED", derr.Cause)
+	}
+	if derr.Attempts != 1 {
+		t.Errorf("intentos = %d: una identidad cambiada no se reintenta", derr.Attempts)
+	}
+	if !strings.Contains(derr.Detail, "identidad distinta") {
+		t.Errorf("el motivo no lo explica: %q", derr.Detail)
 	}
 }
 
