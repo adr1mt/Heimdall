@@ -455,7 +455,7 @@
       "id": "T013",
       "title": "Evidencia del prototipo y cierre de D-2",
       "phase": 1,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T012"

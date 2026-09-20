@@ -20,7 +20,6 @@ evidencia. Nunca se edita un ADR aceptado en silencio.
 
 | # | Decisión | Se cierra en |
 |---|---|---|
-| D-2 | SSH nativo vs. delegar en el binario `ssh` | T013 (fase 1) |
 | D-3 | Política de `known_hosts` | T021 (fase 2), antes del primer examen real |
 | D-5 | Detección de valores repetidos (anticopia) | Cuando haya un caso real; no bloquea |
 | D-6 | Números de concurrencia por defecto | T031 (fase 3) |
@@ -29,6 +28,18 @@ evidencia. Nunca se edita un ADR aceptado en silencio.
 | D-9 | Formato definitivo de los eventos NDJSON | T050 (fase 5) |
 
 ## Bitácora
+
+### 2026-09-20 · D-2 cerrada: SSH nativo (ADR-0010)
+
+El transporte se queda en `x/crypto/ssh`, dentro del proceso. Se cierra con
+medición, no por preferencia: `transport: "ssh"` y el hostname del contenedor
+en el artefacto (A-11), 4,8 s de run con un `sleep 30` y un alumno inalcanzable
+dentro (A-5), y RSS plano entre 13 y 15,5 MB con salidas de 1 a 300 MB (A-6).
+Delegar en el binario `ssh` metería la versión de OpenSSH y el `~/.ssh/config`
+del profesor en la nota, y devolvería los secretos al terreno de `argv`.
+
+El ejemplo del modelo de resultado pasa a ser salida real del laboratorio:
+`docs/design/ejemplo-run.json`.
 
 ### 2026-09-19 · Estructura de proyecto persistente
 

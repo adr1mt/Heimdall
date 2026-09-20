@@ -14,3 +14,4 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 | [0007](0007-json-canonico.md) | Un único modelo canónico en JSON |
 | [0008](0008-compat-teuton-temporal.md) | Compatibilidad con Teuton como adaptador temporal |
 | [0009](0009-politica-de-secretos.md) | Los secretos van por stdin y nunca al resultado |
+| [0010](0010-ssh-nativo.md) | SSH nativo con `x/crypto/ssh`, no el binario `ssh` |

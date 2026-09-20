@@ -4,7 +4,6 @@ Solo las que de verdad lo están. Las cerradas están en `docs/adr/`.
 
 | # | Decisión | Por qué sigue abierta | Cuándo se puede cerrar |
 |---|---|---|---|
-| **D-2** | SSH nativo (`x/crypto/ssh`) vs. delegar en el binario `ssh` | La recomendación es **nativo** y el prototipo lo usa, pero es reversible y no hay ni una medición: Go no está instalado | Tras el prototipo, con A-5 y A-11 en verde |
 | **D-3** | Política de `known_hosts` | El prototipo usa TOFU con aviso y fichero propio del proyecto (`var/known_hosts`). Es una decisión de **seguridad**, no de comodidad, y en un aula las claves de host cambian cada curso. No se cierra sin decidirlo a propósito | Antes del primer examen real |
 | **D-5** | Detección de valores repetidos (anticopia) | Tiene valor pedagógico y hoy pone la nota a 0 automáticamente, cosa descartada. Falta decidir si se implementa como **marca** en el informe | Cuando haya un caso real; no bloquea nada |
 | **D-6** | Números de concurrencia | El **mecanismo** está cerrado (tope global + tope por host de destino). Los valores por defecto (8 y 4) son una conjetura: hay que medirlos con el aula real | Con 100 alumnos reales y `MaxStartups` por defecto |
@@ -19,5 +18,7 @@ Solo las que de verdad lo están. Las cerradas están en `docs/adr/`.
   Ver `05-SECRETOS-TIMEOUTS-REINTENTOS.md` §3.
 - **D-4** (dónde viven las credenciales): el almacén cifrado que la GUI ya
   tiene, entregadas por stdin. ADR-0009.
+- **D-2** (SSH nativo o delegar en el binario `ssh`): nativo, con
+  `x/crypto/ssh`. Medido con A-5, A-6 y A-11 sobre el laboratorio. ADR-0010.
 - **El acantilado de expresividad del YAML**: medido contra dos exámenes reales.
   Dos primitivas nuevas y ningún scripting. ADR-0003.

@@ -66,3 +66,35 @@ El script vuelve a dar A-10 en verde en cuanto T040 exista; hasta entonces
 | Run completo del prototipo (2 alumnos, `sleep 30`, host inalcanzable) | 4,4 s |
 | Memoria máxima del motor con 300 MB de salida de un alumno | 13 MB |
 | Corte de la comprobación con `timeout: 3s` | 3005 ms |
+
+### Escalado por tamaño de salida (T013)
+
+`PERFORMANCE.md` §6 punto 2, medido el 2026-09-20 con `/usr/bin/time -v` sobre
+un examen de una sola comprobación que vuelca N MB por stdout. La memoria del
+motor debe quedar **plana**: lo que escupe el alumno es dato no confiable y no
+puede entrar entero en el proceso.
+
+| Salida del alumno | RSS máximo | Leído antes del corte | Conservado |
+|---|---|---|---|
+| 1 MB | 13,4 MB | 1,0 MB (entero) | 64 kB |
+| 20 MB | 13,1 MB | 8,4 MB | 64 kB |
+| 100 MB | 13,8 MB | 8,4 MB | 64 kB |
+| 300 MB | 15,5 MB | 8,4 MB | 64 kB |
+
+En los tres últimos casos el lector corta en seco y el proceso remoto queda
+`UNKNOWN`; `bytes_total` refleja lo leído, no lo prometido. Trescientos veces
+más salida cuestan 2 MB de RSS.
+
+### Tiempo hasta que la GUI puede pintar algo (T013)
+
+`PERFORMANCE.md` §6 punto 4, parcialmente: los eventos NDJSON no existen aún
+(D-9), así que se mide el artefacto parcial, que es lo que hoy puede leer la
+GUI. Prototipo de dos alumnos, uno de ellos inalcanzable.
+
+| Hito | Desde el arranque |
+|---|---|
+| Primer artefacto parcial en `var/` | 3,2 s |
+| Artefacto definitivo | 4,6 s |
+
+Los puntos 1 y 3 de `PERFORMANCE.md` §6 (10/30/100 alumnos) siguen pendientes:
+necesitan más de dos máquinas y son de la fase 3.

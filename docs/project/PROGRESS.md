@@ -6,13 +6,16 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última tarea terminada
 
-**T012 (el hito de la fase 1, demostrado).** Un script comprueba solo, uno por
-uno, que el motor cumple lo prometido: mismas comprobaciones y mismo peso para
-todos, una avería nunca cuenta como suspenso, sin nota final mientras falte algo,
-un alumno roto no toca al resto, el informe explica cada resultado, la nota no
-cambia con el idioma del equipo, un examen mal escrito no llega a tocar ninguna
-máquina y la contraseña no aparece en ningún sitio. Corrige el prototipo en
-4,4 s; 300 MB de basura de un alumno dejan el motor en 13 MB. Salida literal en
+**T013 (la fase 1, registrada).** El ejemplo del modelo de resultado ya no es
+una redacción a mano: es la salida real del laboratorio
+(`docs/design/ejemplo-run.json`). Se cierra la duda sobre cómo hablamos con las
+máquinas de los alumnos (ADR-0010) con mediciones, no con preferencias: un
+examen con una máquina apagada y un comando eterno dentro acaba en 4,8 s, y un
+alumno que escupe 300 MB deja el motor en 15,5 MB, igual que uno que escupe 1.
+El profesor puede ver resultados parciales a los 3,2 s.
+
+Antes, **T012**: un script comprueba solo, uno por uno, los catorce criterios
+del hito (trece en verde, A-10 espera al formato viejo). Salida literal en
 `docs/design/ACEPTACION-FASE1.md`.
 
 ## Estado actual
@@ -60,7 +63,6 @@ la nota incluidos. Salida literal en `docs/design/ACEPTACION-FASE1.md`.
   entrada ed25519 en el `known_hosts` real lo tumba (F-12).
 - La e2e de la GUI falla entera (40/40) sin `npm run build` previo.
 - No subir el Teuton instalado (2.10.6) a 3.0.0 sin probar (F-11).
-- El golden es de redacción manual; sale uno real en T013.
 - **A-10 sigue pendiente**: pide los ficheros del formato viejo, que los escribe
   T040 (fase 3). El script lo marca `PEND` y no rompe el exit code.
 - Un valor del tipo equivocado en una clave conocida escapa jerga de Go al
@@ -68,6 +70,6 @@ la nota incluidos. Salida literal en `docs/design/ACEPTACION-FASE1.md`.
 
 ## Siguiente tarea recomendada
 
-**T013** (evidencia del prototipo y cierre de D-2, P1), ya `READY`. Toca guardar
-un artefacto real del laboratorio como ejemplo verificado en `docs/design/`,
-sustituyendo al que está redactado a mano, y cerrar D-2.
+**T014** (mensajes de error del YAML sin jerga de Go, P2), ya `READY`. Un examen
+mal escrito debe explicarse en español con fichero, línea y clave; hoy un valor
+del tipo equivocado escupe el nombre de un tipo interno.
