@@ -6,24 +6,25 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última tarea terminada
 
-**T021 (identidad de las máquinas, D-3 cerrada).** Como el alumnado examina
-sobre máquinas virtuales de usar y tirar, el motor deja de guardar la identidad
-de las máquinas entre exámenes: la apunta durante la corrección, la escribe en
-el informe y rechaza a la máquina que cambie de identidad a mitad. Antes,
-recordarla de un examen para otro solo podía producir un aula entera rechazada
-el día del examen. Nunca se toca el fichero de claves del profesor. La entrada
-con clave SSH se queda fuera: el aula usa contraseña (T023, sin empezar).
+**T022 (el examen RA2 del curso, corregido entero).** El examen real de
+servicios de red —las dieciséis comprobaciones de KEA y BIND, con sus mismos
+pesos— se corrige de principio a fin contra un laboratorio de dos máquinas. La
+entrega completa saca 100 y la entrega con cuatro errores y el servidor DNS
+parado saca 69, y el informe dice de cada suspenso qué se esperaba y qué había.
+Al formato no le falta nada: las dieciséis se escriben sin inventar ninguna
+forma nueva de comprobar. Cierra la fase 2.
 
-Antes, **T020**: el motor entiende enteros los dos exámenes reales del curso.
-Comprobar que algo **no** está, comprobar que un valor aparece **cerca** de
-otro, y corregir un cuestionario leyendo las respuestas del aula sin ejecutar
-nada en ninguna máquina. Un alumno con la máquina apagada no aprueba gratis las
-comprobaciones de «esto no debe estar».
+Antes, **T021** (identidad de las máquinas, D-3 cerrada). Como el alumnado
+examina sobre máquinas virtuales de usar y tirar, el motor deja de guardar la
+identidad de las máquinas entre exámenes: la apunta durante la corrección, la
+escribe en el informe y rechaza a la máquina que cambie de identidad a mitad.
+Nunca se toca el fichero de claves del profesor. La entrada con clave SSH se
+queda fuera: el aula usa contraseña (T023, sin empezar).
 
-Antes, **T013**: el ejemplo del modelo de resultado pasa a ser salida real del
-laboratorio (`docs/design/ejemplo-run.json`); ADR-0010 cierra con mediciones la
-forma de hablar con las máquinas. **T012**: los catorce criterios del hito
-comprobados uno por uno (trece en verde). Salida en `ACEPTACION-FASE1.md`.
+Antes, **T020**: comprobar que algo **no** está, que un valor aparece **cerca**
+de otro, y corregir un cuestionario sin ejecutar nada en ninguna máquina.
+**T013**: ADR-0010 y `docs/design/ejemplo-run.json`. **T012**: los catorce
+criterios del hito, trece en verde, en `ACEPTACION-FASE1.md`.
 
 ## Estado actual
 
@@ -62,8 +63,9 @@ comprobados uno por uno (trece en verde). Salida en `ACEPTACION-FASE1.md`.
 ## Pruebas ejecutadas
 
 `make check` verde · `gofmt -l` sin salida · `make test` verde contra el
-laboratorio: integración de `engine` y `ssh`, `test/secrets.sh` y
-`test/acceptance.sh` con 13 de los 14 criterios. Además, contra el laboratorio:
+laboratorio: integración de `engine` y `ssh`, `test/secrets.sh`,
+`test/acceptance.sh` con 13 de los 14 criterios y `test/ra2.sh` con los 13
+suyos (examen RA2 entero, `make lab-ra2`). Además, contra el laboratorio:
 la anticomprobación de un alumno inalcanzable sale `UNEVALUATED` y nunca `PASS`,
 y una máquina que cambia de identidad se rechaza con el motivo escrito.
 
@@ -77,11 +79,14 @@ y una máquina que cambia de identidad se rechaza con el motivo escrito.
 - No subir el Teuton instalado (2.10.6) a 3.0.0 sin probar (F-11).
 - **A-10 sigue pendiente**: pide los ficheros del formato viejo, que los escribe
   T040 (fase 3). El script lo marca `PEND` y no rompe el exit code.
+- `systemctl is-active` sin `dbus` en la máquina del alumno contesta con error
+  y la comprobación sale suspensa, no sin evaluar. Es correcto —el comando
+  respondió— pero conviene saberlo al montar una imagen de examen.
 - Un valor del tipo equivocado en una clave conocida escapa jerga de Go al
   mensaje de error (`plan.NearSpec`). Anotado como T014.
 
 ## Siguiente tarea recomendada
 
-**T022** (un examen real completo contra el laboratorio, P1), ya `READY`: es el
-cierre de la fase 2. También sigue `READY` **T014** (P2): un examen mal escrito
-debe explicarse en español con fichero, línea y clave.
+Fase 2 cerrada. **T030** (concurrencia acotada global y por host, fase 3) queda
+`READY` al terminar T022. También sigue `READY` **T014** (P2): un examen mal
+escrito debe explicarse en español con fichero, línea y clave.

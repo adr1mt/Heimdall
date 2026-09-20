@@ -1,0 +1,113 @@
+# Examen RA2 del curso, traducido del original de Teuton
+# (docs/design/01-TRADUCCION-EXAMENES.md). Son las mismas 16 comprobaciones,
+# con el mismo peso, sin tuberías y sin depender del idioma del sistema.
+examen: "Examen RA2 · Servicios de red (KEA + BIND)"
+version: 3
+hosts: [host1]
+
+por_defecto:
+  peso: 1
+  timeout: 20s
+
+grupos:
+  - grupo: "Red"
+    comprobaciones:
+      - id: netplan
+        descripcion: "El servidor tiene 10.0.0.1/8 en enp2s0"
+        en: host1
+        cmd: ["ip", "address", "show", "dev", "enp2s0"]
+        contiene: "10.0.0.1/8"
+
+  - grupo: "KEA"
+    comprobaciones:
+      - id: kea-red
+        descripcion: "KEA declara la subred 10.0.0.0/8"
+        en: host1
+        cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
+        cerca_de: { ancla: '"subnet"', lineas: 5, contiene: "10.0.0.0/8" }
+
+      - id: kea-tarjeta
+        descripcion: "KEA sirve por la tarjeta enp2s0"
+        en: host1
+        cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
+        contiene: "enp2s0"
+
+      - id: kea-puerta-enlace
+        descripcion: "KEA reparte 10.0.0.1 como puerta de enlace"
+        en: host1
+        cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
+        cerca_de: { ancla: '"name": "routers"', lineas: 5, contiene: "10.0.0.1" }
+
+      - id: kea-dns
+        descripcion: "KEA reparte 10.0.0.1 como servidor DNS"
+        en: host1
+        cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
+        cerca_de: { ancla: '"name": "domain-name-servers"', lineas: 5, contiene: "10.0.0.1" }
+
+  - grupo: "DNS"
+    comprobaciones:
+      - id: dns-forwarder
+        descripcion: "Reenviador 9.9.9.9 configurado"
+        en: host1
+        cmd: ["cat", "/etc/bind/named.conf.options"]
+        cerca_de: { ancla: "forwarders", lineas: 5, contiene: "9.9.9.9" }
+
+      - id: dns-red-trabajo
+        descripcion: "La red 10.0.0.0/8 está autorizada en las opciones"
+        en: host1
+        cmd: ["cat", "/etc/bind/named.conf.options"]
+        contiene: "10.0.0.0/8;"
+
+      - id: dns-zonas
+        descripcion: "La zona inversa 10.in-addr.arpa está declarada"
+        en: host1
+        cmd: ["cat", "/etc/bind/named.conf.local"]
+        contiene: "10.in-addr.arpa"
+
+      - id: dns-pc1
+        descripcion: "pc1 resuelve a 10.1.1.100 en la zona directa"
+        en: host1
+        cmd: ["cat", "/etc/bind/forward.examen.local"]
+        cerca_de: { ancla: "pc1", lineas: 0, contiene: "10.1.1.100" }
+
+      - id: dns-servidorweb
+        descripcion: "servidorweb resuelve a 10.2.0.1 en la zona directa"
+        en: host1
+        cmd: ["cat", "/etc/bind/forward.examen.local"]
+        cerca_de: { ancla: "servidorweb", lineas: 0, contiene: "10.2.0.1" }
+
+      - id: dns-alias
+        descripcion: "blog es un alias de pc1.examen.local"
+        en: host1
+        cmd: ["cat", "/etc/bind/forward.examen.local"]
+        cerca_de: { ancla: "blog", lineas: 0, contiene: "pc1.examen.local" }
+
+      - id: dns-texto
+        descripcion: "La zona directa tiene un registro TXT con «hola»"
+        en: host1
+        cmd: ["cat", "/etc/bind/forward.examen.local"]
+        cerca_de: { ancla: "TXT", lineas: 3, contiene: "hola" }
+
+      - id: dns-inversa-servidor
+        descripcion: "La zona inversa resuelve 10.0.0.1"
+        en: host1
+        cmd: ["cat", "/etc/bind/reverse.examen.local"]
+        contiene: "1.0.0"
+
+      - id: dns-inversa-pc1
+        descripcion: "La zona inversa resuelve 10.1.1.100"
+        en: host1
+        cmd: ["cat", "/etc/bind/reverse.examen.local"]
+        contiene: "100.1.1"
+
+      - id: dns-inversa-servidorweb
+        descripcion: "La zona inversa resuelve 10.2.0.1"
+        en: host1
+        cmd: ["cat", "/etc/bind/reverse.examen.local"]
+        contiene: "1.0.2"
+
+      - id: dns-activo
+        descripcion: "El servicio named está activo"
+        en: host1
+        cmd: ["systemctl", "is-active", "named"]
+        igual_a: "active"

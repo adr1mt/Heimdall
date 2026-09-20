@@ -43,3 +43,32 @@ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=$D/known_hosts \
 
 `podman` y el `timeout` de coreutils (con `--kill-after`). `test/lab.sh` falla
 con un mensaje claro si falta alguno.
+
+## Laboratorio del examen RA2
+
+El examen RA2 real (KEA + BIND, 16 comprobaciones) necesita máquinas con los
+ficheros de configuración del temario y con `named` de verdad. Son dos:
+
+```bash
+make lab-ra2        # levanta ra2-bien y ra2-parcial
+make lab-ra2-down   # los borra
+test/ra2.sh         # ejecuta el examen y comprueba el resultado
+```
+
+| Máquina | Puerto | Entrega |
+|---|---|---|
+| `ra2-bien` | `127.1.2.3:2211` | Ejercicio completo: 16 de 16 |
+| `ra2-parcial` | `127.1.2.3:2212` | Cuatro errores y `named` parado: 11 de 16 |
+
+Son contenedores con systemd (`--systemd=always`) porque el examen pregunta a
+`systemctl` si el servicio está activo, y con `NET_ADMIN` porque el examen lee
+la tarjeta `enp2s0`, que el laboratorio crea como interfaz `dummy` con
+`10.0.0.1/8`.
+
+Credenciales, también ficticias: `usuario` / `EVALON_SECRET_RA2_TEST`. El aula
+de verdad usa `usuario`/`usuario`; aquí no, porque en desarrollo no se usan
+credenciales reales.
+
+Los ficheros que entrega cada alumno están en `test/ra2/configs/<variante>/`.
+Editarlos y volver a levantar el laboratorio es la forma de probar una
+comprobación nueva.

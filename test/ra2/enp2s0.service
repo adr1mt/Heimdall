@@ -1,0 +1,13 @@
+[Unit]
+Description=Lab interface enp2s0 for the RA2 exam
+Before=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/sbin/ip link add enp2s0 type dummy
+ExecStart=/sbin/ip address add 10.0.0.1/8 dev enp2s0
+ExecStart=/sbin/ip link set enp2s0 up
+
+[Install]
+WantedBy=multi-user.target

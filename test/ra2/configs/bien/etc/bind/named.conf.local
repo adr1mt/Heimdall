@@ -1,0 +1,9 @@
+zone "examen.local" {
+    type master;
+    file "/etc/bind/forward.examen.local";
+};
+
+zone "10.in-addr.arpa" {
+    type master;
+    file "/etc/bind/reverse.examen.local";
+};

@@ -1,0 +1,26 @@
+# Aula de pruebas contra el laboratorio de test/ra2. Nombres ficticios; las
+# máquinas son los dos contenedores que levanta test/ra2/lab.sh.
+aula: "Laboratorio RA2"
+version: 2
+
+comun:
+  hosts:
+    host1:
+      usuario: "usuario"
+      password_ref: "${AULA_PASSWORD}"
+  timeouts:
+    conexion: 10s
+    alumno: 5m
+
+alumnos:
+  - id: alumne01
+    nombre: "Ana Ferrer"
+    moodle_id: "ana.ferrer@example.invalid"
+    hosts:
+      host1: { ip: "127.1.2.3", puerto: 2211 }
+
+  - id: alumne02
+    nombre: "Marc Oliva"
+    moodle_id: "marc.oliva@example.invalid"
+    hosts:
+      host1: { ip: "127.1.2.3", puerto: 2212 }

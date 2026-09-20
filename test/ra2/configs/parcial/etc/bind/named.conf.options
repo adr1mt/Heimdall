@@ -1,0 +1,20 @@
+acl "red-trabajo" {
+    10.0.0.0/8;
+    localhost;
+};
+
+options {
+    directory "/var/cache/bind";
+
+    forwarders {
+        9.9.9.9;
+        149.112.112.112;
+    };
+    forward only;
+
+    allow-query { "red-trabajo"; };
+    allow-recursion { "red-trabajo"; };
+
+    dnssec-validation no;
+    listen-on-v6 { any; };
+};

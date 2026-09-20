@@ -1,0 +1,35 @@
+# Student machine for the RA2 exam (KEA + BIND), as close to the classroom
+# image as a container gets: real systemd, real named, real config files.
+#
+# VARIANT picks the work handed in: "bien" is a complete exercise, "parcial"
+# has four mistakes on purpose so the report has something to explain.
+#
+# Test credentials are fictitious and public on purpose. The classroom uses
+# usuario/usuario; the password here is not a real one (see .claude/rules).
+FROM docker.io/library/debian:12-slim
+
+ARG VARIANT=bien
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      systemd systemd-sysv dbus openssh-server bind9 bind9-utils iproute2 procps && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir -p /run/sshd /etc/kea && \
+    useradd -m -s /bin/bash usuario && \
+    echo 'usuario:EVALON_SECRET_RA2_TEST' | chpasswd && \
+    sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -i 's/^#*PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config && \
+    ssh-keygen -A && \
+    systemctl enable ssh
+
+# The exam reads the interface by name. A container has eth0, so the lab adds
+# a dummy enp2s0 with the address the exercise asks for (needs NET_ADMIN).
+COPY enp2s0.service /etc/systemd/system/enp2s0.service
+RUN systemctl enable enp2s0.service
+
+COPY configs/${VARIANT}/etc/ /etc/
+
+# The partial exercise also hands in a DNS server that is not running.
+RUN if [ "$VARIANT" = "parcial" ]; then systemctl disable named; else systemctl enable named; fi
+
+CMD ["/sbin/init"]

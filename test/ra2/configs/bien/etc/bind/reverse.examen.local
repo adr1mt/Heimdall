@@ -1,0 +1,8 @@
+$TTL 604800
+@   IN  SOA ns1.examen.local. admin.examen.local. (
+        2 604800 86400 2419200 604800 )
+
+@           IN  NS      ns1.examen.local.
+1.0.0       IN  PTR     ns1.examen.local.
+100.1.1     IN  PTR     pc1.examen.local.
+1.0.2       IN  PTR     servidorweb.examen.local.

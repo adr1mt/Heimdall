@@ -596,7 +596,7 @@
       "id": "T022",
       "title": "Ejecucion de un examen real completo contra el laboratorio",
       "phase": 2,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T020",
@@ -614,14 +614,16 @@
       "acceptance": [
         "El examen RA2 (16 comprobaciones) se ejecuta entero y cada resultado es explicable desde el JSON"
       ],
-      "tests": [],
-      "notes": "Detallar al llegar."
+      "tests": [
+        "test/ra2.sh"
+      ],
+      "notes": "Hecho el 2026-09-20. Laboratorio en test/ra2 (dos maquinas con systemd, KEA y BIND), examen en testdata/ra2. Las 16 comprobaciones del original se traducen sin primitiva nueva: contiene, cerca_de e igual_a bastan. Al formato no le falta nada para el material real."
     },
     {
       "id": "T030",
       "title": "Concurrencia acotada global y por host",
       "phase": 3,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T022"
