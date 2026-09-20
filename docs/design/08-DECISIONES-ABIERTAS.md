@@ -4,11 +4,14 @@ Solo las que de verdad lo están. Las cerradas están en `docs/adr/`.
 
 | # | Decisión | Por qué sigue abierta | Cuándo se puede cerrar |
 |---|---|---|---|
-| **D-10** | Qué nota vale en una sesión de examen | Las vueltas de un examen son fotografías del mismo examen, no intentos sueltos: ahí manda la **mejor nota completa**, y eso es lo contrario de la regla de ADR-0019, que es para una cadena de reintento técnico. Falta el ADR que fije las dos reglas y la frontera entre ellas | En T062 |
 | **D-5** | Detección de valores repetidos (anticopia) | Tiene valor pedagógico y hoy pone la nota a 0 automáticamente, cosa descartada. Falta decidir si se implementa como **marca** en el informe | Cuando haya un caso real; no bloquea nada |
 
 ## Lo que se ha cerrado en esta sesión y antes estaba abierto
 
+- **D-10** (qué nota vale en una sesión de examen): la **mejor nota completa**
+  de la sesión, por alumno, y `FINISHED` cuando llega al total del PLAN. Es la
+  regla contraria a la de ADR-0019 porque el caso es el contrario: ahí se
+  repite lo que falló, aquí el alumno sigue trabajando. ADR-0020.
 - **D-8** (qué ofrece la GUI ante un `INCOMPLETE`): dejarlo pendiente por
   defecto, o repetir **solo** las comprobaciones sin evaluar, en una ejecución
   aparte con su propio artefacto. Sin marcar a mano en el MVP. ADR-0018.

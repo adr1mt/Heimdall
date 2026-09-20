@@ -524,3 +524,25 @@ Dos decisiones menores:
 6. **T057 se dividió en motor (T057) y pantalla (T061).** La regla y la nota
    son de un sitio, la vista de otro, y mezclarlas en una tarea habría metido
    el cálculo de la nota en la interfaz por comodidad.
+
+## T062 · La sesión de examen
+
+1. **ADR-0020**, que cierra D-10: en una sesión de examen la nota de cada
+   alumno es la **mejor vuelta con nota completa**, y eso es lo contrario de
+   ADR-0019 a propósito. En un reintento se repite lo que falló y lo nuevo
+   sustituye a lo viejo; en un examen el alumno sigue trabajando y cada vuelta
+   es una fotografía más del mismo examen.
+2. **Se elige la vuelta entera, no la mejor comprobación de cada una.** Coser
+   lo mejor de cada vuelta construiría un alumno que nunca existió: uno que
+   tuvo el servidor bien a las 10:20 y el cortafuegos bien a las 11:00 sin que
+   las dos cosas lo estuvieran a la vez nunca.
+3. **Solo compiten las vueltas completas.** De ahí sale la garantía que
+   importa: una vuelta posterior no puede rebajar nada, así que la máquina que
+   se apaga al final no baja una nota ya puesta (principio 3).
+4. **`FINISHED` se compara sobre los pesos crudos**, no sobre el entero 0-100:
+   un 99,6 % redondea a 100 y no es haber terminado.
+5. **Las vueltas se leen en el orden en que se corrieron**, y una fuera de
+   orden es un error, no algo que se arregle por dentro: si el orden no es el
+   real, «de qué vuelta sale la nota» es mentira.
+6. **Empate: gana la primera vuelta que llegó**, que es cuando el alumno llegó
+   ahí.

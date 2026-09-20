@@ -1325,7 +1325,7 @@
       "id": "T062",
       "title": "Sesion de examen: la mejor nota completa y el estado FINALIZADO (modelo)",
       "phase": 5,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T057",
@@ -1363,7 +1363,7 @@
       "id": "T063",
       "title": "Motor: publicar la sesion de examen y dejar fuera a los finalizados",
       "phase": 5,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T062"
