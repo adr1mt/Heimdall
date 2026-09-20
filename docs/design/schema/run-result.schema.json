@@ -214,6 +214,10 @@
           "type": "string",
           "format": "date-time"
         },
+        "reason": {
+          "type": "string",
+          "description": "Por qué no se evaluó a este alumno, en palabras del aula. Solo aparece con status EXCLUDED: el aula lo deja fuera, o la sesión de examen ya lo dio por terminado y esta vuelta no lo corrige (ADR-0020)."
+        },
         "score": {
           "$ref": "#/$defs/Score"
         },

@@ -189,6 +189,12 @@ func sessionStudentOrder(rounds []SessionRound) []string {
 }
 
 // sessionStudent applies the rule to one student.
+//
+// The best round is looked for before anything else, on purpose: a round that
+// left the student out does not erase what an earlier one had already given
+// them. That is how a student the session already finished —and whom the next
+// round leaves out (T063)— keeps their grade instead of losing it the moment
+// they stop being corrected.
 func sessionStudent(id string, rounds []SessionRound) SessionStudent {
 	out := SessionStudent{StudentID: id}
 
@@ -216,13 +222,6 @@ func sessionStudent(id string, rounds []SessionRound) SessionStudent {
 		return out
 	}
 
-	if last.Status == StudentExcluded {
-		out.Status = SessionExcluded
-		out.Score = last.Score
-		out.Reason = "el aula deja fuera a este alumno: ninguna vuelta lo iba a evaluar"
-		return out
-	}
-
 	// Only complete rounds compete (ADR-0020 §2). Ties go to the first round
 	// that reached the grade: that is when the student got there.
 	best := -1
@@ -236,6 +235,14 @@ func sessionStudent(id string, rounds []SessionRound) SessionStudent {
 	}
 
 	if best < 0 {
+		if last.Status == StudentExcluded {
+			// Nobody was ever going to evaluate them, so there is nothing to
+			// compare and nothing to grade.
+			out.Status = SessionExcluded
+			out.Score = last.Score
+			out.Reason = "el aula deja fuera a este alumno: ninguna vuelta lo iba a evaluar"
+			return out
+		}
 		// Still working and nothing whole to grade yet. Not a zero, and not a
 		// reason to stop correcting them (ADR-0020 §3).
 		out.Status = SessionActive

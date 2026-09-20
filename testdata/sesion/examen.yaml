@@ -1,0 +1,21 @@
+# Examen de la sesión de examen (T063, ADR-0020). Todo lo que pide lo cumple
+# la máquina del laboratorio: sirve para que un alumno llegue al examen entero
+# y la vuelta siguiente lo deje fuera.
+examen: "Sesión de examen"
+version: 1
+hosts: [host1]
+por_defecto: { peso: 1, timeout: 20s }
+grupos:
+  - grupo: "Base"
+    comprobaciones:
+      - id: s1-hostname
+        descripcion: "El host responde y se identifica"
+        en: host1
+        cmd: ["hostname"]
+        contiene: "alu"
+      - id: s2-fichero
+        descripcion: "Existe /etc/os-release"
+        en: host1
+        peso: 2
+        cmd: ["test", "-f", "/etc/os-release"]
+        exit_code: 0

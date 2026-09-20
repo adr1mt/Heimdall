@@ -35,11 +35,13 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 	cname := fs.String("cname", "", "nombre del fichero de aula, sin la extensión; por defecto aula.yaml")
 	cases := fs.String("case", "", "posiciones de los alumnos del aula que se evalúan, p. ej. 1,3")
 	retryFrom := fs.String("retry", "", "repite solo las comprobaciones que quedaron sin evaluar en el artefacto indicado")
+	var sessionRounds roundList
+	fs.Var(&sessionRounds, "session", "vuelta anterior de esta sesión de examen; se repite una vez por vuelta, de la más antigua a la más reciente, y deja fuera a quien ya terminó")
 	if err := fs.Parse(args); err != nil {
 		return exitInvalidConfig
 	}
 	if fs.NArg() != 1 {
-		fmt.Fprintln(stderr, "uso: heimdall run [--secrets=stdin|env] [--var=dir] [--events=ndjson] [--retry=artefacto] <directorio del examen>")
+		fmt.Fprintln(stderr, "uso: heimdall run [--secrets=stdin|env] [--var=dir] [--events=ndjson] [--retry=artefacto] [--session=vuelta ...] <directorio del examen>")
 		return exitInvalidConfig
 	}
 	if *eventStream != "" && *eventStream != "ndjson" {
@@ -81,6 +83,20 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 		}
 	}
 
+	// A round of a session and a repeat run are two different rules over two
+	// different questions, and the boundary between them is not crossed
+	// (ADR-0020). The frozen facade is not taught either of them (principio 13).
+	if len(sessionRounds) > 0 {
+		switch {
+		case *retryFrom != "":
+			fmt.Fprintln(stderr, "heimdall run: --session y --retry son dos cosas distintas: una vuelta de la sesión corrige la clase entera y --retry repite lo que quedó sin evaluar")
+			return exitInvalidConfig
+		case *compat != "" || *export != "":
+			fmt.Fprintln(stderr, "heimdall run: --session no se combina con --compat ni con --export")
+			return exitInvalidConfig
+		}
+	}
+
 	p, err := plan.LoadNamed(fs.Arg(0), *cname)
 	if err != nil {
 		fmt.Fprintf(stderr, "heimdall run: la configuración no es válida\n\n%s\n", err)
@@ -89,6 +105,16 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 	if err := selectCases(p, *cases); err != nil {
 		fmt.Fprintf(stderr, "heimdall run: %s\n", err)
 		return exitInvalidConfig
+	}
+
+	// Who has already finished is resolved before anything is dialled too: a
+	// session of another exam is a configuration error and ends with exit 2
+	// and an untouched classroom (ADR-0020 §5).
+	if len(sessionRounds) > 0 {
+		if err := excludeFinished(p, sessionRounds); err != nil {
+			fmt.Fprintf(stderr, "heimdall run: %s\n", err)
+			return exitInvalidConfig
+		}
 	}
 
 	// The repeat run is resolved whole before anything is dialled: a previous

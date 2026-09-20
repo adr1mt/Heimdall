@@ -1363,7 +1363,7 @@
       "id": "T063",
       "title": "Motor: publicar la sesion de examen y dejar fuera a los finalizados",
       "phase": 5,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T062"
@@ -1398,7 +1398,7 @@
       "id": "T064",
       "title": "La aplicacion encadena el examen sobre la sesion, no sobre vueltas sueltas",
       "phase": 5,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T058",

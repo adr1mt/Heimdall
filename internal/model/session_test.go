@@ -449,3 +449,57 @@ func TestSessionSaysItIsNotAnArtifact(t *testing.T) {
 		t.Errorf("the session does not carry the PLAN denominator: %v", s.Plan)
 	}
 }
+
+// sessExcluded is the student the inventory leaves out: nothing ran and there
+// is no grade.
+func sessExcluded(id string, m int) StudentResult {
+	return StudentResult{
+		StudentID:  id,
+		Name:       id,
+		Status:     StudentExcluded,
+		StartedAt:  minute(m),
+		FinishedAt: minute(m),
+		Score:      Score{Total: sessPlan().TotalWeight, Status: ScoreExcluded},
+	}
+}
+
+// The classroom leaving a student out is not a grade and never becomes one.
+func TestSessionExcludedByTheInventoryHasNoGrade(t *testing.T) {
+	s := buildOK(t,
+		sessRound("R1", 0, sessExcluded("alumne09", 0)),
+		sessRound("R2", 10, sessExcluded("alumne09", 10)),
+	)
+	got := onlyStudent(t, s)
+
+	if got.Status != SessionExcluded {
+		t.Errorf("estado = %s, se esperaba %s", got.Status, SessionExcluded)
+	}
+	if got.Score.Final != nil || got.FromRound != 0 {
+		t.Errorf("nota = %v de la vuelta %d: al alumno que el aula deja fuera no se le pone nota", got.Score.Final, got.FromRound)
+	}
+	if got.Reason == "" {
+		t.Error("tiene que decir por qué no tiene nota")
+	}
+}
+
+// The one that T063 depends on: a student the session already finished is left
+// out of the next round, and that round does not take their grade away
+// (ADR-0020 §2 y §4).
+func TestSessionKeepsTheGradeOfAStudentLeftOutAfterFinishing(t *testing.T) {
+	s := buildOK(t,
+		sessRound("R1", 0, sessStudent("alumne01", 0, 8, 0)),
+		sessRound("R2", 10, sessStudent("alumne01", 10, 10, 0)),
+		sessRound("R3", 20, sessExcluded("alumne01", 20)),
+	)
+	got := onlyStudent(t, s)
+
+	if got.Status != SessionFinished {
+		t.Errorf("estado = %s, se esperaba %s: ya tenía el examen entero", got.Status, SessionFinished)
+	}
+	if got.Score.Final == nil || *got.Score.Final != 100 || got.FromRound != 2 {
+		t.Errorf("nota = %v de la vuelta %d, se esperaba 100 de la vuelta 2", got.Score.Final, got.FromRound)
+	}
+	if len(got.Rounds) != 3 || got.Rounds[2].Status != StudentExcluded {
+		t.Errorf("el histórico tiene que guardar también la vuelta que lo dejó fuera: %+v", got.Rounds)
+	}
+}

@@ -87,6 +87,12 @@ type StudentResult struct {
 	StartedAt  time.Time `json:"started_at"`
 	FinishedAt time.Time `json:"finished_at"`
 
+	// Reason is why this student was not evaluated, in the words of the
+	// classroom, and it is only ever set when Status is EXCLUDED. A student
+	// left out of a round has a reason, never a zero and never a grade that
+	// says nobody could look (ADR-0020 §4, principio 2).
+	Reason string `json:"reason,omitempty"`
+
 	Score  Score         `json:"score"`
 	Checks []CheckResult `json:"checks"`
 }

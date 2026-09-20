@@ -34,6 +34,7 @@ func (r *runner) evalStudent(ctx context.Context, sp plan.StudentPlan) model.Stu
 	if sp.Excluded {
 		result.FinishedAt = time.Now()
 		result.Status = model.StudentExcluded
+		result.Reason = sp.ExcludedReason
 		result.Score = model.Score{Total: r.plan.Summary.TotalWeight, Status: model.ScoreExcluded}
 		return result
 	}

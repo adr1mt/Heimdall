@@ -1,0 +1,31 @@
+# Aula de la sesión de examen. Nombres ficticios y credenciales de prueba.
+#
+# alumne01 lo tiene todo bien desde la primera vuelta: termina el examen y la
+# vuelta siguiente ya no lo corrige. alumne02 apunta a un puerto cerrado a
+# propósito: nunca llega a una vuelta entera, así que la sesión lo sigue
+# corrigiendo.
+aula: "Sesión de examen"
+version: 1
+
+comun:
+  hosts:
+    host1:
+      puerto: 2201
+      usuario: "alumno"
+      password_ref: "${AULA_PASSWORD}"
+  timeouts:
+    conexion: 10s
+    alumno: 2m
+
+alumnos:
+  - id: alumne01
+    nombre: "Alumna Uno"
+    hosts:
+      host1: { ip: "127.1.2.3", puerto: 2201 }
+    usuario: "alumno"
+
+  - id: alumne02
+    nombre: "Alumne Dos"
+    hosts:
+      host1: { ip: "127.1.2.3", puerto: 2299 }
+    usuario: "alumno"

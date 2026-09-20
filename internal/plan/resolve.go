@@ -68,6 +68,11 @@ type StudentPlan struct {
 	MoodleID string
 	Excluded bool
 	Checks   []ResolvedCheck
+
+	// ExcludedReason is why this student is left out, when it is not the
+	// inventory that left them out. It is carried to the artifact as it is:
+	// it is read by the teacher, not by the engine.
+	ExcludedReason string
 }
 
 // ResolvedCheck is one check of one student, with every ${...} already

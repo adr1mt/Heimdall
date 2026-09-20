@@ -45,6 +45,9 @@ printf '%s' "$SECRETS_JSON" | heimdall run --secrets=stdin --events=ndjson --var
   de comprobaciones. Si el `plan_hash` no coincide con el PLAN recién resuelto,
   es error de configuración (exit 2) y no se toca ninguna máquina.
   `--retry` no se combina con `--compat`, `--export` ni `--case`.
+- `--session=<vuelta>`, repetible, deja fuera de esta vuelta a quien la sesión
+  ya dio por terminado (§8). No se combina con `--retry` ni con la fachada
+  congelada.
 
 Códigos de salida, sin cambios: `0` todo evaluado · `2` configuración inválida
 · `3` ejecución parcial · `4` cancelada · `1` ni se pudo escribir.
@@ -179,7 +182,49 @@ produjo.
 La nota consolidada la calcula el motor con la misma función que la de una
 ejecución suelta. La GUI la enseña; no la suma.
 
-## 8. Cómo se verifica
+## 8. La sesión de examen
+
+La cuarta cosa que el motor publica es la **sesión de examen** (ADR-0020): las
+vueltas de una misma práctica leídas como una sola.
+
+```
+heimdall session <vuelta1.json> <vuelta2.json> …
+```
+
+Las vueltas se dan **de la más antigua a la más reciente**, en el orden en que
+se corrieron: el motor no las reordena, porque «de qué vuelta sale la nota»
+dejaría de ser cierto si lo hiciera. Escribe por `stdout` y no toca ningún
+fichero. Sale con `0` si todos los alumnos de la sesión tienen ya una nota
+cerrada, `3` si alguno todavía no, y `2` si las vueltas no forman sesión —otro
+`plan_hash`, un fichero que no se puede leer, la misma vuelta dos veces—, con
+el motivo en `stderr`.
+
+Lo que imprime lleva `kind: "session"` y su propia versión, `session_version`.
+**No es una consolidación y no se pide por `consolidate`**: una cadena de
+reintento vale por lo más reciente y una sesión por la mejor vuelta completa,
+y mezclarlas pondría la nota equivocada. De cada alumno dice la nota que vale,
+de qué vuelta sale (`from_round`, `from_run_id`), si está `FINISHED` y qué dijo
+cada vuelta (`rounds`, con `counts` en la que manda). No lleva comandos ni
+salida de las máquinas: eso sigue en el artefacto de cada vuelta.
+
+### La vuelta siguiente
+
+```
+heimdall run --session=<vuelta1.json> --session=<vuelta2.json> … <examen>
+```
+
+`--session` se repite una vez por vuelta, en el mismo orden, y deja fuera de
+esta vuelta a los alumnos que la sesión ya dio por **terminados**: no se abre
+ni una conexión contra su máquina. Salen en el artefacto con `status:
+"EXCLUDED"` y un `reason` que dice por qué y de qué vuelta viene su nota;
+nunca como un cero ni como sin evaluar.
+
+Lo que **no** cambia es el PLAN: `check_ids`, pesos, `total_weight` y
+`plan_hash` son los mismos que en las demás vueltas. Dejar a alguien fuera es
+una decisión de ejecución, no de nota. `--session` no se combina con `--retry`
+—son las dos reglas distintas— ni con la fachada congelada.
+
+## 9. Cómo se verifica
 
 [`test/eventos.sh`](../../test/eventos.sh) es el consumidor de prueba: lee una
 ejecución entera del laboratorio con nada más que el flujo y el artefacto al
@@ -187,6 +232,12 @@ que apunta, y comprueba E-1 a E-10 con `jq`. Entre ellos, que el flujo y el
 artefacto digan exactamente lo mismo comprobación a comprobación, que no
 aparezca ninguna contraseña, que ninguna línea se desborde y que una ejecución
 cancelada cierre el flujo.
+
+[`test/sesion.sh`](../../test/sesion.sh) hace lo propio con la sesión: corre
+dos vueltas seguidas contra el laboratorio con un alumno que llega al examen
+entero y comprueba S-1 a S-8, entre ellos que la segunda vuelta no deja ni una
+línea nueva en el registro de `sshd` de su máquina y que su nota de sesión
+sigue siendo la de la vuelta en que la sacó.
 
 El esquema no se puede desincronizar de los tipos en silencio: los tests de
 `internal/report` lo recorren campo a campo contra el modelo.
