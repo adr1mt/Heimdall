@@ -1,0 +1,154 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 27% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 217 91% 52%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 214 100% 96%;
+    --accent-foreground: 221 83% 45%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    /* Verde oscurecido: con el 40% anterior, el texto blanco de los chips «OK»
+       de la matriz se quedaba en 2,8:1 y el «7/9» verde sobre blanco en 3:1. */
+    --success: 142 76% 29%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    /* Texto oscuro sobre ámbar: en blanco se quedaba en 2,1:1 en los chips
+       «parcial» de la matriz, que es lo que más se repite al proyectar. */
+    --warning-foreground: 222 47% 11%;
+    /* Variantes «strong»: texto sobre superficies teñidas con el mismo color al
+       10-15%. El color puro se queda ahí en 2-3:1, y justo eso es lo que llevan
+       la nota del alumno y los avisos: lo más importante de la pantalla. */
+    --warning-strong: 32 95% 30%;
+    --success-strong: 142 78% 24%;
+    --destructive-strong: 0 74% 38%;
+    --border: 220 13% 91%;
+    --input: 220 13% 88%;
+    --ring: 217 91% 52%;
+    --sidebar: 222 47% 11%;
+    --sidebar-foreground: 220 14% 90%;
+    /* Consola del CLI: siempre oscura en los dos temas (es una terminal), pero
+       declarada como token para que no haya literales sueltos en los componentes. */
+    --console: 222 47% 6%;
+    --console-foreground: 220 14% 86%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222 47% 7%;
+    --foreground: 220 14% 96%;
+    --card: 222 40% 11%;
+    --card-foreground: 220 14% 96%;
+    --popover: 222 40% 11%;
+    --popover-foreground: 220 14% 96%;
+    --primary: 213 94% 68%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 222 30% 17%;
+    --secondary-foreground: 220 14% 96%;
+    --muted: 222 30% 16%;
+    --muted-foreground: 220 10% 60%;
+    --accent: 217 45% 24%;
+    --accent-foreground: 213 94% 85%;
+    --destructive: 0 72% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 65% 47%;
+    /* Texto oscuro sobre el verde claro del tema oscuro (mismo criterio que
+       --warning-foreground): en blanco se quedaba en 2,2:1. */
+    --success-foreground: 222 47% 11%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 222 47% 11%;
+    --warning-strong: 38 95% 68%;
+    --success-strong: 142 62% 60%;
+    --destructive-strong: 0 85% 74%;
+    --border: 222 25% 20%;
+    --input: 222 25% 24%;
+    --ring: 213 94% 68%;
+    --sidebar: 222 47% 5%;
+    --sidebar-foreground: 220 14% 88%;
+    --console: 222 47% 4%;
+    --console-foreground: 220 14% 86%;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  /* Modo proyector: la raíz pasa de 16px a 20px. Toda la interfaz está medida
+     en `rem`, así que este único número agranda el panel entero un 25 % —lo que
+     hace falta para leerlo desde el fondo del aula— sin tocar ni un componente
+     ni romper ninguna proporción. */
+  html.proyector {
+    font-size: 20px;
+  }
+
+  body {
+    margin: 0;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Cifras del marcador: mismo ancho por dígito y sin la «1» estrecha. Un número
+     que reajusta su columna al cambiar en vivo roba la mirada durante el examen. */
+  .tnum {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.35);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.55);
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer utilities {
+  .no-drag {
+    -webkit-app-region: no-drag;
+  }
+  .drag {
+    -webkit-app-region: drag;
+  }
+}

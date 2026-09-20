@@ -882,7 +882,7 @@
       "id": "T051",
       "title": "Semilla de gui/: Heimdall GUI sin una linea de Teuton",
       "phase": 5,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "T050"
@@ -906,13 +906,13 @@
         "make check del motor sigue en verde"
       ],
       "tests": [],
-      "notes": "La GUI vive dentro de este repositorio (decision del 2026-09-20). teuton-gui queda como referencia de solo lectura en workspace/."
+      "notes": "Cerrada el 2026-09-20. gui/ arranca con identidad propia, encuentra el motor y dice su version; grep -ri teuton en gui/src no devuelve nada. De teuton-gui pasan la base tecnica y el sistema visual, no sus pantallas: estaban escritas contra el contrato viejo y se rehacen en T052/T053/T054/T071. Tests retirados y su motivo en gui/docs/TESTS-RETIRADOS.md. make gui-check verde (13 tests), make check del motor sin tocar."
     },
     {
       "id": "T052",
       "title": "La GUI lanza el motor y sigue la ejecucion por el contrato nativo",
       "phase": 5,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P0",
       "depends_on": [
         "T051"

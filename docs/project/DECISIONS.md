@@ -347,3 +347,24 @@ Dos decisiones menores:
 8. **`test/eventos.sh` es el consumidor de prueba.** Lee una ejecución entera
    con nada más que el flujo y el artefacto al que apunta. Lo que no se pueda
    averiguar ahí, la GUI tampoco podrá.
+
+## T051 · La semilla de la GUI
+
+1. **La semilla es el armazón, no la aplicación entera.** De `teuton-gui` pasan
+   la base técnica (Electron, Vite, CSP, preload aislado y sin ESM) y el sistema
+   visual (`components/ui`, `globals.css`, la escala tipográfica). Las pantallas
+   de ejecución, resultados, analíticas, clases y editor **no** se copian: todas
+   estaban escritas contra el contrato de Teutón y se rehacen sobre el nativo en
+   T052, T053, T054 y T071. Copiarlas para vaciarlas después habría dejado un
+   árbol lleno de código muerto que nadie podía ejecutar.
+2. **La aplicación reconoce el motor por su propia línea de versión.** Busca
+   `heimdall <versión>` en la salida de `heimdall version`, que hoy lleva
+   delante el prefijo de la fachada congelada y mañana, tras T060, no lo
+   llevará. La GUI funciona con las dos y no acepta como motor un programa que
+   no se identifique como Heimdall.
+3. **El ajuste que se guarda es uno: con qué binario se lanza el motor.** Se
+   escribe de forma atómica en el directorio de datos de la aplicación y no
+   contiene ningún secreto. Un fichero ilegible abre la aplicación con el valor
+   por defecto en vez de impedir arrancar.
+4. **`gui/` es un árbol Node independiente.** `make check` no lo toca;
+   `make gui-check` corre su typecheck y su suite.

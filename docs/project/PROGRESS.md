@@ -6,25 +6,17 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-Dos cosas, en dos commits.
+**T051, hecha**: existe `gui/`, la aplicación propia. Arranca con su nombre, su
+icono y su identidad, encuentra el motor, dice su versión y recuerda el examen y
+el aula con los que se va a trabajar. Todavía no corrige: eso es T052.
 
-**Replanificación (ADR-0016)**: Heimdall deja de ser compatible con Teuton. Ni
-`config.yaml`, ni `start.rb`, ni importador de exámenes antiguos. T041, T043 y
-T044 quedan `DROPPED` con su motivo y la capa legacy, congelada hasta T060. La
-cadena es Heimdall GUI → contrato nativo → motor → SSH → máquinas.
+De `teuton-gui` pasan la base técnica y el sistema visual; sus pantallas no
+—estaban escritas contra el contrato de Teutón y se rehacen sobre el nativo—.
+`grep -ri teuton gui/src` no devuelve nada; los tests retirados y su motivo
+están en `gui/docs/TESTS-RETIRADOS.md`.
 
-**T050, hecha (ADR-0017)**: `heimdall run --events=ndjson` emite cinco eventos
-por `stdout` —`run.start` con el denominador exacto y el total de la barra,
-`student.start`, `check.end` con estado y causa separados, `student.end` con la
-nota, `run.end` con el artefacto y el código de salida— y el esquema del
-artefacto está publicado en `docs/design/schema/`. `test/eventos.sh` lee una
-ejecución entera solo con el flujo y el artefacto: E-1 a E-10 en verde contra
-el laboratorio. El esquema no puede desincronizarse del modelo. La fachada
-congelada no se ha tocado; `--events` y `--export` son incompatibles.
-
-En palabras de aula: la GUI nueva ya puede saber, mientras corrige, cuántas
-comprobaciones quedan y por qué ha fallado cada una. Una máquina apagada deja
-de parecerse a un examen mal hecho.
+En palabras de aula: ya hay una aplicación de Heimdall que se abre y sabe decir
+si el corrector está instalado. Falta que corrija y enseñe las notas.
 
 ## Estado actual
 
@@ -46,13 +38,17 @@ de parecerse a un examen mal hecho.
   reintentos, identidades en memoria (ADR-0011), 64 kB por flujo, corte a 8 MB.
 - `test/lab.sh`: `alu1` en `127.1.2.3:2201`; el alumno roto, puerto 2299.
   `test/acceptance.sh` recorre A-1 a A-14 y `test/eventos.sh` E-1 a E-10.
-- `gui/` **no existe todavía**. `workspace/teuton-gui` es referencia de solo
-  lectura.
+- `gui/`: Electron + React + Tailwind, árbol Node independiente. `make gui-check`
+  (typecheck + vitest) y `make gui-build`; `make check` no depende de él. Tres
+  vistas: Inicio, Ajustes y Ayuda. Un solo ajuste guardado, la ruta del motor.
+  `npm run screenshot` captura la ventana ya compilada.
+- `workspace/teuton-gui` es referencia de solo lectura.
 
 ## Pruebas ejecutadas
 
-`make check` verde · `gofmt -l` sin salida · `make test` entero contra el
-laboratorio: integración de `engine` y `ssh`, `secrets.sh`, `acceptance.sh`
+`make check` verde · `gofmt -l` sin salida · `make gui-check` verde (13 tests,
+typecheck de main, renderer y tests) · la ventana levantada y capturada en los
+dos temas · `make test` entero contra el laboratorio: integración de `engine` y `ssh`, `secrets.sh`, `acceptance.sh`
 13 de 14, **`eventos.sh` 10 de 10**, `ra2.sh` 13, `carga.sh` con A-15.
 
 ## Problemas conocidos
@@ -65,5 +61,6 @@ laboratorio: integración de `engine` y `ssh`, `secrets.sh`, `acceptance.sh`
 
 ## Siguiente tarea recomendada
 
-**T051** (`READY`, P0): la semilla de `gui/`. Heimdall GUI arrancando con la
-base técnica y visual de `teuton-gui` y sin una línea de Teuton dentro.
+**T052** (`READY`, P0): que la GUI lance el motor y siga la ejecución por el
+contrato nativo, con progreso por comprobación y cancelación con artefacto
+parcial.

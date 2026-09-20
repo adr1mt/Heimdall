@@ -4,7 +4,7 @@ GO ?= go
 BIN := bin/heimdall
 
 # Test SSH lab. See test/lab.sh.
-.PHONY: check test build lab lab-down lab-status lab-ra2 lab-ra2-down rendimiento clean
+.PHONY: check test build lab lab-down lab-status lab-ra2 lab-ra2-down rendimiento gui-check gui-build clean
 
 ## check: fast suite. No network, no disk. Must stay under 10 s.
 check:
@@ -49,6 +49,15 @@ lab-down:
 ## lab-status: report whether the lab is listening.
 lab-status:
 	test/lab.sh status
+
+## gui-check: the GUI's own fast suite. Independent Node tree, so `make check`
+## never depends on it.
+gui-check:
+	cd gui && npm run typecheck && npm test
+
+## gui-build: compile the GUI into gui/out.
+gui-build:
+	cd gui && npm run build
 
 clean:
 	rm -rf bin/

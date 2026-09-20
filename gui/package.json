@@ -1,0 +1,91 @@
+{
+  "name": "heimdall-gui",
+  "version": "0.1.0",
+  "description": "Heimdall GUI: interfaz de escritorio del motor de evaluacion Heimdall",
+  "desktopName": "heimdall-gui",
+  "main": "./out/main/index.js",
+  "author": {
+    "name": "Adria Munoz",
+    "email": "adriamt@elpuig.xeill.net"
+  },
+  "license": "MPL-2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build && npm run verify:preload",
+    "start": "electron-vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
+    "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
+    "typecheck:test": "tsc --noEmit -p tsconfig.test.json",
+    "typecheck": "npm run typecheck:node && npm run typecheck:web && npm run typecheck:test",
+    "verify:preload": "node scripts/verify-preload.mjs",
+    "icon": "python3 scripts/make-icon.py",
+    "screenshot": "esbuild scripts/screenshot.ts --bundle --platform=node --format=esm --outfile=/tmp/heimdall-shot.mjs --external:electron && node_modules/electron/dist/electron /tmp/heimdall-shot.mjs --no-sandbox"
+  },
+  "build": {
+    "appId": "net.xeill.elpuig.heimdall",
+    "productName": "Heimdall",
+    "copyright": "Copyright (c) 2026 Adria Munoz",
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "files": [
+      "out/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "build/icon.png",
+        "to": "icon.png"
+      }
+    ],
+    "linux": {
+      "artifactName": "Heimdall-${version}.${ext}",
+      "icon": "build/icons",
+      "category": "Education",
+      "synopsis": "Evaluacion de practicas de sistemas y redes por SSH",
+      "description": "Corrige practicas de sistemas y redes sobre las maquinas del alumnado y publica las notas.",
+      "desktop": {
+        "entry": {
+          "Name": "Heimdall",
+          "Keywords": "heimdall;evaluacion;notas;aula;",
+          "StartupWMClass": "heimdall-gui"
+        }
+      },
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    }
+  },
+  "dependencies": {
+    "js-yaml": "^4.3.1"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.20.1",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "autoprefixer": "^10.4.19",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "electron": "^43.4.1",
+    "electron-builder": "^26.15.3",
+    "electron-vite": "^5.0.0",
+    "lucide-react": "^0.408.0",
+    "postcss": "^8.4.39",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^2.4.0",
+    "tailwindcss": "^3.4.6",
+    "typescript": "^5.5.3",
+    "vite": "^7.3.6",
+    "vitest": "^4.1.10",
+    "zustand": "^4.5.4"
+  }
+}

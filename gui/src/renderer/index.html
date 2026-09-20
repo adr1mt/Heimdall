@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- In DEVELOPMENT the CSP arrives as an HTTP header from the main process
+         (see src/main/index.ts), because it has to be relaxed
+         (script-src 'unsafe-inline') for the inline preamble of
+         @vitejs/plugin-react. In the PACKAGED app the renderer is loaded with
+         file://, where webRequest does not take part and the header never
+         arrives: there the strict CSP is embedded as a <meta> at build time
+         (inlineCsp in electron.vite.config.ts). Do not write it by hand here. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Heimdall</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
