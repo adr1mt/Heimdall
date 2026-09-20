@@ -672,7 +672,7 @@
       "id": "T032",
       "title": "Una salida desbordada no debe dejar la comprobación sin evaluar",
       "phase": 3,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [
         "T031"
@@ -701,7 +701,7 @@
       "id": "T040",
       "title": "LegacyTeutonWriter completo y fachada CLI",
       "phase": 4,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T031"

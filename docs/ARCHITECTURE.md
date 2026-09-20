@@ -106,7 +106,8 @@ Score             obtained/evaluable/total  (puntuación)
 
 - **Eje académico**, por comprobación: `PASS`, `FAIL`, `UNEVALUATED`.
 - **Eje técnico**, independiente: `NONE`, `CONNECT_FAILED`, `AUTH_FAILED`,
-  `TIMEOUT`, `CONNECTION_LOST`, `NOT_RUN`, `CANCELLED`, `ENGINE_ERROR`.
+  `TIMEOUT`, `CONNECTION_LOST`, `OUTPUT_OVERFLOW`, `NOT_RUN`, `CANCELLED`,
+  `ENGINE_ERROR`.
 - `UNEVALUATED` no entra en el denominador y **nunca** se convierte en `FAIL`.
 - Un exit 127 del servidor del alumno **es `FAIL`**: la máquina respondió.
 - `final_score` es `null` mientras exista una comprobación `UNEVALUATED` de peso

@@ -127,6 +127,10 @@ type ExecutionResult struct {
 	Completed bool `json:"completed"`
 	// ExitCode is null when !Completed.
 	ExitCode *int `json:"exit_code"`
+	// Overflow means the engine stopped reading because the command produced
+	// more output than it is willing to hold. It explains a !Completed that
+	// has nothing to do with the network.
+	Overflow bool `json:"overflow"`
 
 	Stdout Stream `json:"stdout"`
 	Stderr Stream `json:"stderr"`

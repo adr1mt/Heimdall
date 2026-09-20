@@ -33,6 +33,7 @@ es siempre `NONE`.
 | `AUTH_FAILED` | La sesión TCP se estableció y el servidor **rechazó las credenciales** | `s03-sshfail`: contraseña o usuario incorrectos |
 | `TIMEOUT` | El comando se envió y **no terminó** dentro del `timeout` de la comprobación | `s05-hang`: `sleep 100000` |
 | `CONNECTION_LOST` | La sesión estaba establecida y se **cayó** a mitad: la máquina se apaga, la red se corta, EOF inesperado | `s06-drop`: apagón durante la 2ª de 3 |
+| `OUTPUT_OVERFLOW` | El comando produjo más salida de la que el motor lee y se **dejó de leer** antes de que terminara (ADR-0015) | `cat` de un fichero de 300 MB |
 | `NOT_RUN` | El motor **decidió no ejecutarla**: una comprobación anterior del mismo alumno dejó la sesión inservible, o se agotó el presupuesto del alumno | Las 2 restantes de `s06-drop` |
 | `CANCELLED` | El profesor paró la ejecución antes de que le llegase el turno o mientras corría | Botón «Parar» de la GUI, `Ctrl-C` |
 | `ENGINE_ERROR` | Fallo del propio motor: pánico recuperado, error de escritura, bug. **Nunca silencioso** | Cualquier defecto nuestro |

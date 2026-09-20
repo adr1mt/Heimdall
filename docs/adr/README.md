@@ -19,3 +19,4 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 | [0012](0012-topes-de-concurrencia.md) | Dos topes de concurrencia: 8 alumnos a la vez, 4 conexiones por máquina |
 | [0013](0013-alumnos-en-paralelo.md) | 16 alumnos en paralelo, medido; cierra D-6 |
 | [0014](0014-nombre-heimdall.md) | El producto se llama Heimdall; cierra D-7 |
+| [0015](0015-causa-salida-desbordada.md) | Novena causa técnica: `OUTPUT_OVERFLOW` |

@@ -87,6 +87,10 @@ const (
 	CauseNotRun Cause = "NOT_RUN"
 	// CauseCancelled means the teacher stopped the run.
 	CauseCancelled Cause = "CANCELLED"
+	// CauseOutputOverflow means the command produced more output than the
+	// engine is willing to read, so it was cut off before it could finish.
+	// It is not a network fault: the exam asks for too much output.
+	CauseOutputOverflow Cause = "OUTPUT_OVERFLOW"
 	// CauseEngineError is the only cause that is a bug of ours. Never silent.
 	CauseEngineError Cause = "ENGINE_ERROR"
 )

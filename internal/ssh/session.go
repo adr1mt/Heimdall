@@ -322,6 +322,7 @@ func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration
 		s.warn("OUTPUT_NOT_UTF8", fmt.Sprintf("la salida de %s no era UTF-8 valido y se ha saneado", s.cfg.Host))
 	}
 	if stdout.overflow || stderr.overflow {
+		res.Overflow = true
 		s.warn("OUTPUT_OVERFLOW", fmt.Sprintf("un comando en %s ha producido mas de 8 MB y se ha dejado de leer", s.cfg.Host))
 		return res // not completed: there is no trustworthy output to compare
 	}

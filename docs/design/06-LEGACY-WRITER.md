@@ -79,7 +79,7 @@ Mapeo de causas a etiquetas que la GUI ya conoce:
 |---|---|
 | `AUTH_FAILED` | `error_authentication_failed` |
 | `CONNECT_FAILED` | `host_unreachable` |
-| `CONNECTION_LOST`, `TIMEOUT`, `NOT_RUN`, `CANCELLED`, `ENGINE_ERROR` | `error` |
+| `CONNECTION_LOST`, `TIMEOUT`, `OUTPUT_OVERFLOW`, `NOT_RUN`, `CANCELLED`, `ENGINE_ERROR` | `error` |
 
 ## 4. `case-NN.json`
 

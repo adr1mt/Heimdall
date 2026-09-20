@@ -74,6 +74,8 @@ func detailFor(cause Cause) string {
 		return "el comando no terminó dentro del tiempo límite"
 	case CauseConnectionLost:
 		return "la sesión se cortó mientras se ejecutaba el comando"
+	case CauseOutputOverflow:
+		return "el comando produjo demasiada salida y se dejó de leer antes de que terminara; se conserva solo el principio"
 	case CauseNotRun:
 		return "el motor no llegó a ejecutar la comprobación"
 	case CauseCancelled:

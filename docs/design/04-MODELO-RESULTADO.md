@@ -119,6 +119,7 @@ type ExecutionResult struct {
 
     Completed bool  `json:"completed"`  // se recibió exit status y EOF en ambos flujos
     ExitCode  *int  `json:"exit_code"`  // null si !Completed
+    Overflow  bool  `json:"overflow"`   // se dejó de leer por exceso de salida
 
     Stdout    Stream `json:"stdout"`
     Stderr    Stream `json:"stderr"`
@@ -257,6 +258,7 @@ byte.
             "duration_ms": 2,
             "completed": true,
             "exit_code": 0,
+            "overflow": false,
             "stdout": {
               "text": "alu1\n",
               "bytes": 5,
@@ -300,6 +302,7 @@ byte.
             "duration_ms": 2,
             "completed": true,
             "exit_code": 127,
+            "overflow": false,
             "stdout": {
               "text": "",
               "bytes": 0,
@@ -344,6 +347,7 @@ byte.
             "duration_ms": 3003,
             "completed": false,
             "exit_code": null,
+            "overflow": false,
             "stdout": {
               "text": "",
               "bytes": 0,

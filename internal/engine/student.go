@@ -211,6 +211,11 @@ func causeOf(runCtx, studentCtx context.Context, sp plan.StudentPlan, budget tim
 		return model.CauseNone, ""
 	}
 	switch {
+	case exec.Overflow:
+		// The command was cut off for printing too much. Naming it a lost
+		// connection would send the teacher to look at the network.
+		return model.CauseOutputOverflow, fmt.Sprintf(
+			"el comando de la comprobación %s produjo demasiada salida y se dejó de leer; en el informe está el principio de lo que respondió", c.ID)
 	case exec.RemoteProcess == model.RemoteKilledRemote:
 		return model.CauseTimeout, fmt.Sprintf(
 			"el comando no terminó en %s y se ha matado en la máquina del alumno", c.Timeout)

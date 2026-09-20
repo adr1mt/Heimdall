@@ -150,6 +150,10 @@ else
     "$(q6 '.students[0].checks[0].execution.stdout.bytes <= 65536')" 'true'
   expect A-6 "se contabiliza todo lo que produjo el comando" \
     "$(q6 '.students[0].checks[0].execution.stdout.bytes_total > 65536')" 'true'
+  expect A-6 "el motivo nombra el desbordamiento, no una conexión perdida" \
+    "$(q6 '.students[0].checks[0].status + "/" + .students[0].checks[0].cause')" 'UNEVALUATED/OUTPUT_OVERFLOW'
+  expect A-6 "nadie suspende por una salida enorme" \
+    "$(q6 '.students[0].score.final_score == null and .students[0].score.status == "NOT_EVALUATED"')" 'true'
   RSS6="$(awk -F': ' '/Maximum resident set size/ {print $2}' "$WORK/time6")"
   if [ "${RSS6:-999999}" -lt 102400 ]; then
     ok A-6 "la memoria del motor se queda en $((RSS6 / 1024)) MB (< 100 MB)"

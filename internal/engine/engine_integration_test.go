@@ -110,3 +110,49 @@ func TestPrototypeAgainstTheLab(t *testing.T) {
 		t.Error("la contraseña aparece en el artefacto")
 	}
 }
+
+// TestOverflowIsNotALostConnection is the acceptance of T032: a machine that
+// prints 300 MB has its check cut off, and the reason that reaches the
+// artifact must name the overflow. What was read stays in the report, and the
+// student is not failed for it.
+//
+// Needs `make lab`.
+func TestOverflowIsNotALostConnection(t *testing.T) {
+	p, err := plan.Load("../../testdata/salida-grande")
+	if err != nil {
+		t.Fatalf("el PLAN de salida grande no resuelve: %v", err)
+	}
+
+	run := Run(context.Background(), p, Options{
+		RunID:         "integration-overflow",
+		EngineVersion: "test",
+		Secrets:       map[string]string{"AULA_PASSWORD": labPassword},
+	})
+
+	s := find(t, run, "alumne01")
+	if len(s.Checks) != 1 {
+		t.Fatalf("el examen tiene una sola comprobación, hay %d", len(s.Checks))
+	}
+	c := s.Checks[0]
+	if c.Status != model.Unevaluated || c.Cause != model.CauseOutputOverflow {
+		t.Errorf("%s: %q/%q, se esperaba UNEVALUATED/OUTPUT_OVERFLOW (%s)",
+			c.CheckID, c.Status, c.Cause, c.Detail)
+	}
+	if c.Detail == "" {
+		t.Error("una comprobación sin evaluar nunca se queda sin explicación")
+	}
+	if c.Execution == nil {
+		t.Fatal("la ejecución debe llegar al artefacto aunque se cortara")
+	}
+	if !c.Execution.Overflow {
+		t.Error("la ejecución no está marcada como desbordada")
+	}
+	// The 64 kB that were read are the point of the task: they stay in the
+	// report so the teacher can see what the machine was answering.
+	if c.Execution.Stdout.Bytes == 0 || !c.Execution.Stdout.Truncated {
+		t.Errorf("lo leído debe conservarse y marcarse truncado: %+v", c.Execution.Stdout)
+	}
+	if s.Score.Final != nil || s.Score.Status != model.ScoreNotEvaluated {
+		t.Errorf("nadie suspende por una salida enorme: %+v", s.Score)
+	}
+}

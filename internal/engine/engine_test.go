@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"reflect"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -394,5 +395,29 @@ func TestPartialArtifactAfterEachStudent(t *testing.T) {
 			OnStudentDone: func(*model.RunResult) error { calls++; return nil }})
 	if calls != 2 {
 		t.Errorf("%d parciales para 2 alumnos, se esperaban 2", calls)
+	}
+}
+
+// TestOverflowBeatsALostConnection pins the reason an overflow gets: closing
+// the session ourselves looks exactly like a drop from the outside, and the
+// teacher would be sent to look at the network instead of at the exam.
+func TestOverflowBeatsALostConnection(t *testing.T) {
+	exec := &model.ExecutionResult{Completed: false, Overflow: true, DurationMS: 5}
+	c := plan.ResolvedCheck{ID: "a6-salida-enorme", Timeout: time.Minute}
+
+	cause, detail := causeOf(context.Background(), context.Background(), plan.StudentPlan{ID: "alumne01"}, time.Minute, exec, c)
+	if cause != model.CauseOutputOverflow {
+		t.Errorf("causa %q, se esperaba OUTPUT_OVERFLOW", cause)
+	}
+	if !strings.Contains(detail, "salida") {
+		t.Errorf("el motivo no nombra la salida: %q", detail)
+	}
+
+	status, gotCause, _ := model.Classify(exec, nil, cause)
+	if status != model.Unevaluated {
+		t.Errorf("estado %q: una salida desbordada nunca es un suspenso", status)
+	}
+	if gotCause != model.CauseOutputOverflow {
+		t.Errorf("la causa se pierde por el camino: %q", gotCause)
 	}
 }

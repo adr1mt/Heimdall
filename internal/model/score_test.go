@@ -10,6 +10,7 @@ var allCauses = []Cause{
 	CauseAuthFailed,
 	CauseTimeout,
 	CauseConnectionLost,
+	CauseOutputOverflow,
 	CauseNotRun,
 	CauseCancelled,
 	CauseEngineError,

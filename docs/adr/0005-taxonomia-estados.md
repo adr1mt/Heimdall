@@ -1,5 +1,6 @@
 # ADR-0005 · PASS / FAIL / UNEVALUATED más causa técnica
 
+- Ampliada por ADR-0015: la causa `OUTPUT_OVERFLOW` hace nueve.
 - Estado: **aceptada** · 2026-09-19
 - Contexto: `KEEP-DROP-CHANGE.md` §Taxonomía, `03-ESTADOS-Y-NOTA.md`, F-07
 

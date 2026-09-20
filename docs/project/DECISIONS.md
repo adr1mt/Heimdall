@@ -229,3 +229,14 @@ Dos decisiones menores:
 4. **`seq` como generador de salida grande**: un único vector de argumentos,
    sin shell ni tubería, y texto de verdad en vez de bytes nulos.
 
+
+## T032 · Una salida desbordada ya no se llama caída de conexión
+
+1. **Novena causa técnica, `OUTPUT_OVERFLOW`** (ADR-0015). El corte lo hacemos
+   nosotros; llamarlo `CONNECTION_LOST` mandaba al profesor a mirar la red en
+   vez del comando del examen.
+2. **Lo conservado no se evalúa.** Son los primeros 64 kB de una salida que
+   seguía: un `no_contiene` que pasara sobre ese prefijo sería un aprobado
+   inventado. La comprobación sigue `UNEVALUATED` y fuera del denominador.
+3. **Los topes no se tocan**: 64 kB conservados y corte duro a 8 MB, como
+   estaban.

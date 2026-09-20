@@ -6,25 +6,20 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última tarea terminada
 
-**Cambio de nombre: el proyecto se llama Heimdall** (antes `Evalon`). Módulo,
-CLI, binario, documentación y scripts renombrados; `docs/research/` intacto por
-ser evidencia histórica. ADR-0014; D-7 queda cerrada. La carpeta del
-repositorio sigue llamándose `Evalon` hasta que se renombre a mano.
+**T032 (una salida enorme ya no se confunde con un apagón).** Cuando la máquina
+de un alumno contesta más de lo que el motor puede leer, el informe ya no dice
+«se cortó la conexión»: dice que el comando produjo demasiada salida y se dejó
+de leer, y enseña el principio de lo que respondió. Cambia a quién señala el
+aviso: antes el profesor iba a mirar la red del aula, ahora mira el comando del
+examen. La comprobación sigue sin evaluarse y nadie suspende por ello.
+ADR-0015. Verificado contra el laboratorio con un comando de 300 MB.
 
-Antes, **T031 (cuántos alumnos a la vez, ya no a ojo).** Medido: una clase de 30
-alumnos con máquina propia se corrige ahora en la mitad de tiempo (de 25 s a
-13 s), porque el motor lleva 16 alumnos a la vez en vez de 8. La memoria no lo
-paga: se queda en 11-16 MB siempre, tanto con 10 alumnos como con 100, y tanto
-si una máquina contesta 1 MB como si contesta 300. Teuton llegaba a 970 MB con
-esos 300 MB. Cien alumnos contra un solo servidor siguen en 3 s y sin un solo
-cero técnico. ADR-0013 y `make rendimiento`; D-6 queda cerrada.
-
-Antes, **T014 (los errores del examen se leen en español).** Un examen mal escrito ya
-no contesta con jerga del motor: `cerca_de: 3` dice «la clave "cerca_de" debe
-ser un bloque de claves», con el fichero y la línea. El motor comprueba la
-forma de cada valor antes de leerlo, así que ningún mensaje de la librería de
-YAML llega al profesor. Verificado con un test de tabla que prueba un valor del
-tipo equivocado en cada clave de `examen.yaml` y de `aula.yaml`.
+Antes: **cambio de nombre a Heimdall** (ADR-0014, cierra D-7; la carpeta del
+repositorio sigue llamándose `Evalon` hasta que se renombre a mano). **T031**,
+16 alumnos a la vez medidos: una clase de 30 pasa de 25 s a 13 s y la memoria
+se queda en 11-16 MB pase lo que pase (ADR-0013, `make rendimiento`, cierra
+D-6). **T014**, los errores de un examen mal escrito se leen en español, con
+fichero y línea.
 
 **T030**: cien alumnos contra un mismo servidor se corrigen sin perder
 ni una comprobación, con cuatro conexiones a la vez por máquina y ocho alumnos
@@ -94,6 +89,7 @@ y una máquina que cambia de identidad se rechaza con el motivo escrito.
 
 ## Siguiente tarea recomendada
 
-**T032** (`READY`, P2): una máquina que contesta más de 8 MB deja hoy la
-comprobación sin evaluar por conexión perdida; hay que aprovechar los 64 kB
-que sí se leyeron. Nadie suspende por ello, así que no corre prisa.
+**T040** (`READY`, P1): escribir los ficheros del formato viejo para que la GUI
+actual funcione contra el motor nuevo sin tocarla. Abre la fase 4 y desbloquea
+la UAT de los 40 escenarios (T041). Es también lo que cierra A-10, el único
+criterio que sigue pendiente en el script de aceptación.
