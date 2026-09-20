@@ -1,0 +1,51 @@
+package main
+
+import (
+	"fmt"
+	"io"
+	"strconv"
+
+	"evalon/internal/plan"
+)
+
+// checkCmd resolves the PLAN and prints it. It opens no connection and writes
+// no file: it is what lets the teacher see the exact number of checks and the
+// exact total weight before the exam starts (ADR-0002).
+func checkCmd(args []string, stdout, stderr io.Writer) int {
+	if len(args) != 1 {
+		fmt.Fprintln(stderr, "uso: evalon check <directorio del examen>")
+		return exitInvalidConfig
+	}
+
+	p, err := plan.Load(args[0])
+	if err != nil {
+		fmt.Fprintf(stderr, "evalon check: la configuración no es válida\n\n%s\n", err)
+		return exitInvalidConfig
+	}
+
+	evaluable, excluded := 0, 0
+	for _, s := range p.Students {
+		if s.Excluded {
+			excluded++
+		} else {
+			evaluable++
+		}
+	}
+
+	fmt.Fprintf(stdout, "Examen:         %s\n", p.ExamName)
+	fmt.Fprintf(stdout, "Aula:           %s\n", p.InventoryName)
+	fmt.Fprintf(stdout, "Alumnos:        %d evaluables", evaluable)
+	if excluded > 0 {
+		fmt.Fprintf(stdout, ", %d excluidos", excluded)
+	}
+	fmt.Fprintf(stdout, "\n")
+	fmt.Fprintf(stdout, "Comprobaciones: %d\n", p.Summary.CheckCount)
+	fmt.Fprintf(stdout, "Peso total:     %s\n", formatWeight(p.Summary.TotalWeight))
+	fmt.Fprintf(stdout, "Concurrencia:   %d\n", p.Summary.Concurrency)
+	fmt.Fprintf(stdout, "Hash del plan:  %s\n", p.Hash)
+	return exitOK
+}
+
+func formatWeight(w float64) string {
+	return strconv.FormatFloat(w, 'f', -1, 64)
+}

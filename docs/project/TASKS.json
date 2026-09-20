@@ -129,7 +129,7 @@
       "id": "T005",
       "title": "Resolucion del PLAN, sustitucion y subcomando check",
       "phase": 0,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": ["T004", "T002"],
       "goal": "Fijar el denominador y la lista de comprobaciones antes de tocar ninguna maquina, y poder verlo sin ejecutar nada.",

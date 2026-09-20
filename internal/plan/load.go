@@ -23,6 +23,7 @@ func LoadExam(path string) (*Exam, error) {
 		return nil, err
 	}
 	exam.applyDefaults()
+	exam.markLines(node)
 	return &exam, nil
 }
 
@@ -192,6 +193,36 @@ func (e *Exam) applyDefaults() {
 			}
 		}
 	}
+}
+
+// markLines walks the document again to remember where each check was
+// written. The teacher gets "examen.yaml:34" instead of "la comprobación 7".
+func (e *Exam) markLines(node *yaml.Node) {
+	groups := childValue(node, "grupos")
+	if groups == nil {
+		return
+	}
+	for g := 0; g < len(groups.Content) && g < len(e.Groups); g++ {
+		checks := childValue(groups.Content[g], "comprobaciones")
+		if checks == nil {
+			continue
+		}
+		for c := 0; c < len(checks.Content) && c < len(e.Groups[g].Checks); c++ {
+			e.Groups[g].Checks[c].Line = checks.Content[c].Line
+		}
+	}
+}
+
+func childValue(node *yaml.Node, key string) *yaml.Node {
+	if node == nil || node.Kind != yaml.MappingNode {
+		return nil
+	}
+	for i := 0; i+1 < len(node.Content); i += 2 {
+		if node.Content[i].Value == key {
+			return node.Content[i+1]
+		}
+	}
+	return nil
 }
 
 // inheritHosts folds comun.hosts into each student's hosts, field by field.

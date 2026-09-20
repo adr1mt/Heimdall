@@ -40,28 +40,28 @@ func TestParseExamExample(t *testing.T) {
 				Name: "Red y DHCP",
 				Checks: []Check{
 					{
-						ID: "red-ip-servidor", On: "host1",
+						ID: "red-ip-servidor", On: "host1", Line: 12,
 						Description: "El servidor tiene 10.0.0.1/8 en enp2s0",
 						Weight:      f(1), Timeout: d(20 * time.Second),
 						Cmd:      []string{"ip", "address", "show", "dev", "enp2s0"},
 						Contains: s("10.0.0.1/8"),
 					},
 					{
-						ID: "kea-subnet", On: "host1",
+						ID: "kea-subnet", On: "host1", Line: 18,
 						Description: "KEA declara la subred 10.0.0.0/8",
 						Weight:      f(1), Timeout: d(20 * time.Second),
 						Cmd:  []string{"cat", "/etc/kea/kea-dhcp4.conf"},
 						Near: &NearSpec{Anchor: `"subnet"`, Lines: 5, Contains: "10.0.0.0/8"},
 					},
 					{
-						ID: "kea-interfaz", On: "host1",
+						ID: "kea-interfaz", On: "host1", Line: 27,
 						Description: "KEA escucha en enp2s0",
 						Weight:      f(1), Timeout: d(20 * time.Second),
 						Cmd:      []string{"cat", "/etc/kea/kea-dhcp4.conf"},
 						Contains: s("enp2s0"),
 					},
 					{
-						ID: "kea-servicio", On: "host1",
+						ID: "kea-servicio", On: "host1", Line: 33,
 						Description: "El servicio kea-dhcp4 está activo",
 						Weight:      f(2), Timeout: d(20 * time.Second),
 						Cmd:    []string{"systemctl", "is-active", "kea-dhcp4-server"},
@@ -73,28 +73,28 @@ func TestParseExamExample(t *testing.T) {
 				Name: "DNS",
 				Checks: []Check{
 					{
-						ID: "dns-forwarder", On: "host1",
+						ID: "dns-forwarder", On: "host1", Line: 42,
 						Description: "Reenviador 9.9.9.9 configurado",
 						Weight:      f(1), Timeout: d(20 * time.Second),
 						Cmd:  []string{"cat", "/etc/bind/named.conf.options"},
 						Near: &NearSpec{Anchor: "forwarders", Lines: 5, Contains: "9.9.9.9"},
 					},
 					{
-						ID: "dns-registro-alumno", On: "host1",
+						ID: "dns-registro-alumno", On: "host1", Line: 48,
 						Description: "El alumno tiene su registro A en la zona directa",
 						Weight:      f(1), Timeout: d(20 * time.Second),
 						Cmd:      []string{"cat", "/etc/bind/forward.examen.local"},
 						Contains: s("${alumno.subdominio}"),
 					},
 					{
-						ID: "dns-sin-recursion-abierta", On: "host1",
+						ID: "dns-sin-recursion-abierta", On: "host1", Line: 54,
 						Description: "No se permite recursión desde cualquier origen",
 						Weight:      f(1), Timeout: d(20 * time.Second),
 						Cmd:         []string{"cat", "/etc/bind/named.conf.options"},
 						NotContains: s("allow-recursion { any; }"),
 					},
 					{
-						ID: "dns-activo", On: "host1",
+						ID: "dns-activo", On: "host1", Line: 60,
 						Description: "named responde",
 						Weight:      f(1), Timeout: d(10 * time.Second),
 						Cmd:    []string{"dig", "+short", "+time=3", "@127.0.0.1", "pc1.examen.local"},
@@ -106,14 +106,14 @@ func TestParseExamExample(t *testing.T) {
 				Name: "Cuestionario",
 				Checks: []Check{
 					{
-						ID:          "q-puerto-https",
+						ID: "q-puerto-https", Line: 69,
 						Description: "Puerto por defecto de HTTPS",
 						Weight:      f(1), Timeout: d(20 * time.Second),
 						Value:  "${alumno.p1}",
 						Equals: s("443"),
 					},
 					{
-						ID:          "q-mascara-24",
+						ID: "q-mascara-24", Line: 74,
 						Description: "Máscara /24 en decimal",
 						Weight:      f(1), Timeout: d(20 * time.Second),
 						Value:  "${alumno.p3}",

@@ -1,0 +1,10 @@
+examen: "Proyecto con errores"
+version: 1
+hosts: [host1]
+grupos:
+  - grupo: "Base"
+    comprobaciones:
+      - id: p1
+        descripcion: "Sin aserción"
+        en: host1
+        cmd: ["hostname"]

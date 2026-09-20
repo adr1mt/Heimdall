@@ -31,8 +31,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 		fmt.Fprintln(stderr, "evalon run: no implementado todavia")
 		return exitInvalidConfig
 	case "check":
-		fmt.Fprintln(stderr, "evalon check: no implementado todavia")
-		return exitInvalidConfig
+		return checkCmd(args[1:], stdout, stderr)
 	default:
 		fmt.Fprintf(stderr, "evalon: subcomando desconocido %q\n", args[0])
 		usage(stderr)
@@ -43,8 +42,8 @@ func run(args []string, stdout, stderr io.Writer) int {
 func usage(w io.Writer) {
 	fmt.Fprint(w, `uso: evalon <subcomando>
 
-  run       evalua un examen contra el aula
-  check     resuelve el PLAN sin tocar ninguna maquina
-  version   imprime la version del motor
+  run                  evalua un examen contra el aula
+  check <directorio>   resuelve el PLAN sin tocar ninguna maquina
+  version              imprime la version del motor
 `)
 }

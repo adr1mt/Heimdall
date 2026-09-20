@@ -2,46 +2,47 @@
 
 Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
-**Actualizado**: 2026-09-20 · **Fase**: 0 — Bootstrap y contratos
+**Actualizado**: 2026-09-20 · **Fase**: 1 — Rebanada vertical
 
 ## Última tarea terminada
 
-**T004 — parseo estricto de `examen.yaml` y `aula.yaml`.** Los dos ficheros del
-profesor se leen con las claves en español. Una clave que el formato no conoce
-se rechaza con fichero y línea, y se listan todas las del fichero de una vez.
-Un `timeout` mal escrito es un error, nunca un valor por defecto silencioso.
+**T005 — resolución del PLAN y subcomando `check`.** `evalon check <directorio>`
+dice cuántas comprobaciones tiene el examen y cuánto pesan en total, sin abrir
+ninguna conexión y sin escribir nada. Fase 0 cerrada.
 
 ## Estado actual
 
 - **Go 1.27.1** en `/mnt/datos/Applications/Claude/toolchains/go`. `~/.profile`
   lo añade al `PATH`; en shell no interactiva hay que exportarlo a mano.
-- `go.mod`: `module evalon`, `go 1.22` (mínimo soportado, no lo instalado). El
-  nombre es provisional, D-7 sigue abierta.
-- `cmd/evalon` tiene `run`, `check` y `version`; `run` y `check` imprimen «no
-  implementado» y salen con 2. Exit codes: 0 ok · 2 config inválida · 3 parcial
-  · 4 cancelado; el 1 queda libre a propósito.
+  `go.mod`: `module evalon`, `go 1.22`. El nombre es provisional (D-7).
+- `cmd/evalon`: `check` y `version` funcionan; `run` sigue sin implementar.
+  Exit codes: 0 ok · 2 config inválida · 3 parcial · 4 cancelado; el 1 libre.
 - `internal/model` tiene el artefacto completo (T002) más `Classify`,
   `ComputeScore`, `StudentStatusOf` y `RunStatusOf`. Ni red, ni disco, ni
   reloj: hay un test que parsea el paquete y lo comprueba. `EXCLUDED` sale del
   inventario, nunca del cálculo.
-- `internal/plan` lee los dos YAML (T004): herencia de `comun:` host a host,
-  `por_defecto:` para peso y timeout, campos libres del alumno accesibles por
-  nombre. El esquema conoce `cerca_de`, `no_contiene` y `valor:` para no
-  perderlos al parsear; evaluarlos es de fase 2.
-- Única dependencia externa: `gopkg.in/yaml.v3`. Se descartó `go-cmp` en los
-  tests para no abrir un ADR por una comodidad.
-- Ficheros de prueba: el examen y el aula del diseño en `testdata/formato/`;
-  los malformados y el golden del modelo, junto a su paquete.
+- `internal/plan` lee los dos YAML (T004) y resuelve el PLAN (T005): las nueve
+  validaciones del §5, sustitución `${alumno.X}` y `${host.ip|puerto|usuario}`,
+  hashes del examen, del aula y del plan resuelto. El esquema conoce
+  `cerca_de`, `no_contiene` y `valor:`; evaluarlos es de fase 2.
+- Un secreto `${MAYUSCULAS}` fuera de `password_ref` es error de PLAN, también
+  en los campos libres del alumno: por ahí entraría en un comando.
+- `testdata/proto/` existe ya (5 comprobaciones, peso 6, `alumne02` contra un
+  puerto cerrado). Lo creó T005 para poder probar `check`; T012 lo revisará.
+- Única dependencia externa: `gopkg.in/yaml.v3`. Ficheros de prueba: los del
+  diseño en `testdata/formato/`, los malformados junto a su paquete.
 - `Makefile` con `check`, `test`, `build`, `lab` y `lab-down`. `make lab`
   levanta `alu1` y `alu2` en `127.1.2.3:2201-2202` con podman.
 
 ## Pruebas ejecutadas
 
-`make check` verde en 0,5 s · `gofmt -l` sin salida. En T004 se verificó por
-mutación: aceptar claves desconocidas, convertir un timeout mal formado en el
-valor por defecto, dejar que `por_defecto:` pise el valor propio de una
-comprobación, no heredar de `comun:` y descartar los campos libres del alumno.
-Las cinco las detecta la suite.
+`make check` verde en 0,7 s · `gofmt -l` sin salida. `./bin/evalon check
+testdata/proto` imprime 5 comprobaciones y peso 6 y sale 0; el proyecto
+inválido sale 2 sin crear `var/`. Verificado por mutación en T004 (5 casos) y
+en T005: referencia ausente convertida en cadena vacía, secreto admitido en el
+examen y en un campo libre, peso negativo, contraseña literal, dos aserciones,
+alumno excluido con comprobaciones y aula sin alumnos evaluables. Las ocho las
+detecta la suite.
 
 ## Problemas conocidos
 
@@ -57,16 +58,16 @@ Las cinco las detecta la suite.
 
 ## Decisiones inesperadas de la sesión
 
-- `KnownFields(true)` de yaml.v3 no vale para este formato: no llega a los
-  tipos anidados y rechazaría los campos libres del alumno. El paquete recorre
-  el árbol del YAML contra las structs y da la línea de cada clave desconocida.
-  Detalle en `DECISIONS.md`.
-- `password:` sigue en el esquema del inventario a propósito: sin él, una
-  contraseña literal saldría como «clave desconocida» y no como lo que es.
+- Una aserción por comprobación, exactamente una: el diseño hablaba de
+  «aserciones incompatibles» sin decir cuáles.
+- El alumno excluido no se resuelve: no se le piden hosts ni campos. Pedírselos
+  empujaría a inventar datos de inventario.
+- `${alumno.X}` ve también `id`, `nombre` y `moodle_id`.
+- Las cuatro, con su motivo, en `DECISIONS.md`.
 
 ## Siguiente tarea recomendada
 
-Tres `READY` P0: **T005** (resolución del PLAN y subcomando `check`), **T007**
-(aserciones) y **T009** (escritura atómica); T006 es P1. Toca **T005**: cierra
-la fase 0 y es la que da al profesor el número de comprobaciones y el peso
-total sin encender ninguna máquina.
+Fase 0 cerrada (T001-T005). Quedan `READY`: **T007** (aserciones, P0), **T009**
+(escritura atómica, P0) y **T006** (laboratorio SSH, P1). Toca **T007**: es
+lógica pura, se prueba sin máquinas y T010 la necesita. T006 hay que hacerlo
+antes que T008, que es lo único que toca red.

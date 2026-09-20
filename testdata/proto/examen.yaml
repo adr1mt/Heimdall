@@ -1,0 +1,34 @@
+examen: "Prototipo vertical"
+version: 1
+hosts: [host1]
+por_defecto: { peso: 1, timeout: 20s }
+grupos:
+  - grupo: "Base"
+    comprobaciones:
+      - id: p1-hostname
+        descripcion: "El host responde y se identifica"
+        en: host1
+        cmd: ["hostname"]
+        contiene: "alu"
+      - id: p2-usuario
+        descripcion: "La cuenta del alumno existe"
+        en: host1
+        cmd: ["id", "-un"]
+        igual_a: "${alumno.usuario}"
+      - id: p3-fichero
+        descripcion: "Existe /etc/os-release"
+        en: host1
+        peso: 2
+        cmd: ["test", "-f", "/etc/os-release"]
+        exit_code: 0
+      - id: p4-ausente
+        descripcion: "Un comando que no existe suspende, no avería"
+        en: host1
+        cmd: ["comando_que_no_existe"]
+        exit_code: 0
+      - id: p5-lento
+        descripcion: "Comprobación con timeout corto"
+        en: host1
+        timeout: 3s
+        cmd: ["sleep", "30"]
+        exit_code: 0

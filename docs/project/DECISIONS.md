@@ -111,3 +111,27 @@ Dos elecciones menores del mismo paquete:
 2. `password:` existe en el esquema del inventario. Si no estuviera, una
    contraseña literal saldría como «clave desconocida» en vez de como lo que
    es. La valida el PLAN (T005); aquí solo se conserva para poder acusarla.
+
+### 2026-09-20 · T005 · Cuatro elecciones al resolver el PLAN
+
+1. **Una aserción por comprobación, exactamente una.** El §5 habla de «dos
+   aserciones incompatibles» sin decir cuáles lo son. Permitir combinaciones
+   obligaría a mantener una tabla de compatibilidad y haría ambiguo el motivo
+   de un suspenso. Ninguno de los exámenes reales lo necesita.
+2. **`${alumno.X}` ve también `id`, `nombre` y `moodle_id`,** además de los
+   campos libres. Son datos del alumno como los demás, y así un
+   `${alumno.id}` da el valor en vez de un «campo inexistente» desconcertante.
+   Un conocido vacío cuenta como ausente, para que siga valiendo la regla de
+   «o lo tienen todos, o no se usa».
+3. **El alumno excluido no se resuelve.** No se le exigen ni hosts ni campos:
+   no se le examina, y pedirle datos empujaría a rellenar el inventario con
+   información inventada, que es justo lo que no se hace con material de aula.
+4. **Una referencia `${MAYUSCULAS}` en un campo libre del alumno es error.**
+   Los campos libres se sustituyen dentro de los comandos del examen; sin esta
+   comprobación, un secreto escrito ahí entraría en un `cmd` y saldría en el
+   resultado. La garantía del §1.4 de `security.md` depende de cerrar también
+   esta puerta, no solo la del examen.
+
+`testdata/proto/` se crea aquí, antes de T012, porque el subcomando `check`
+necesitaba un proyecto válido de verdad contra el que probarse. T012 lo dará
+por bueno o lo corregirá al escribir la aceptación del hito.

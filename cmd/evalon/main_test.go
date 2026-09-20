@@ -16,7 +16,7 @@ func TestRunSubcommands(t *testing.T) {
 	}{
 		{"version", []string{"version"}, exitOK, version, ""},
 		{"run not implemented", []string{"run"}, exitInvalidConfig, "", "no implementado"},
-		{"check not implemented", []string{"check"}, exitInvalidConfig, "", "no implementado"},
+		{"check without a directory", []string{"check"}, exitInvalidConfig, "", "uso: evalon check"},
 		{"no args", nil, exitInvalidConfig, "", "uso: evalon"},
 		{"unknown", []string{"nope"}, exitInvalidConfig, "", "subcomando desconocido"},
 	}

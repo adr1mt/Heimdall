@@ -88,6 +88,9 @@ type Check struct {
 	Equals      *string   `yaml:"igual_a"`
 	ExitCode    *int      `yaml:"exit_code"`
 	Near        *NearSpec `yaml:"cerca_de"`
+
+	// Line of the check in examen.yaml, for the PLAN error messages.
+	Line int `yaml:"-"`
 }
 
 // NearSpec is cerca_de: what grep -A N used to do (M-10).
