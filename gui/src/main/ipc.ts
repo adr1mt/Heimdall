@@ -1,3 +1,5 @@
+import { writeFileSync } from 'node:fs'
+import { basename } from 'node:path'
 import { app, dialog, ipcMain, shell, type WebContents } from 'electron'
 import { IPC } from '../shared/ipc'
 import { detectEngine } from './engine'
@@ -104,6 +106,20 @@ export function registerIpc(): void {
   ipcMain.handle(IPC.listRuns, (_e, examPath: unknown) => {
     if (typeof examPath !== 'string' || !examPath) return []
     return listRuns(varDirOf(examPath))
+  })
+
+  // Writing the grades out. The renderer built the text and chose the scale;
+  // here nothing is computed, only saved where the teacher points.
+  ipcMain.handle(IPC.saveCsv, async (_e, name: unknown, text: unknown): Promise<string | null> => {
+    if (typeof text !== 'string') throw new Error('No hay nada que exportar.')
+    const suggested = typeof name === 'string' && name.trim() ? basename(name.trim()) : 'notas.csv'
+    const result = await dialog.showSaveDialog({
+      defaultPath: suggested,
+      filters: [{ name: 'Notas', extensions: ['csv'] }]
+    })
+    if (result.canceled || !result.filePath) return null
+    writeFileSync(result.filePath, text, 'utf-8')
+    return result.filePath
   })
 
   ipcMain.handle(IPC.cancelRun, (): void => {

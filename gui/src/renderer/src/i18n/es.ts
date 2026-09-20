@@ -113,6 +113,17 @@ export const t = {
     pick: 'Elige una comprobación de la matriz para verla en detalle.',
     previous: 'El intento anterior'
   },
+  export: {
+    button: 'Exportar notas…',
+    title: '¿Exportar las notas?',
+    yes: 'Guardar el fichero',
+    hint:
+      'Se guarda una hoja con el nombre de cada alumno, su identificador de Moodle si el aula lo trae, y su nota. Quien no tenga nota final sale sin nota y con el motivo. No sale nada de lo que escribieron las máquinas.',
+    scale: (label: string) => `Escala: ${label}. Se cambia en Ajustes.`,
+    saved: (path: string) => `Notas guardadas en ${path}`,
+    cancelled: 'No se ha guardado nada.',
+    failed: 'No se pudieron guardar las notas'
+  },
   pending: {
     title: 'Qué ha quedado sin comprobar',
     hint:
@@ -156,6 +167,10 @@ export const t = {
   settings: {
     title: 'Ajustes',
     engineSection: 'Motor de corrección',
+    scaleSection: 'Escala de las notas',
+    scaleHint:
+      'Con qué escala se escriben las notas al exportarlas. La corrección guardada no cambia: el motor siempre calcula sobre 100 y la conversión es solo para la hoja que te llevas.',
+    scaleExample: (example: string) => `Un 87 sobre 100 se exporta como ${example}.`,
     aboutSection: 'Acerca de',
     about:
       'Heimdall corrige prácticas de sistemas y redes conectándose por SSH a las máquinas del alumnado.',

@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
 import { AlertTriangle, CheckCircle2 } from 'lucide-react'
-import { Button, Input, SectionTitle, ViewHeader } from '@/components/ui'
+import { Button, Input, SectionTitle, Segmented, SegmentedItem, ViewHeader } from '@/components/ui'
 import { useApp, noticeFrom } from '@/stores/app'
+import { SCALES, scaleOf, toScale, type ScaleId } from '@/lib/export'
 import { t } from '@/i18n/es'
 
 export default function SettingsView() {
   const engine = useApp((s) => s.engine)
+  const scale = useApp((s) => s.scale)
+  const setScale = useApp((s) => s.setScale)
   const setEngine = useApp((s) => s.setEngine)
   const setNotice = useApp((s) => s.setNotice)
   const [path, setPath] = useState('')
@@ -74,6 +77,26 @@ export default function SettingsView() {
               {engine.found ? `${t.engine.ready} · ${engine.version}` : engine.problem}
             </p>
           )}
+        </section>
+
+        {/* The scale is the teacher's: it decides how a grade is written down
+            when it leaves the application, and nothing else. */}
+        <section className="max-w-2xl">
+          <SectionTitle hint={t.settings.scaleHint}>{t.settings.scaleSection}</SectionTitle>
+          <Segmented>
+            {Object.values(SCALES).map((option) => (
+              <SegmentedItem
+                key={option.id}
+                active={scale === option.id}
+                onClick={() => setScale(option.id as ScaleId)}
+              >
+                {option.label}
+              </SegmentedItem>
+            ))}
+          </Segmented>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {t.settings.scaleExample(toScale(87, scaleOf(scale)))}
+          </p>
         </section>
 
         <section className="max-w-2xl">

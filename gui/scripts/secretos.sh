@@ -37,9 +37,12 @@ chmod 600 "$WORK/clave"
 PATTERN="$WORK/patron"
 printf '%s\n' "$SECRET" >"$PATTERN"
 
+CSV="$WORK/notas.csv"
+
 PROJECT="$WORK" \
 HEIMDALL_ENGINE="$REPO/bin/heimdall" \
 LAB_SECRET_FILE="$WORK/clave" \
+CSV_OUT="$CSV" \
   npm run --silent lab-run -- --user-data-dir="$USERDATA" >"$WORK/salida.txt" 2>&1 &
 app=$!
 
@@ -83,6 +86,19 @@ fi
 grep -q "^\[lab-run\] historico: igual$" "$WORK/salida.txt" \
   && ok "H-1" "reabrir la corrección desde el histórico da la misma pantalla" \
   || fail "H-1" "el histórico no enseña lo mismo que el día de la corrección"
+
+# T056: las notas salen de la aplicación, y solo las notas.
+if [ -s "$CSV" ] && head -1 "$CSV" | grep -q "alumno;identificador;moodle"; then
+  ok "X-1" "las notas se exportan a CSV desde la aplicación"
+else
+  fail "X-1" "no se ha escrito el fichero de notas"
+fi
+
+if [ -s "$CSV" ] && grep -qFf "$PATTERN" "$CSV"; then
+  fail "X-2" "contraseña en el fichero de notas"
+else
+  ok "X-2" "ninguna contraseña en el fichero de notas"
+fi
 
 [ -z "$failed" ] || { echo; echo "Hay fallos."; exit 1; }
 echo; echo "Los secretos no salen de la memoria."

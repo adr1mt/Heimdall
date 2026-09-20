@@ -55,6 +55,11 @@ export interface HeimdallApi {
   readArtifact: (path: string) => Promise<RunResult>
   /** The past runs of the project the exam belongs to, newest first. */
   listRuns: (examPath: string) => Promise<RunSummary[]>
+  /**
+   * Writes the grades the renderer already built where the teacher says.
+   * Returns the path, or null if they cancelled the dialog.
+   */
+  saveCsv: (name: string, text: string) => Promise<string | null>
   cancelRun: () => Promise<void>
   /** Subscribes to the stream. Returns the unsubscribe function. */
   onRunEvent: (listener: (event: EngineEvent) => void) => () => void

@@ -485,3 +485,22 @@ Dos decisiones menores:
 7. **T054 se dividió antes de implementarla.** Juntaba histórico, modo examen,
    modo proyector, analíticas y exportación: cuatro entregas y ninguna
    verificable por separado. Quedan T054, T056, T058 y T059.
+
+## T056 · Las notas fuera de la aplicación
+
+1. **La escala la convierte la GUI, nunca el motor.** El artefacto guarda el
+   0-100 y los números crudos (architecture.md §8); exportar solo lee. Dos
+   escalas fijas, 0-10 y 0-100: un máximo arbitrario invita a una conversión
+   que nadie puede volver a comprobar.
+2. **Quien no tiene nota final exporta que no la tiene.** Columna de nota
+   vacía y el motivo al lado. La provisional no viaja: en una hoja de cálculo
+   no se distingue de una cerrada, y un 0 por una máquina apagada sería un
+   suspenso que el alumno no se ha ganado (principio 3, ADR-0006).
+3. **Solo viajan los datos de la hoja de notas.** Nombre, identificadores,
+   estado, nota y recuento. Ni comandos, ni salida de las máquinas, ni por
+   tanto secretos: una hoja de notas se reenvía por correo.
+4. **CSV con punto y coma, coma decimal y BOM.** Es lo que abre una hoja de
+   cálculo en español sin romper los acentos ni partir las columnas. Los
+   campos que empiezan como una fórmula salen prefijados (F-14).
+5. **La escala se guarda con las preferencias de pantalla, no con la
+   corrección.** Es del profesor y de su máquina; ningún artefacto la nombra.

@@ -29,10 +29,14 @@ function readSecret(path: string | undefined): string {
 }
 const cancelMs = Number(process.env.CANCEL_MS || 0)
 const shot = process.env.SHOT_OUT || ''
+// Where the fake «save as» dialog says the teacher pointed, for X-1.
+const csvOut = process.env.CSV_OUT || ''
 
 const picks = [join(project, 'examen.yaml'), join(project, 'aula.yaml')]
 let pick = 0
 dialog.showOpenDialog = (async () => ({ canceled: false, filePaths: [picks[pick++]] })) as never
+
+dialog.showSaveDialog = (async () => ({ canceled: !csvOut, filePath: csvOut })) as never
 
 const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms))
 
@@ -123,6 +127,26 @@ app.whenReady().then(async () => {
     console.log('----- historico -----')
     console.log(again)
     console.log('---------------------')
+  }
+
+  // X-1 of T056: take the grades out through the real button and the real
+  // save dialog. What lands on disk is what the teacher would get.
+  if (csvOut) {
+    const clicked = await js(`(() => {
+      const open = [...document.querySelectorAll('main button')]
+        .find(b => b.textContent.includes('Exportar notas'))
+      if (open) open.click()
+      return !!open
+    })()`)
+    await wait(400)
+    const saved = await js(`(() => {
+      const yes = [...document.querySelectorAll('button')]
+        .find(b => b.textContent.trim() === 'Guardar el fichero')
+      if (yes) yes.click()
+      return !!yes
+    })()`)
+    await wait(800)
+    console.log('[lab-run] exportar:', clicked && saved ? 'ok' : `boton=${clicked} confirmar=${saved}`)
   }
 
   // Open one check, which is where the cause and the output live.

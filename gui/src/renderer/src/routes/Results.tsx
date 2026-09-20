@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AlertTriangle, RotateCcw, X } from 'lucide-react'
+import { AlertTriangle, Download, RotateCcw, X } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -10,7 +10,7 @@ import {
   SectionTitle,
   ViewHeader
 } from '@/components/ui'
-import { useApp } from '@/stores/app'
+import { useApp, noticeFrom } from '@/stores/app'
 import { useRun } from '@/stores/run'
 import {
   CAUSE_TEXT,
@@ -31,6 +31,7 @@ import {
   type Filters,
   type Pending
 } from '@/lib/results'
+import { csvName, exportSummary, scaleOf, toCsv } from '@/lib/export'
 import type { AcademicStatus } from '../../../shared/events'
 import type { CheckResult, Stream, StudentResult } from '../../../shared/artifact'
 import { cn } from '@/lib/utils'
@@ -97,6 +98,8 @@ export default function ResultsView() {
           {/* Which correction these grades come from, always. */}
           <p className="text-xs text-muted-foreground">{originText(artifact)}</p>
         </div>
+
+        <ExportButton />
 
         <PendingPanel artifactPath={artifactPath} />
 
@@ -180,6 +183,57 @@ export default function ResultsView() {
           <p className="text-xs text-muted-foreground">{t.results.pick}</p>
         )}
       </div>
+    </div>
+  )
+}
+
+/**
+ * Taking the grades out of the application.
+ *
+ * It asks first and says what is going out, because a grade sheet leaves the
+ * teacher's hands. What it writes is read from the artifact and converted to
+ * the teacher's scale; the correction on disk is not touched, and a student
+ * without a final grade travels as «sin nota» with the reason.
+ */
+function ExportButton() {
+  const artifact = useRun((s) => s.artifact)
+  const scaleId = useApp((s) => s.scale)
+  const setNotice = useApp((s) => s.setNotice)
+  const [confirm, setConfirm] = useState(false)
+  const scale = scaleOf(scaleId)
+
+  if (!artifact) return null
+
+  async function save(): Promise<void> {
+    setConfirm(false)
+    if (!artifact) return
+    try {
+      const path = await window.heimdall.saveCsv(csvName(artifact), toCsv(artifact, scale))
+      setNotice(path ? t.export.saved(path) : t.export.cancelled)
+    } catch (error) {
+      setNotice(noticeFrom(t.export.failed, error))
+    }
+  }
+
+  return (
+    <div>
+      <Button variant="outline" size="sm" onClick={() => setConfirm(true)}>
+        <Download className="h-4 w-4" />
+        {t.export.button}
+      </Button>
+      <ConfirmDialog
+        open={confirm}
+        title={t.export.title}
+        confirmLabel={t.export.yes}
+        onConfirm={() => void save()}
+        onCancel={() => setConfirm(false)}
+      >
+        <span className="space-y-2 block">
+          <span className="block">{exportSummary(artifact, scale)}</span>
+          <span className="block">{t.export.hint}</span>
+          <span className="block text-xs text-muted-foreground">{t.export.scale(scale.label)}</span>
+        </span>
+      </ConfirmDialog>
     </div>
   )
 }

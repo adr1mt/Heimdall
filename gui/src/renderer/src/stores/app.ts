@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { EngineStatus } from '../../../shared/types'
+import { DEFAULT_SCALE, type ScaleId } from '@/lib/export'
 
 export type View = 'home' | 'results' | 'history' | 'settings' | 'help'
 export type Theme = 'dark' | 'light'
@@ -16,6 +17,11 @@ interface AppState {
   /** One operational notice on screen, or null. */
   notice: string | null
   /**
+   * The scale the teacher marks in. It only affects what is exported: the
+   * artifact keeps the engine's 0-100 whatever this says.
+   */
+  scale: ScaleId
+  /**
    * The correction the next run repeats, when the teacher asked for it. Null
    * is the ordinary case and also the default: leaving an incomplete pending
    * is the safe action and nothing here happens on its own (ADR-0018 §1).
@@ -29,6 +35,7 @@ interface AppState {
   setExamPath: (path: string | null) => void
   setClassPath: (path: string | null) => void
   setNotice: (message: string | null) => void
+  setScale: (scale: ScaleId) => void
   setRetry: (retry: RetryRequest | null) => void
 }
 
@@ -43,6 +50,8 @@ export interface RetryRequest {
 }
 
 const savedTheme: Theme = localStorage.getItem('heimdall-theme') === 'light' ? 'light' : 'dark'
+const savedScale: ScaleId =
+  localStorage.getItem('heimdall-scale') === 'hundred' ? 'hundred' : DEFAULT_SCALE
 
 /**
  * The `dark` class is written here, next to the state change, and not in an
@@ -65,6 +74,7 @@ export const useApp = create<AppState>((set, get) => ({
   examPath: null,
   classPath: null,
   notice: null,
+  scale: savedScale,
   retry: null,
 
   setTheme: (theme) => {
@@ -78,6 +88,10 @@ export const useApp = create<AppState>((set, get) => ({
   setExamPath: (examPath) => set({ examPath }),
   setClassPath: (classPath) => set({ classPath }),
   setNotice: (notice) => set({ notice }),
+  setScale: (scale) => {
+    localStorage.setItem('heimdall-scale', scale)
+    set({ scale })
+  },
   setRetry: (retry) => set({ retry })
 }))
 

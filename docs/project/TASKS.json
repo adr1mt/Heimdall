@@ -1080,7 +1080,7 @@
       "id": "T056",
       "title": "Sacar las notas fuera de la aplicacion",
       "phase": 5,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T054"
@@ -1100,7 +1100,10 @@
         "La escala la elige el profesor y no toca el artefacto",
         "Ningun secreto ni ninguna salida de alumno viaja en la exportacion"
       ],
-      "tests": [],
+      "tests": [
+        "gui/tests/export.test.ts",
+        "X-1 y X-2 en gui/scripts/secretos.sh: las notas salen de la aplicacion y sin ninguna contrasena dentro"
+      ],
       "notes": "Sale del reparto de T054 del 2026-09-20. K-10 de KEEP-DROP-CHANGE."
     },
     {
