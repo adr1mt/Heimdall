@@ -60,7 +60,7 @@ func readDocument(path string) (*yaml.Node, error) {
 // sees every unknown key of the file at once instead of one per run.
 func decode(path string, node *yaml.Node, v any) error {
 	var errs []error
-	checkKeys(node, reflect.TypeOf(v).Elem(), &errs)
+	checkKeys(node, reflect.TypeOf(v).Elem(), "", &errs)
 	if err := join(errs); err != nil {
 		return withFile(path, err)
 	}
@@ -109,21 +109,25 @@ func splitYAMLMessage(msg string) (int, string) {
 }
 
 // checkKeys walks the document against the shape of typ and reports every key
-// the schema does not know. yaml.v3's own KnownFields cannot be used: it
-// applies to the top-level decoder only and it would also reject the free
-// fields of a student, which are legal.
-func checkKeys(node *yaml.Node, typ reflect.Type, errs *[]error) {
+// the schema does not know and every value written with the wrong shape.
+// yaml.v3's own KnownFields cannot be used: it applies to the top-level
+// decoder only and it would also reject the free fields of a student, which
+// are legal. The shape is checked here, and not left to the decoder, because
+// yaml.v3 names Go types in its messages and the teacher does not read Go
+// (T014).
+func checkKeys(node *yaml.Node, typ reflect.Type, what string, errs *[]error) {
 	if node.Kind == yaml.AliasNode {
 		node = node.Alias
 	}
 	for typ != nil && typ.Kind() == reflect.Pointer {
 		typ = typ.Elem()
 	}
+	checkShape(node, typ, what, errs)
 
 	switch typ.Kind() {
 	case reflect.Struct:
 		if node.Kind != yaml.MappingNode {
-			return // shape mismatch: the decoder reports it with its line
+			return
 		}
 		fields := yamlFields(typ)
 		extras := typ == reflect.TypeOf(Student{})
@@ -136,22 +140,77 @@ func checkKeys(node *yaml.Node, typ reflect.Type, errs *[]error) {
 				}
 				continue
 			}
-			checkKeys(val, field.Type, errs)
+			checkKeys(val, field.Type, fmt.Sprintf("la clave %q", key.Value), errs)
 		}
 	case reflect.Map:
 		if node.Kind != yaml.MappingNode {
 			return
 		}
 		for i := 1; i < len(node.Content); i += 2 {
-			checkKeys(node.Content[i], typ.Elem(), errs)
+			checkKeys(node.Content[i], typ.Elem(),
+				fmt.Sprintf("la clave %q", node.Content[i-1].Value), errs)
 		}
 	case reflect.Slice:
 		if node.Kind != yaml.SequenceNode {
 			return
 		}
 		for _, item := range node.Content {
-			checkKeys(item, typ.Elem(), errs)
+			checkKeys(item, typ.Elem(), "cada elemento de "+what, errs)
 		}
+	}
+}
+
+var unmarshalerType = reflect.TypeOf((*yaml.Unmarshaler)(nil)).Elem()
+
+// checkShape reports a value written with the wrong shape in the teacher's
+// own words: "la clave \"cerca_de\" debe ser un bloque de claves" instead of
+// yaml.v3's "cannot unmarshal !!int into plan.NearSpec".
+//
+// Types with their own UnmarshalYAML (una duración, un alumno) are left alone:
+// they already explain themselves in Spanish.
+func checkShape(node *yaml.Node, typ reflect.Type, what string, errs *[]error) {
+	if typ == nil || reflect.PointerTo(typ).Implements(unmarshalerType) {
+		return
+	}
+	if node.Kind == yaml.ScalarNode && node.Tag == "!!null" {
+		return // an empty value is absent, not malformed
+	}
+	if what == "" {
+		what = "el contenido del fichero"
+	}
+
+	want := ""
+	switch typ.Kind() {
+	case reflect.Struct, reflect.Map:
+		if node.Kind != yaml.MappingNode {
+			want = "un bloque de claves"
+		}
+	case reflect.Slice:
+		if node.Kind != yaml.SequenceNode {
+			want = "una lista"
+		}
+	case reflect.String:
+		if node.Kind != yaml.ScalarNode {
+			want = "un valor simple"
+		} else if node.Tag != "!!str" {
+			want = "texto: escríbelo entre comillas"
+		}
+	case reflect.Bool:
+		if node.Kind != yaml.ScalarNode || node.Tag != "!!bool" {
+			want = "sí o no (true o false)"
+		}
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		if node.Kind != yaml.ScalarNode || node.Tag != "!!int" {
+			want = "un número entero"
+		}
+	case reflect.Float32, reflect.Float64:
+		if node.Kind != yaml.ScalarNode || (node.Tag != "!!int" && node.Tag != "!!float") {
+			want = "un número"
+		}
+	}
+	if want != "" {
+		*errs = append(*errs, errf(node.Line, "%s debe ser %s", what, want))
 	}
 }
 

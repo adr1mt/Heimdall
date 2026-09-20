@@ -6,16 +6,18 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última tarea terminada
 
-**T030 (la corrección de una clase entera contra un solo servidor).** Cien
-alumnos examinándose sobre la misma máquina se corrigen sin que el motor pierda
-ni una comprobación: ahora abre como mucho cuatro conexiones a la vez contra un
-mismo destino y evalúa ocho alumnos en paralelo. Sin ese freno, el servidor
-rechazaba cerca de la mitad de las conexiones —39 a 49 de cada 100 en la
-medida— que es el fallo que en Teuton dejaba 53 ceros de 100. El informe dice
-con qué topes se corrigió y el profesor puede cambiarlos. ADR-0012; D-6 queda
-solo a falta de medir cuántos alumnos en paralelo convienen (T031).
+**T014 (los errores del examen se leen en español).** Un examen mal escrito ya
+no contesta con jerga del motor: `cerca_de: 3` dice «la clave "cerca_de" debe
+ser un bloque de claves», con el fichero y la línea. El motor comprueba la
+forma de cada valor antes de leerlo, así que ningún mensaje de la librería de
+YAML llega al profesor. Verificado con un test de tabla que prueba un valor del
+tipo equivocado en cada clave de `examen.yaml` y de `aula.yaml`.
 
-Antes, **T022**: el examen real de KEA y BIND corregido entero contra el
+Antes, **T030**: cien alumnos contra un mismo servidor se corrigen sin perder
+ni una comprobación, con cuatro conexiones a la vez por máquina y ocho alumnos
+en paralelo (ADR-0012).
+
+**T022**: el examen real de KEA y BIND corregido entero contra el
 laboratorio (100 y 69); cierra la fase 2. **T021**: identidad de las máquinas
 por ejecución (ADR-0011). **T020**: `no_contiene`, `cerca_de` y cuestionarios
 sin máquina.
@@ -76,12 +78,9 @@ y una máquina que cambia de identidad se rechaza con el motivo escrito.
 - `systemctl is-active` sin `dbus` en la máquina del alumno contesta con error
   y la comprobación sale suspensa, no sin evaluar. Es correcto —el comando
   respondió— pero conviene saberlo al montar una imagen de examen.
-- Un valor del tipo equivocado en una clave conocida escapa jerga de Go al
-  mensaje de error (`plan.NearSpec`). Anotado como T014.
 
 ## Siguiente tarea recomendada
 
 **T031** (`READY`, P2): medir tiempo y memoria con 10, 30 y 100 alumnos y con
 salidas de 1/20/100/300 MB, fijar con eso cuántos alumnos en paralelo y cerrar
-D-6. También sigue `READY` **T014** (P2): un examen mal escrito debe explicarse
-en español con fichero, línea y clave.
+D-6.

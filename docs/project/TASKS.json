@@ -482,7 +482,7 @@
       "id": "T014",
       "title": "Mensajes de error del YAML sin jerga de Go",
       "phase": 1,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [
         "T012"

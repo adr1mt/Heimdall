@@ -201,10 +201,12 @@ func (s *Student) UnmarshalYAML(node *yaml.Node) error {
 	return join(errs)
 }
 
+// decodeErr keeps yaml.v3's Go type names out of the teacher's message: what
+// the decoder says is replaced by the key and its line (T014).
 func decodeErr(key string, node *yaml.Node, err error) error {
 	var e *Error
 	if errors.As(err, &e) {
 		return err
 	}
-	return errf(node.Line, "valor inválido en %q: %s", key, err)
+	return errf(node.Line, "valor inválido en %q", key)
 }
