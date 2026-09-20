@@ -17,6 +17,7 @@ test: check build
 	$(GO) test -tags=integration ./...
 	test/secrets.sh
 	test/acceptance.sh
+	test/eventos.sh
 	test/ra2.sh
 	test/carga.sh
 

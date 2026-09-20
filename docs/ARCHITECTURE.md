@@ -72,6 +72,7 @@ La fase PLAN es anterior a cualquier conexión y no puede alterarse después.
 | `internal/assert` | `contiene`, `igual_a`, `no_contiene`, `exit_code`, `cerca_de` | Saber de notas |
 | `internal/report` | Escritura atómica, artefacto parcial, redacción de secretos | Calcular nada |
 | `internal/legacy` | **Congelado (ADR-0016)**: ficheros y fachada de Teuton para pruebas internas, hasta que se borre en T060 | Recibir nada nuevo, influir en la nota |
+| `internal/events` | Contrato nativo: eventos NDJSON por `stdout` (ADR-0017) | Llevar salida de las máquinas, ser fuente de verdad |
 | `gui/` | Heimdall GUI: Electron sobre el contrato nativo | Calcular notas, hablar con SSH |
 
 ## 4. Separación motor / GUI
@@ -83,6 +84,13 @@ Heimdall GUI ──► examen.yaml + aula.yaml + secretos por stdin ──► mo
 Heimdall GUI ◄── eventos NDJSON (progreso, estado, causa) ──────── motor
 Heimdall GUI ◄── artefacto canónico JSON ──────────────────────── motor
 ```
+
+El detalle está en [design/09-CONTRATO-GUI.md](design/09-CONTRATO-GUI.md) y el
+esquema del artefacto en
+[design/schema/run-result.schema.json](design/schema/run-result.schema.json).
+El artefacto es la fuente de verdad y los eventos son el progreso: nada viaja
+por el flujo que el artefacto no tenga, y la salida de las máquinas del
+alumnado no viaja por él en absoluto (ADR-0017).
 
 El motor no sabe que existe una GUI: publica eventos y un artefacto. La GUI no
 sabe de SSH ni de notas: presenta lo que el modelo canónico dice. No hay

@@ -28,6 +28,7 @@ descanso.
 | Estado entre sesiones | [docs/project/PROGRESS.md](docs/project/PROGRESS.md) |
 | Reglas de ejecución | [.claude/rules/](.claude/rules/) |
 | Especificaciones de detalle | [docs/design/](docs/design/) |
+| Contrato motor ↔ GUI | [docs/design/09-CONTRATO-GUI.md](docs/design/09-CONTRATO-GUI.md) |
 | Evidencia del sistema viejo | [docs/research/](docs/research/) |
 
 Prioridad ante contradicciones: **ADR aceptado > `docs/design/` > `docs/research/`**.
@@ -94,8 +95,6 @@ implementarla, termina una parte coherente y **no encadenes una segunda**.
    tags, sin tocar remotos.
 
 ## Comandos
-
-El módulo Go todavía no existe (T001). Cuando exista:
 
 ```bash
 make check    # go vet + go test ./... (rápidos, sin red)

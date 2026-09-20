@@ -10,6 +10,7 @@ import (
 	"syscall"
 
 	"heimdall/internal/engine"
+	"heimdall/internal/events"
 	"heimdall/internal/legacy"
 	"heimdall/internal/model"
 	"heimdall/internal/plan"
@@ -29,6 +30,7 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 	concurrency := fs.Int("concurrency", 0, "alumnos en paralelo; 0 usa el del examen")
 	hostConcurrency := fs.Int("host-concurrency", 0, "conexiones que se abren a la vez contra una misma máquina; 0 usa el del examen")
 	compat := fs.String("compat", "", "escribe además los ficheros del formato antiguo: teuton2")
+	eventStream := fs.String("events", "", "emite el contrato nativo por stdout mientras corre: ndjson")
 	export := fs.String("export", "", "fachada para la GUI actual: json")
 	cname := fs.String("cname", "", "nombre del fichero de aula, sin la extensión; por defecto aula.yaml")
 	cases := fs.String("case", "", "posiciones de los alumnos del aula que se evalúan, p. ej. 1,3")
@@ -36,7 +38,15 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 		return exitInvalidConfig
 	}
 	if fs.NArg() != 1 {
-		fmt.Fprintln(stderr, "uso: heimdall run [--secrets=stdin|env] [--var=dir] [--compat=teuton2] <directorio del examen>")
+		fmt.Fprintln(stderr, "uso: heimdall run [--secrets=stdin|env] [--var=dir] [--events=ndjson] <directorio del examen>")
+		return exitInvalidConfig
+	}
+	if *eventStream != "" && *eventStream != "ndjson" {
+		fmt.Fprintf(stderr, "heimdall run: --events=%s no existe; el contrato nativo es ndjson\n", *eventStream)
+		return exitInvalidConfig
+	}
+	if *eventStream != "" && *export != "" {
+		fmt.Fprintln(stderr, "heimdall run: --events y --export escriben los dos en stdout; usa solo uno")
 		return exitInvalidConfig
 	}
 	if *compat != "" && *compat != "teuton2" {
@@ -102,6 +112,14 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 		live = newProgress(stdout)
 	}
 
+	// The native stream owns stdout while it is on: a line of prose in the
+	// middle of it would break the only channel the GUI has.
+	var stream *events.Emitter
+	if *eventStream == "ndjson" {
+		stream = events.New(stdout, values(secrets))
+		stream.RunStart(runStartOf(runID, p))
+	}
+
 	var partialErr error
 	result := engine.Run(ctx, p, engine.Options{
 		RunID:           runID,
@@ -109,6 +127,7 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 		Secrets:         secrets,
 		Concurrency:     *concurrency,
 		HostConcurrency: *hostConcurrency,
+		Progress:        progressTo(stream),
 		OnStudentDone: func(run *model.RunResult) error {
 			if live != nil {
 				live.students(run)
@@ -129,6 +148,9 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 	path, err := writer.WriteFinal(result)
 	if err != nil {
 		fmt.Fprintf(stderr, "heimdall run: no se pudo escribir el artefacto: %s\n", err)
+		if stream != nil {
+			stream.RunEnd(runEndOf(result, "", exitFailure))
+		}
 		return exitFailure
 	}
 	if partialErr != nil {
@@ -141,13 +163,85 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 		}
 	}
 
-	printSummary(stdout, result, path)
-
 	code := engine.ExitCode(result)
 	if *export == "json" {
 		code = legacyExitCode(code)
 	}
+
+	if stream != nil {
+		stream.RunEnd(runEndOf(result, path, code))
+		if err := stream.Err(); err != nil {
+			fmt.Fprintf(stderr, "heimdall run: aviso: %s\n", err)
+		}
+	} else {
+		printSummary(stdout, result, path)
+	}
 	return code
+}
+
+// progressTo wires the engine's live report to the event stream. Without a
+// stream there is nothing to report and the engine is told so, which keeps
+// the run free of callbacks nobody reads.
+func progressTo(stream *events.Emitter) *engine.Progress {
+	if stream == nil {
+		return nil
+	}
+	return &engine.Progress{
+		StudentStart: func(studentID, name string) {
+			stream.StudentStart(events.StudentStart{StudentID: studentID, Name: name})
+		},
+		CheckDone: func(studentID string, c model.CheckResult) {
+			stream.CheckEnd(events.CheckEndOf(studentID, c))
+		},
+		StudentEnd: func(result model.StudentResult) {
+			stream.StudentEnd(events.StudentEnd{
+				StudentID: result.StudentID,
+				Status:    result.Status,
+				Score:     result.Score,
+			})
+		},
+	}
+}
+
+// runStartOf describes the run before it touches a machine. Everything here
+// comes from the PLAN, which is already fixed and will not move (ADR-0002).
+func runStartOf(runID string, p *plan.Plan) events.RunStart {
+	students := make([]events.StudentRef, 0, len(p.Students))
+	evaluable := 0
+	for _, sp := range p.Students {
+		students = append(students, events.StudentRef{
+			StudentID: sp.ID,
+			Name:      sp.Name,
+			MoodleID:  sp.MoodleID,
+			Excluded:  sp.Excluded,
+		})
+		if !sp.Excluded {
+			evaluable++
+		}
+	}
+	return events.RunStart{
+		RunID:          runID,
+		EngineVersion:  version,
+		Exam:           p.Exam,
+		Inventory:      p.Inventory,
+		PlanHash:       p.Hash,
+		Plan:           p.Summary,
+		ExpectedChecks: evaluable * p.Summary.CheckCount,
+		Students:       students,
+	}
+}
+
+// runEndOf closes the stream with the same status and the same exit code the
+// process is about to use, and points at the artifact, which is where the
+// result really lives.
+func runEndOf(run *model.RunResult, artifact string, code int) events.RunEnd {
+	return events.RunEnd{
+		Status:   run.Status,
+		ExitCode: code,
+		Artifact: artifact,
+		Counts:   events.CountsOf(run),
+		Warnings: run.Warnings,
+	}
 }
 
 // writeLegacy writes the files the current GUI reads, on top of the canonical

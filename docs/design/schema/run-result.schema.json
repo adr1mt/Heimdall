@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/adr1mt/heimdall/docs/design/schema/run-result.schema.json",
+  "title": "Heimdall RunResult",
+  "description": "El artefacto canónico de una ejecución. Es la fuente de verdad del resultado: el flujo de eventos y cualquier exportación derivan de aquí y nunca al revés. Un dato que no esté en este esquema no existe. Las claves son inglesas porque es un contrato de máquina; la documentación es española.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "run_id", "engine_version", "started_at", "finished_at",
+    "status", "exam", "inventory", "plan_hash", "plan", "students"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Versión del artefacto. Sube solo si un campo cambia de significado o desaparece."
+    },
+    "run_id": { "type": "string", "description": "ULID, ordenable por tiempo." },
+    "engine_version": { "type": "string" },
+    "started_at": { "type": "string", "format": "date-time" },
+    "finished_at": { "type": "string", "format": "date-time" },
+    "status": { "$ref": "#/$defs/RunStatus" },
+    "exam": { "$ref": "#/$defs/SourceRef" },
+    "inventory": { "$ref": "#/$defs/SourceRef" },
+    "plan_hash": { "type": "string", "description": "sha256 del PLAN resuelto." },
+    "plan": { "$ref": "#/$defs/PlanSummary" },
+    "students": { "type": "array", "items": { "$ref": "#/$defs/StudentResult" } },
+    "warnings": { "type": "array", "items": { "$ref": "#/$defs/Warning" } }
+  },
+  "$defs": {
+    "RunStatus": { "enum": ["COMPLETE", "PARTIAL", "CANCELLED", "INVALID_CONFIG"] },
+    "StudentStatus": { "enum": ["OK", "PARTIAL", "NOT_EVALUATED", "EXCLUDED"] },
+    "ScoreStatus": { "enum": ["COMPLETE", "INCOMPLETE", "NOT_EVALUATED", "EXCLUDED"] },
+    "AcademicStatus": {
+      "enum": ["PASS", "FAIL", "UNEVALUATED"],
+      "description": "El eje académico. UNEVALUATED nunca se convierte en FAIL."
+    },
+    "Cause": {
+      "enum": [
+        "NONE", "CONNECT_FAILED", "AUTH_FAILED", "TIMEOUT", "CONNECTION_LOST",
+        "NOT_RUN", "CANCELLED", "OUTPUT_OVERFLOW", "ENGINE_ERROR"
+      ],
+      "description": "El eje técnico. Solo tiene sentido con UNEVALUATED; con PASS o FAIL es siempre NONE."
+    },
+    "RemoteProcessState": { "enum": ["FINISHED", "KILLED_REMOTE", "UNKNOWN"] },
+
+    "SourceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string" },
+        "sha256": { "type": "string" },
+        "version": { "type": "string", "description": "La clave version: del YAML." }
+      }
+    },
+
+    "PlanSummary": {
+      "type": "object",
+      "description": "Lo que el PLAN fijó antes de tocar ninguna máquina. Es idéntico para todos los alumnos: eso es lo que hace justo el denominador.",
+      "additionalProperties": false,
+      "required": ["check_count", "total_weight", "check_ids", "concurrency", "host_concurrency"],
+      "properties": {
+        "check_count": { "type": "integer", "minimum": 0 },
+        "total_weight": { "type": "number", "minimum": 0 },
+        "check_ids": { "type": "array", "items": { "type": "string" }, "description": "En orden." },
+        "concurrency": { "type": "integer" },
+        "host_concurrency": { "type": "integer" }
+      }
+    },
+
+    "StudentResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["student_id", "name", "status", "started_at", "finished_at", "score", "checks"],
+      "properties": {
+        "student_id": { "type": "string" },
+        "name": { "type": "string" },
+        "moodle_id": { "type": "string" },
+        "status": { "$ref": "#/$defs/StudentStatus" },
+        "started_at": { "type": "string", "format": "date-time" },
+        "finished_at": { "type": "string", "format": "date-time" },
+        "score": { "$ref": "#/$defs/Score" },
+        "checks": { "type": "array", "items": { "$ref": "#/$defs/CheckResult" } }
+      }
+    },
+
+    "Score": {
+      "type": "object",
+      "description": "La capa de nota. El motor publica 0-100 entero y los números crudos; convertir a la escala del profesor es cosa de la GUI. Quien lea provisional_score o final_score sin mirar status lo está haciendo mal.",
+      "additionalProperties": false,
+      "required": ["obtained", "evaluable", "total", "unevaluated", "provisional_score", "final_score", "status"],
+      "properties": {
+        "obtained": { "type": "number", "description": "Peso de las comprobaciones PASS." },
+        "evaluable": { "type": "number", "description": "Peso de PASS más FAIL." },
+        "total": { "type": "number", "description": "Peso total del PLAN." },
+        "unevaluated": { "type": "number", "description": "total menos evaluable." },
+        "provisional_score": {
+          "type": ["integer", "null"],
+          "description": "round(100*obtained/evaluable); null si evaluable es 0."
+        },
+        "final_score": {
+          "type": ["integer", "null"],
+          "description": "round(100*obtained/total); null mientras quede una comprobación UNEVALUATED con peso > 0. Nunca un 0 que signifique «no se pudo mirar»."
+        },
+        "status": { "$ref": "#/$defs/ScoreStatus" }
+      }
+    },
+
+    "CheckResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["check_id", "group", "description", "weight", "status", "cause", "execution", "assertion"],
+      "properties": {
+        "check_id": { "type": "string" },
+        "group": { "type": "string" },
+        "description": { "type": "string" },
+        "weight": { "type": "number", "minimum": 0 },
+        "status": { "$ref": "#/$defs/AcademicStatus" },
+        "cause": { "$ref": "#/$defs/Cause" },
+        "detail": { "type": "string", "description": "Una frase. Nunca una traza de pila." },
+        "execution": {
+          "oneOf": [{ "$ref": "#/$defs/ExecutionResult" }, { "type": "null" }],
+          "description": "null cuando el comando no llegó a lanzarse."
+        },
+        "assertion": {
+          "oneOf": [{ "$ref": "#/$defs/AssertionResult" }, { "type": "null" }],
+          "description": "null cuando no hubo una ejecución completa que comparar."
+        }
+      }
+    },
+
+    "ExecutionResult": {
+      "type": "object",
+      "description": "Los hechos sobre el proceso. No sabe nada de notas.",
+      "additionalProperties": false,
+      "required": [
+        "host", "address", "user", "transport", "command", "started_at",
+        "duration_ms", "completed", "exit_code", "overflow", "stdout", "stderr",
+        "connect_attempts", "command_attempts", "remote_process"
+      ],
+      "properties": {
+        "host": { "type": "string" },
+        "address": { "type": "string" },
+        "user": { "type": "string" },
+        "transport": { "type": "string", "description": "ssh, o inventory si el valor salió de aula.yaml." },
+        "command": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Vector de argumentos, ya sustituido. No hay shell en ningún punto."
+        },
+        "started_at": { "type": "string", "format": "date-time" },
+        "duration_ms": { "type": "integer" },
+        "completed": {
+          "type": "boolean",
+          "description": "Se recibió el estado de salida y se leyeron los dos flujos hasta el final. Si falta algo de eso, la comprobación es UNEVALUATED."
+        },
+        "exit_code": { "type": ["integer", "null"], "description": "null cuando completed es false." },
+        "overflow": {
+          "type": "boolean",
+          "description": "El motor dejó de leer porque el comando producía más salida de la que sostiene. No es un fallo de red."
+        },
+        "stdout": { "$ref": "#/$defs/Stream" },
+        "stderr": { "$ref": "#/$defs/Stream" },
+        "connect_attempts": { "type": "integer", "description": "1 significa sin reintento." },
+        "command_attempts": { "type": "integer" },
+        "remote_process": { "$ref": "#/$defs/RemoteProcessState" }
+      }
+    },
+
+    "Stream": {
+      "type": "object",
+      "description": "Un flujo capturado. La salida del alumno es dato no confiable: se acota y lo que se descartó se sigue contando.",
+      "additionalProperties": false,
+      "required": ["text", "bytes", "bytes_total", "truncated"],
+      "properties": {
+        "text": { "type": "string", "description": "Hasta el límite, UTF-8 válido, cortado en frontera de runa." },
+        "bytes": { "type": "integer" },
+        "bytes_total": { "type": "integer", "description": "Lo que el comando produjo, aunque no se conservara." },
+        "truncated": { "type": "boolean" }
+      }
+    },
+
+    "AssertionResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "expected", "found", "matched"],
+      "properties": {
+        "kind": { "enum": ["contains", "equals", "not_contains", "exit_code", "near"] },
+        "expected": { "type": "string", "description": "Ya sustituido." },
+        "found": { "type": "string" },
+        "matched": { "type": "boolean" },
+        "where": { "type": "string", "description": "Por ejemplo: stdout linea 12." }
+      }
+    },
+
+    "Warning": {
+      "type": "object",
+      "description": "Algo que el profesor tiene que saber y no es el resultado de una comprobación.",
+      "additionalProperties": false,
+      "required": ["scope", "code", "message"],
+      "properties": {
+        "scope": { "type": "string", "description": "run | student:alumne02 | check:kea-subnet" },
+        "code": { "type": "string" },
+        "message": { "type": "string" }
+      }
+    }
+  }
+}

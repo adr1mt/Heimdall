@@ -2,53 +2,58 @@
 
 Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
-**Actualizado**: 2026-09-20 · **Fase**: 4 — Contrato nativo motor ↔ GUI
+**Actualizado**: 2026-09-20 · **Fase**: 5 — Heimdall GUI sobre el contrato nativo
 
 ## Última sesión
 
-**ADR-0016**, que sustituye a ADR-0008: **Heimdall deja de ser compatible con
-Teuton**. No se lee `config.yaml` ni `start.rb`, no hay importador de exámenes
-antiguos y ninguna limitación de Teuton GUI condiciona el diseño. La cadena
-definitiva es Heimdall GUI → contrato nativo → motor → SSH → máquinas.
-Consecuencias, ya aplicadas a la planificación:
+Dos cosas, en dos commits.
 
-- **T041, T043 y T044** quedan `DROPPED`, con su motivo en `TASKS.json`.
-- **Fase 4** pasa a ser el contrato nativo: **T050** (eventos NDJSON + esquema
-  del artefacto, cierra D-9) es la única tarea `READY` y todo cuelga de ella.
-- **Fase 5**, Heimdall GUI en `gui/`, sembrada desde `teuton-gui` y sin una
-  línea de Teuton: T051 semilla, T052 ejecución y progreso, T053 resultados e
-  incompletas (cierra D-8), T054 histórico, modo examen y analíticas.
-- **Fase 6**: T060, borrado de la capa legacy. **Fase 7**: T070 rehacer los
-  exámenes en formato nativo (sin migrador), T071 editor, T072 empaquetado.
-- `internal/legacy` y la fachada `--compat`/`--export=json` quedan **congeladas**:
-  pruebas internas y nada nuevo.
+**Replanificación (ADR-0016)**: Heimdall deja de ser compatible con Teuton. Ni
+`config.yaml`, ni `start.rb`, ni importador de exámenes antiguos. T041, T043 y
+T044 quedan `DROPPED` con su motivo y la capa legacy, congelada hasta T060. La
+cadena es Heimdall GUI → contrato nativo → motor → SSH → máquinas.
 
-No se tocó código: solo ADR, roadmap, tareas y reglas.
+**T050, hecha (ADR-0017)**: `heimdall run --events=ndjson` emite cinco eventos
+por `stdout` —`run.start` con el denominador exacto y el total de la barra,
+`student.start`, `check.end` con estado y causa separados, `student.end` con la
+nota, `run.end` con el artefacto y el código de salida— y el esquema del
+artefacto está publicado en `docs/design/schema/`. `test/eventos.sh` lee una
+ejecución entera solo con el flujo y el artefacto: E-1 a E-10 en verde contra
+el laboratorio. El esquema no puede desincronizarse del modelo. La fachada
+congelada no se ha tocado; `--events` y `--export` son incompatibles.
+
+En palabras de aula: la GUI nueva ya puede saber, mientras corrige, cuántas
+comprobaciones quedan y por qué ha fallado cada una. Una máquina apagada deja
+de parecerse a un examen mal hecho.
 
 ## Estado actual
 
 - **Go 1.27.1** en `/mnt/datos/Applications/Claude/toolchains/go`; en shell no
   interactiva hay que exportar el `PATH` a mano. `go.mod`: `module heimdall`.
 - `cmd/heimdall`: `check`, `run`, `version`. `run` acepta `--secrets=stdin|env`,
-  `--var=dir`, `--concurrency=N`, `--host-concurrency=N` y, congeladas,
-  `--compat=teuton2` y la fachada en `compat.go`. Exit: 0 ok · 2 config
-  inválida · 3 parcial · 4 cancelado · 1 ni se pudo escribir.
+  `--var=dir`, `--concurrency=N`, `--host-concurrency=N`, `--events=ndjson` y,
+  congeladas, `--compat=teuton2` y la fachada en `compat.go`. `--events` y
+  `--export` son incompatibles. Exit: 0 ok · 2 config inválida · 3 parcial ·
+  4 cancelado · 1 ni se pudo escribir.
 - `internal/model` (puro): `Classify`, `ComputeScore`, `StudentStatusOf`.
   `internal/plan`: los dos YAML y las nueve validaciones. `internal/assert`:
   cinco aserciones. `internal/report`: escritura atómica y redacción.
+- `internal/events`: contrato nativo NDJSON (ADR-0017), con su propia
+  redacción de secretos. `docs/design/09-CONTRATO-GUI.md` y el esquema en
+  `docs/design/schema/run-result.schema.json`.
 - `internal/engine`: pool de 16, 4 aperturas por máquina, presupuesto por
   alumno, `panic` recuperado, parcial tras cada alumno. `internal/ssh`: 2
   reintentos, identidades en memoria (ADR-0011), 64 kB por flujo, corte a 8 MB.
 - `test/lab.sh`: `alu1` en `127.1.2.3:2201`; el alumno roto, puerto 2299.
-  `test/acceptance.sh` recorre A-1 a A-14 con `jq`.
+  `test/acceptance.sh` recorre A-1 a A-14 y `test/eventos.sh` E-1 a E-10.
 - `gui/` **no existe todavía**. `workspace/teuton-gui` es referencia de solo
   lectura.
 
 ## Pruebas ejecutadas
 
-**En esta sesión no se ejecutó nada**: no se tocó código. Última suite verde
-(sesión anterior): `make check`, `gofmt -l` limpio y `make test` contra el
-laboratorio, con `acceptance.sh` 13 de 14 y `carga.sh` con A-15.
+`make check` verde · `gofmt -l` sin salida · `make test` entero contra el
+laboratorio: integración de `engine` y `ssh`, `secrets.sh`, `acceptance.sh`
+13 de 14, **`eventos.sh` 10 de 10**, `ra2.sh` 13, `carga.sh` con A-15.
 
 ## Problemas conocidos
 
@@ -60,5 +65,5 @@ laboratorio, con `acceptance.sh` 13 de 14 y `carga.sh` con A-15.
 
 ## Siguiente tarea recomendada
 
-**T050** (`READY`, P0): el contrato nativo motor ↔ GUI. Eventos NDJSON
-versionados y esquema del artefacto, con el ADR que cierra D-9.
+**T051** (`READY`, P0): la semilla de `gui/`. Heimdall GUI arrancando con la
+base técnica y visual de `teuton-gui` y sin una línea de Teuton dentro.

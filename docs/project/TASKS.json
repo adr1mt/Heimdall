@@ -845,7 +845,7 @@
       "id": "T050",
       "title": "Contrato nativo motor-GUI: eventos NDJSON y esquema del artefacto",
       "phase": 4,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "T032"
@@ -870,17 +870,19 @@
         "El contrato esta versionado y documentado"
       ],
       "tests": [
-        "cmd/heimdall",
+        "internal/events",
+        "internal/engine",
         "internal/report",
-        "test/acceptance.sh"
+        "cmd/heimdall",
+        "test/eventos.sh"
       ],
-      "notes": "Primera tarea del enfoque nativo (ADR-0016). Todo lo de fase 5 cuelga de aqui."
+      "notes": "Cerrada el 2026-09-20. ADR-0017, docs/design/09-CONTRATO-GUI.md y el esquema en docs/design/schema/. E-1 a E-10 en verde contra el laboratorio."
     },
     {
       "id": "T051",
       "title": "Semilla de gui/: Heimdall GUI sin una linea de Teuton",
       "phase": 5,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P0",
       "depends_on": [
         "T050"

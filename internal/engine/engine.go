@@ -68,6 +68,20 @@ type Options struct {
 	// returns becomes a warning: it must not be silent and it must not stop
 	// the run.
 	OnStudentDone func(run *model.RunResult) error
+
+	// Progress is told what the run is doing while it happens, so the caller
+	// can publish it. Nil means nobody is watching.
+	Progress *Progress
+}
+
+// Progress is the live report of a run. Every function is called from the
+// worker that did the work, so several may run at once, and none of them may
+// block or panic: they say what the engine did and never have a say in it.
+// A nil function is simply not called.
+type Progress struct {
+	StudentStart func(studentID, name string)
+	CheckDone    func(studentID string, c model.CheckResult)
+	StudentEnd   func(result model.StudentResult)
 }
 
 // Run evaluates the whole PLAN and returns the artifact. It always returns
@@ -172,6 +186,9 @@ func (r *runner) evaluate(ctx context.Context, run *model.RunResult) {
 			defer wg.Done()
 			for i := range jobs {
 				result := r.evalStudent(ctx, r.plan.Students[i])
+				if r.opts.Progress != nil && r.opts.Progress.StudentEnd != nil {
+					r.opts.Progress.StudentEnd(result)
+				}
 				r.publish(i, result)
 			}
 		}()
@@ -201,6 +218,13 @@ func (r *runner) publish(i int, result model.StudentResult) {
 			Code:    "PARTIAL_WRITE_FAILED",
 			Message: fmt.Sprintf("no se ha podido guardar el resultado parcial: %s", oneLine(err)),
 		})
+	}
+}
+
+// checkDone reports one finished check to the caller, if it asked.
+func (r *runner) checkDone(studentID string, c model.CheckResult) {
+	if r.opts.Progress != nil && r.opts.Progress.CheckDone != nil {
+		r.opts.Progress.CheckDone(studentID, c)
 	}
 }
 

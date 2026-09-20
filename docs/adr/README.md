@@ -21,3 +21,4 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 | [0014](0014-nombre-heimdall.md) | El producto se llama Heimdall; cierra D-7 |
 | [0015](0015-causa-salida-desbordada.md) | Novena causa técnica: `OUTPUT_OVERFLOW` |
 | [0016](0016-heimdall-independiente-de-teuton.md) | Heimdall es un producto independiente, con GUI propia; sustituye a 0008 |
+| [0017](0017-contrato-nativo-ndjson.md) | Contrato nativo motor ↔ GUI: eventos NDJSON y esquema del artefacto; cierra D-9 |

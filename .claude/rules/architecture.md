@@ -53,6 +53,7 @@ internal/ssh/    sesión, exec, límites de salida, timeouts
 internal/engine/ worker pool, presupuesto por alumno, cancelación
 internal/assert/ aserciones
 internal/report/ escritura atómica del artefacto
+internal/events/ contrato nativo NDJSON hacia la GUI
 internal/legacy/ LegacyTeutonWriter (congelado, se borra en T060)
 testdata/        exámenes e inventarios de prueba
 test/            scripts de aceptación e integración

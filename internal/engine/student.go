@@ -27,6 +27,9 @@ func (r *runner) evalStudent(ctx context.Context, sp plan.StudentPlan) model.Stu
 		MoodleID:  sp.MoodleID,
 		StartedAt: time.Now(),
 	}
+	if r.opts.Progress != nil && r.opts.Progress.StudentStart != nil {
+		r.opts.Progress.StudentStart(sp.ID, sp.Name)
+	}
 
 	if sp.Excluded {
 		result.FinishedAt = time.Now()
@@ -85,6 +88,7 @@ func (r *runner) runChecks(runCtx, studentCtx context.Context, sp plan.StudentPl
 			checks[i].Status = model.Unevaluated
 			checks[i].Cause = model.CauseEngineError
 			checks[i].Detail = detail
+			r.checkDone(sp.ID, checks[i])
 		}
 		r.warn(model.Warning{Scope: "student:" + sp.ID, Code: "ENGINE_ERROR", Message: detail})
 	}()
@@ -101,6 +105,7 @@ func (r *runner) runChecks(runCtx, studentCtx context.Context, sp plan.StudentPl
 			checks[i] = r.runCheck(runCtx, studentCtx, sp, hosts, c)
 		}
 		done = i + 1
+		r.checkDone(sp.ID, checks[i])
 	}
 }
 

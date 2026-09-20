@@ -318,3 +318,32 @@ Dos decisiones menores:
 7. **No hay migrador de exámenes.** Los exámenes del curso se rehacen en el
    formato nativo (T070). Un traductor de un DSL ejecutable a un formato
    declarativo es un compilador incompleto que solo se usaría una vez.
+
+## T050 · El contrato nativo con la GUI (ADR-0017)
+
+1. **El artefacto es la fuente de verdad; los eventos son el progreso.** Nada
+   viaja por el flujo que el artefacto no tenga, así que una GUI que se pierda
+   un evento pierde progreso y nunca una nota.
+2. **La salida del alumnado no entra en el flujo.** Es dato no confiable y sin
+   tamaño máximo. `check.end` lleva estado, causa, detalle y duración; el texto
+   está en el artefacto, acotado. Un test comprueba que una salida de 100 kB no
+   asoma por el canal.
+3. **`expected_checks` y `check_count` son cosas distintas y se publican
+   aparte.** Uno es el total de la barra de progreso (comprobaciones × alumnos
+   evaluables); el otro es el denominador, que no se mueve. Confundirlos es lo
+   que hacía que un alumno roto moviera la nota de los demás.
+4. **`--events` y `--export` son incompatibles.** Los dos escriben en `stdout`.
+   Con el flujo encendido, `stdout` es solo suyo y el resumen en prosa no se
+   imprime.
+5. **`internal/events` es un paquete nuevo de primer nivel.** El contrato es una
+   pieza publicada, con versión y reglas propias; `internal/report` escribe el
+   artefacto en disco, atómicamente, y son dos ciclos de vida distintos.
+6. **El emisor lleva su propia redacción de secretos.** Es la misma segunda
+   línea de defensa que el escritor del artefacto, independiente a propósito:
+   dos canales, dos defensas.
+7. **El esquema del artefacto se publica y no puede desincronizarse.** Los
+   tests de `internal/report` recorren el esquema campo a campo contra los
+   tipos del modelo, incluidas las enumeraciones cerradas y `schema_version`.
+8. **`test/eventos.sh` es el consumidor de prueba.** Lee una ejecución entera
+   con nada más que el flujo y el artefacto al que apunta. Lo que no se pueda
+   averiguar ahí, la GUI tampoco podrá.

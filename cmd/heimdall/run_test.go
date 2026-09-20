@@ -224,3 +224,32 @@ func TestRunRejectsAnUnknownCompatFormat(t *testing.T) {
 	}
 	assertEmptyDir(t, out)
 }
+
+// The native stream has one format. Any other spelling is a mistake that must
+// stop here and not end with the GUI waiting for a line that never comes.
+func TestRunRejectsAnUnknownEventFormat(t *testing.T) {
+	out := t.TempDir()
+	var stdout, stderr bytes.Buffer
+	if got := run([]string{"run", "--events=xml", "--var=" + out, protoProject}, &stdout, &stderr); got != exitInvalidConfig {
+		t.Fatalf("exit = %d, se esperaba %d", got, exitInvalidConfig)
+	}
+	if !strings.Contains(stderr.String(), "ndjson") {
+		t.Errorf("stderr = %q: debe decir cuál es el formato", stderr.String())
+	}
+	assertEmptyDir(t, out)
+}
+
+// The native stream and the frozen facade both write to stdout: asking for
+// both would corrupt the only channel the GUI has.
+func TestRunRejectsTheNativeStreamTogetherWithTheLegacyFacade(t *testing.T) {
+	out := t.TempDir()
+	var stdout, stderr bytes.Buffer
+	got := run([]string{"run", "--events=ndjson", "--export=json", "--var=" + out, protoProject}, &stdout, &stderr)
+	if got != exitInvalidConfig {
+		t.Fatalf("exit = %d, se esperaba %d", got, exitInvalidConfig)
+	}
+	if stdout.Len() != 0 {
+		t.Errorf("stdout = %q: no debe escribirse nada", stdout.String())
+	}
+	assertEmptyDir(t, out)
+}
