@@ -3,6 +3,7 @@
 
 import type { EngineEvent } from './events'
 import type { RunResult } from './artifact'
+import type { RunSummary } from './history'
 
 /** Result of locating the engine and asking it for its version. */
 export interface EngineStatus {
@@ -45,13 +46,15 @@ export interface HeimdallApi {
   detectEngine: () => Promise<EngineStatus>
   getEnginePath: () => Promise<string>
   setEnginePath: (path: string) => Promise<EngineStatus>
-  pickFile: (kind: 'exam' | 'class' | 'engine') => Promise<string | null>
+  pickFile: (kind: 'exam' | 'class' | 'engine' | 'result') => Promise<string | null>
   openExternal: (url: string) => Promise<void>
   /** Credential names the chosen classroom asks for. */
   secretRefs: (classPath: string) => Promise<string[]>
   startRun: (request: RunRequest) => Promise<void>
   /** Reads the canonical artifact of a finished run. */
   readArtifact: (path: string) => Promise<RunResult>
+  /** The past runs of the project the exam belongs to, newest first. */
+  listRuns: (examPath: string) => Promise<RunSummary[]>
   cancelRun: () => Promise<void>
   /** Subscribes to the stream. Returns the unsubscribe function. */
   onRunEvent: (listener: (event: EngineEvent) => void) => () => void

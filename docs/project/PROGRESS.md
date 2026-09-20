@@ -6,17 +6,15 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T055, hecha. D-8 cerrada con ADR-0018.** Ante un alumno incompleto la
-aplicación no hace nada por su cuenta: enseña qué falta —en comprobaciones y en
-peso, que no son la misma cifra— y ofrece dos salidas. Dejarlo pendiente es lo
-normal. Repetir solo repite lo que no se pudo comprobar: lo que salió bien y lo
-que salió mal no se vuelve a intentar. El reintento se guarda aparte, dice de
-qué corrección viene y conserva, comprobación a comprobación, qué era y por qué
-causa la vez anterior. Nada automático convierte un «sin evaluar» en suspenso ni
-inventa una nota final. Marcar a mano queda fuera del MVP.
+**T054, hecha, después de dividirla** en histórico (T054), exportación de notas
+(T056), modo examen y proyector (T058) e inventario de lo heredado (T059).
 
-Consolidar una cadena de correcciones para cerrar la nota de quien quedó entero
-entre dos pasadas es **T057**, nueva y bloqueada por T054.
+Lo entregado es el histórico: una vista nueva que lista las correcciones
+guardadas del examen elegido, de la más reciente a la más antigua, leyendo los
+artefactos y nada más. Abrir una enseña la misma pantalla que el día que se
+corrió, sin tocar ninguna máquina. Una corrección con el fichero roto no
+desaparece de la lista: sale con el motivo. Un examen sin correcciones lo dice
+y no es un error. Y se puede abrir a mano un resultado de otra carpeta.
 
 ## Estado actual
 
@@ -25,46 +23,43 @@ entre dos pasadas es **T057**, nueva y bloqueada por T054.
 - `cmd/heimdall`: `check`, `run`, `version`. `run`: `--secrets=stdin|env`,
   `--var`, `--cname`, `--case`, `--concurrency`, `--host-concurrency`,
   `--events=ndjson`, `--retry=<artefacto>` y, congeladas, `--compat=teuton2` y
-  `--export=json`. `--retry` no se combina con `--case` ni con la fachada.
-  Exit: 0 ok · 2 config inválida · 3 parcial · 4 cancelado · 1 ni se pudo
-  escribir.
+  `--export=json`. Exit: 0 ok · 2 config inválida · 3 parcial · 4 cancelado ·
+  1 ni se pudo escribir.
 - `internal/model` (puro): `Classify`, `ComputeScore`, `StudentStatusOf`; el
-  rastro del intento anterior está en el artefacto y no entra en ninguna nota.
-  `plan`: los dos YAML y las nueve validaciones. `assert`: cinco aserciones.
-  `report`: escritura atómica y redacción. `events`: contrato NDJSON (ADR-0017),
-  con la procedencia del reintento en `run.start`.
+  rastro del intento anterior no entra en ninguna nota. `plan`: los dos YAML y
+  las nueve validaciones. `assert`: cinco aserciones. `report`: escritura
+  atómica y redacción. `events`: contrato NDJSON (ADR-0017).
 - `internal/engine`: pool de 16, 4 aperturas por máquina, presupuesto por
   alumno, parcial tras cada alumno y selección de reintento. `internal/ssh`: 2
   reintentos, identidades en memoria (ADR-0011), 64 kB por flujo, corte a 8 MB.
-- `test/lab.sh`: `alu1` en `127.1.2.3:2201`; el alumno roto, puerto 2299.
+- `test/lab.sh`: `alu1` en `127.1.2.3:2201`; el roto, en el 2299.
   `acceptance.sh` recorre A-1 a A-14 y `eventos.sh` E-1 a E-10.
-- `gui/`: árbol Node independiente; `make gui-check` (70 tests), `gui-build` y
-  `gui-lab`. Vistas: Inicio, Resultados, Ajustes, Ayuda. Resultados lleva el
-  panel de lo que quedó sin comprobar y manda el reintento a Inicio, que pide
-  otra vez las credenciales y lanza el motor con `--retry`.
+- `gui/`: árbol Node independiente; `make gui-check` (79 tests), `gui-build` y
+  `gui-lab`. Vistas: Inicio, Resultados, **Histórico**, Ajustes, Ayuda.
+  Resultados lleva el panel de lo que quedó sin comprobar y manda el reintento
+  a Inicio. El histórico lee `var/run-*.json` del proyecto del examen, como
+  mucho las 50 más recientes, y no mira nada de la capa legacy.
 - `workspace/teuton-gui` es referencia de solo lectura.
 
 ## Pruebas ejecutadas
 
-`make check` y `make gui-check` (70 tests) verdes · `gofmt -l` sin salida ·
-`acceptance.sh` (13 en verde, A-10 pendiente) y `eventos.sh` (E-1 a E-10)
-verdes · `make gui-lab` verde (S-0 a S-4) · prototipo corregido contra el
-laboratorio y reintentado sobre su artefacto: se repitió solo lo que quedó sin
-evaluar, lo demás salió «no se repitió» con su resultado anterior anotado, y
-cero coincidencias del secreto en `var/` y en los logs. `make test` no se
-repitió.
+`make check` y `make gui-check` (79 tests) verdes · `gofmt -l` sin salida ·
+`make gui-lab` verde: S-0 a S-4 y **H-1**, que reabre la última corrección
+desde el histórico y compara la pantalla carácter a carácter contra el
+laboratorio real. `acceptance.sh`, `eventos.sh` y `make test` no se repitieron.
 
 ## Problemas conocidos
 
 - Laboratorio en **`127.1.2.3`**, nunca `127.0.0.x` (F-01, A-11).
 - **A-10**: los ficheros legacy se escriben, pero el script de aceptación lo
   marca `PEND`. Con la capa congelada, se cierra o se retira en T060.
-- El artefacto de un reintento parcial no da nota final, y es correcto: la
-  cadena entera se lee en T057.
-- Un reintento exige el mismo PLAN. Si lo que había mal era el `aula.yaml`, esa
-  clase se corrige entera otra vez.
+- El histórico se apoya en la carpeta del examen elegido; sin examen elegido no
+  hay lista, y para eso está «Abrir otro resultado…».
+- El artefacto de un reintento parcial no da nota final: la cadena entera se
+  lee en T057. Y un reintento exige el mismo PLAN: si lo que estaba mal era el
+  `aula.yaml`, esa clase se corrige entera otra vez.
 
 ## Siguiente tarea recomendada
 
-**T054** (`READY`, P1): histórico, modo examen y analíticas sobre el modelo
-canónico. Desbloquea T057.
+**T056** (`READY`, P1): sacar las notas fuera —CSV y escala del profesor—.
+También `READY`: T057 (cadena de correcciones) y T058 (examen y proyector).

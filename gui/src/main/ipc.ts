@@ -2,15 +2,17 @@ import { app, dialog, ipcMain, shell, type WebContents } from 'electron'
 import { IPC } from '../shared/ipc'
 import { detectEngine } from './engine'
 import { readArtifact } from './artifact'
+import { listRuns, varDirOf } from './history'
 import { RunSession, resolveRunTarget } from './run'
 import { secretRefsOf } from './secrets'
 import { readSettings, writeSettings } from './store'
 import type { EngineStatus, RunClosed, RunRequest } from '../shared/types'
 
-const FILTERS: Record<'exam' | 'class' | 'engine', Electron.FileFilter[]> = {
+const FILTERS: Record<'exam' | 'class' | 'engine' | 'result', Electron.FileFilter[]> = {
   exam: [{ name: 'Examen', extensions: ['yaml', 'yml'] }],
   class: [{ name: 'Aula', extensions: ['yaml', 'yml'] }],
-  engine: [{ name: 'Motor', extensions: ['*'] }]
+  engine: [{ name: 'Motor', extensions: ['*'] }],
+  result: [{ name: 'Resultado', extensions: ['json'] }]
 }
 
 /** Where the settings file lives: the app's own data directory. */
@@ -53,7 +55,8 @@ export function registerIpc(): void {
   })
 
   ipcMain.handle(IPC.pickFile, async (_e, kind: unknown): Promise<string | null> => {
-    const key = kind === 'exam' || kind === 'class' || kind === 'engine' ? kind : 'exam'
+    const key =
+      kind === 'exam' || kind === 'class' || kind === 'engine' || kind === 'result' ? kind : 'exam'
     const result = await dialog.showOpenDialog({ properties: ['openFile'], filters: FILTERS[key] })
     return result.canceled ? null : (result.filePaths[0] ?? null)
   })
@@ -94,6 +97,13 @@ export function registerIpc(): void {
   ipcMain.handle(IPC.readArtifact, (_e, path: unknown) => {
     if (typeof path !== 'string' || !path) throw new Error('No hay ningún resultado que abrir.')
     return readArtifact(path)
+  })
+
+  // Reading the history touches no machine and computes no grade: it only
+  // lists the artifacts already on disk.
+  ipcMain.handle(IPC.listRuns, (_e, examPath: unknown) => {
+    if (typeof examPath !== 'string' || !examPath) return []
+    return listRuns(varDirOf(examPath))
   })
 
   ipcMain.handle(IPC.cancelRun, (): void => {

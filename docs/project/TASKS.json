@@ -1018,7 +1018,7 @@
       "id": "T057",
       "title": "Vista consolidada de una cadena de correcciones",
       "phase": 5,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T054",
@@ -1045,29 +1045,117 @@
     },
     {
       "id": "T054",
-      "title": "Historico, modo examen y analiticas sobre el modelo real",
+      "title": "Historico de ejecuciones sobre los artefactos canonicos",
       "phase": 5,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T053"
       ],
-      "goal": "Recuperar el resto del flujo de aula que ya funcionaba, ahora con datos completos.",
+      "goal": "Que una correccion de la semana pasada se pueda volver a mirar entera, sin volver a tocar ninguna maquina.",
       "scope": [
-        "Historico de ejecuciones por clase leyendo los artefactos canonicos",
-        "Modo examen y modo proyector",
-        "Analiticas y utilidades que sigan teniendo sentido, revisadas una a una",
-        "Exportacion de notas"
+        "Listado de las ejecuciones de un proyecto leyendo los artefactos de var/",
+        "Abrir una ejecucion anterior y verla en Resultados como el dia que se corrio",
+        "Abrir un artefacto suelto elegido a mano"
       ],
       "out_of_scope": [
-        "Funciones nuevas sin caso de uso demostrado (principio 10)"
+        "Modo examen y modo proyector (T058)",
+        "Exportacion de notas y conversion de escala (T056)",
+        "Base de datos o indice propio: la verdad son los artefactos",
+        "Consolidar una cadena de reintentos (T057)"
       ],
       "acceptance": [
         "El profesor abre una ejecucion anterior y ve lo mismo que el dia que la corrio",
-        "Cada utilidad heredada esta conservada o retirada con su motivo por escrito"
+        "Un artefacto ilegible aparece en la lista con su motivo, nunca desaparece en silencio",
+        "Un proyecto sin var/ o sin ejecuciones lo dice y no es un error",
+        "El historico no lee ni escribe nada de la capa legacy"
+      ],
+      "tests": [
+        "gui/tests/history.test.ts",
+        "H-1 en gui/scripts/secretos.sh: reabrir la ultima ejecucion desde el historico da la misma pantalla"
+      ],
+      "notes": "T054 era las cuatro piezas del flujo de aula a la vez. Dividida el 2026-09-20 en T054 (historico), T056 (notas fuera), T058 (modo examen y proyector) y T059 (inventario de lo heredado)."
+    },
+    {
+      "id": "T056",
+      "title": "Sacar las notas fuera de la aplicacion",
+      "phase": 5,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [
+        "T054"
+      ],
+      "goal": "Que el profesor lleve las notas de una correccion a donde las necesita sin copiarlas a mano.",
+      "scope": [
+        "Exportacion de las notas de una ejecucion a CSV",
+        "Conversion de la nota 0-100 del motor a la escala del profesor, en la GUI",
+        "Identificador de Moodle por alumno cuando el aula lo trae"
+      ],
+      "out_of_scope": [
+        "Que el motor convierta la escala: publica 0-100 y los numeros crudos (architecture.md)",
+        "Formatos del escritor legacy"
+      ],
+      "acceptance": [
+        "Un alumno sin nota final no exporta una nota inventada: exporta que no la tiene",
+        "La escala la elige el profesor y no toca el artefacto",
+        "Ningun secreto ni ninguna salida de alumno viaja en la exportacion"
       ],
       "tests": [],
-      "notes": "Detallar al llegar."
+      "notes": "Sale del reparto de T054 del 2026-09-20. K-10 de KEEP-DROP-CHANGE."
+    },
+    {
+      "id": "T058",
+      "title": "Modo examen y modo proyector",
+      "phase": 5,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [
+        "T054"
+      ],
+      "goal": "Recuperar las dos formas de usar la aplicacion delante de la clase.",
+      "scope": [
+        "Modo examen: correcciones encadenadas mientras dura la practica",
+        "Modo proyector: lo que se puede ensenar en la pantalla del aula",
+        "Bloqueo de suspension y confirmacion al cerrar mientras hay examen"
+      ],
+      "out_of_scope": [
+        "Cualquier cosa que convierta un sin evaluar en suspenso",
+        "Redaccion de secretos ad hoc: el artefacto ya nace sin ellos"
+      ],
+      "acceptance": [
+        "Con el proyector encendido no se ve en pantalla nada que identifique a un alumno mas de lo que el profesor decida",
+        "Cerrar la aplicacion con un examen en marcha pide confirmacion",
+        "El modo examen no lanza dos motores a la vez"
+      ],
+      "tests": [],
+      "notes": "Sale del reparto de T054 del 2026-09-20. §4 de docs/research/GUI-CONTRACT.md."
+    },
+    {
+      "id": "T059",
+      "title": "Inventario de lo heredado: conservado o retirado con su motivo",
+      "phase": 5,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T054",
+        "T056",
+        "T058"
+      ],
+      "goal": "Cerrar la fase 5 sin deudas: de cada utilidad de la GUI vieja, que se hizo con ella y por que.",
+      "scope": [
+        "Recorrer §3 y §4 de docs/research/GUI-CONTRACT.md, utilidad a utilidad",
+        "Escribir el veredicto en gui/docs/ con su motivo",
+        "Retirar lo que era andamio del motor viejo"
+      ],
+      "out_of_scope": [
+        "Reimplementar nada solo por haber existido (principio 10)"
+      ],
+      "acceptance": [
+        "Cada utilidad heredada esta conservada o retirada con su motivo por escrito",
+        "Ninguna entrada queda sin veredicto"
+      ],
+      "tests": [],
+      "notes": "Sale del reparto de T054 del 2026-09-20. Es el segundo acceptance del T054 original."
     },
     {
       "id": "T060",
@@ -1076,7 +1164,7 @@
       "status": "BLOCKED",
       "priority": "P1",
       "depends_on": [
-        "T054"
+        "T059"
       ],
       "goal": "Quitar el andamio en cuanto deja de sostener nada.",
       "scope": [

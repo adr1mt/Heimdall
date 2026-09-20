@@ -104,6 +104,27 @@ app.whenReady().then(async () => {
     if (done) break
   }
 
+  // H-1 of T054: the same correction, reopened from the history, has to say
+  // exactly what it said the day it ran. The text of Resultados is captured
+  // before going anywhere, and again after opening the top row of Histórico.
+  const live = (await js(`document.querySelector('main').innerText`)) as string
+  await js(`[...document.querySelectorAll('aside button')].find(b => b.textContent.trim() === 'Histórico').click()`)
+  await wait(800)
+  const opened = await js(`(() => {
+    const row = [...document.querySelectorAll('main button')].find(b => b.textContent.trim() === 'Abrir')
+    if (row) row.click()
+    return !!row
+  })()`)
+  await wait(800)
+  const again = (await js(`document.querySelector('main').innerText`)) as string
+  console.log('[lab-run] historico abierto:', opened)
+  console.log('[lab-run] historico:', opened && again === live ? 'igual' : 'distinto')
+  if (opened && again !== live) {
+    console.log('----- historico -----')
+    console.log(again)
+    console.log('---------------------')
+  }
+
   // Open one check, which is where the cause and the output live.
   if (process.env.OPEN_CHECK) {
     await js(`(() => {

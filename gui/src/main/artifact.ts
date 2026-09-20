@@ -6,7 +6,12 @@ import { parseArtifact, type RunResult } from '../shared/artifact'
  * inside it; anything bigger is said out loud instead of freezing the window
  * while it loads.
  */
-const MAX_ARTIFACT = 64 << 20
+export const MAX_ARTIFACT = 64 << 20
+
+/** Said the same way whether the file was opened or only summarised. */
+export function tooBigMessage(size: number): string {
+  return `El fichero de resultados ocupa ${Math.round(size / (1 << 20))} MB y la aplicación no abre más de ${MAX_ARTIFACT >> 20} MB.`
+}
 
 /** Reads the artifact of one run from disk. */
 export function readArtifact(path: string): RunResult {
@@ -16,10 +21,6 @@ export function readArtifact(path: string): RunResult {
   } catch {
     throw new Error(`No se encuentra el fichero de resultados «${path}».`)
   }
-  if (size > MAX_ARTIFACT) {
-    throw new Error(
-      `El fichero de resultados ocupa ${Math.round(size / (1 << 20))} MB y la aplicación no abre más de ${MAX_ARTIFACT >> 20} MB.`
-    )
-  }
+  if (size > MAX_ARTIFACT) throw new Error(tooBigMessage(size))
   return parseArtifact(readFileSync(path, 'utf-8'))
 }

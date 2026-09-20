@@ -460,3 +460,28 @@ Dos decisiones menores:
 8. **El reintento no abre ninguna vía nueva hacia los secretos.** Viaja como la
    ruta del artefacto anterior y nada más; el motor decide qué repite. Los
    comandos del detalle siguen siendo los que publica el artefacto, ya saneados.
+
+## T054 · El histórico
+
+1. **La verdad son los artefactos, no un índice aparte.** El histórico es la
+   lista de los `var/run-*.json` del proyecto, leídos en el momento. Una base
+   de datos o un fichero de índice sería una segunda versión de los resultados
+   que podría discrepar de la primera, y el principio 12 dice cuál manda.
+2. **Abrir una ejecución anterior es abrir su artefacto en la misma pantalla.**
+   No hay vista de «resultado histórico» distinta de Resultados: si fuera otra
+   pantalla, tendría que mantenerse al día con ella y acabarían enseñando cosas
+   distintas del mismo fichero.
+3. **Un artefacto que no se puede leer conserva su fila, con el motivo.** Una
+   corrección que ocurrió no puede desaparecer de la lista porque su fichero
+   esté roto: eso sería el error silencioso del principio 2.
+4. **Un proyecto sin `var/` no es un error.** Es un examen que todavía no se ha
+   corrido, y se dice tal cual.
+5. **La lista se corta en las 50 más recientes.** Cada fila obliga a leer el
+   artefacto entero para resumirlo, y una carpeta con un curso entero dentro
+   dejaría la ventana colgada. Las anteriores siguen en la carpeta y se abren
+   con «Abrir otro resultado…».
+6. **Mientras hay una corrección en marcha no se abre ninguna del histórico.**
+   Sustituiría en pantalla lo que se está corrigiendo ahora mismo.
+7. **T054 se dividió antes de implementarla.** Juntaba histórico, modo examen,
+   modo proyector, analíticas y exportación: cuatro entregas y ninguna
+   verificable por separado. Quedan T054, T056, T058 y T059.

@@ -3,6 +3,7 @@ import {
   AlertTriangle,
   CheckCircle2,
   HelpCircle,
+  History as HistoryIcon,
   Home,
   ListChecks,
   Loader2,
@@ -20,10 +21,12 @@ const HomeView = lazy(() => import('./routes/Home'))
 const SettingsView = lazy(() => import('./routes/Settings'))
 const HelpView = lazy(() => import('./routes/Help'))
 const ResultsView = lazy(() => import('./routes/Results'))
+const HistoryView = lazy(() => import('./routes/History'))
 
 const NAV: { id: View; label: string; icon: typeof Home }[] = [
   { id: 'home', label: t.nav.home, icon: Home },
   { id: 'results', label: t.nav.results, icon: ListChecks },
+  { id: 'history', label: t.nav.history, icon: HistoryIcon },
   { id: 'settings', label: t.nav.settings, icon: SettingsIcon },
   { id: 'help', label: t.nav.help, icon: HelpCircle }
 ]
@@ -84,6 +87,7 @@ function AppBody() {
   const views: Record<View, JSX.Element> = {
     home: <HomeView />,
     results: <ResultsView />,
+    history: <HistoryView />,
     settings: <SettingsView />,
     help: <HelpView />
   }

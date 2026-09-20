@@ -8,6 +8,7 @@ export const t = {
   nav: {
     home: 'Inicio',
     results: 'Resultados',
+    history: 'Histórico',
     settings: 'Ajustes',
     help: 'Ayuda'
   },
@@ -126,6 +127,31 @@ export const t = {
     confirmBody:
       'Se repiten solo las comprobaciones sin evaluar. Lo que salió bien y lo que salió mal no se vuelve a intentar, y esta corrección se conserva tal cual: el reintento se guarda aparte.',
     confirmYes: 'Repetir'
+  },
+  history: {
+    title: 'Histórico',
+    hint: 'Las correcciones guardadas de este examen. Abrir una no toca ninguna máquina.',
+    needExam: 'Elige un examen en Inicio y aquí aparecerán sus correcciones anteriores.',
+    empty: 'Este examen todavía no tiene ninguna corrección guardada.',
+    refresh: 'Actualizar',
+    openOther: 'Abrir otro resultado…',
+    open: 'Abrir',
+    busy: 'Hay una corrección en marcha; se puede mirar el histórico cuando termine.',
+    loading: 'Buscando correcciones…',
+    unreadable: 'No se puede abrir',
+    // The same four states as a run, in the two or three words a row has room
+    // for. The whole sentence is on Resultados, where there is space for it.
+    status: {
+      COMPLETE: 'Clase entera',
+      PARTIAL: 'Con alumnos sin evaluar',
+      CANCELLED: 'Detenida',
+      INVALID_CONFIG: 'Configuración no válida'
+    },
+    retryOf: (runId: string) => `Reintento de la corrección ${runId}`,
+    counts: (students: number, checks: number) =>
+      `${students} alumnos · ${checks} comprobaciones`,
+    capped: (max: number) =>
+      `Se muestran las ${max} correcciones más recientes. Las anteriores siguen en la carpeta y se pueden abrir a mano.`
   },
   settings: {
     title: 'Ajustes',

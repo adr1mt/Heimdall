@@ -80,5 +80,9 @@ else
   ok "S-4" "ninguna contraseña en la salida de la aplicación"
 fi
 
+grep -q "^\[lab-run\] historico: igual$" "$WORK/salida.txt" \
+  && ok "H-1" "reabrir la corrección desde el histórico da la misma pantalla" \
+  || fail "H-1" "el histórico no enseña lo mismo que el día de la corrección"
+
 [ -z "$failed" ] || { echo; echo "Hay fallos."; exit 1; }
 echo; echo "Los secretos no salen de la memoria."
