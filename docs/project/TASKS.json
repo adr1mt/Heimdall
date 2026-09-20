@@ -759,29 +759,82 @@
       "notes": "Capa temporal, como T040."
     },
     {
-      "id": "T041",
-      "title": "UAT: 40 escenarios e2e de la GUI contra el motor nuevo",
+      "id": "T043",
+      "title": "Leer el proyecto que monta la GUI: config.yaml y start.rb",
       "phase": 4,
       "status": "READY",
       "priority": "P0",
       "depends_on": [
-        "T040",
         "T042"
       ],
-      "goal": "Prueba de aceptacion externa del motor, con una suite que ya existe y es hostil.",
+      "goal": "Que el binario nuevo evalue un proyecto de los que la GUI abre hoy, que es el unico que la GUI sabe crear.",
       "scope": [
-        "Apuntar la GUI al binario nuevo",
-        "ejecutar los 40 escenarios",
-        "corregir el motor, nunca la suite"
+        "Decidir y documentar en un ADR si el motor lee el proyecto viejo, si la GUI aprende a escribir el nuevo, o si hay una conversion",
+        "Implementar lo decidido",
+        "El alumnado y sus identificadores de Moodle salen de config.yaml"
       ],
       "out_of_scope": [
+        "Interpretar start.rb como lenguaje: no hay DSL ejecutable (regla de arquitectura)",
         "Modificar la GUI"
       ],
       "acceptance": [
-        "40 escenarios en verde sin tocar una linea de la GUI"
+        "`run --export=json .` sobre un proyecto con config.yaml evalua y escribe los tres ficheros del formato viejo",
+        "Un ADR recoge la decision y su motivo",
+        "La nota no cambia respecto al mismo examen en formato canonico"
       ],
       "tests": [],
-      "notes": "npm run build ANTES o fallan las 40 con un error que no lo explica."
+      "notes": "Comprobado el 2026-09-20: hoy sale exit 2 con \"no se puede leer examen.yaml\"."
+    },
+    {
+      "id": "T041",
+      "title": "UAT: los escenarios e2e de la GUI que no necesitan una averia simulada",
+      "phase": 4,
+      "status": "BLOCKED",
+      "priority": "P0",
+      "depends_on": [
+        "T040",
+        "T042",
+        "T043"
+      ],
+      "goal": "Prueba de aceptacion externa del motor con la suite de la GUI, en los escenarios que un motor real puede producir.",
+      "scope": [
+        "Apuntar la GUI al binario nuevo sin tocar el repositorio de la GUI",
+        "Ejecutar los escenarios cuyo modo del teuton falso es ok o slow",
+        "Corregir el motor, nunca la suite"
+      ],
+      "out_of_scope": [
+        "Modificar la GUI ni su suite",
+        "Los escenarios con modo hang, crash, truncate, syntaxerror, badgrades, staleresume, noresume, emptyresume, offline, huge, noreports o notargets: son averias que el motor no puede producir a peticion y prueban las defensas de la GUI, no el motor (ver T044)"
+      ],
+      "acceptance": [
+        "Los escenarios sin averia simulada en verde con el binario real, sin tocar una linea del repositorio de la GUI",
+        "La lista de escenarios ejecutados y la de excluidos queda escrita, con el motivo de cada exclusion"
+      ],
+      "tests": [],
+      "notes": "npm run build ANTES o fallan las 40 con un error que no lo explica. Baseline 2026-09-20 con el teuton falso: 40 pasan, 2 saltadas (app empaquetada). Bloqueada por T043: hoy el motor lee examen.yaml y aula.yaml, y los proyectos que monta la suite son de Teuton (config.yaml y start.rb), asi que `run --export=json .` sale con 2 antes de evaluar nada."
+    },
+    {
+      "id": "T044",
+      "title": "Averias reales para los escenarios hostiles de la GUI",
+      "phase": 4,
+      "status": "BLOCKED",
+      "priority": "P2",
+      "depends_on": [
+        "T041"
+      ],
+      "goal": "Cerrar los escenarios de la suite que hoy solo cubre el teuton falso, provocando la averia de verdad.",
+      "scope": [
+        "Para cada modo hostil, decidir si la averia se puede provocar con el laboratorio (maquina apagada, salida enorme, proceso colgado) o si no tiene sentido pedirsela al motor",
+        "Cubrir los que se puedan; dejar escrito por que no los demas"
+      ],
+      "out_of_scope": [
+        "Anadir modos de fallo al motor solo para pasar un test"
+      ],
+      "acceptance": [
+        "Cada modo hostil de la suite queda cubierto con una averia real o descartado por escrito con su motivo"
+      ],
+      "tests": [],
+      "notes": "Modos en uso: hang(5), slow(4), offline(2), truncate, crash, badgrades, mas crash/noreports/syntaxerror/staleresume en procedencia y emptyresume por setFakeMode."
     },
     {
       "id": "T050",
