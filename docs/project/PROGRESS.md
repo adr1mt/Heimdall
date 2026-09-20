@@ -6,13 +6,14 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última tarea terminada
 
-**T008 (conexión con las máquinas).** El motor ya entra en la máquina de un
-alumno, ejecuta un comando y cuenta con fidelidad qué pasó: si terminó, con qué
-código, y qué escribió por cada lado. Nunca se queda colgado: si el comando se
-pasa de tiempo, lo mata en la máquina del alumno y lo dice; si no puede matarlo,
-avisa de que puede haber quedado algo corriendo. Una salida gigante ni llena la
-memoria ni retrasa la corrección. Con la máquina apagada reintenta; con la
-contraseña mal, no: reintentar podría bloquear la cuenta del alumno.
+**T010 (el motor completo de una pasada).** El motor ya corrige a toda la clase
+de una vez: dos alumnos a la vez, cada uno con su propia conexión, su propio
+tiempo y su propio resultado. Un alumno con la máquina apagada, con una avería
+o con un fallo interno del motor no le cambia ni un punto a los demás: sale en
+el informe con sus comprobaciones sin evaluar y explicadas, nunca suspendidas.
+Cada alumno tiene un tiempo máximo propio; lo que no dé tiempo a comprobar sale
+como no ejecutado, no como fallo. Si el profesor para la corrección a media, el
+informe se escribe igual con lo que hubiera.
 
 ## Estado actual
 
@@ -27,13 +28,16 @@ contraseña mal, no: reintentar podría bloquear la cuenta del alumno.
   hashes. `internal/assert`: `contiene`, `igual_a`, `exit_code`, puras.
 - `internal/report`: escritura atómica, parciales por alumno, `latest.json`,
   ULID propio y filtro de redacción de secretos.
-- `internal/ssh` (nuevo): `Dial` con 2 reintentos (1 s y 3 s más jitter) y sin
-  reintento en `AUTH_FAILED`; `known_hosts` propio en `var/` con TOFU y aviso
-  (D-3, provisional); `Run` sin pty, flujos separados, 64 kB conservados por
-  flujo, corte duro a 8 MB que cierra la sesión, `bytes_total` real y corte en
-  frontera de runa; envoltura `timeout -k 5s N` si la máquina tiene coreutils
-  (`KILLED_REMOTE`) y aviso `REMOTE_TIMEOUT_UNAVAILABLE` si no (`UNKNOWN`).
-  Dependencia nueva: `golang.org/x/crypto/ssh`, ya permitida.
+- `internal/engine` (nuevo): `Run` recorre el PLAN, pool de 2, una sesión por
+  host y alumno, presupuesto por alumno, `panic` recuperado por alumno
+  (`ENGINE_ERROR` + aviso), parcial tras cada alumno y `ExitCode` (0/3/4). Las
+  aserciones que faltan y las comprobaciones `valor:` salen `ENGINE_ERROR`
+  explicado (T020). `CheckSecrets` antes de conectar: una referencia sin valor
+  nunca es contraseña vacía.
+- `internal/ssh`: `Dial` con 2 reintentos y sin reintento en `AUTH_FAILED`;
+  `known_hosts` propio en `var/` con TOFU (D-3, provisional); `Run` sin pty,
+  64 kB por flujo, corte duro a 8 MB, envoltura `timeout -k 5s N` cuando la
+  máquina tiene coreutils y aviso cuando no.
 - `test/lab.sh` (`make lab`, `lab-down`, `lab-status`): un contenedor `alu1` en
   `127.1.2.3:2201`, idempotente. Credenciales ficticias y HOME aislado en
   `test/README.md`. El alumno roto usa `127.1.2.3:2299`, puerto cerrado.
@@ -42,12 +46,14 @@ contraseña mal, no: reintentar podría bloquear la cuenta del alumno.
 ## Pruebas ejecutadas
 
 `make check` verde · `gofmt -l` sin salida · `go test -race -tags=integration
-./internal/ssh` verde, 12 tests: comando normal con los dos flujos y su código;
-`sleep 30` con 3 s da 3,1 s y `KILLED_REMOTE`; con el `timeout` escondido en el
-contenedor da `UNKNOWN` y su aviso; puerto cerrado da `CONNECT_FAILED` en 3
-intentos y 4,5 s; contraseña mala da `AUTH_FAILED` con 1 intento; 300 MB de
-`/dev/zero` se cortan en 0,17 s con `bytes_total` real y sin crecer la memoria;
-la contraseña no aparece en `argv`; TOFU escribe y no repite el aviso.
+./internal/engine` verde contra el laboratorio: el prototipo da PASS/PASS/PASS,
+FAIL en el comando inexistente y UNEVALUATED/TIMEOUT en `sleep 30`; provisional
+80, sin nota final; el alumno del puerto cerrado sale entero con
+`CONNECT_FAILED` y no mueve ni un número del otro; la contraseña no aparece en
+el artefacto. 10 tests rápidos de `internal/engine` (alumno roto, panic,
+cancelación, presupuesto, sesión única, excluido, secreto sin valor).
+`go test -race -tags=integration ./internal/ssh` verde, 12 tests (timeouts,
+reintentos, 300 MB cortados, contraseña fuera de `argv`, TOFU).
 
 ## Problemas conocidos
 
@@ -60,5 +66,6 @@ la contraseña no aparece en `argv`; TOFU escribe y no repite el aviso.
 
 ## Siguiente tarea recomendada
 
-**T010** (motor: worker pool, presupuesto por alumno y cancelación, P0), ya
-`READY`. Es la pieza que une PLAN, sesión SSH, aserciones y escritura.
+**T011** (CLI `run`, secretos por stdin y por env, P0), ya `READY`. Falta
+enganchar el motor al binario: leer los secretos sin pasar por `argv`, atender
+al Ctrl-C y escribir el artefacto con el código de salida que corresponda.

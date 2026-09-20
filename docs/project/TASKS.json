@@ -347,7 +347,7 @@
       "id": "T010",
       "title": "Motor: worker pool, presupuesto por alumno y cancelacion",
       "phase": 1,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "T003",
@@ -388,7 +388,7 @@
       "id": "T011",
       "title": "CLI run, secretos por stdin y por env",
       "phase": 1,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P0",
       "depends_on": [
         "T010"

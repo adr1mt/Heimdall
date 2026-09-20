@@ -1,0 +1,346 @@
+package engine
+
+import (
+	"context"
+	"fmt"
+	"strings"
+	"time"
+
+	"evalon/internal/assert"
+	"evalon/internal/model"
+	"evalon/internal/plan"
+	"evalon/internal/ssh"
+)
+
+// evalStudent runs every check of one student, in the PLAN's order, reusing
+// one session per logical host.
+//
+// It never returns early: whatever happens, the result carries one
+// CheckResult for every check of the PLAN, so the denominator is the same for
+// everybody.
+func (r *runner) evalStudent(ctx context.Context, sp plan.StudentPlan) model.StudentResult {
+	result := model.StudentResult{
+		StudentID: sp.ID,
+		Name:      sp.Name,
+		MoodleID:  sp.MoodleID,
+		StartedAt: time.Now(),
+	}
+
+	if sp.Excluded {
+		result.FinishedAt = time.Now()
+		result.Status = model.StudentExcluded
+		result.Score = model.Score{Total: r.plan.Summary.TotalWeight, Status: model.ScoreExcluded}
+		return result
+	}
+
+	// Every check starts as "not run": if this student dies at any point, the
+	// checks it never reached are already reported, never missing and never
+	// FAIL.
+	checks := make([]model.CheckResult, len(sp.Checks))
+	for i, c := range sp.Checks {
+		checks[i] = skeleton(c, model.CauseNotRun,
+			"el motor no llegó a ejecutar la comprobación")
+	}
+
+	// The budget is the student's alone: when it runs out, that student's
+	// remaining checks are NOT_RUN and nobody else notices.
+	studentCtx, cancel := withBudget(ctx, r.plan.StudentBudget)
+	defer cancel()
+
+	r.runChecks(ctx, studentCtx, sp, checks)
+
+	result.FinishedAt = time.Now()
+	result.Checks = checks
+	result.Status = model.StudentStatusOf(checks)
+	result.Score = model.ComputeScore(r.plan.Summary, checks)
+	return result
+}
+
+// withBudget bounds a student's context by the run-wide student budget. A
+// budget of zero means no bound.
+func withBudget(ctx context.Context, budget time.Duration) (context.Context, context.CancelFunc) {
+	if budget > 0 {
+		return context.WithTimeout(ctx, budget)
+	}
+	return context.WithCancel(ctx)
+}
+
+// runChecks fills checks in place. A panic in here is a bug of ours: it is
+// caught, it becomes ENGINE_ERROR for the checks this student had left, and
+// the rest of the class carries on.
+func (r *runner) runChecks(runCtx, studentCtx context.Context, sp plan.StudentPlan, checks []model.CheckResult) {
+	done := 0
+	hosts := newHostPool(r, sp)
+	defer hosts.closeAll()
+
+	defer func() {
+		p := recover()
+		if p == nil {
+			return
+		}
+		detail := fmt.Sprintf("fallo interno del motor evaluando a %s: %s", sp.ID, oneLine(fmt.Errorf("%v", p)))
+		for i := done; i < len(checks); i++ {
+			checks[i].Status = model.Unevaluated
+			checks[i].Cause = model.CauseEngineError
+			checks[i].Detail = detail
+		}
+		r.warn(model.Warning{Scope: "student:" + sp.ID, Code: "ENGINE_ERROR", Message: detail})
+	}()
+
+	for i, c := range sp.Checks {
+		switch {
+		case runCtx.Err() != nil:
+			checks[i] = skeleton(c, model.CauseCancelled, "")
+		case studentCtx.Err() != nil:
+			checks[i] = skeleton(c, model.CauseNotRun, fmt.Sprintf(
+				"el alumno %s agotó su presupuesto de %s antes de llegar a esta comprobación",
+				sp.ID, r.plan.StudentBudget))
+		default:
+			checks[i] = r.runCheck(runCtx, studentCtx, sp, hosts, c)
+		}
+		done = i + 1
+	}
+}
+
+// runCheck executes one check and classifies it. Everything technical stays
+// on the technical side: the only way out of here with PASS or FAIL is a
+// complete execution with an assertion that was actually evaluated.
+func (r *runner) runCheck(runCtx, studentCtx context.Context, sp plan.StudentPlan, hosts *hostPool, c plan.ResolvedCheck) model.CheckResult {
+	spec, err := specOf(c)
+	if err != nil {
+		return skeleton(c, model.CauseEngineError, err.Error())
+	}
+
+	sess, dialErr := hosts.get(studentCtx, c.Host)
+	if dialErr != nil {
+		return skeleton(c, dialErr.Cause, dialErr.Detail)
+	}
+
+	timeout := c.Timeout
+	if deadline, ok := studentCtx.Deadline(); ok {
+		if left := time.Until(deadline); left > 0 && left < timeout {
+			timeout = left
+		}
+	}
+
+	exec := sess.Run(studentCtx, c.Cmd, timeout)
+	cause, detail := causeOf(runCtx, studentCtx, sp, r.plan.StudentBudget, exec, c)
+
+	out := skeleton(c, model.CauseNone, "")
+	out.Execution = exec
+	if cause == model.CauseNone {
+		assertion, err := assert.Eval(*exec, spec)
+		if err != nil {
+			return failedAssertion(out, err)
+		}
+		out.Assertion = &assertion
+	}
+
+	status, finalCause, fallback := model.Classify(out.Execution, out.Assertion, cause)
+	out.Status, out.Cause = status, finalCause
+	out.Detail = detail
+	if out.Detail == "" {
+		out.Detail = fallback
+	}
+	return out
+}
+
+// failedAssertion turns a refusal of the assertion layer into an engine
+// error. It is never a failed check: the student did not get it wrong, we
+// did.
+func failedAssertion(out model.CheckResult, err error) model.CheckResult {
+	out.Assertion = nil
+	out.Status = model.Unevaluated
+	out.Cause = model.CauseEngineError
+	out.Detail = oneLine(err)
+	return out
+}
+
+// causeOf reads what happened to the process and names the technical cause.
+// An execution that completed has none: from there on it is academic.
+func causeOf(runCtx, studentCtx context.Context, sp plan.StudentPlan, budget time.Duration, exec *model.ExecutionResult, c plan.ResolvedCheck) (model.Cause, string) {
+	if exec.Completed {
+		return model.CauseNone, ""
+	}
+	switch {
+	case exec.RemoteProcess == model.RemoteKilledRemote:
+		return model.CauseTimeout, fmt.Sprintf(
+			"el comando no terminó en %s y se ha matado en la máquina del alumno", c.Timeout)
+	case runCtx.Err() != nil:
+		return model.CauseCancelled, ""
+	case studentCtx.Err() != nil:
+		return model.CauseTimeout, fmt.Sprintf(
+			"el alumno %s agotó su presupuesto de %s durante esta comprobación", sp.ID, budget)
+	case time.Duration(exec.DurationMS)*time.Millisecond >= c.Timeout:
+		return model.CauseTimeout, fmt.Sprintf(
+			"el comando no terminó en %s y puede haber quedado corriendo en la máquina del alumno", c.Timeout)
+	default:
+		return model.CauseConnectionLost, ""
+	}
+}
+
+// skeleton is the check as the artifact reports it when nothing ran: the
+// PLAN's identity and weight, an academic status of UNEVALUATED and a reason.
+func skeleton(c plan.ResolvedCheck, cause model.Cause, detail string) model.CheckResult {
+	status, finalCause, fallback := model.Classify(nil, nil, cause)
+	if detail == "" {
+		detail = fallback
+	}
+	return model.CheckResult{
+		CheckID:     c.ID,
+		Group:       c.Group,
+		Description: c.Description,
+		Weight:      c.Weight,
+		Status:      status,
+		Cause:       finalCause,
+		Detail:      detail,
+	}
+}
+
+// specOf names the assertion of a resolved check for the assertion layer.
+// An assertion this version does not evaluate is said out loud: turning it
+// into a failed check would cost the student marks for a hole of ours.
+func specOf(c plan.ResolvedCheck) (assert.Spec, error) {
+	if len(c.Cmd) == 0 {
+		return assert.Spec{}, fmt.Errorf(
+			"la comprobación %q no tiene cmd: y las comprobaciones sin comando todavía no están implementadas", c.ID)
+	}
+	switch {
+	case c.Contains != nil:
+		return assert.Spec{Kind: assert.KindContains, Expected: *c.Contains}, nil
+	case c.Equals != nil:
+		return assert.Spec{Kind: assert.KindEquals, Expected: *c.Equals}, nil
+	case c.ExitCode != nil:
+		return assert.Spec{Kind: assert.KindExitCode, ExitCode: *c.ExitCode}, nil
+	default:
+		return assert.Spec{}, fmt.Errorf(
+			"la aserción de la comprobación %q todavía no está implementada", c.ID)
+	}
+}
+
+// hostPool keeps one session per logical host of one student, dialled the
+// first time a check needs it and reused afterwards (K-6). A host that
+// refused to answer is not dialled again for the same student: the checks
+// that needed it all carry the same cause.
+type hostPool struct {
+	r        *runner
+	student  plan.StudentPlan
+	sessions map[string]Session
+	failures map[string]*ssh.DialError
+	targets  map[string]plan.Host
+}
+
+func newHostPool(r *runner, sp plan.StudentPlan) *hostPool {
+	targets := map[string]plan.Host{}
+	for _, c := range sp.Checks {
+		if c.Host != "" {
+			targets[c.Host] = c.Target
+		}
+	}
+	return &hostPool{
+		r:        r,
+		student:  sp,
+		sessions: map[string]Session{},
+		failures: map[string]*ssh.DialError{},
+		targets:  targets,
+	}
+}
+
+func (h *hostPool) get(ctx context.Context, name string) (Session, *ssh.DialError) {
+	if s, ok := h.sessions[name]; ok {
+		return s, nil
+	}
+	if err, ok := h.failures[name]; ok {
+		return nil, err
+	}
+
+	target := h.targets[name]
+	password, err := secretFor(target.PasswordRef, h.r.opts.Secrets)
+	if err != nil {
+		derr := &ssh.DialError{Cause: model.CauseEngineError, Detail: oneLine(err)}
+		h.failures[name] = derr
+		return nil, derr
+	}
+
+	sess, derr := h.r.opts.Dial(ctx, ssh.Config{
+		Host:           name,
+		Address:        target.IP,
+		Port:           target.Port,
+		User:           target.User,
+		Password:       password,
+		KnownHostsPath: h.r.opts.KnownHostsPath,
+		ConnectTimeout: h.r.plan.ConnectTimeout,
+	})
+	if derr != nil {
+		h.failures[name] = derr
+		return nil, derr
+	}
+	h.sessions[name] = sess
+	return sess, nil
+}
+
+// closeAll ends the student's sessions and moves their warnings into the
+// artifact, tagged with the student they belong to.
+func (h *hostPool) closeAll() {
+	for name, s := range h.sessions {
+		for _, w := range s.Warnings() {
+			w.Scope = "student:" + h.student.ID + "/" + w.Scope
+			h.r.warn(w)
+		}
+		_ = s.Close()
+		delete(h.sessions, name)
+	}
+}
+
+// secretFor resolves a ${NOMBRE} reference from the inventory. A reference
+// with no value defined is an error and never an empty password: trying to
+// log in with "" would lock accounts and report a wrong cause.
+func secretFor(ref string, secrets map[string]string) (string, error) {
+	if ref == "" {
+		return "", nil
+	}
+	name := strings.TrimSuffix(strings.TrimPrefix(ref, "${"), "}")
+	if name == ref {
+		return "", fmt.Errorf("password_ref %q no es una referencia como ${AULA_PASSWORD}", ref)
+	}
+	value, ok := secrets[name]
+	if !ok {
+		return "", fmt.Errorf("no se ha definido ningún valor para ${%s}", name)
+	}
+	return value, nil
+}
+
+// CheckSecrets reports the references the PLAN needs and the run does not
+// have. The CLI calls it before opening the first connection, so a missing
+// password is a configuration error (exit 2) and not a class full of
+// UNEVALUATED.
+func CheckSecrets(p *plan.Plan, secrets map[string]string) error {
+	var missing []string
+	seen := map[string]bool{}
+	for _, sp := range p.Students {
+		if sp.Excluded {
+			continue
+		}
+		for _, c := range sp.Checks {
+			ref := c.Target.PasswordRef
+			if ref == "" || seen[ref] {
+				continue
+			}
+			seen[ref] = true
+			if _, err := secretFor(ref, secrets); err != nil {
+				missing = append(missing, oneLine(err))
+			}
+		}
+	}
+	if len(missing) == 0 {
+		return nil
+	}
+	return fmt.Errorf("%s", strings.Join(missing, "\n"))
+}
+
+func oneLine(err error) string {
+	if err == nil {
+		return ""
+	}
+	return strings.TrimSpace(strings.ReplaceAll(err.Error(), "\n", " "))
+}

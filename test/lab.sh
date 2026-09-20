@@ -27,7 +27,10 @@ up() {
   podman image exists "$IMAGE" || \
     podman build -t "$IMAGE" -f "$CONTAINERFILE_DIR/Containerfile" "$CONTAINERFILE_DIR"
   # --replace makes a second run idempotent instead of a name clash.
-  podman run -d --replace --name "$NAME" -p "$HOST:$PORT:22" "$IMAGE" >/dev/null
+  # --hostname: the prototype exam checks that the machine identifies itself,
+  # and a container's default hostname is a random id.
+  podman run -d --replace --name "$NAME" --hostname "$NAME" \
+    -p "$HOST:$PORT:22" "$IMAGE" >/dev/null
   for _ in $(seq 30); do
     if (exec 3<>/dev/tcp/$HOST/$PORT) 2>/dev/null; then
       echo "lab: $NAME listening on $HOST:$PORT"
