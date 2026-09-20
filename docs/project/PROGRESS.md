@@ -17,8 +17,10 @@ siempre se dice de qué vuelta sale.
 Solo compiten las vueltas completas: si la máquina se apaga en una vuelta
 posterior, esa vuelta no cuenta y el 9 sigue en pie. Quien aún no tenga
 ninguna vuelta entera no tiene nota y se dice por qué; nunca un cero. Quien
-llega al total queda marcado como terminado sin que nadie lo apunte, y de cada
-alumno se guarda lo que dijo cada vuelta.
+llega al examen entero —todo comprobado y todo bien— queda marcado como
+terminado sin que nadie lo apunte; con un 8 y todo comprobado sigue activo,
+porque todavía puede arreglarlo. De cada alumno se guarda lo que dijo cada
+vuelta.
 
 Es solo la regla: el motor aún no la publica (T063) ni se ve en pantalla
 (T064).
@@ -33,8 +35,8 @@ Es solo la regla: el motor aún no la publica (T063) ni se ve en pantalla
   `--compat=teuton2` y `--export=json`. Exit: 0 ok · 2 config · 3 parcial ·
   4 cancelado · 1 sin escribir.
 - `internal/model` (puro): `Classify`, `ComputeScore`, `StudentStatusOf`,
-  `Consolidate` (ADR-0019) y `BuildSession` (ADR-0020: mejor vuelta completa y
-  `FINISHED` derivado). El rastro de los intentos anteriores no entra en
+  `Consolidate` (ADR-0019) y `BuildSession` (ADR-0020: mejor vuelta completa;
+  `ACTIVE`/`FINISHED` derivados, `FINISHED` solo con el peso entero). El rastro de los intentos anteriores no entra en
   ninguna nota. `plan`: los dos YAML y nueve validaciones. `assert`: cinco
   aserciones. `report`: escritura atómica y redacción. `events`: NDJSON.
 - `internal/engine`: pool de 16, 4 aperturas por máquina, presupuesto por

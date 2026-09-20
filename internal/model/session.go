@@ -22,21 +22,26 @@ import (
 // not the artifact's schema and not the consolidation's: a session is neither.
 const SessionVersion = 1
 
-// SessionStatus is where a student stands at the end of the session. It is
+// SessionStatus is where a student stands in the session. It answers one
+// question and only one: does the next round still have to correct them? It is
 // derived from the rounds, never given as input (ADR-0020 §4).
+//
+// Whether there is a session grade yet is a different question, and it is
+// answered by the score and by FromRound, not by this.
 type SessionStatus string
 
 const (
+	// SessionActive means the session is still correcting this student. Every
+	// round of the session touches them.
+	//
+	// A student with a complete grade below the full weight is still ACTIVE:
+	// having every check evaluated is not being finished if any of them is
+	// FAIL. They can still fix it and be corrected again.
+	SessionActive SessionStatus = "ACTIVE"
 	// SessionFinished means one round gave the student the whole weight of the
-	// PLAN. There is nothing left to correct.
+	// PLAN: every check evaluated and every check PASS. There is nothing left
+	// to correct, so the next round leaves them out (T063).
 	SessionFinished SessionStatus = "FINISHED"
-	// SessionGraded means the student has a complete round, so a session
-	// grade, but not the whole PLAN.
-	SessionGraded SessionStatus = "GRADED"
-	// SessionUngraded means no round of the session was complete for this
-	// student. It is not a zero: there is no session grade and the view says
-	// why (ADR-0006, ADR-0020 §3).
-	SessionUngraded SessionStatus = "UNGRADED"
 	// SessionExcluded mirrors StudentExcluded: the inventory left the student
 	// out, so no round was ever going to evaluate them.
 	SessionExcluded SessionStatus = "EXCLUDED"
@@ -82,9 +87,12 @@ type SessionStudent struct {
 	Status    SessionStatus `json:"status"`
 
 	// Score is the grade of the best complete round, and FromRound says which
-	// one it was. With no complete round there is no session grade: Score is
-	// the last round's, which is never COMPLETE, FromRound is 0 and Reason
-	// says why.
+	// one it was. A round is complete when every check of weight > 0 was
+	// evaluated and there is a final_score; a provisional one is not a grade
+	// and does not compete (ADR-0006, ADR-0020 §2).
+	//
+	// With no complete round there is no session grade: Score is the last
+	// round's, which is never COMPLETE, FromRound is 0 and Reason says why.
 	Score     Score  `json:"score"`
 	FromRound int    `json:"from_round"` // 0 when there is no session grade
 	FromRunID string `json:"from_run_id,omitempty"`
@@ -203,7 +211,7 @@ func sessionStudent(id string, rounds []SessionRound) SessionStudent {
 	}
 	if last == nil {
 		// Cannot happen: the order comes from the rounds themselves.
-		out.Status = SessionUngraded
+		out.Status = SessionActive
 		out.Reason = "el alumno no aparece en ninguna vuelta de la sesión"
 		return out
 	}
@@ -228,7 +236,9 @@ func sessionStudent(id string, rounds []SessionRound) SessionStudent {
 	}
 
 	if best < 0 {
-		out.Status = SessionUngraded
+		// Still working and nothing whole to grade yet. Not a zero, and not a
+		// reason to stop correcting them (ADR-0020 §3).
+		out.Status = SessionActive
 		out.Score = last.Score
 		out.Reason = "ninguna vuelta de la sesión llegó a evaluarlo entero, " +
 			"así que todavía no tiene nota de la sesión"
@@ -239,10 +249,14 @@ func sessionStudent(id string, rounds []SessionRound) SessionStudent {
 	out.Score = out.Rounds[best].Score
 	out.FromRound = out.Rounds[best].Round
 	out.FromRunID = out.Rounds[best].RunID
+
+	// FINISHED is the full weight of the PLAN, not merely a complete grade:
+	// every check evaluated and every check PASS. Compared on the raw weights,
+	// because the published 0-100 integer rounds (ADR-0020 §4).
 	if isZeroWeight(out.Score.Total - out.Score.Obtained) {
 		out.Status = SessionFinished
 	} else {
-		out.Status = SessionGraded
+		out.Status = SessionActive
 	}
 	return out
 }

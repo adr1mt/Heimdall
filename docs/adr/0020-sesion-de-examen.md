@@ -35,6 +35,17 @@ sustituye a la vieja: la máquina estaba apagada y ahora contestó. Aquí la
 información no sustituye a nada, se **añade**: son cuatro estados sucesivos de
 la misma máquina, todos ciertos en su momento.
 
+**La frontera, en dos líneas, y no se cruza:**
+
+- **cadena de reintento técnico** → vale el resultado evaluado más reciente;
+- **sesión de examen** → vale la mejor nota completa obtenida en la sesión.
+
+Lo que decide cuál se aplica no es una preferencia: es qué relación declararon
+las ejecuciones. Con `retry_of`, cadena. Vueltas sucesivas del mismo PLAN
+dentro de una sesión, sesión. Ninguna implementación puede mezclarlas, y T063
+publica la sesión por su propio subcomando y su propio `kind`, nunca a través
+de `consolidate`.
+
 ## Decisión
 
 ### 1. La regla: por alumno, la mejor vuelta con nota completa
@@ -55,9 +66,14 @@ nada.
 
 ### 2. Solo compiten las vueltas completas
 
-Una vuelta solo entra en la comparación si su `score.status` es `COMPLETE`.
-Una nota provisional no es una nota (ADR-0006): compararla con una completa
-sería comparar un 100 % de tres comprobaciones con un 90 % de diez.
+**Nota completa** significa exactamente esto: todas las comprobaciones con peso
+del PLAN se pudieron evaluar en esa vuelta, y por tanto hay `final_score`. Ni
+una sola `UNEVALUATED` con peso > 0. Es la regla 1 de la política de nota
+(ADR-0006) aplicada vuelta a vuelta, sin umbral de tolerancia.
+
+Una vuelta solo entra en la comparación si es completa. Una nota provisional no
+es una nota: compararla con una completa sería comparar un 100 % de tres
+comprobaciones con un 90 % de diez.
 
 De ahí sale lo que más protege al alumno: **una vuelta posterior no puede
 rebajar nada**. Si la máquina se apaga en la vuelta 5, esa vuelta no compite, y
@@ -74,15 +90,35 @@ hizo nada, y lo que pasó es que no se pudo mirar.
 La vista publica igualmente el estado de la última vuelta, para que el profesor
 vea qué está ocurriendo, pero nunca como nota de sesión.
 
-### 4. `FINISHED` se deriva, no se marca
+### 4. `FINISHED` es el examen entero, y se deriva
 
 Un alumno queda `FINISHED` cuando una vuelta le dio **todo el peso del PLAN**:
-`obtained == total_weight`, comparado sobre los pesos crudos y no sobre el
-entero 0-100, que redondea. Un 99,6 % redondea a 100 y no es haber terminado.
+todas las comprobaciones evaluadas **y todas en `PASS`**.
+
+Tener el examen entero evaluado no es haber terminado. Con las dieciséis
+comprobaciones evaluadas y un 8, el alumno sigue `ACTIVE`: le quedan cosas por
+arreglar, puede arreglarlas, y la sesión lo tiene que seguir corrigiendo. Lo
+contrario echaría de la práctica a quien todavía puede subir, que es justo lo
+que la regla de la mejor nota existe para permitir.
+
+| Vuelta | Estado |
+|---|---|
+| 16 de 16 evaluadas, todas `PASS` → nota 10 | `FINISHED` |
+| 16 de 16 evaluadas, nota 8 | `ACTIVE` |
+| 15 de 16 evaluadas, provisional 9 | `ACTIVE`, y sin nota de sesión |
+| Nota completa 8 en una vuelta y provisional o `UNEVALUATED` después | `ACTIVE`, con 8 como nota de sesión |
+
+La comparación es sobre los **pesos crudos**, no sobre el entero 0-100 que se
+publica: un 99,6 % redondea a 100 y no es haber terminado.
+
+Los estados de sesión son tres y cerrados: `ACTIVE`, `FINISHED` y `EXCLUDED`.
+Contestan a una sola pregunta —¿la vuelta siguiente todavía tiene que corregir
+a este alumno?—, y no a si ya tiene nota: eso lo dicen la nota y la vuelta de
+la que sale. Lo que se hace con `FINISHED` —dejar al alumno fuera de la vuelta
+siguiente— es de T063 y es una decisión de ejecución, no de nota.
 
 Nadie lo marca a mano, ni el profesor ni la interfaz: sale del modelo, como
-`StudentStatus`. Lo que se hace con ese estado —dejar al alumno fuera de la
-vuelta siguiente— es de T063 y es una decisión de ejecución, no de nota.
+`StudentStatus`.
 
 ### 5. La sesión se compone del mismo PLAN
 
@@ -128,3 +164,6 @@ artefacto de cada vuelta.
   bien, que es exactamente lo que este ADR existe para evitar.
 - **Marcar a mano a un alumno como terminado.** Una nota que depende de que
   alguien pulse un botón a tiempo no es una nota derivada (principio 12).
+- **Dar por terminado a quien tiene el examen entero evaluado.** Descartada en
+  §4: con un 8 y todo evaluado el alumno puede seguir arreglando cosas, y
+  echarlo de la sesión le quitaría la nota que la regla §1 existe para darle.

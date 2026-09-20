@@ -9,9 +9,15 @@ Solo las que de verdad lo están. Las cerradas están en `docs/adr/`.
 ## Lo que se ha cerrado en esta sesión y antes estaba abierto
 
 - **D-10** (qué nota vale en una sesión de examen): la **mejor nota completa**
-  de la sesión, por alumno, y `FINISHED` cuando llega al total del PLAN. Es la
-  regla contraria a la de ADR-0019 porque el caso es el contrario: ahí se
-  repite lo que falló, aquí el alumno sigue trabajando. ADR-0020.
+  de la sesión, por alumno. Nota completa es todas las comprobaciones con peso
+  evaluadas, con `final_score`; una provisional no compite y no puede rebajar
+  nada. `FINISHED` solo con el peso entero del PLAN, todo evaluado y todo
+  `PASS`: con un 8 y las dieciséis comprobaciones evaluadas el alumno sigue
+  `ACTIVE`. La frontera con ADR-0019 es la que fija ADR-0020: **cadena de
+  reintento técnico → el resultado evaluado más reciente; sesión de examen →
+  la mejor nota completa de la sesión**. Lo decide qué relación declararon las
+  ejecuciones (`retry_of` o vueltas de la misma sesión), nunca una preferencia,
+  y T063 publica la sesión por su propio subcomando. ADR-0020.
 - **D-8** (qué ofrece la GUI ante un `INCOMPLETE`): dejarlo pendiente por
   defecto, o repetir **solo** las comprobaciones sin evaluar, en una ejecución
   aparte con su propio artefacto. Sin marcar a mano en el MVP. ADR-0018.

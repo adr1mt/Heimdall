@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -98,8 +99,8 @@ func TestSessionKeepsTheBestCompleteRound(t *testing.T) {
 	if got.FromRound != 4 || got.FromRunID != "R4" {
 		t.Errorf("grade comes from round %d (%s), want round 4 (R4)", got.FromRound, got.FromRunID)
 	}
-	if got.Status != SessionGraded {
-		t.Errorf("status = %s, want %s", got.Status, SessionGraded)
+	if got.Status != SessionActive {
+		t.Errorf("status = %s, want %s", got.Status, SessionActive)
 	}
 }
 
@@ -160,8 +161,8 @@ func TestSessionWithoutACompleteRoundHasNoGrade(t *testing.T) {
 	)
 	got := onlyStudent(t, s)
 
-	if got.Status != SessionUngraded {
-		t.Errorf("status = %s, want %s", got.Status, SessionUngraded)
+	if got.Status != SessionActive {
+		t.Errorf("status = %s, want %s", got.Status, SessionActive)
 	}
 	if got.Score.Final != nil {
 		t.Errorf("final score = %d, want none at all", *got.Score.Final)
@@ -199,11 +200,65 @@ func TestSessionFinishedIsDerivedFromTheWholePlan(t *testing.T) {
 	}
 }
 
-// Nine of ten is a 90 and is not finished: the border is exact.
-func TestSessionAlmostEverythingIsNotFinished(t *testing.T) {
-	s := buildOK(t, sessRound("R1", 0, sessStudent("alumne01", 0, 9, 0)))
-	if got := onlyStudent(t, s); got.Status != SessionGraded {
-		t.Errorf("status = %s, want %s", got.Status, SessionGraded)
+// The border of FINISHED, on the exam Adrià described: sixteen checks.
+// Having every check evaluated is not being finished if any of them is FAIL —
+// the student can still fix it, so the session keeps correcting them
+// (ADR-0020 §4).
+func TestSessionFinishedOnlyAtTheFullWeight(t *testing.T) {
+	plan := PlanSummary{CheckCount: 16, TotalWeight: 16}
+	for i := 1; i <= 16; i++ {
+		plan.CheckIDs = append(plan.CheckIDs, fmt.Sprintf("C-%02d", i))
+	}
+	student := func(pass, unevaluated int) StudentResult {
+		checks := make([]CheckResult, 0, 16)
+		for i, id := range plan.CheckIDs {
+			c := CheckResult{CheckID: id, Weight: 1}
+			switch {
+			case i >= 16-unevaluated:
+				c.Status, c.Cause = Unevaluated, CauseConnectFailed
+			case i < pass:
+				c.Status = Pass
+			default:
+				c.Status = Fail
+			}
+			checks = append(checks, c)
+		}
+		return StudentResult{
+			StudentID: "alumne01", Name: "alumne01",
+			Status: StudentStatusOf(checks), Score: ComputeScore(plan, checks), Checks: checks,
+		}
+	}
+	round := func(id string, m int, s StudentResult) SessionRound {
+		return SessionRound{Artifact: "var/" + id + ".json", Run: &RunResult{
+			SchemaVersion: SchemaVersion, RunID: id, StartedAt: minute(m), FinishedAt: minute(m),
+			Status: RunStatusOf([]StudentResult{s}), PlanHash: "hash-del-examen",
+			Plan: plan, Students: []StudentResult{s},
+		}}
+	}
+
+	cases := []struct {
+		name      string
+		student   StudentResult
+		want      SessionStatus
+		wantScore *int // nil means no session grade at all
+	}{
+		{"16 de 16 evaluadas, todas PASS", student(16, 0), SessionFinished, intp(100)},
+		{"16 de 16 evaluadas, alguna FAIL", student(13, 0), SessionActive, intp(81)},
+		{"15 de 16 evaluadas, provisional", student(14, 1), SessionActive, nil},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := onlyStudent(t, buildOK(t, round("R1", 0, tc.student)))
+			if got.Status != tc.want {
+				t.Errorf("status = %s, want %s", got.Status, tc.want)
+			}
+			switch {
+			case tc.wantScore == nil && got.Score.Final != nil:
+				t.Errorf("final score = %d, want no session grade", *got.Score.Final)
+			case tc.wantScore != nil && (got.Score.Final == nil || *got.Score.Final != *tc.wantScore):
+				t.Errorf("final score = %v, want %d", got.Score.Final, *tc.wantScore)
+			}
+		})
 	}
 }
 
@@ -230,8 +285,8 @@ func TestSessionRoundedHundredIsNotFinished(t *testing.T) {
 	if got.Score.Final == nil || *got.Score.Final != 100 {
 		t.Fatalf("final score = %v, want the rounded 100", got.Score.Final)
 	}
-	if got.Status != SessionGraded {
-		t.Errorf("status = %s, want %s: a rounded 100 is not the whole PLAN", got.Status, SessionGraded)
+	if got.Status != SessionActive {
+		t.Errorf("status = %s, want %s: a rounded 100 is not the whole PLAN", got.Status, SessionActive)
 	}
 }
 

@@ -539,10 +539,16 @@ Dos decisiones menores:
 3. **Solo compiten las vueltas completas.** De ahí sale la garantía que
    importa: una vuelta posterior no puede rebajar nada, así que la máquina que
    se apaga al final no baja una nota ya puesta (principio 3).
-4. **`FINISHED` se compara sobre los pesos crudos**, no sobre el entero 0-100:
-   un 99,6 % redondea a 100 y no es haber terminado.
-5. **Las vueltas se leen en el orden en que se corrieron**, y una fuera de
+4. **`FINISHED` es el examen entero, no el examen entero mirado.** Todas las
+   comprobaciones evaluadas y todas en `PASS`. Con un 8 y las dieciséis
+   evaluadas el alumno sigue `ACTIVE`: puede arreglarlo y la sesión lo tiene
+   que seguir corrigiendo. Se compara sobre los pesos crudos, no sobre el
+   entero 0-100, porque un 99,6 % redondea a 100 y no es haber terminado.
+5. **Tres estados de sesión: `ACTIVE`, `FINISHED`, `EXCLUDED`.** Contestan a si
+   la vuelta siguiente tiene que corregir al alumno, no a si ya tiene nota: eso
+   lo dicen la nota y la vuelta de la que sale.
+6. **Las vueltas se leen en el orden en que se corrieron**, y una fuera de
    orden es un error, no algo que se arregle por dentro: si el orden no es el
    real, «de qué vuelta sale la nota» es mentira.
-6. **Empate: gana la primera vuelta que llegó**, que es cuando el alumno llegó
+7. **Empate: gana la primera vuelta que llegó**, que es cuando el alumno llegó
    ahí.
