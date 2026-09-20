@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/img/logo.png" alt="Heimdall" width="120">
+</p>
+
 <h1 align="center">Heimdall</h1>
 
 <p align="center">
