@@ -6,11 +6,10 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última tarea terminada
 
-**T007 (aserciones) y T009 (escritura del resultado).** El motor ya sabe decir
-si una comprobación se cumple o no, y ya sabe guardar el resultado de una
-tanda sin perderlo: dos correcciones a la vez no se pisan el fichero y si el
-programa muere a media tanda queda lo ya corregido. Falta el trozo que se
-conecta a las máquinas (T008), y para eso hace falta el laboratorio (T006).
+**T006 (laboratorio SSH).** Ya se levanta con un comando la máquina de pruebas
+contra la que se probará la conexión, igual en cualquier sesión y en cualquier
+equipo, y se borra sin dejar rastro. Con eso desbloqueado, lo siguiente es el
+trozo que se conecta a las máquinas de los alumnos (T008).
 
 ## Estado actual
 
@@ -42,8 +41,11 @@ conecta a las máquinas (T008), y para eso hace falta el laboratorio (T006).
   puerto cerrado). Lo creó T005 para poder probar `check`; T012 lo revisará.
 - Única dependencia externa: `gopkg.in/yaml.v3`. Ficheros de prueba: los del
   diseño en `testdata/formato/`, los malformados junto a su paquete.
-- `Makefile` con `check`, `test`, `build`, `lab` y `lab-down`. `make lab`
-  levanta `alu1` y `alu2` en `127.1.2.3:2201-2202` con podman.
+- `Makefile` con `check`, `test`, `build`, `lab`, `lab-down` y `lab-status`.
+  Los tres últimos llaman a `test/lab.sh`, que levanta un único contenedor
+  `alu1` en `127.1.2.3:2201`, espera a que escuche y es idempotente. El alumno
+  roto usa `127.1.2.3:2299`, puerto cerrado, sin segundo contenedor.
+  Credenciales ficticias y HOME aislado documentados en `test/README.md`.
 
 ## Pruebas ejecutadas
 
@@ -51,7 +53,10 @@ conecta a las máquinas (T008), y para eso hace falta el laboratorio (T006).
 ./internal/report` verde: 8 tandas simultáneas dejan 8 ficheros completos y
 ningún temporal; un subproceso que se manda un SIGKILL deja un `partial.json`
 válido con el alumno ya terminado; un secreto inyectado en un stderr simulado
-sale como `[oculto]` con su aviso. `./bin/evalon check testdata/proto` imprime
+sale como `[oculto]` con su aviso. `make lab` dos veces seguidas desde cero deja `127.1.2.3:2201` escuchando,
+un `ssh` manual con las credenciales de prueba entra y devuelve 0, y
+`make lab-down` deja el equipo sin contenedores ni puertos abiertos.
+`./bin/evalon check testdata/proto` imprime
 5 comprobaciones y peso 6 y sale 0; el proyecto inválido sale 2 sin crear
 `var/`. Verificado por mutación en T004 (5 casos) y T005 (8 casos).
 
@@ -69,6 +74,8 @@ sale como `[oculto]` con su aviso. `./bin/evalon check testdata/proto` imprime
 
 ## Decisiones inesperadas de la sesión
 
+- El laboratorio se queda en un solo contenedor: el alumno roto no necesita
+  máquina, le basta un puerto cerrado.
 - `assert.Eval` devuelve error, no un resultado «no coincide», cuando la
   ejecución no se completó o la aserción no está soportada.
 - ULID implementado en el propio repo en vez de añadir una dependencia.
@@ -77,5 +84,5 @@ sale como `[oculto]` con su aviso. `./bin/evalon check testdata/proto` imprime
 
 ## Siguiente tarea recomendada
 
-**T006** (laboratorio SSH, P1) es la única `READY`. Desbloquea T008 (sesión
-SSH), que a su vez desbloquea T010 y el resto de la fase 1.
+**T008** (sesión SSH, exec, límites de salida y timeouts, P0), ya `READY`.
+Desbloquea T010 y el resto de la fase 1.

@@ -1,7 +1,12 @@
 {
   "schema_version": 1,
   "updated": "2026-09-20",
-  "status_values": ["BLOCKED", "READY", "IN_PROGRESS", "DONE"],
+  "status_values": [
+    "BLOCKED",
+    "READY",
+    "IN_PROGRESS",
+    "DONE"
+  ],
   "rules": [
     "Se trabaja la tarea READY de mayor prioridad con todas sus depends_on en DONE.",
     "Una tarea por sesion. Si crece, se divide aqui antes de implementarla.",
@@ -38,7 +43,11 @@
         "bin/evalon run y bin/evalon check salen con exit 2 y mensaje explicito de no implementado",
         "PROGRESS.md documenta la version de Go instalada y el comando exacto usado"
       ],
-      "tests": ["go vet ./...", "go test ./...", "make build && ./bin/evalon version"],
+      "tests": [
+        "go vet ./...",
+        "go test ./...",
+        "make build && ./bin/evalon version"
+      ],
       "notes": "Go NO esta instalado en el equipo: es lo primero y sin ello no hay medicion posible. Preferir el tarball oficial en una ruta bajo /mnt/datos si el gestor de paquetes no ofrece >= 1.22."
     },
     {
@@ -47,7 +56,9 @@
       "phase": 0,
       "status": "DONE",
       "priority": "P0",
-      "depends_on": ["T001"],
+      "depends_on": [
+        "T001"
+      ],
       "goal": "Que el modelo canonico exista como tipos Go con serializacion JSON estable y verificada.",
       "scope": [
         "internal/model con todas las structs de design/04-MODELO-RESULTADO.md §2, nombres de campo JSON exactos",
@@ -56,14 +67,21 @@
         "Test de round-trip contra un golden JSON en testdata/",
         "Validacion de que los campos opcionales se omiten y los nullables salen como null, no como cero"
       ],
-      "out_of_scope": ["Classify", "ComputeScore", "escritura a disco", "NDJSON"],
+      "out_of_scope": [
+        "Classify",
+        "ComputeScore",
+        "escritura a disco",
+        "NDJSON"
+      ],
       "acceptance": [
         "El ejemplo de design/04-MODELO-RESULTADO.md §3 se deserializa, se vuelve a serializar y es identico campo a campo",
         "final_score ausente de valor sale como null, nunca como 0",
         "assertion y execution ausentes salen como null",
         "make check en verde"
       ],
-      "tests": ["go test ./internal/model -run TestRoundTrip"],
+      "tests": [
+        "go test ./internal/model -run TestRoundTrip"
+      ],
       "notes": "El golden de testdata sale del ejemplo redactado a mano; se sustituira por uno real en T013."
     },
     {
@@ -72,7 +90,9 @@
       "phase": 0,
       "status": "DONE",
       "priority": "P0",
-      "depends_on": ["T002"],
+      "depends_on": [
+        "T002"
+      ],
       "goal": "Cerrar por construccion el camino de un error tecnico hacia la nota, con tests exhaustivos.",
       "scope": [
         "model.Classify(exec *ExecutionResult, assertion *AssertionResult, cause Cause) -> (AcademicStatus, Cause, detail)",
@@ -82,7 +102,13 @@
         "Caso frontera exit 127: FAIL con cause NONE",
         "Peso 0: se informa, no degrada el estado del alumno ni deja INCOMPLETE a nadie"
       ],
-      "out_of_scope": ["Red", "disco", "reloj", "os.Getenv", "conversion a la escala del profesor"],
+      "out_of_scope": [
+        "Red",
+        "disco",
+        "reloj",
+        "os.Getenv",
+        "conversion a la escala del profesor"
+      ],
       "acceptance": [
         "Test de tabla exhaustiva sobre las 8 causas: ninguna causa != NONE produce PASS ni FAIL",
         "ComputeScore con cualquier unevaluated > 0 devuelve Final == nil y Status == INCOMPLETE",
@@ -91,7 +117,9 @@
         "Total siempre igual a plan.TotalWeight, independientemente de los checks recibidos",
         "Ni una llamada a red, disco o reloj en el paquete (revision manual y ausencia de imports)"
       ],
-      "tests": ["go test ./internal/model -run 'TestClassify|TestComputeScore'"],
+      "tests": [
+        "go test ./internal/model -run 'TestClassify|TestComputeScore'"
+      ],
       "notes": "Estos son los tests que protegen los principios 1, 3 y 6. Invariantes 3 a 6 de ARCHITECTURE.md §7."
     },
     {
@@ -100,7 +128,9 @@
       "phase": 0,
       "status": "DONE",
       "priority": "P0",
-      "depends_on": ["T001"],
+      "depends_on": [
+        "T001"
+      ],
       "goal": "Leer los dos ficheros con claves en espanol, rechazando cualquier clave desconocida con fichero y linea.",
       "scope": [
         "internal/plan: structs del examen y del inventario segun design/02-FORMATO.md §3 y §4",
@@ -122,7 +152,9 @@
         "Un timeout mal formado es error, no un valor por defecto silencioso",
         "make check en verde"
       ],
-      "tests": ["go test ./internal/plan -run TestParse"],
+      "tests": [
+        "go test ./internal/plan -run TestParse"
+      ],
       "notes": "El MVP acepta cerca_de y valor: en el esquema pero T004 puede rechazarlos con 'no implementado'; no deben aceptarse en silencio."
     },
     {
@@ -131,7 +163,10 @@
       "phase": 0,
       "status": "DONE",
       "priority": "P0",
-      "depends_on": ["T004", "T002"],
+      "depends_on": [
+        "T004",
+        "T002"
+      ],
       "goal": "Fijar el denominador y la lista de comprobaciones antes de tocar ninguna maquina, y poder verlo sin ejecutar nada.",
       "scope": [
         "Las 9 validaciones de design/02-FORMATO.md §5, cada una con su test y su mensaje",
@@ -141,7 +176,12 @@
         "PlanSummary con check_count, total_weight, check_ids en orden y concurrency",
         "evalon check: ejecuta solo el PLAN, imprime el resumen, exit 0 o 2, no escribe en var/ ni abre ninguna conexion"
       ],
-      "out_of_scope": ["SSH", "ejecucion", "escritura del artefacto", "variantes de examen"],
+      "out_of_scope": [
+        "SSH",
+        "ejecucion",
+        "escritura del artefacto",
+        "variantes de examen"
+      ],
       "acceptance": [
         "Las 9 validaciones tienen un test que falla por el motivo correcto, con fichero y linea",
         "Una ${alumno.X} ausente en un solo alumno es error de PLAN, no cadena vacia",
@@ -151,16 +191,21 @@
         "evalon check sobre un proyecto valido imprime check_count y total_weight exactos y sale 0",
         "evalon check sobre un proyecto invalido sale 2 y no crea ningun fichero en var/"
       ],
-      "tests": ["go test ./internal/plan", "bin/evalon check testdata/proto"],
+      "tests": [
+        "go test ./internal/plan",
+        "bin/evalon check testdata/proto"
+      ],
       "notes": "Arregla de raiz F-02 (typo que encoge el denominador) y c14-check (total estimado). Invariantes 1 y 2."
     },
     {
       "id": "T006",
       "title": "Laboratorio SSH reproducible",
       "phase": 0,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
-      "depends_on": ["T001"],
+      "depends_on": [
+        "T001"
+      ],
       "goal": "Levantar y tirar el laboratorio con un comando, de forma identica en cualquier sesion.",
       "scope": [
         "test/lab.sh con up, down y status usando el Containerfile de docs/research/evidence/",
@@ -169,14 +214,20 @@
         "Documentar credenciales de prueba (ficticias) y el uso de HOME aislado",
         "Comprobacion de que el host tiene coreutils timeout"
       ],
-      "out_of_scope": ["Mas de un contenedor", "orquestacion", "laboratorio de 100 alumnos (fase 3)"],
+      "out_of_scope": [
+        "Mas de un contenedor",
+        "orquestacion",
+        "laboratorio de 100 alumnos (fase 3)"
+      ],
       "acceptance": [
         "make lab deja el contenedor escuchando en 127.1.2.3:2201 desde cero",
         "ssh manual con las credenciales de prueba funciona",
         "make lab es idempotente: ejecutarlo dos veces no falla",
         "test/lab.sh down deja el equipo como estaba"
       ],
-      "tests": ["make lab && ss -ltn | grep 127.1.2.3:2201"],
+      "tests": [
+        "make lab && ss -ltn | grep 127.1.2.3:2201"
+      ],
       "notes": "127.1.2.3 y NO 127.0.0.1 (F-01). La imagen teutonlab-ssh ya existe en podman en este equipo, pero el script debe poder reconstruirla."
     },
     {
@@ -185,7 +236,9 @@
       "phase": 1,
       "status": "DONE",
       "priority": "P0",
-      "depends_on": ["T002"],
+      "depends_on": [
+        "T002"
+      ],
       "goal": "Evaluar las tres aserciones del prototipo como funciones puras que producen AssertionResult.",
       "scope": [
         "internal/assert.Eval(exec ExecutionResult, spec) -> AssertionResult",
@@ -194,7 +247,12 @@
         "exit_code: comparacion del codigo de salida",
         "Found con el fragmento encontrado o cadena vacia"
       ],
-      "out_of_scope": ["no_contiene", "cerca_de", "valor:", "expresiones regulares"],
+      "out_of_scope": [
+        "no_contiene",
+        "cerca_de",
+        "valor:",
+        "expresiones regulares"
+      ],
       "acceptance": [
         "Eval nunca devuelve un estado academico: solo AssertionResult",
         "Eval no se invoca ni es invocable cuando Completed es false (test que lo demuestra)",
@@ -202,16 +260,21 @@
         "Where apunta a la linea correcta en salidas multilinea",
         "El paquete no importa net, os ni time"
       ],
-      "tests": ["go test ./internal/assert"],
+      "tests": [
+        "go test ./internal/assert"
+      ],
       "notes": "Capa 2 de las cuatro. No sabe nada de notas."
     },
     {
       "id": "T008",
       "title": "Sesion SSH, exec, limites de salida y timeouts",
       "phase": 1,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P0",
-      "depends_on": ["T001", "T006"],
+      "depends_on": [
+        "T001",
+        "T006"
+      ],
       "goal": "Ejecutar un comando en la maquina del alumno y producir un ExecutionResult fiel, sin bloquearse nunca.",
       "scope": [
         "internal/ssh: sesion por alumno y host, reutilizada para todas sus comprobaciones (K-6)",
@@ -225,7 +288,13 @@
         "Mapeo de errores de transporte a Cause con detail de una frase, sin traza de pila",
         "Tests de integracion con build tag integration"
       ],
-      "out_of_scope": ["Autenticacion por clave", "ProxyJump", "ssh_config", "concurrencia", "varios hosts logicos"],
+      "out_of_scope": [
+        "Autenticacion por clave",
+        "ProxyJump",
+        "ssh_config",
+        "concurrencia",
+        "varios hosts logicos"
+      ],
       "acceptance": [
         "Un comando normal contra el laboratorio produce Completed true, ExitCode correcto y los dos flujos separados",
         "sleep 30 con timeout 3 s produce Completed false, Cause TIMEOUT, duration_ms entre 3000 y 4000 y remote_process KILLED_REMOTE",
@@ -235,7 +304,9 @@
         "El host sin coreutils timeout genera el Warning REMOTE_TIMEOUT_UNAVAILABLE y remote_process UNKNOWN",
         "La contrasena no aparece en argv del proceso ni en ningun log"
       ],
-      "tests": ["go test -tags integration ./internal/ssh"],
+      "tests": [
+        "go test -tags integration ./internal/ssh"
+      ],
       "notes": "Si la tarea crece, dividir en T008a (sesion, exec, timeouts) y T008b (limites de salida y timeout remoto). Es la candidata mas probable a division."
     },
     {
@@ -244,7 +315,9 @@
       "phase": 1,
       "status": "DONE",
       "priority": "P0",
-      "depends_on": ["T002"],
+      "depends_on": [
+        "T002"
+      ],
       "goal": "Que ninguna ejecucion pierda resultados ni pise los de otra.",
       "scope": [
         "internal/report: WriteAtomic con temporal en el mismo directorio y rename",
@@ -253,14 +326,21 @@
         "Filtro de redaccion de secretos conocidos antes de serializar, con Warning si redacta",
         "Generacion del ULID"
       ],
-      "out_of_scope": ["NDJSON", "HTML", "Moodle", "formato legacy"],
+      "out_of_scope": [
+        "NDJSON",
+        "HTML",
+        "Moodle",
+        "formato legacy"
+      ],
       "acceptance": [
         "Dos ejecuciones simultaneas producen dos ficheros distintos y ninguno queda a medias (test con escritura concurrente)",
         "Un SIGKILL a mitad deja un partial.json que es JSON valido y contiene al menos un alumno completo",
         "El artefacto se escribe tambien cuando todos los alumnos fallan",
         "Un secreto inyectado a proposito en un stderr simulado sale como [oculto] y genera Warning"
       ],
-      "tests": ["go test ./internal/report"],
+      "tests": [
+        "go test ./internal/report"
+      ],
       "notes": "Contra F-13 (dos ejecuciones se pisan el JSON) y F-16 (la pasada muere y no queda nada)."
     },
     {
@@ -269,7 +349,13 @@
       "phase": 1,
       "status": "BLOCKED",
       "priority": "P0",
-      "depends_on": ["T003", "T005", "T007", "T008", "T009"],
+      "depends_on": [
+        "T003",
+        "T005",
+        "T007",
+        "T008",
+        "T009"
+      ],
       "goal": "Unir las piezas: ejecutar el PLAN sobre todos los alumnos en paralelo acotado, con aislamiento y cancelacion.",
       "scope": [
         "internal/engine: worker pool de 2 (valor del prototipo), un alumno por worker, un context.Context por alumno",
@@ -279,7 +365,12 @@
         "Recuperacion de panic por alumno -> ENGINE_ERROR, nunca silencioso, nunca aborta la pasada",
         "Exit codes: 0 todo evaluado, 3 parcial, 4 cancelado"
       ],
-      "out_of_scope": ["Tope por host de destino (fase 3)", "NDJSON", "compat legacy", "mas de un examen por ejecucion"],
+      "out_of_scope": [
+        "Tope por host de destino (fase 3)",
+        "NDJSON",
+        "compat legacy",
+        "mas de un examen por ejecucion"
+      ],
       "acceptance": [
         "El alumno roto no altera ningun campo del alumno correcto (comparacion del artefacto con y sin el alumno roto)",
         "El artefacto contiene siempre a los dos alumnos",
@@ -287,7 +378,10 @@
         "Un panic simulado en un alumno produce ENGINE_ERROR para ese alumno y el resto termina normal",
         "Exit code 3 y no 1 cuando la ejecucion es parcial"
       ],
-      "tests": ["go test ./internal/engine", "go test -tags integration ./internal/engine"],
+      "tests": [
+        "go test ./internal/engine",
+        "go test -tags integration ./internal/engine"
+      ],
       "notes": "Es el nucleo del principio 4. Contra F-03 (un alumno roto aborta la clase entera)."
     },
     {
@@ -296,7 +390,9 @@
       "phase": 1,
       "status": "BLOCKED",
       "priority": "P0",
-      "depends_on": ["T010"],
+      "depends_on": [
+        "T010"
+      ],
       "goal": "Poder ejecutar el prototipo de principio a fin desde la linea de comandos, con el secreto por un canal privado.",
       "scope": [
         "evalon run con el directorio del proyecto",
@@ -305,14 +401,23 @@
         "Mensajes de error de configuracion a stderr con fichero y linea",
         "Ninguna traza de pila en la salida"
       ],
-      "out_of_scope": ["--compat", "--case", "--export", "NDJSON", "fachada legacy"],
+      "out_of_scope": [
+        "--compat",
+        "--case",
+        "--export",
+        "NDJSON",
+        "fachada legacy"
+      ],
       "acceptance": [
         "El prototipo completo corre con evalon run --secrets=stdin y produce var/run-<id>.json",
         "grep del secreto sobre var/, la salida de terminal y /proc/<pid>/cmdline con el proceso vivo: cero coincidencias",
         "--secrets=stdin sin datos aborta a los 5 s con exit 2",
         "Una referencia sin variable definida con --secrets=env es exit 2, no una contrasena vacia"
       ],
-      "tests": ["go test ./cmd/evalon", "test/secrets.sh"],
+      "tests": [
+        "go test ./cmd/evalon",
+        "test/secrets.sh"
+      ],
       "notes": "ADR-0009. El NDJSON saldra por stdout mas adelante, asi que stdin queda libre a proposito."
     },
     {
@@ -321,7 +426,9 @@
       "phase": 1,
       "status": "BLOCKED",
       "priority": "P0",
-      "depends_on": ["T011"],
+      "depends_on": [
+        "T011"
+      ],
       "goal": "Demostrar el hito con un script reproducible, no con una inspeccion a ojo.",
       "scope": [
         "testdata/proto con el examen.yaml y el aula.yaml exactos de design/07-PROTOTIPO.md §3 y §5",
@@ -329,14 +436,19 @@
         "Salida del script: una linea por criterio, OK o FALLO, y exit != 0 si alguno falla",
         "Los criterios que son de logica pura (A-2, A-3, A-14) tambien como test en Go"
       ],
-      "out_of_scope": ["Criterios de fases posteriores", "medicion con 100 alumnos"],
+      "out_of_scope": [
+        "Criterios de fases posteriores",
+        "medicion con 100 alumnos"
+      ],
       "acceptance": [
         "Los 14 criterios en verde con el laboratorio levantado",
         "A-1, A-2, A-3, A-8 y A-14 son bloqueantes: si alguno falla, la tarea no se marca DONE y no se sigue adelante",
         "La salida real del script queda pegada en PROGRESS.md",
         "El run completo termina en menos de 90 s medido con /usr/bin/time"
       ],
-      "tests": ["test/acceptance.sh"],
+      "tests": [
+        "test/acceptance.sh"
+      ],
       "notes": "Criterios completos en design/07-PROTOTIPO.md §6. Este es el cierre de la fase 1."
     },
     {
@@ -345,7 +457,9 @@
       "phase": 1,
       "status": "BLOCKED",
       "priority": "P1",
-      "depends_on": ["T012"],
+      "depends_on": [
+        "T012"
+      ],
       "goal": "Dejar constancia verificada de que el diseno aguanta, y cerrar la decision de SSH nativo.",
       "scope": [
         "Guardar un run-<id>.json real del laboratorio como ejemplo verificado y sustituir el ejemplo redactado a mano de design/04-MODELO-RESULTADO.md §3",
@@ -353,7 +467,9 @@
         "ADR-0010 cerrando D-2 (SSH nativo) con las mediciones de A-5 y A-11, o abriendo la alternativa si fallaron",
         "Actualizar docs/design/08-DECISIONES-ABIERTAS.md quitando D-2"
       ],
-      "out_of_scope": ["Mediciones con 10/30/100 alumnos (fase 3)"],
+      "out_of_scope": [
+        "Mediciones con 10/30/100 alumnos (fase 3)"
+      ],
       "acceptance": [
         "El ejemplo de 04-MODELO-RESULTADO.md §3 es una salida real, no redactada",
         "ADR-0010 existe, esta fechado y cita las mediciones concretas",
@@ -368,16 +484,29 @@
       "phase": 2,
       "status": "BLOCKED",
       "priority": "P1",
-      "depends_on": ["T013"],
+      "depends_on": [
+        "T013"
+      ],
       "goal": "Cubrir las capacidades M-8, M-10 y M-11 que exigen los examenes reales del curso.",
-      "scope": ["no_contiene", "cerca_de (ancla, lineas, contiene)", "valor: contra campo del inventario, con transport inventory", "excluido: true con estado EXCLUDED"],
-      "out_of_scope": ["Expresiones regulares", "variantes de examen"],
+      "scope": [
+        "no_contiene",
+        "cerca_de (ancla, lineas, contiene)",
+        "valor: contra campo del inventario, con transport inventory",
+        "excluido: true con estado EXCLUDED"
+      ],
+      "out_of_scope": [
+        "Expresiones regulares",
+        "variantes de examen"
+      ],
       "acceptance": [
         "Los dos examenes de design/01-TRADUCCION-EXAMENES.md se parsean y planifican completos",
         "Una anticomprobacion (no_contiene) no puede aprobar por averia: si no hubo ejecucion completa es UNEVALUATED (K-7)",
         "Un alumno EXCLUDED no altera el denominador de los demas"
       ],
-      "tests": ["go test ./internal/assert", "go test ./internal/plan"],
+      "tests": [
+        "go test ./internal/assert",
+        "go test ./internal/plan"
+      ],
       "notes": "Detallar al llegar."
     },
     {
@@ -386,11 +515,23 @@
       "phase": 2,
       "status": "BLOCKED",
       "priority": "P1",
-      "depends_on": ["T013"],
+      "depends_on": [
+        "T013"
+      ],
       "goal": "Cerrar D-3, que es una decision de seguridad y no puede quedar en TOFU provisional.",
-      "scope": ["ADR que cierre D-3", "implementacion de la politica elegida", "autenticacion por clave y passphrase por stdin"],
-      "out_of_scope": ["ProxyJump", "ssh_config"],
-      "acceptance": ["D-3 fuera de 08-DECISIONES-ABIERTAS.md", "Un cambio de clave de host produce un resultado explicito, nunca una nota silenciosamente distinta"],
+      "scope": [
+        "ADR que cierre D-3",
+        "implementacion de la politica elegida",
+        "autenticacion por clave y passphrase por stdin"
+      ],
+      "out_of_scope": [
+        "ProxyJump",
+        "ssh_config"
+      ],
+      "acceptance": [
+        "D-3 fuera de 08-DECISIONES-ABIERTAS.md",
+        "Un cambio de clave de host produce un resultado explicito, nunca una nota silenciosamente distinta"
+      ],
       "tests": [],
       "notes": "Bloqueante antes del primer examen real. Detallar al llegar."
     },
@@ -400,11 +541,22 @@
       "phase": 2,
       "status": "BLOCKED",
       "priority": "P1",
-      "depends_on": ["T020", "T021"],
+      "depends_on": [
+        "T020",
+        "T021"
+      ],
       "goal": "Cerrar la fase 2 demostrando el formato sobre material real de aula.",
-      "scope": ["Laboratorio con KEA y BIND suficientes para el examen RA2", "ejecucion completa de E2", "revision de lo que falte en el formato"],
-      "out_of_scope": ["Concurrencia alta"],
-      "acceptance": ["El examen RA2 (16 comprobaciones) se ejecuta entero y cada resultado es explicable desde el JSON"],
+      "scope": [
+        "Laboratorio con KEA y BIND suficientes para el examen RA2",
+        "ejecucion completa de E2",
+        "revision de lo que falte en el formato"
+      ],
+      "out_of_scope": [
+        "Concurrencia alta"
+      ],
+      "acceptance": [
+        "El examen RA2 (16 comprobaciones) se ejecuta entero y cada resultado es explicable desde el JSON"
+      ],
       "tests": [],
       "notes": "Detallar al llegar."
     },
@@ -414,11 +566,21 @@
       "phase": 3,
       "status": "BLOCKED",
       "priority": "P1",
-      "depends_on": ["T022"],
+      "depends_on": [
+        "T022"
+      ],
       "goal": "Que la propia concurrencia no produzca ceros (F-05).",
-      "scope": ["Tope global configurable", "tope por host de destino", "laboratorio de 10/30/100 alumnos"],
-      "out_of_scope": ["Reparto adaptativo"],
-      "acceptance": ["100 alumnos contra un host con MaxStartups por defecto: cero UNEVALUATED por rechazo de conexion"],
+      "scope": [
+        "Tope global configurable",
+        "tope por host de destino",
+        "laboratorio de 10/30/100 alumnos"
+      ],
+      "out_of_scope": [
+        "Reparto adaptativo"
+      ],
+      "acceptance": [
+        "100 alumnos contra un host con MaxStartups por defecto: cero UNEVALUATED por rechazo de conexion"
+      ],
       "tests": [],
       "notes": "Detallar al llegar."
     },
@@ -428,11 +590,19 @@
       "phase": 3,
       "status": "BLOCKED",
       "priority": "P2",
-      "depends_on": ["T030"],
+      "depends_on": [
+        "T030"
+      ],
       "goal": "Sustituir los numeros por defecto conjeturados por numeros medidos.",
-      "scope": ["PERFORMANCE.md §6 completo: tiempo y RSS con 10/30/100 alumnos, RSS con salidas de 1/20/100/300 MB", "ADR que cierre D-6"],
+      "scope": [
+        "PERFORMANCE.md §6 completo: tiempo y RSS con 10/30/100 alumnos, RSS con salidas de 1/20/100/300 MB",
+        "ADR que cierre D-6"
+      ],
       "out_of_scope": [],
-      "acceptance": ["RSS plano respecto al tamano de la salida", "D-6 fuera de 08-DECISIONES-ABIERTAS.md"],
+      "acceptance": [
+        "RSS plano respecto al tamano de la salida",
+        "D-6 fuera de 08-DECISIONES-ABIERTAS.md"
+      ],
       "tests": [],
       "notes": "Detallar al llegar."
     },
@@ -442,11 +612,22 @@
       "phase": 4,
       "status": "BLOCKED",
       "priority": "P1",
-      "depends_on": ["T031"],
+      "depends_on": [
+        "T031"
+      ],
       "goal": "Que la GUI actual funcione contra el motor nuevo sin cambiar una linea.",
-      "scope": ["resume.json, case-NN.json y moodle.csv segun design/06-LEGACY-WRITER.md", "fachada version, check y progreso por caracteres", "golden files contra salidas reales de Teuton"],
-      "out_of_scope": ["Otros formatos de exportacion (C9 devuelve error explicito)"],
-      "acceptance": ["Golden files identicos campo a campo en los campos que la GUI lee", "un INCOMPLETE sale con grade 0 y conn_status no vacio"],
+      "scope": [
+        "resume.json, case-NN.json y moodle.csv segun design/06-LEGACY-WRITER.md",
+        "fachada version, check y progreso por caracteres",
+        "golden files contra salidas reales de Teuton"
+      ],
+      "out_of_scope": [
+        "Otros formatos de exportacion (C9 devuelve error explicito)"
+      ],
+      "acceptance": [
+        "Golden files identicos campo a campo en los campos que la GUI lee",
+        "un INCOMPLETE sale con grade 0 y conn_status no vacio"
+      ],
       "tests": [],
       "notes": "Detallar al llegar. Capa temporal: no se le anade nada que la UAT no exija."
     },
@@ -456,11 +637,21 @@
       "phase": 4,
       "status": "BLOCKED",
       "priority": "P0",
-      "depends_on": ["T040"],
+      "depends_on": [
+        "T040"
+      ],
       "goal": "Prueba de aceptacion externa del motor, con una suite que ya existe y es hostil.",
-      "scope": ["Apuntar la GUI al binario nuevo", "ejecutar los 40 escenarios", "corregir el motor, nunca la suite"],
-      "out_of_scope": ["Modificar la GUI"],
-      "acceptance": ["40 escenarios en verde sin tocar una linea de la GUI"],
+      "scope": [
+        "Apuntar la GUI al binario nuevo",
+        "ejecutar los 40 escenarios",
+        "corregir el motor, nunca la suite"
+      ],
+      "out_of_scope": [
+        "Modificar la GUI"
+      ],
+      "acceptance": [
+        "40 escenarios en verde sin tocar una linea de la GUI"
+      ],
       "tests": [],
       "notes": "npm run build ANTES o fallan las 40 con un error que no lo explica."
     },
@@ -470,11 +661,22 @@
       "phase": 5,
       "status": "BLOCKED",
       "priority": "P1",
-      "depends_on": ["T041"],
+      "depends_on": [
+        "T041"
+      ],
       "goal": "Dar a la GUI eventos legibles por maquina y borrar el andamio de progreso.",
-      "scope": ["run.start con el total exacto", "un evento por comprobacion con estado tecnico", "ADR que cierre D-9"],
-      "out_of_scope": ["Cambios en la GUI (fase 6)"],
-      "acceptance": ["El contrato esta documentado y versionado", "el motor lo emite a la vez que la capa legacy"],
+      "scope": [
+        "run.start con el total exacto",
+        "un evento por comprobacion con estado tecnico",
+        "ADR que cierre D-9"
+      ],
+      "out_of_scope": [
+        "Cambios en la GUI (fase 6)"
+      ],
+      "acceptance": [
+        "El contrato esta documentado y versionado",
+        "el motor lo emite a la vez que la capa legacy"
+      ],
       "tests": [],
       "notes": "Detallar al llegar."
     },
@@ -484,11 +686,23 @@
       "phase": 6,
       "status": "BLOCKED",
       "priority": "P1",
-      "depends_on": ["T050"],
+      "depends_on": [
+        "T050"
+      ],
       "goal": "Sustituir el andamio de la GUI modulo a modulo, con su suite en verde en cada paso.",
-      "scope": ["progress.ts a NDJSON", "results.ts al artefacto canonico", "presentacion de INCOMPLETE (D-8)", "borrado de internal/legacy en un solo commit"],
-      "out_of_scope": ["Reescribir la GUI"],
-      "acceptance": ["Ningun test de la GUI lee resume.json ni case-NN.json", "los 192 unitarios y los 40 e2e siguen en verde"],
+      "scope": [
+        "progress.ts a NDJSON",
+        "results.ts al artefacto canonico",
+        "presentacion de INCOMPLETE (D-8)",
+        "borrado de internal/legacy en un solo commit"
+      ],
+      "out_of_scope": [
+        "Reescribir la GUI"
+      ],
+      "acceptance": [
+        "Ningun test de la GUI lee resume.json ni case-NN.json",
+        "los 192 unitarios y los 40 e2e siguen en verde"
+      ],
       "tests": [],
       "notes": "Se divide en varias tareas al llegar, una por modulo. Solo aqui se toca el repositorio de la GUI, y en su rama."
     },
@@ -498,11 +712,22 @@
       "phase": 7,
       "status": "BLOCKED",
       "priority": "P1",
-      "depends_on": ["T060"],
+      "depends_on": [
+        "T060"
+      ],
       "goal": "Que el profesor descargue la aplicacion, la ejecute y funcione.",
-      "scope": ["migrador config.yaml + start.rb a los dos YAML con informe de lo no traducible", "editor del formato nuevo en la GUI", "binario embebido para Linux y Windows", "nombre definitivo (D-7)"],
-      "out_of_scope": ["Traducir construcciones del DSL que no tengan equivalente: se informan, no se adivinan"],
-      "acceptance": ["Instalacion sin Ruby, sin gems, sin Go, sin Docker ni Podman y sin servicios externos"],
+      "scope": [
+        "migrador config.yaml + start.rb a los dos YAML con informe de lo no traducible",
+        "editor del formato nuevo en la GUI",
+        "binario embebido para Linux y Windows",
+        "nombre definitivo (D-7)"
+      ],
+      "out_of_scope": [
+        "Traducir construcciones del DSL que no tengan equivalente: se informan, no se adivinan"
+      ],
+      "acceptance": [
+        "Instalacion sin Ruby, sin gems, sin Go, sin Docker ni Podman y sin servicios externos"
+      ],
       "tests": [],
       "notes": "Detallar al llegar."
     },
@@ -512,11 +737,21 @@
       "phase": 8,
       "status": "BLOCKED",
       "priority": "P1",
-      "depends_on": ["T070"],
+      "depends_on": [
+        "T070"
+      ],
       "goal": "Cerrar los 16 modos de fallo documentados y demostrar que no hay regresion de notas.",
-      "scope": ["repaso de FAILURE-MODES.md uno a uno", "auditoria de secretos de extremo a extremo", "comparacion nota a nota entre los dos motores como test", "documentacion de usuario y versionado"],
+      "scope": [
+        "repaso de FAILURE-MODES.md uno a uno",
+        "auditoria de secretos de extremo a extremo",
+        "comparacion nota a nota entre los dos motores como test",
+        "documentacion de usuario y versionado"
+      ],
       "out_of_scope": [],
-      "acceptance": ["Cada modo de fallo esta corregido o documentado como aceptado, con su motivo", "un examen real de aula corregido con el motor nuevo"],
+      "acceptance": [
+        "Cada modo de fallo esta corregido o documentado como aceptado, con su motivo",
+        "un examen real de aula corregido con el motor nuevo"
+      ],
       "tests": [],
       "notes": "Detallar al llegar."
     }

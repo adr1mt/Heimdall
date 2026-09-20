@@ -3,12 +3,8 @@
 GO ?= go
 BIN := bin/evalon
 
-# Test SSH lab. 127.1.2.3 on purpose: Teuton routes any address containing
-# "127.0.0." to local execution (F-01) and A-11 checks that we do not.
-LAB_IMAGE := teutonlab-ssh
-LAB_HOST  := 127.1.2.3
-
-.PHONY: check test build lab lab-down clean
+# Test SSH lab. See test/lab.sh.
+.PHONY: check test build lab lab-down lab-status clean
 
 ## check: fast suite. No network, no disk. Must stay under 10 s.
 check:
@@ -25,13 +21,15 @@ build:
 
 ## lab: bring up the podman SSH lab used by the integration tests.
 lab:
-	podman build -t $(LAB_IMAGE) -f docs/research/evidence/Containerfile docs/research/evidence
-	podman run -d --replace --name alu1 -p $(LAB_HOST):2201:22 $(LAB_IMAGE)
-	podman run -d --replace --name alu2 -p $(LAB_HOST):2202:22 $(LAB_IMAGE)
+	test/lab.sh up
 
-## lab-down: stop and remove the lab containers.
+## lab-down: stop and remove the lab container.
 lab-down:
-	-podman rm -f alu1 alu2
+	test/lab.sh down
+
+## lab-status: report whether the lab is listening.
+lab-status:
+	test/lab.sh status
 
 clean:
 	rm -rf bin/
