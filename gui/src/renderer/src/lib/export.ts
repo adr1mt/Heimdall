@@ -1,4 +1,6 @@
 import type { RunResult, StudentResult } from '../../../shared/artifact'
+import type { AcademicStatus, Score, StudentStatus } from '../../../shared/events'
+import type { Consolidation } from '../../../shared/consolidation'
 import { dateText } from './results'
 
 /**
@@ -65,6 +67,21 @@ export interface GradeRow {
 }
 
 /**
+ * What the export needs of a student: who they are, what state they are in and
+ * the grade the engine published. One correction and a whole chain say it in
+ * the same words, so both export with the same rules and neither of them can
+ * invent a grade the other would not (ADR-0019, T056).
+ */
+export interface Gradable {
+  student_id: string
+  name: string
+  moodle_id?: string
+  status: StudentStatus
+  score: Score
+  checks: { status: AcademicStatus }[]
+}
+
+/**
  * What one student exports.
  *
  * A student without a final grade exports an empty grade and the reason, never
@@ -72,7 +89,7 @@ export interface GradeRow {
  * closed one, and a 0 for a machine nobody could reach would be a fail the
  * student did not earn (principio 3, ADR-0006).
  */
-export function gradeRow(student: StudentResult, scale: Scale): GradeRow {
+export function gradeRow(student: Gradable, scale: Scale): GradeRow {
   const checks = student.checks
   const row: GradeRow = {
     name: student.name,
@@ -100,7 +117,7 @@ export function gradeRow(student: StudentResult, scale: Scale): GradeRow {
   return row
 }
 
-const STATE_TEXT: Record<StudentResult['status'], string> = {
+const STATE_TEXT: Record<StudentStatus, string> = {
   OK: 'Evaluado',
   PARTIAL: 'Incompleto',
   NOT_EVALUATED: 'Sin evaluar',
@@ -109,6 +126,11 @@ const STATE_TEXT: Record<StudentResult['status'], string> = {
 
 export function gradeRows(run: RunResult, scale: Scale): GradeRow[] {
   return run.students.map((student) => gradeRow(student, scale))
+}
+
+/** The same, for a chain the engine read as one. */
+export function chainGradeRows(chain: Consolidation, scale: Scale): GradeRow[] {
+  return chain.students.map((student) => gradeRow(student, scale))
 }
 
 const HEADER = [
@@ -136,8 +158,21 @@ const HEADER = [
  * Spanish reads; the BOM is what keeps the accents from arriving broken.
  */
 export function toCsv(run: RunResult, scale: Scale): string {
+  return csvOf(gradeRows(run, scale), scale)
+}
+
+/**
+ * The grades of a whole chain, written exactly like those of a single
+ * correction: a student still missing a weighted check travels without a
+ * number, however many corrections were read to get there.
+ */
+export function chainCsv(chain: Consolidation, scale: Scale): string {
+  return csvOf(chainGradeRows(chain, scale), scale)
+}
+
+function csvOf(rows: GradeRow[], scale: Scale): string {
   const lines = [HEADER.join(';')]
-  for (const row of gradeRows(run, scale)) {
+  for (const row of rows) {
     lines.push(
       [
         row.name,
@@ -169,11 +204,27 @@ function field(value: string): string {
   return `"${defused.replace(/"/g, '""')}"`
 }
 
+/** The chain's file name, said so it cannot be taken for one correction's. */
+export function chainCsvName(chain: Consolidation): string {
+  return `notas-consolidado-${stamp(chain.runs[0]?.finished_at ?? '')}.csv`
+}
+
+/** What the teacher is told a chain's export contains, before saving it. */
+export function chainExportSummary(chain: Consolidation, scale: Scale): string {
+  const rows = chainGradeRows(chain, scale)
+  const graded = rows.filter((row) => row.grade !== '').length
+  return `${rows.length} alumnos · ${graded} con nota final en escala ${scale.label} · ${rows.length - graded} sin nota · ${chain.runs.length} correcciones leídas juntas`
+}
+
 /** What the file is called by default, so two exports never overwrite each other. */
 export function csvName(run: RunResult): string {
   const exam = (run.exam?.path ?? 'examen').split(/[\\/]/).pop() ?? 'examen'
-  const stamp = run.started_at.replace(/[-:]/g, '').replace(/[.Z].*$/, '').replace('T', '-')
-  return `notas-${exam.replace(/\.[^.]+$/, '')}-${stamp}.csv`
+  return `notas-${exam.replace(/\.[^.]+$/, '')}-${stamp(run.started_at)}.csv`
+}
+
+/** A timestamp as it goes in a file name. */
+function stamp(iso: string): string {
+  return iso.replace(/[-:]/g, '').replace(/[.Z].*$/, '').replace('T', '-')
 }
 
 /** What the teacher is told the export contains, before saving it. */

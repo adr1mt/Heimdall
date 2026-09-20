@@ -9,6 +9,7 @@ export const IPC = {
   startRun: 'run:start',
   cancelRun: 'run:cancel',
   readArtifact: 'run:artifact',
+  consolidate: 'run:consolidate',
   listRuns: 'history:list',
   saveCsv: 'export:saveCsv',
   // Pushed from the main process while a run is alive.

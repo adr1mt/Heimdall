@@ -26,6 +26,7 @@ const api: HeimdallApi = {
   startRun: (request: RunRequest) => ipcRenderer.invoke(IPC.startRun, request),
   cancelRun: () => ipcRenderer.invoke(IPC.cancelRun),
   readArtifact: (path) => ipcRenderer.invoke(IPC.readArtifact, path),
+  consolidate: (path) => ipcRenderer.invoke(IPC.consolidate, path),
   listRuns: (examPath) => ipcRenderer.invoke(IPC.listRuns, examPath),
   saveCsv: (name, text) => ipcRenderer.invoke(IPC.saveCsv, name, text),
   onRunEvent: (listener) => subscribe<EngineEvent>(IPC.runEvent, listener),

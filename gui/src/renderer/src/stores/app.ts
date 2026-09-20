@@ -95,7 +95,19 @@ export const useApp = create<AppState>((set, get) => ({
   setRetry: (retry) => set({ retry })
 }))
 
+/**
+ * What went wrong, in the sentence the main process wrote.
+ *
+ * Electron wraps anything a handler throws with «Error invoking remote method
+ * 'x:y'», which names a channel the teacher has never heard of and buries the
+ * reason at the end of the line. The reason is what goes on screen.
+ */
+export function messageOf(error: unknown): string {
+  const text = error instanceof Error ? error.message : String(error)
+  return text.replace(/^Error invoking remote method '[^']*':\s*(Error:\s*)?/, '')
+}
+
 /** Turns anything thrown into a sentence the teacher can read. */
 export function noticeFrom(prefix: string, error: unknown): string {
-  return `${prefix}: ${error instanceof Error ? error.message : String(error)}`
+  return `${prefix}: ${messageOf(error)}`
 }

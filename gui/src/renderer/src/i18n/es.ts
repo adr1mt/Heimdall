@@ -124,6 +124,26 @@ export const t = {
     cancelled: 'No se ha guardado nada.',
     failed: 'No se pudieron guardar las notas'
   },
+  chain: {
+    title: 'La nota de toda la cadena',
+    hint:
+      'Esta corrección repite otra anterior. Leyéndolas juntas, quien completó lo que faltaba en una segunda vuelta tiene ya su nota final. No se toca ni se reescribe ninguna corrección: es una lectura, y la nota la cierra el motor.',
+    show: 'Ver la nota de toda la cadena',
+    reload: 'Volver a leer la cadena',
+    loading: 'Leyendo las correcciones anteriores…',
+    failed: 'No se pudo leer la cadena',
+    refused: (why: string) =>
+      `Estas correcciones no se pueden leer juntas, así que no se enseña ninguna nota de la cadena: ${why}`,
+    closed: (closed: number, open: number) =>
+      `${closed} alumnos con nota final · ${open} todavía sin nota`,
+    attempts: 'Antes de eso',
+    noEvidence:
+      'La ejecución y la salida de la máquina están en la corrección de la que sale este resultado; se abre desde el Histórico.',
+    export: 'Exportar las notas de la cadena…',
+    exportTitle: '¿Exportar las notas de la cadena?',
+    exportHint:
+      'Se guarda una hoja igual que la de una corrección suelta, con la nota que el motor cierra leyendo todas juntas. Quien siga sin nota final sale sin nota y con el motivo.'
+  },
   pending: {
     title: 'Qué ha quedado sin comprobar',
     hint:

@@ -1291,7 +1291,7 @@
       "id": "T061",
       "title": "Vista consolidada de una cadena en la aplicacion",
       "phase": 5,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T054",
@@ -1312,8 +1312,10 @@
         "Una cadena que el motor rechaza se explica en pantalla y no ensena ninguna nota",
         "Lo exportado de una cadena consolidada no inventa ninguna nota"
       ],
-      "tests": [],
-      "notes": "Mitad de pantalla de T057, separada el 2026-09-20."
+      "tests": [
+        "gui/tests/consolidate.test.ts"
+      ],
+      "notes": "Mitad de pantalla de T057, separada el 2026-09-20. Cerrada el 2026-09-20: la aplicacion llama a heimdall consolidate y ensena la cadena en Resultados."
     }
   ]
 }

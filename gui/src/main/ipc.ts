@@ -4,6 +4,7 @@ import { app, dialog, ipcMain, shell, type WebContents } from 'electron'
 import { IPC } from '../shared/ipc'
 import { detectEngine } from './engine'
 import { readArtifact } from './artifact'
+import { consolidateChain } from './consolidate'
 import { listRuns, varDirOf } from './history'
 import { RunSession, resolveRunTarget } from './run'
 import { secretRefsOf } from './secrets'
@@ -99,6 +100,13 @@ export function registerIpc(): void {
   ipcMain.handle(IPC.readArtifact, (_e, path: unknown) => {
     if (typeof path !== 'string' || !path) throw new Error('No hay ningún resultado que abrir.')
     return readArtifact(path)
+  })
+
+  // Reading a chain touches no machine either: `heimdall consolidate` opens
+  // the artifacts already on disk and prints a view of them.
+  ipcMain.handle(IPC.consolidate, (_e, path: unknown) => {
+    if (typeof path !== 'string' || !path) throw new Error('No hay ninguna cadena que consolidar.')
+    return consolidateChain(readSettings(settingsDir()).enginePath, path)
   })
 
   // Reading the history touches no machine and computes no grade: it only

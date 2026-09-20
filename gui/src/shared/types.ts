@@ -3,6 +3,7 @@
 
 import type { EngineEvent } from './events'
 import type { RunResult } from './artifact'
+import type { Consolidation } from './consolidation'
 import type { RunSummary } from './history'
 
 /** Result of locating the engine and asking it for its version. */
@@ -53,6 +54,11 @@ export interface HeimdallApi {
   startRun: (request: RunRequest) => Promise<void>
   /** Reads the canonical artifact of a finished run. */
   readArtifact: (path: string) => Promise<RunResult>
+  /**
+   * Asks the engine what the chain this artifact belongs to looks like as a
+   * whole. It is read-only, and the grade in it is the engine's (ADR-0019).
+   */
+  consolidate: (path: string) => Promise<Consolidation>
   /** The past runs of the project the exam belongs to, newest first. */
   listRuns: (examPath: string) => Promise<RunSummary[]>
   /**

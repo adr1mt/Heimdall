@@ -6,16 +6,15 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T057, hecha su mitad de motor**; la pantalla queda en T061.
+**T061 hecha**: la cadena consolidada ya se ve y se exporta desde la aplicación.
 
-El motor lee varias correcciones de la misma clase como una sola: el alumno
-cuya máquina estaba apagada el martes y contestó el miércoles sale con nota
-final, y cada comprobación dice de qué corrección sale y qué se intentó antes.
-Si falta algo en toda la cadena, sigue sin haber nota final; si las
-correcciones no son del mismo examen y la misma aula, se rechazan con el
-motivo. No se mezcla ni se reescribe ningún fichero: es una lectura.
-
-**ADR-0019**: la nota consolidada la suma el motor, nunca la aplicación.
+En Resultados, una corrección que repite otra ofrece leer toda la cadena junta.
+El alumno que quedó entero en la segunda vuelta aparece con su nota final, y
+cada comprobación dice de qué corrección sale y qué se intentó antes. Las notas
+de la cadena se exportan con las mismas reglas que las de una corrección
+suelta: quien siga sin nota sale sin nota y con el motivo. Si el motor rechaza
+la cadena, en pantalla queda el motivo y ninguna nota. La aplicación no suma
+nada: llama al motor y enseña lo que publica (ADR-0019).
 
 ## Estado actual
 
@@ -35,19 +34,23 @@ motivo. No se mezcla ni se reescribe ningún fichero: es una lectura.
   reintentos, identidades en memoria (ADR-0011), 64 kB por flujo, corte a 8 MB.
 - `test/lab.sh`: `alu1` en `127.1.2.3:2201`; el roto, en el 2299.
   `acceptance.sh` recorre A-1 a A-14 y `eventos.sh` E-1 a E-10.
-- `gui/`: árbol Node independiente; `make gui-check` (93 tests), `gui-build` y
+- `gui/`: árbol Node independiente; `make gui-check` (111 tests), `gui-build` y
   `gui-lab`. Vistas: Inicio, Resultados, Histórico, Ajustes, Ayuda. Resultados
-  lleva lo que quedó sin comprobar, manda el reintento a Inicio y **exporta las
-  notas a CSV**; la escala del profesor va con las preferencias de pantalla. El
-  histórico lee `var/run-*.json` del examen, 50 como mucho, sin tocar legacy.
+  lleva lo que quedó sin comprobar, manda el reintento a Inicio, **exporta las
+  notas a CSV** y, si repite otra corrección, **enseña y exporta la cadena
+  consolidada** llamando a `heimdall consolidate`; la escala del profesor va con
+  las preferencias de pantalla. El histórico lee `var/run-*.json` del examen, 50
+  como mucho, sin tocar legacy.
 - `workspace/teuton-gui` es referencia de solo lectura.
 
 ## Pruebas ejecutadas
 
-`make check` y `make gui-check` (93 tests) verdes · `gofmt -l` sin salida ·
-cadena real del laboratorio —corrección, reintento y `consolidate`— leída a
-mano: exit 3 y cada resultado apuntando a su corrección. `make gui-lab`,
-`acceptance.sh`, `eventos.sh` y `make test` no se repitieron esta sesión.
+`make check` y `make gui-check` (111 tests) verdes · `npm run typecheck` y
+`npm run build` sin errores · la aplicación real, abierta sobre una cadena de
+dos artefactos: la nota final en pantalla, cada comprobación con su corrección
+y sus intentos, y una cadena de otro examen rechazada con su motivo y sin
+ninguna nota. `make gui-lab`, `acceptance.sh`, `eventos.sh` y `make test` no se
+repitieron esta sesión.
 
 ## Problemas conocidos
 
@@ -56,14 +59,12 @@ mano: exit 3 y cada resultado apuntando a su corrección. `make gui-lab`,
   marca `PEND`. Con la capa congelada, se cierra o se retira en T060.
 - El histórico se apoya en la carpeta del examen elegido; sin examen elegido
   no hay lista, y para eso está «Abrir otro resultado…».
-- La consolidación existe en el motor pero **todavía no se ve ni se exporta**
-  desde la aplicación (T061): un alumno cerrado en dos correcciones sigue
-  saliendo sin nota en pantalla. El laboratorio no puede encender la máquina
-  apagada, así que esa cadena la prueban los tests y no el laboratorio.
+- La cadena solo se ofrece desde una corrección que repite otra, y se prueba
+  con artefactos: el laboratorio no puede encender una máquina apagada.
 - Un reintento exige el mismo PLAN: si lo que estaba mal era el `aula.yaml`,
   esa clase se corrige entera otra vez.
 
 ## Siguiente tarea recomendada
 
-**T061** (`READY`, P1): enseñar y exportar la cadena consolidada desde la
-aplicación. También `READY`: T058 (examen y proyector) y T059.
+**T058** (`READY`, P1): modo examen y modo proyector. Detrás, T059 cierra la
+fase 5 con el inventario de lo heredado.

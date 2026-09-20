@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AlertTriangle, Download, RotateCcw, X } from 'lucide-react'
+import { AlertTriangle, Download, Layers, RotateCcw, X } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -8,9 +8,10 @@ import {
   Segmented,
   SegmentedItem,
   SectionTitle,
+  Spinner,
   ViewHeader
 } from '@/components/ui'
-import { useApp, noticeFrom } from '@/stores/app'
+import { useApp, messageOf, noticeFrom } from '@/stores/app'
 import { useRun } from '@/stores/run'
 import {
   CAUSE_TEXT,
@@ -31,7 +32,17 @@ import {
   type Filters,
   type Pending
 } from '@/lib/results'
-import { csvName, exportSummary, scaleOf, toCsv } from '@/lib/export'
+import {
+  chainCsv,
+  chainCsvName,
+  chainExportSummary,
+  csvName,
+  exportSummary,
+  scaleOf,
+  toCsv
+} from '@/lib/export'
+import { attemptsText, chainTally, chainText, fromRunText } from '@/lib/chain'
+import type { Consolidation, ConsolidatedCheck } from '../../../shared/consolidation'
 import type { AcademicStatus } from '../../../shared/events'
 import type { CheckResult, Stream, StudentResult } from '../../../shared/artifact'
 import { cn } from '@/lib/utils'
@@ -102,6 +113,8 @@ export default function ResultsView() {
         <ExportButton />
 
         <PendingPanel artifactPath={artifactPath} />
+
+        <ChainPanel artifactPath={artifactPath} />
 
         {artifact.warnings && artifact.warnings.length > 0 && (
           <div className="space-y-1.5 rounded-md bg-warning/10 p-3">
@@ -231,6 +244,247 @@ function ExportButton() {
         <span className="space-y-2 block">
           <span className="block">{exportSummary(artifact, scale)}</span>
           <span className="block">{t.export.hint}</span>
+          <span className="block text-xs text-muted-foreground">{t.export.scale(scale.label)}</span>
+        </span>
+      </ConfirmDialog>
+    </div>
+  )
+}
+
+
+/**
+ * The grade of a whole chain of corrections.
+ *
+ * It appears only when this correction repeats an earlier one, because that is
+ * the only case where there is a chain to read. Pressing it runs `heimdall
+ * consolidate`, which opens the artifacts already on disk and writes nothing:
+ * the grade that comes back was closed by the engine, and this screen adds
+ * nothing to it (ADR-0019). A chain the engine refuses shows its reason and no
+ * grade at all.
+ */
+function ChainPanel({ artifactPath }: { artifactPath: string | null }) {
+  const artifact = useRun((s) => s.artifact)
+  const [chain, setChain] = useState<Consolidation | null>(null)
+  const [problem, setProblem] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  if (!artifact?.retry_of || !artifactPath) return null
+
+  async function read(): Promise<void> {
+    if (!artifactPath) return
+    setLoading(true)
+    setProblem(null)
+    setChain(null)
+    try {
+      setChain(await window.heimdall.consolidate(artifactPath))
+    } catch (error) {
+      setProblem(t.chain.refused(messageOf(error)))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="space-y-3 rounded-md border border-border p-4">
+      <div className="flex items-center gap-2 text-sm font-medium">
+        <Layers className="h-4 w-4" />
+        {t.chain.title}
+      </div>
+      <p className="max-w-3xl text-xs text-muted-foreground">{t.chain.hint}</p>
+
+      <Button variant="outline" size="sm" disabled={loading} onClick={() => void read()}>
+        {loading ? <Spinner /> : null}
+        {chain ? t.chain.reload : t.chain.show}
+      </Button>
+
+      {loading && <p className="text-xs text-muted-foreground">{t.chain.loading}</p>}
+
+      {problem && (
+        <p role="alert" className="rounded-md bg-destructive/10 p-3 text-sm text-destructive-strong">
+          {problem}
+        </p>
+      )}
+
+      {chain && !problem && <ChainResult chain={chain} />}
+    </div>
+  )
+}
+
+/** The class as the chain leaves it, student by student. */
+function ChainResult({ chain }: { chain: Consolidation }) {
+  const counts = chainTally(chain)
+  const [selected, setSelected] = useState<Selection | null>(null)
+
+  const chosen = useMemo(() => {
+    if (!selected) return null
+    const student = chain.students.find((s) => s.student_id === selected.studentId)
+    const check = student?.checks.find((c) => c.check_id === selected.checkId)
+    return student && check ? { name: student.name, check } : null
+  }, [chain, selected])
+
+  return (
+    <div className="space-y-3">
+      <div className="space-y-0.5">
+        <p className="text-xs text-muted-foreground">{chainText(chain)}</p>
+        <p className="text-xs text-muted-foreground">{t.chain.closed(counts.closed, counts.open)}</p>
+      </div>
+
+      <ChainExportButton chain={chain} />
+
+      <div className="space-y-2">
+        {chain.students.map((student) => {
+          const score = scoreView(student.score)
+          return (
+            <div key={student.student_id} className="rounded-md border border-border p-3">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">{student.name}</span>
+                  <Badge variant={badgeOf(student.status)}>{STUDENT_TEXT[student.status]}</Badge>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  {score.value == null ? (
+                    <span className="text-sm text-muted-foreground">{t.results.noGrade}</span>
+                  ) : (
+                    <>
+                      <span className="text-lg font-semibold tabular-nums">{score.value}</span>
+                      {score.kind === 'provisional' && (
+                        <span className="text-xs text-warning-strong">{t.results.provisional}</span>
+                      )}
+                    </>
+                  )}
+                  <span className="text-micro text-muted-foreground">{score.note}</span>
+                </div>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1">
+                {student.checks.map((check) => (
+                  <button
+                    key={check.check_id}
+                    type="button"
+                    onClick={() => setSelected({ studentId: student.student_id, checkId: check.check_id })}
+                    title={`${check.check_id} · ${STATUS_TEXT[check.status]} · ${fromRunText(check)}`}
+                    aria-label={`${check.check_id}: ${STATUS_TEXT[check.status]}`}
+                    className={cn(
+                      'max-w-[14rem] truncate rounded px-2 py-1 text-micro font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                      cellTone(check.status),
+                      selected?.studentId === student.student_id &&
+                        selected.checkId === check.check_id &&
+                        'ring-2 ring-ring'
+                    )}
+                  >
+                    {check.check_id}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {chosen && (
+        <ChainCheckDetail
+          name={chosen.name}
+          check={chosen.check}
+          onClose={() => setSelected(null)}
+        />
+      )}
+    </div>
+  )
+}
+
+/** One consolidated check: what it says, where it comes from and what came before. */
+function ChainCheckDetail({
+  name,
+  check,
+  onClose
+}: {
+  name: string
+  check: ConsolidatedCheck
+  onClose: () => void
+}) {
+  const attempts = attemptsText(check.attempts)
+  return (
+    <div className="space-y-3 rounded-md border border-border p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <SectionTitle>{t.results.checkTitle}</SectionTitle>
+          <p className="mt-1 text-sm">
+            <span className="font-mono">{check.check_id}</span> · {name}
+          </p>
+          {check.description && (
+            <p className="text-xs text-muted-foreground">{check.description}</p>
+          )}
+        </div>
+        <Button variant="ghost" size="icon" aria-label={t.errors.dismiss} onClick={onClose}>
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge
+          variant={
+            check.status === 'PASS' ? 'success' : check.status === 'FAIL' ? 'destructive' : 'warning'
+          }
+        >
+          {STATUS_TEXT[check.status]}
+        </Badge>
+        {check.cause !== 'NONE' && <Badge variant="warning">{CAUSE_TEXT[check.cause]}</Badge>}
+        <span className="text-xs text-muted-foreground">
+          {t.results.weight}: {check.weight}
+        </span>
+      </div>
+
+      {check.detail && <p className="text-sm">{check.detail}</p>}
+
+      <p className="text-xs text-muted-foreground">{fromRunText(check)}</p>
+
+      {attempts.length > 0 && (
+        <Field label={t.chain.attempts}>
+          {attempts.map((line, index) => (
+            <p key={index} className="text-dense">
+              {line}
+            </p>
+          ))}
+        </Field>
+      )}
+
+      <p className="text-xs text-muted-foreground">{t.chain.noEvidence}</p>
+    </div>
+  )
+}
+
+/** The chain's grades, out of the application, with the rules of one correction. */
+function ChainExportButton({ chain }: { chain: Consolidation }) {
+  const scaleId = useApp((s) => s.scale)
+  const setNotice = useApp((s) => s.setNotice)
+  const [confirm, setConfirm] = useState(false)
+  const scale = scaleOf(scaleId)
+
+  async function save(): Promise<void> {
+    setConfirm(false)
+    try {
+      const path = await window.heimdall.saveCsv(chainCsvName(chain), chainCsv(chain, scale))
+      setNotice(path ? t.export.saved(path) : t.export.cancelled)
+    } catch (error) {
+      setNotice(noticeFrom(t.export.failed, error))
+    }
+  }
+
+  return (
+    <div>
+      <Button variant="outline" size="sm" onClick={() => setConfirm(true)}>
+        <Download className="h-4 w-4" />
+        {t.chain.export}
+      </Button>
+      <ConfirmDialog
+        open={confirm}
+        title={t.chain.exportTitle}
+        confirmLabel={t.export.yes}
+        onConfirm={() => void save()}
+        onCancel={() => setConfirm(false)}
+      >
+        <span className="space-y-2 block">
+          <span className="block">{chainExportSummary(chain, scale)}</span>
+          <span className="block">{t.chain.exportHint}</span>
           <span className="block text-xs text-muted-foreground">{t.export.scale(scale.label)}</span>
         </span>
       </ConfirmDialog>
