@@ -39,9 +39,12 @@ Reglas duras:
 
 ## Alcance de la sesión
 
-Una tarea por sesión. Si crece: divídela en `TASKS.json`, implementa una parte
-coherente y deja el repositorio en estado válido. No se empieza la tarea
-siguiente porque sobre contexto.
+Máximo dos tareas por sesión, con las condiciones y las áreas excluidas que
+fija `CLAUDE.md` («Seleccionar la tarea»). Un commit por tarea.
+
+Si una tarea crece: divídela en `TASKS.json`, implementa una parte coherente,
+deja el repositorio en estado válido y cierra la sesión ahí. No se encadena una
+tarea más porque sobre contexto.
 
 ## Errores
 

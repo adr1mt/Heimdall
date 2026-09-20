@@ -50,10 +50,25 @@ Prioridad ante contradicciones: **ADR aceptado > `docs/design/` > `docs/research
 ## Seleccionar la tarea
 
 La tarea `READY` de mayor prioridad (`P0` > `P1` > `P2`) con todas sus
-`depends_on` en `DONE`. A igualdad, el `id` menor. **Una tarea por sesión.**
+`depends_on` en `DONE`. A igualdad, el `id` menor.
+
+**Máximo dos tareas por sesión.** La segunda solo si cumple **todas** estas
+condiciones:
+
+- es pequeña y de bajo riesgo;
+- pertenece a la misma fase que la primera;
+- no introduce ninguna decisión arquitectónica nueva.
+
+**Nunca se encadena una segunda tarea** si cualquiera de las dos toca:
+integridad de la nota, modelo de estados y resultados, SSH, concurrencia,
+cancelación, seguridad o secretos, contrato motor ↔ GUI, migración, o
+empaquetado y release.
+
+Un commit por tarea, siempre separado. El repositorio queda en estado válido
+después de cada uno.
 
 Si la tarea resulta más grande de lo previsto: divídela en `TASKS.json` antes de
-implementarla, y termina una parte coherente.
+implementarla, termina una parte coherente y **no encadenes una segunda**.
 
 ## Terminar una sesión
 
