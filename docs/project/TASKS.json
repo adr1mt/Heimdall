@@ -269,7 +269,7 @@
       "id": "T008",
       "title": "Sesion SSH, exec, limites de salida y timeouts",
       "phase": 1,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "T001",
@@ -347,7 +347,7 @@
       "id": "T010",
       "title": "Motor: worker pool, presupuesto por alumno y cancelacion",
       "phase": 1,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P0",
       "depends_on": [
         "T003",

@@ -150,3 +150,25 @@ Dos decisiones menores:
    base32) en vez de añadir la dependencia que `architecture.md` permitía. Son
    cuarenta líneas y no hay nada más que necesitemos de esa librería; la regla
    de simplicidad pesa más que el permiso.
+
+### 2026-09-20 · Sesión SSH (T008)
+
+1. **`golang.org/x/crypto/ssh`, la dependencia que `architecture.md` ya
+   permitía.** Arrastra `golang.org/x/sys` y sube la directiva `go` del módulo
+   de 1.22 a 1.26; el toolchain instalado es 1.27.1, así que no cambia nada en
+   la práctica.
+2. **El corte duro de 8 MB cierra la sesión del comando, no solo deja de
+   leer.** Dejar de leer sin cerrar bloquea al otro lado hasta que vence el
+   timeout: el `head -c 300000000` tardaba 68 s en vez de 0,1 s. El límite
+   existe para que una salida enorme no cueste ni memoria ni tiempo.
+3. **`duration_ms` mide hasta que llega el estado de salida o vence la
+   comprobación, no la limpieza posterior.** Tras un timeout se da una gracia
+   de 2 s al cierre del canal y se informa con lo que haya: un servidor que no
+   cierre no puede retener a un trabajador.
+4. **El vector de argumentos se serializa con comillas simples** al enviarlo.
+   `sshd` siempre ejecuta la petición `exec` a través de una shell remota: no
+   hay forma de evitarlo. Lo que sí se garantiza es que cada argumento llega
+   literal, sin reinterpretar espacios, comillas ni `;`.
+5. **La ausencia del `timeout` de coreutils se prueba de verdad**: el test
+   esconde el binario dentro del contenedor y lo restaura. Sin ganchos de
+   prueba en el código de producción.
