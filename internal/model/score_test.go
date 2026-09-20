@@ -173,3 +173,21 @@ func TestClassifyNeverGradesOnAnyCause(t *testing.T) {
 		}
 	}
 }
+
+// TestClassifyExitCode127IsAcademic is criterion A-14 as pure logic: a command
+// the student's machine does not have exits 127, which looks like a breakdown
+// and is not one. The machine answered, so the check is a FAIL with no
+// technical cause. Reading it as UNEVALUATED would let a student dodge a check
+// by simply not installing what the exam asks for.
+func TestClassifyExitCode127IsAcademic(t *testing.T) {
+	status, cause, detail := Classify(okExecution(127), &AssertionResult{Kind: "exit_code", Matched: false}, CauseNone)
+	if status != Fail {
+		t.Errorf("status = %s, want %s", status, Fail)
+	}
+	if cause != CauseNone {
+		t.Errorf("cause = %s, want %s: the machine answered, nothing broke", cause, CauseNone)
+	}
+	if detail != "" {
+		t.Errorf("detail = %q, want empty on an academic result", detail)
+	}
+}

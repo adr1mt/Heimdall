@@ -424,7 +424,7 @@
       "id": "T012",
       "title": "Los 14 criterios de aceptacion del vertical slice",
       "phase": 1,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "T011"
@@ -455,7 +455,7 @@
       "id": "T013",
       "title": "Evidencia del prototipo y cierre de D-2",
       "phase": 1,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T012"
@@ -477,6 +477,34 @@
       ],
       "tests": [],
       "notes": "Sin esta tarea, la fase 1 queda demostrada pero no registrada."
+    },
+    {
+      "id": "T014",
+      "title": "Mensajes de error del YAML sin jerga de Go",
+      "phase": 1,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [
+        "T012"
+      ],
+      "goal": "Un error de examen.yaml debe leerlo el profesor, no el que escribio el motor.",
+      "scope": [
+        "Un valor del tipo equivocado en una clave conocida (cerca_de: 3) dice hoy \"cannot unmarshal !!int `3` into plan.NearSpec\"",
+        "Traducir los errores de tipo de yaml.v3 a una frase en espanol con fichero, linea y clave",
+        "Repasar las nueve validaciones del §5 buscando el mismo escape"
+      ],
+      "out_of_scope": [
+        "Cambiar el formato del YAML",
+        "Nuevas validaciones"
+      ],
+      "acceptance": [
+        "Ningun mensaje de error de configuracion contiene un nombre de tipo Go, un !!tag de YAML ni texto en ingles",
+        "Test de tabla en internal/plan con un valor del tipo equivocado por cada clave que lo admita"
+      ],
+      "tests": [
+        "go test ./internal/plan"
+      ],
+      "notes": "Detectado al preparar testdata/clave-desconocida para A-13 (T012)."
     },
     {
       "id": "T020",

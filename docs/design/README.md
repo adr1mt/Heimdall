@@ -13,5 +13,6 @@ profundamente a la arquitectura, **antes** de escribir una línea de Go.
 | [06-LEGACY-WRITER.md](06-LEGACY-WRITER.md) | `LegacyTeutonWriter`: diseño, mapeo y pérdidas |
 | [07-PROTOTIPO.md](07-PROTOTIPO.md) | Especificación exacta del primer prototipo y 14 criterios de aceptación |
 | [08-DECISIONES-ABIERTAS.md](08-DECISIONES-ABIERTAS.md) | Lo que sigue abierto |
+| [ACEPTACION-FASE1.md](ACEPTACION-FASE1.md) | Salida real de `test/acceptance.sh`: evidencia del cierre de la fase 1 |
 
 Decisiones cerradas: [`../adr/`](../adr/) (ADR-0001 … ADR-0009).

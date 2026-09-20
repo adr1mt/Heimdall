@@ -1,0 +1,15 @@
+# Examen de una sola comprobación para el criterio A-6: una máquina de alumno
+# que escupe 300 MB no puede hacer crecer la memoria del motor. La salida de un
+# alumno es dato no confiable.
+examen: "Salida desbordada"
+version: 1
+hosts: [host1]
+por_defecto: { peso: 1, timeout: 60s }
+grupos:
+  - grupo: "Límites"
+    comprobaciones:
+      - id: a6-salida-enorme
+        descripcion: "300 MB de salida no tumban el motor"
+        en: host1
+        cmd: ["head", "-c", "300000000", "/dev/zero"]
+        exit_code: 0

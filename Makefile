@@ -16,6 +16,7 @@ check:
 test: check build
 	$(GO) test -tags=integration ./...
 	test/secrets.sh
+	test/acceptance.sh
 
 ## build: single binary in bin/evalon.
 build:

@@ -1,0 +1,15 @@
+# Examen con una clave que no existe, para el criterio A-13: un YAML mal
+# escrito no llega a tocar ninguna máquina.
+examen: "Clave desconocida"
+version: 1
+hosts: [host1]
+por_defecto: { peso: 1, timeout: 20s }
+grupos:
+  - grupo: "Base"
+    comprobaciones:
+      - id: a13-clave
+        descripcion: "Una comprobación con una clave inventada"
+        en: host1
+        cmd: ["hostname"]
+        contiene: "alu"
+        comprobar_que: "inventado"

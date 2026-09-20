@@ -1,0 +1,30 @@
+# Aula del prototipo (docs/design/07-PROTOTIPO.md §3). Nombres ficticios y
+# credenciales de prueba: aquí no entran datos reales de alumnado.
+#
+# alumne02 apunta a un puerto cerrado a propósito: es el alumno roto que
+# demuestra que nadie puede tumbar la evaluación de los demás.
+aula: "Prototipo vertical"
+version: 1
+
+comun:
+  hosts:
+    host1:
+      puerto: 2201
+      usuario: "alumno"
+      password_ref: "${AULA_PASSWORD}"
+  timeouts:
+    conexion: 10s
+    alumno: 2m
+
+alumnos:
+  - id: alumne01
+    nombre: "Alumna Uno"
+    hosts:
+      host1: { ip: "127.1.2.3", puerto: 2201 }
+    usuario: "alumno"
+
+  - id: alumne02
+    nombre: "Alumne Dos"
+    hosts:
+      host1: { ip: "127.1.2.3", puerto: 2299 }
+    usuario: "alumno"
