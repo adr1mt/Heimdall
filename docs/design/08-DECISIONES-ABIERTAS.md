@@ -4,6 +4,7 @@ Solo las que de verdad lo están. Las cerradas están en `docs/adr/`.
 
 | # | Decisión | Por qué sigue abierta | Cuándo se puede cerrar |
 |---|---|---|---|
+| **D-10** | Qué nota vale en una sesión de examen | Las vueltas de un examen son fotografías del mismo examen, no intentos sueltos: ahí manda la **mejor nota completa**, y eso es lo contrario de la regla de ADR-0019, que es para una cadena de reintento técnico. Falta el ADR que fije las dos reglas y la frontera entre ellas | En T062 |
 | **D-5** | Detección de valores repetidos (anticopia) | Tiene valor pedagógico y hoy pone la nota a 0 automáticamente, cosa descartada. Falta decidir si se implementa como **marca** en el informe | Cuando haya un caso real; no bloquea nada |
 
 ## Lo que se ha cerrado en esta sesión y antes estaba abierto

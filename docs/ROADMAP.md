@@ -98,6 +98,13 @@ la nota provisional, los avisos y los resultados parciales.
 Se cierra **D-8**: cómo presenta la GUI un `INCOMPLETE` y qué ofrece al
 profesor.
 
+Se cierra **D-10**: qué nota vale en una sesión de examen. Las vueltas que
+encadena el modo examen son fotografías del mismo examen, así que ahí se
+conserva la **mejor nota completa** de cada alumno y quien llega al total queda
+`FINALIZADO` y deja de entrar en las vueltas siguientes. Es una regla distinta
+de la de ADR-0019, que gobierna la cadena de reintento de una incidencia
+técnica, y se resuelve en el motor (T062, T063, T064).
+
 **Salida**: un examen completo corregido de principio a fin desde la aplicación,
 contra el laboratorio, sin que exista un solo fichero de Teuton por medio.
 

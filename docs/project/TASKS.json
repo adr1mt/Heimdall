@@ -1320,6 +1320,113 @@
         "gui/tests/consolidate.test.ts"
       ],
       "notes": "Mitad de pantalla de T057, separada el 2026-09-20. Cerrada el 2026-09-20: la aplicacion llama a heimdall consolidate y ensena la cadena en Resultados."
+    },
+    {
+      "id": "T062",
+      "title": "Sesion de examen: la mejor nota completa y el estado FINALIZADO (modelo)",
+      "phase": 5,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [
+        "T057",
+        "T058"
+      ],
+      "goal": "Que las vueltas de un examen sean fotografias de lo mismo y no intentos sueltos: cada alumno conserva la mejor nota completa de la sesion.",
+      "scope": [
+        "ADR nuevo con la regla de sesion, separada y explicitamente distinta de ADR-0019: en una cadena de reintento manda lo mas reciente; en una sesion de examen manda la mejor nota COMPLETA",
+        "internal/model: funcion pura que, dadas las vueltas de una sesion sobre el mismo plan_hash, elige por alumno la mejor nota completa (6 -> 8 -> 7 -> 9 conserva 9)",
+        "Una nota provisional o un UNEVALUATED posterior nunca sustituye una nota completa anterior",
+        "Estado FINALIZADO cuando un alumno alcanza el total del PLAN, derivado del modelo y nunca marcado a mano",
+        "El historico de todas las vueltas se conserva entero: de que vuelta sale la nota que vale y que dijo cada una"
+      ],
+      "out_of_scope": [
+        "Cambiar ADR-0019: la consolidacion de una cadena de reintento sigue siendo la ejecucion mas reciente que evaluo",
+        "Reescribir, mezclar o tocar ningun artefacto (ADR-0007)",
+        "Calcular nada de esto en la GUI (principio 12)",
+        "Dejar fuera de una vuelta a los finalizados: eso es motor y va en T063",
+        "Ensenarlo en la aplicacion (T064)"
+      ],
+      "acceptance": [
+        "Con las vueltas 6, 8, 7 y 9 de un mismo alumno, la nota de la sesion es 9 y se dice de que vuelta sale",
+        "Una vuelta posterior con UNEVALUATED o con nota provisional no rebaja ni borra una nota completa anterior",
+        "Un alumno con el total del PLAN queda FINALIZADO sin que nadie lo marque",
+        "Mientras un alumno no tenga ninguna vuelta completa no tiene nota de sesion, y se dice por que (ADR-0004, ADR-0006)",
+        "Una sesion con distinto plan_hash se rechaza, como en ADR-0019 3",
+        "La regla es pura: sin red, sin disco, sin reloj"
+      ],
+      "tests": [
+        "internal/model/session_test.go: 6->8->7->9 conserva 9; provisional posterior no sustituye a completa; UNEVALUATED posterior no sustituye a completa; sin ninguna vuelta completa no hay nota; FINALIZADO exacto al total del PLAN; plan_hash distinto rechazado"
+      ],
+      "notes": "Pedida por Adria el 2026-09-20 al cerrar T058: en un examen cada vuelta es una fotografia del mismo examen, no un intento independiente. Abre D-10. No toca T058, que queda como esta."
+    },
+    {
+      "id": "T063",
+      "title": "Motor: publicar la sesion de examen y dejar fuera a los finalizados",
+      "phase": 5,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T062"
+      ],
+      "goal": "Que la aplicacion pueda pedir la sesion al motor y que la vuelta siguiente no vuelva a molestar a quien ya termino.",
+      "scope": [
+        "Subcomando que lee las vueltas de una sesion y publica la vista por la salida estandar, sin escribir ningun fichero, con su propio kind",
+        "La vista lleva por alumno: la nota que vale, de que vuelta sale, si esta FINALIZADO y el historico de todas las vueltas",
+        "Opcion de run que deja fuera de la vuelta a los alumnos FINALIZADOS de esa sesion",
+        "Un alumno dejado fuera sale en el artefacto con su motivo, nunca como un cero ni como sin evaluar"
+      ],
+      "out_of_scope": [
+        "Tocar el PLAN, los pesos o el denominador: son los mismos para toda la sesion (ADR-0004, principio 6 y 7)",
+        "Reintento de incidencias tecnicas: es --retry y es otra cosa (ADR-0018)",
+        "Escribir ningun artefacto nuevo desde el subcomando de sesion (ADR-0019 5)"
+      ],
+      "acceptance": [
+        "La sesion se publica por la salida estandar y no se escribe ni se modifica ningun fichero",
+        "Con un alumno FINALIZADO, la vuelta siguiente no abre ninguna conexion contra su maquina",
+        "El artefacto de esa vuelta dice por que ese alumno no se corrigio, y su nota de sesion sigue siendo la que ya tenia",
+        "Los demas alumnos reciben exactamente las mismas comprobaciones y los mismos pesos que antes (principio 7)",
+        "Una sesion ilegible o con distinto plan_hash es exit 2 y se dice cual no encaja"
+      ],
+      "tests": [
+        "cmd/heimdall/session_test.go: la vista sale por stdout, no escribe nada, plan_hash distinto es exit 2",
+        "internal/engine/session_test.go: los FINALIZADOS no entran en la seleccion de la vuelta y el denominador no cambia",
+        "Laboratorio: dos vueltas seguidas con un alumno al total; la segunda no toca su maquina"
+      ],
+      "notes": "Mitad de motor de la logica de sesion. Se separa de T062 porque la regla pura y la ejecucion son dos trabajos, como T057 y T061."
+    },
+    {
+      "id": "T064",
+      "title": "La aplicacion encadena el examen sobre la sesion, no sobre vueltas sueltas",
+      "phase": 5,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T058",
+        "T063"
+      ],
+      "goal": "Que en pantalla se vea la mejor nota de cada alumno durante el examen, quien ha terminado y que dijo cada vuelta.",
+      "scope": [
+        "El modo examen encadena las vueltas como una sesion y le pide al motor la nota que vale",
+        "Pantalla: por alumno, la nota de la sesion, de que vuelta sale, si esta FINALIZADO y el historico de todas las vueltas",
+        "Las vueltas siguientes dejan fuera a los FINALIZADOS, con el motivo a la vista",
+        "Exportar las notas de una sesion con las mismas reglas que una correccion suelta (T056)"
+      ],
+      "out_of_scope": [
+        "Calcular la mejor nota ni el estado final en la interfaz: los publica el motor (principio 12, ADR-0019 4)",
+        "Marcar a mano a un alumno como finalizado",
+        "Tocar lo que T058 ya hace: el intervalo, el bloqueo de suspension y el aviso al cerrar se quedan como estan"
+      ],
+      "acceptance": [
+        "Con un alumno que va de 6 a 9 en cuatro vueltas, la pantalla ensena 9 y de que vuelta sale",
+        "Un alumno al total aparece FINALIZADO y no vuelve a corregirse; el profesor ve por que",
+        "Ninguna nota que ensena la pantalla se ha calculado en la aplicacion",
+        "Lo exportado de una sesion no inventa ninguna nota: quien no tenga vuelta completa sale sin nota y con el motivo"
+      ],
+      "tests": [
+        "gui/tests/session.test.ts: la pantalla se construye con lo que publica el motor y no suma nada",
+        "gui/scripts/examen-lab.ts: una sesion real de dos vueltas contra el laboratorio, con la mejor nota conservada y el finalizado fuera de la segunda"
+      ],
+      "notes": "Mitad de pantalla de la logica de sesion. No modifica T058 ni se mezcla con T059."
     }
   ]
 }

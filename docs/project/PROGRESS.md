@@ -76,5 +76,11 @@ no se repitieron esta sesión.
 
 ## Siguiente tarea recomendada
 
-**T059** (`READY`, P1): inventario de lo heredado, conservado o retirado con su
-motivo. Cierra la fase 5 y abre T060, el borrado de la capa legacy.
+**T062** (`READY`, P1): la regla de la sesión de examen —mejor nota completa y
+`FINALIZADO`—, con su ADR. Detrás van T063 (motor) y T064 (pantalla). A la par,
+**T059** sigue `READY` y cierra la fase 5 con el inventario de lo heredado.
+
+El modo examen de T058 encadena vueltas, pero cada vuelta sigue siendo una
+corrección suelta: nadie conserva todavía la mejor nota de la sesión ni deja
+fuera a quien ya terminó. Eso es D-10 y se resuelve en el motor, no en la
+aplicación.
