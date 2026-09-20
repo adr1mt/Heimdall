@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"io"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 
 	"heimdall/internal/engine"
+	"heimdall/internal/legacy"
 	"heimdall/internal/model"
 	"heimdall/internal/plan"
 	"heimdall/internal/report"
@@ -26,11 +28,16 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 	varDir := fs.String("var", "var", "directorio donde se escribe el artefacto")
 	concurrency := fs.Int("concurrency", 0, "alumnos en paralelo; 0 usa el del examen")
 	hostConcurrency := fs.Int("host-concurrency", 0, "conexiones que se abren a la vez contra una misma máquina; 0 usa el del examen")
+	compat := fs.String("compat", "", "escribe además los ficheros del formato antiguo: teuton2")
 	if err := fs.Parse(args); err != nil {
 		return exitInvalidConfig
 	}
 	if fs.NArg() != 1 {
-		fmt.Fprintln(stderr, "uso: heimdall run [--secrets=stdin|env] [--var=dir] <directorio del examen>")
+		fmt.Fprintln(stderr, "uso: heimdall run [--secrets=stdin|env] [--var=dir] [--compat=teuton2] <directorio del examen>")
+		return exitInvalidConfig
+	}
+	if *compat != "" && *compat != "teuton2" {
+		fmt.Fprintf(stderr, "heimdall run: --compat=%s no existe; el único formato antiguo soportado es teuton2\n", *compat)
 		return exitInvalidConfig
 	}
 
@@ -97,8 +104,35 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 		fmt.Fprintf(stderr, "heimdall run: aviso: no se pudo guardar algún parcial: %s\n", partialErr)
 	}
 
+	if *compat == "teuton2" {
+		if err := writeLegacy(*varDir, fs.Arg(0), result, values(secrets)); err != nil {
+			fmt.Fprintf(stderr, "heimdall run: aviso: %s\n", err)
+		}
+	}
+
 	printSummary(stdout, result, path)
 	return engine.ExitCode(result)
+}
+
+// writeLegacy writes the files the current GUI reads, on top of the canonical
+// artifact, which is always written. The test name is the name of the project
+// directory, which is where the GUI looks when the project has no tt_testname
+// (C5). A failure here is a warning, never a different exit code: the run and
+// its grades already happened.
+func writeLegacy(varDir, projectDir string, run *model.RunResult, secrets []string) error {
+	clean, err := report.Redact(run, secrets)
+	if err != nil {
+		return fmt.Errorf("no se pudieron escribir los ficheros del formato antiguo: %w", err)
+	}
+	abs, err := filepath.Abs(projectDir)
+	if err != nil {
+		return fmt.Errorf("no se pudo resolver %s: %w", projectDir, err)
+	}
+	w, err := legacy.New(varDir, filepath.Base(abs))
+	if err != nil {
+		return err
+	}
+	return w.Write(clean)
 }
 
 // printSummary tells the teacher what happened in the words of the classroom:

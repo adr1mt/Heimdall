@@ -699,28 +699,62 @@
     },
     {
       "id": "T040",
-      "title": "LegacyTeutonWriter completo y fachada CLI",
+      "title": "LegacyTeutonWriter: resume.json, case-NN.json y moodle.csv",
       "phase": 4,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T031"
       ],
-      "goal": "Que la GUI actual funcione contra el motor nuevo sin cambiar una linea.",
+      "goal": "Que la GUI actual encuentre los tres ficheros que lee, con la nota bien traducida.",
       "scope": [
-        "resume.json, case-NN.json y moodle.csv segun design/06-LEGACY-WRITER.md",
-        "fachada version, check y progreso por caracteres",
-        "golden files contra salidas reales de Teuton"
+        "internal/legacy segun design/06-LEGACY-WRITER.md 3 y 4",
+        "bandera --compat=teuton2 en run, que escribe en var/<testname>/",
+        "golden files contra las salidas reales de Teuton 2.10.6"
       ],
       "out_of_scope": [
-        "Otros formatos de exportacion (C9 devuelve error explicito)"
+        "Fachada CLI (version, check, progreso, --export, --case): T042",
+        "Otros formatos de exportacion (C9)"
       ],
       "acceptance": [
         "Golden files identicos campo a campo en los campos que la GUI lee",
-        "un INCOMPLETE sale con grade 0 y conn_status no vacio"
+        "un INCOMPLETE sale con grade 0 y conn_status no vacio",
+        "sin --compat no se escribe ningun fichero legacy; el artefacto canonico se escribe siempre"
+      ],
+      "tests": [
+        "internal/legacy (golden files y tabla de estados)",
+        "cmd/heimdall TestRunWritesTheLegacyFilesOnlyWithCompat"
+      ],
+      "notes": "Capa temporal: no se le anade nada que la UAT no exija."
+    },
+    {
+      "id": "T042",
+      "title": "Fachada CLI compatible con Teuton (C1-C4, C9)",
+      "phase": 4,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [
+        "T040"
+      ],
+      "goal": "Que la GUI lance el motor nuevo, lo reconozca y vea el progreso, sin cambiar una linea.",
+      "scope": [
+        "version imprime Teuton version 2.10.6 (heimdall <ver>)",
+        "check imprime la tabla DSL Stats con el numero exacto de targets",
+        "banderas --export=json, --cname y --case=1,3",
+        "progreso: Started at, un caracter por comprobacion, Finished in",
+        "C9: cualquier otro --export devuelve error explicito"
+      ],
+      "out_of_scope": [
+        "Cambiar la GUI",
+        "NDJSON (fase posterior)"
+      ],
+      "acceptance": [
+        "Las tres salidas casan con las expresiones regulares de la GUI",
+        "el numero de targets de check coincide con las comprobaciones del PLAN",
+        "un --export desconocido sale con error y codigo distinto de 0"
       ],
       "tests": [],
-      "notes": "Detallar al llegar. Capa temporal: no se le anade nada que la UAT no exija."
+      "notes": "Capa temporal, como T040."
     },
     {
       "id": "T041",
@@ -729,7 +763,8 @@
       "status": "BLOCKED",
       "priority": "P0",
       "depends_on": [
-        "T040"
+        "T040",
+        "T042"
       ],
       "goal": "Prueba de aceptacion externa del motor, con una suite que ya existe y es hostil.",
       "scope": [

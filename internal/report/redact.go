@@ -8,7 +8,7 @@ import (
 	"heimdall/internal/model"
 )
 
-// redact returns a copy of run with every known secret value replaced, plus a
+// Redact returns a copy of run with every known secret value replaced, plus a
 // warning if anything was replaced. The original is never modified: the
 // engine keeps working with what it collected.
 //
@@ -16,7 +16,7 @@ import (
 // reach a command in the first place, because ${MAYUSCULAS} is only valid in
 // the authentication fields of the inventory. If this ever fires, something
 // upstream is broken and the teacher has to know.
-func redact(run *model.RunResult, secrets []string) (*model.RunResult, error) {
+func Redact(run *model.RunResult, secrets []string) (*model.RunResult, error) {
 	out, err := clone(run)
 	if err != nil {
 		return nil, err

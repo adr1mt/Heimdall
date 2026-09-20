@@ -86,7 +86,7 @@ func (w *Writer) WriteFinal(run *model.RunResult) (string, error) {
 
 // write redacts, serialises and stores the artifact atomically.
 func (w *Writer) write(run *model.RunResult, path string) error {
-	clean, err := redact(run, w.secrets)
+	clean, err := Redact(run, w.secrets)
 	if err != nil {
 		return err
 	}

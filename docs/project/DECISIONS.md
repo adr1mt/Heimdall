@@ -240,3 +240,29 @@ Dos decisiones menores:
    inventado. La comprobación sigue `UNEVALUATED` y fuera del denominador.
 3. **Los topes no se tocan**: 64 kB conservados y corte duro a 8 MB, como
    estaban.
+
+
+## T040 · Los tres ficheros que lee la GUI actual
+
+1. **T040 se parte en dos.** El escritor de datos (C6, C7, C8) y la fachada
+   de línea de órdenes (C1-C4, C9, ahora **T042**) son dos trabajos con
+   riesgos distintos. T041 depende de los dos.
+2. **El nombre del test es el del directorio del proyecto.** No hay
+   `config.yaml` ni `tt_testname` en el formato nuevo, y es justo lo que la GUI
+   usa como respaldo (`main/results.ts`, C5). Los ficheros van a
+   `var/<directorio>/`, al lado del artefacto canónico.
+3. **La letra del resumen se escribe siempre.** Teuton dejaba la clave fuera
+   para un 50 y la GUI caía en `?`; aquí `✓` es un 100, `✗` un 0, `S` un
+   excluido y `?` el resto. Es el mismo valor que la GUI acaba mostrando.
+4. **La causa dominante por máquina, con orden explícito**: credenciales
+   rechazadas manda sobre máquina inalcanzable, y esta sobre todo lo demás. Es
+   lo que el profesor tiene que arreglar primero, y el formato viejo solo
+   admite una etiqueta por máquina.
+5. **Una avería sin máquina conocida se etiqueta `desconocido`.** Un alumno
+   `INCOMPLETE` o `NOT_EVALUATED` nunca sale sin `conn_status`: sin esa
+   etiqueta la GUI publicaría un cero como si fuera la nota final.
+6. **`moodle.csv` se escribe a mano, no con `encoding/csv`.** La biblioteca no
+   entrecomilla el comentario y Teuton sí; el CSV sigue siendo válido y
+   conserva el prefijo defensivo contra fórmulas (F-14).
+7. **Ninguna credencial en `case-NN.json`.** Teuton volcaba `host1_password`
+   ahí; esta capa escribe dirección, puerto y usuario, y nada más.

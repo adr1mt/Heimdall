@@ -177,3 +177,50 @@ func assertEmptyDir(t *testing.T, dir string) {
 		t.Errorf("%s debería estar vacío, contiene %v", dir, names)
 	}
 }
+
+// The questionnaire project answers itself: no machine is contacted, so the
+// legacy files can be checked without the lab.
+const quizProject = "../../testdata/cuestionario"
+
+// With --compat=teuton2 the current GUI finds the three files it reads, in
+// var/<nombre del proyecto>/.
+func TestRunWritesTheLegacyFilesOnlyWithCompat(t *testing.T) {
+	out := t.TempDir()
+	var stdout, stderr bytes.Buffer
+	if got := run([]string{"run", "--var=" + out, "--compat=teuton2", quizProject}, &stdout, &stderr); got != 0 {
+		t.Fatalf("exit = %d (%s)", got, stderr.String())
+	}
+	dir := filepath.Join(out, "cuestionario")
+	for _, name := range []string{"resume.json", "case-01.json", "moodle.csv"} {
+		if _, err := os.Stat(filepath.Join(dir, name)); err != nil {
+			t.Errorf("falta %s: %s", name, err)
+		}
+	}
+
+	plain := t.TempDir()
+	stdout.Reset()
+	stderr.Reset()
+	if got := run([]string{"run", "--var=" + plain, quizProject}, &stdout, &stderr); got != 0 {
+		t.Fatalf("exit = %d (%s)", got, stderr.String())
+	}
+	if _, err := os.Stat(filepath.Join(plain, "cuestionario")); !os.IsNotExist(err) {
+		t.Errorf("sin --compat no se escribe nada del formato antiguo (%v)", err)
+	}
+	if entries, err := os.ReadDir(plain); err != nil || len(entries) == 0 {
+		t.Errorf("el artefacto canónico se escribe siempre: %v %v", entries, err)
+	}
+}
+
+// A format this engine does not know is an explicit error, never a silent run
+// without the files the teacher asked for (C9).
+func TestRunRejectsAnUnknownCompatFormat(t *testing.T) {
+	out := t.TempDir()
+	var stdout, stderr bytes.Buffer
+	if got := run([]string{"run", "--var=" + out, "--compat=teuton3", quizProject}, &stdout, &stderr); got != exitInvalidConfig {
+		t.Fatalf("exit = %d, se esperaba %d", got, exitInvalidConfig)
+	}
+	if !strings.Contains(stderr.String(), "teuton2") {
+		t.Errorf("stderr = %q: debe decir cuál es el formato soportado", stderr.String())
+	}
+	assertEmptyDir(t, out)
+}
