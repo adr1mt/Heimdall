@@ -8,6 +8,7 @@ export const IPC = {
   secretRefs: 'run:secretRefs',
   startRun: 'run:start',
   cancelRun: 'run:cancel',
+  readArtifact: 'run:artifact',
   // Pushed from the main process while a run is alive.
   runEvent: 'run:event',
   runClosed: 'run:closed'

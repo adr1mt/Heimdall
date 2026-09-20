@@ -94,11 +94,25 @@ app.whenReady().then(async () => {
     console.log('[lab-run] detener pulsado')
   }
 
-  // Wait for the screen to say the run is over.
+  // Wait for the run to be over: the application opens the artifact by itself
+  // and lands on Resultados, so that is what says it finished.
   for (let i = 0; i < 120; i++) {
     await wait(500)
-    const done = await js(`!!document.body.textContent.match(/Corregir otra vez/)`)
+    const done = await js(
+      `!!document.querySelector('main')?.innerText.match(/de peso total|Corregir otra vez/)`
+    )
     if (done) break
+  }
+
+  // Open one check, which is where the cause and the output live.
+  if (process.env.OPEN_CHECK) {
+    await js(`(() => {
+      const cell = [...document.querySelectorAll('main button')]
+        .find(b => b.textContent.trim() === ${JSON.stringify(process.env.OPEN_CHECK)})
+      if (cell) cell.click()
+      return !!cell
+    })()`).then((r) => console.log('[lab-run] comprobación abierta:', r))
+    await wait(400)
   }
 
   const progress = await js(

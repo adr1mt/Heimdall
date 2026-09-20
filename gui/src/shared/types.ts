@@ -2,6 +2,7 @@
 // events.ts, which follows docs/design/09-CONTRATO-GUI.md.
 
 import type { EngineEvent } from './events'
+import type { RunResult } from './artifact'
 
 /** Result of locating the engine and asking it for its version. */
 export interface EngineStatus {
@@ -43,6 +44,8 @@ export interface HeimdallApi {
   /** Credential names the chosen classroom asks for. */
   secretRefs: (classPath: string) => Promise<string[]>
   startRun: (request: RunRequest) => Promise<void>
+  /** Reads the canonical artifact of a finished run. */
+  readArtifact: (path: string) => Promise<RunResult>
   cancelRun: () => Promise<void>
   /** Subscribes to the stream. Returns the unsubscribe function. */
   onRunEvent: (listener: (event: EngineEvent) => void) => () => void

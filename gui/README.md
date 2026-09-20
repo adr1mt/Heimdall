@@ -7,14 +7,21 @@ secretos por `stdin`, eventos NDJSON y artefacto canónico
 ([docs/design/09-CONTRATO-GUI.md](../docs/design/09-CONTRATO-GUI.md)). No lee
 ningún fichero de Teutón y no conoce `internal/legacy`.
 
-## Qué hay hoy (T052)
+## Qué hay hoy (T053)
 
 La aplicación corrige. Se eligen el examen y el aula, se escriben las
 contraseñas que el aula nombra, y la corrección avanza en pantalla comprobación
 a comprobación, alumno a alumno, con un botón para detenerla. Al terminar dice
 qué ha pasado y dónde ha quedado el resultado.
 
-- **T053**: matriz de resultados, notas y causas técnicas.
+En Resultados sale cada alumno con su estado y su nota, la matriz de
+comprobaciones y el detalle de cualquiera: causa técnica, comando ejecutado,
+qué se esperaba, qué se encontró y las salidas con su corte. Un alumno al que
+no se pudo llegar sale **sin nota**, nunca con un 0, y un examen incompleto no
+enseña nota final en ningún sitio (principio 3, ADR-0006).
+
+- **T055**: qué se ofrece ante un incompleto; cierra D-8.
+- **T054**: histórico, modo examen y analíticas.
 
 Las contraseñas viven en memoria y solo en memoria: viajan por `stdin` al
 motor, nunca en `argv`, nunca al disco y nunca a un fichero de ajustes
@@ -53,7 +60,8 @@ PROJECT=/ruta/al/examen HEIMDALL_ENGINE=../bin/heimdall \
 `lab-run` corrige a través de la aplicación construida —preload, IPC y vistas
 reales— y escribe en pantalla lo que ve el profesor. Lo único simulado es el
 diálogo de ficheros del sistema, que no se puede pulsar desde un script.
-`CANCEL_MS=1200` pulsa «Detener» a mitad. Desde la raíz: `make gui-lab`.
+`CANCEL_MS=1200` pulsa «Detener» a mitad y `OPEN_CHECK=p5-lento` abre esa
+comprobación en Resultados. Desde la raíz: `make gui-lab`.
 
 Desde la raíz del repositorio: `make gui-check` (typecheck + tests) y
 `make gui-build`. `make check`, la suite del motor, no depende de este árbol.

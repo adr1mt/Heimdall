@@ -1,0 +1,373 @@
+import { useMemo, useState } from 'react'
+import { AlertTriangle, X } from 'lucide-react'
+import {
+  Badge,
+  Button,
+  Input,
+  Segmented,
+  SegmentedItem,
+  SectionTitle,
+  ViewHeader
+} from '@/components/ui'
+import { useRun } from '@/stores/run'
+import {
+  CAUSE_TEXT,
+  NO_FILTERS,
+  REMOTE_TEXT,
+  STATUS_TEXT,
+  STUDENT_TEXT,
+  causesIn,
+  filterRun,
+  hasFilters,
+  scoreView,
+  tally,
+  truncationNote,
+  type Filters
+} from '@/lib/results'
+import type { AcademicStatus } from '../../../shared/events'
+import type { CheckResult, Stream, StudentResult } from '../../../shared/artifact'
+import { cn } from '@/lib/utils'
+import { t } from '@/i18n/es'
+
+/** Which cell the teacher opened, by student and check. */
+interface Selection {
+  studentId: string
+  checkId: string
+}
+
+export default function ResultsView() {
+  const artifact = useRun((s) => s.artifact)
+  const problem = useRun((s) => s.artifactProblem)
+  const [filters, setFilters] = useState<Filters>(NO_FILTERS)
+  const [selected, setSelected] = useState<Selection | null>(null)
+
+  const rows = useMemo(() => (artifact ? filterRun(artifact, filters) : []), [artifact, filters])
+  const causes = useMemo(() => (artifact ? causesIn(artifact) : []), [artifact])
+
+  const chosen = useMemo(() => {
+    if (!artifact || !selected) return null
+    const student = artifact.students.find((s) => s.student_id === selected.studentId)
+    const check = student?.checks.find((c) => c.check_id === selected.checkId)
+    return student && check ? { student, check } : null
+  }, [artifact, selected])
+
+  if (problem) {
+    return (
+      <div className="flex h-full flex-col">
+        <ViewHeader title={t.results.title} />
+        <p role="alert" className="m-6 rounded-md bg-destructive/10 p-4 text-sm text-destructive-strong">
+          {problem}
+        </p>
+      </div>
+    )
+  }
+
+  if (!artifact) {
+    return (
+      <div className="flex h-full flex-col">
+        <ViewHeader title={t.results.title} />
+        <p className="m-6 text-sm text-muted-foreground">{t.results.empty}</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex h-full flex-col">
+      <ViewHeader title={t.results.title} />
+      <div className="min-h-0 flex-1 space-y-5 overflow-auto p-6">
+        <div className="space-y-1">
+          <p className="text-sm">
+            {artifact.exam.path.split('/').pop()} · {artifact.inventory.path.split('/').pop()}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {t.results.plan(
+              artifact.students.length,
+              artifact.plan.check_count,
+              artifact.plan.total_weight
+            )}
+          </p>
+        </div>
+
+        {artifact.warnings && artifact.warnings.length > 0 && (
+          <div className="space-y-1.5 rounded-md bg-warning/10 p-3">
+            <div className="flex items-center gap-2 text-sm font-medium text-warning-strong">
+              <AlertTriangle className="h-4 w-4" />
+              {t.results.warnings}
+            </div>
+            {artifact.warnings.map((warning, index) => (
+              <p key={index} className="text-xs text-warning-strong/90">
+                <span className="font-mono">{warning.scope}</span> · {warning.message}
+              </p>
+            ))}
+          </div>
+        )}
+
+        <div className="flex flex-wrap items-center gap-3">
+          <Input
+            className="max-w-xs"
+            placeholder={t.results.filterText}
+            value={filters.text}
+            onChange={(e) => setFilters({ ...filters, text: e.target.value })}
+          />
+          <Segmented>
+            {(['ALL', 'PASS', 'FAIL', 'UNEVALUATED'] as const).map((status) => (
+              <SegmentedItem
+                key={status}
+                active={filters.status === status}
+                onClick={() => setFilters({ ...filters, status })}
+              >
+                {status === 'ALL' ? t.results.filterAll : STATUS_TEXT[status]}
+              </SegmentedItem>
+            ))}
+          </Segmented>
+          {causes.length > 0 && (
+            <select
+              className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+              aria-label={t.results.filterCause}
+              value={filters.cause}
+              onChange={(e) => setFilters({ ...filters, cause: e.target.value as Filters['cause'] })}
+            >
+              <option value="ALL">{t.results.filterCause}: {t.results.filterAll.toLowerCase()}</option>
+              {causes.map((cause) => (
+                <option key={cause} value={cause}>
+                  {CAUSE_TEXT[cause]}
+                </option>
+              ))}
+            </select>
+          )}
+          {hasFilters(filters) && (
+            <Button variant="ghost" size="sm" onClick={() => setFilters(NO_FILTERS)}>
+              {t.results.clear}
+            </Button>
+          )}
+        </div>
+
+        {rows.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{t.results.noMatches}</p>
+        ) : (
+          <div className="space-y-2">
+            {rows.map(({ student, checks }) => (
+              <StudentRow
+                key={student.student_id}
+                student={student}
+                checks={checks}
+                selected={selected}
+                onPick={(checkId) => setSelected({ studentId: student.student_id, checkId })}
+              />
+            ))}
+          </div>
+        )}
+
+        {chosen ? (
+          <CheckDetail
+            student={chosen.student}
+            check={chosen.check}
+            onClose={() => setSelected(null)}
+          />
+        ) : (
+          <p className="text-xs text-muted-foreground">{t.results.pick}</p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/** One student: the grade as it is allowed to be read, then their checks. */
+function StudentRow({
+  student,
+  checks,
+  selected,
+  onPick
+}: {
+  student: StudentResult
+  checks: CheckResult[]
+  selected: Selection | null
+  onPick: (checkId: string) => void
+}) {
+  const score = scoreView(student.score)
+  const counts = tally(student.checks)
+
+  return (
+    <div className="rounded-md border border-border p-3">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">{student.name}</span>
+          <Badge variant={badgeOf(student.status)}>{STUDENT_TEXT[student.status]}</Badge>
+        </div>
+        <div className="flex items-baseline gap-2">
+          {score.value == null ? (
+            <span className="text-sm text-muted-foreground">{t.results.noGrade}</span>
+          ) : (
+            <>
+              <span className="text-lg font-semibold tabular-nums">{score.value}</span>
+              {score.kind === 'provisional' && (
+                <span className="text-xs text-warning-strong">{t.results.provisional}</span>
+              )}
+            </>
+          )}
+          <span className="text-micro text-muted-foreground">{score.note}</span>
+        </div>
+      </div>
+
+      <p className="mt-1 text-micro text-muted-foreground">
+        {counts.pass} bien · {counts.fail} mal · {counts.unevaluated} sin evaluar
+      </p>
+
+      <div className="mt-2 flex flex-wrap gap-1">
+        {checks.map((check) => (
+          <button
+            key={check.check_id}
+            type="button"
+            onClick={() => onPick(check.check_id)}
+            title={`${check.check_id} · ${STATUS_TEXT[check.status]}${check.cause !== 'NONE' ? ` · ${CAUSE_TEXT[check.cause]}` : ''}`}
+            aria-label={`${check.check_id}: ${STATUS_TEXT[check.status]}`}
+            className={cn(
+              'max-w-[14rem] truncate rounded px-2 py-1 text-micro font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              cellTone(check.status),
+              selected?.studentId === student.student_id &&
+                selected.checkId === check.check_id &&
+                'ring-2 ring-ring'
+            )}
+          >
+            {check.check_id}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/**
+ * The three academic states, each with its own colour. Unevaluated is amber and
+ * never red: it is a technical problem, not a fail (principio 3).
+ */
+function cellTone(status: AcademicStatus): string {
+  return status === 'PASS'
+    ? 'bg-success/15 text-success-strong'
+    : status === 'FAIL'
+      ? 'bg-destructive/15 text-destructive-strong'
+      : 'bg-warning/15 text-warning-strong'
+}
+
+function badgeOf(status: StudentResult['status']): 'success' | 'warning' | 'outline' | undefined {
+  if (status === 'OK') return 'success'
+  if (status === 'EXCLUDED') return 'outline'
+  return 'warning'
+}
+
+/** Everything the artifact knows about one check, with nothing inferred. */
+function CheckDetail({
+  student,
+  check,
+  onClose
+}: {
+  student: StudentResult
+  check: CheckResult
+  onClose: () => void
+}) {
+  const execution = check.execution
+  return (
+    <div className="space-y-3 rounded-md border border-border p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <SectionTitle>{t.results.checkTitle}</SectionTitle>
+          <p className="mt-1 text-sm">
+            <span className="font-mono">{check.check_id}</span> · {student.name}
+          </p>
+          {check.description && (
+            <p className="text-xs text-muted-foreground">{check.description}</p>
+          )}
+        </div>
+        <Button variant="ghost" size="icon" aria-label={t.errors.dismiss} onClick={onClose}>
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge
+          variant={
+            check.status === 'PASS' ? 'success' : check.status === 'FAIL' ? 'destructive' : 'warning'
+          }
+        >
+          {STATUS_TEXT[check.status]}
+        </Badge>
+        {check.cause !== 'NONE' && <Badge variant="warning">{CAUSE_TEXT[check.cause]}</Badge>}
+        <span className="text-xs text-muted-foreground">
+          {t.results.weight}: {check.weight}
+        </span>
+        {check.group && <span className="text-xs text-muted-foreground">{check.group}</span>}
+      </div>
+
+      {check.detail && <p className="text-sm">{check.detail}</p>}
+
+      {check.assertion ? (
+        <Field label={t.results.assertion}>
+          <p className="text-dense">
+            <span className="font-mono">{check.assertion.kind}</span> · {t.results.expected}:{' '}
+            <span className="font-mono">{check.assertion.expected}</span>
+          </p>
+          <p className="text-dense">
+            {t.results.found}:{' '}
+            {check.assertion.found ? (
+              <span className="font-mono">{check.assertion.found}</span>
+            ) : (
+              <span className="text-muted-foreground">{t.results.notFound}</span>
+            )}
+            {check.assertion.where && ` · ${t.results.where}: ${check.assertion.where}`}
+          </p>
+        </Field>
+      ) : (
+        <p className="text-xs text-muted-foreground">{t.results.noAssertion}</p>
+      )}
+
+      {execution ? (
+        <>
+          <Field label={t.results.command}>
+            {/* The argument vector as it was sent. No shell ever built it. */}
+            <pre className="overflow-x-auto whitespace-pre-wrap break-all font-mono text-dense">
+              {execution.command.join(' ')}
+            </pre>
+          </Field>
+          <p className="text-xs text-muted-foreground">
+            {t.results.machine}: {execution.user}@{execution.address} · {t.results.exit}:{' '}
+            {execution.exit_code ?? '—'} · {t.results.duration}: {execution.duration_ms} ms ·{' '}
+            {t.results.attempts}: {execution.connect_attempts}/{execution.command_attempts}
+          </p>
+          {REMOTE_TEXT[execution.remote_process] && (
+            <p className="text-xs text-warning-strong">{REMOTE_TEXT[execution.remote_process]}</p>
+          )}
+          <StreamBlock label={t.results.stdout} stream={execution.stdout} />
+          <StreamBlock label={t.results.stderr} stream={execution.stderr} />
+        </>
+      ) : (
+        <p className="text-xs text-muted-foreground">{t.results.noExecution}</p>
+      )}
+    </div>
+  )
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1">
+      <p className="text-micro font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
+      {children}
+    </div>
+  )
+}
+
+/** A student's output: untrusted data, shown as text and never as markup. */
+function StreamBlock({ label, stream }: { label: string; stream: Stream }) {
+  const cut = truncationNote(stream)
+  return (
+    <Field label={label}>
+      {stream.text ? (
+        <pre className="max-h-48 overflow-auto whitespace-pre-wrap break-all rounded bg-muted p-2 font-mono text-dense">
+          {stream.text}
+        </pre>
+      ) : (
+        <p className="text-xs text-muted-foreground">{t.results.emptyStream}</p>
+      )}
+      {cut && <p className="text-micro text-warning-strong">{cut}</p>}
+    </Field>
+  )
+}

@@ -399,3 +399,31 @@ Dos decisiones menores:
 7. **Nada rojo por un fallo técnico.** Un alumno con comprobaciones sin
    evaluar sale en ámbar y con el recuento escrito; el verde es solo para quien
    terminó entero (principio 3).
+
+## T053 · La pantalla de resultados
+
+1. **T053 se partió en dos al llegar.** Presentar y actuar son dos trabajos:
+   T053 enseña lo que el artefacto sabe; T055 decide qué se le ofrece al
+   profesor ante un incompleto y cierra D-8 con un ADR. Juntas no cabían en una
+   sesión sin dejar la mitad a medias.
+2. **La pantalla lee el artefacto, no el flujo.** Al llegar `run.end` la
+   aplicación abre el fichero al que apunta y se planta en Resultados. El flujo
+   sirvió para ver avanzar; lo que se enseña sale de la fuente de verdad.
+3. **Un esquema que no se conoce se rechaza, no se adivina.** Si el artefacto
+   declara otra `schema_version`, la aplicación lo dice y no enseña nada. Un
+   campo que cambiara de significado se leería como una nota que no es.
+4. **La nota final solo existe cuando está todo evaluado.** Un `INCOMPLETE`
+   enseña la provisional, dicha como provisional y con el denominador al lado.
+   Un alumno al que no se pudo llegar no enseña número ninguno: un 0 se lee
+   como «lo hizo mal» y no como «no se pudo mirar» (principio 3, ADR-0006).
+5. **Las palabras del modelo están en un sitio y se prueban contra el motor.**
+   Cada causa, cada estado académico, cada estado de alumno y cada estado del
+   proceso remoto tiene su frase en castellano, y el test las contrasta con
+   `internal/model/enums.go`. Una causa nueva en el motor rompe el test de la
+   GUI antes que la clase.
+6. **Lo que puede quedar vivo en la máquina del alumno se dice.** Un comando
+   matado por timeout deja un aviso en el detalle: es trabajo del profesor y
+   callarlo sería esconderlo.
+7. **Una salida cortada se ve cortada**, con los bytes guardados y los que el
+   comando sacó de verdad. Es la única manera de que se note que el examen pide
+   más salida de la que se puede leer.

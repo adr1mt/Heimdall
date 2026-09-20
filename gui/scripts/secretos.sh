@@ -59,7 +59,7 @@ for _ in $(seq 60); do
 done
 wait "$app"
 
-grep -q "10 de 10 comprobaciones" "$WORK/salida.txt" \
+grep -q "de peso total" "$WORK/salida.txt" \
   && ok "S-0" "la corrección del laboratorio ha llegado hasta el final" \
   || fail "S-0" "la corrección no ha terminado; el resto de la prueba no vale"
 

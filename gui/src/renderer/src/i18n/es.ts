@@ -7,6 +7,7 @@ export const t = {
   },
   nav: {
     home: 'Inicio',
+    results: 'Resultados',
     settings: 'Ajustes',
     help: 'Ayuda'
   },
@@ -72,6 +73,38 @@ export const t = {
     },
     counts: (pass: number, fail: number, unevaluated: number) =>
       `${pass} bien · ${fail} mal · ${unevaluated} sin evaluar`
+  },
+  results: {
+    title: 'Resultados',
+    empty: 'Aquí aparecerán las notas en cuanto termine una corrección.',
+    plan: (students: number, checks: number, weight: number) =>
+      `${students} alumnos · ${checks} comprobaciones · ${weight} de peso total`,
+    warnings: 'Avisos de la ejecución',
+    filterText: 'Buscar alumno o comprobación…',
+    filterAll: 'Todo',
+    filterCause: 'Causa técnica',
+    noMatches: 'Ningún resultado con esos filtros.',
+    clear: 'Quitar filtros',
+    provisional: 'provisional',
+    noGrade: 'sin nota',
+    checkTitle: 'La comprobación',
+    weight: 'Peso',
+    command: 'Comando ejecutado',
+    assertion: 'Qué se esperaba',
+    expected: 'Esperado',
+    found: 'Encontrado',
+    where: 'Dónde',
+    notFound: 'no se encontró',
+    exit: 'Código de salida',
+    duration: 'Duración',
+    attempts: 'Intentos',
+    machine: 'Máquina',
+    stdout: 'Salida',
+    stderr: 'Errores',
+    emptyStream: 'sin salida',
+    noExecution: 'El comando no llegó a ejecutarse.',
+    noAssertion: 'No hubo ejecución completa que comparar.',
+    pick: 'Elige una comprobación de la matriz para verla en detalle.'
   },
   settings: {
     title: 'Ajustes',

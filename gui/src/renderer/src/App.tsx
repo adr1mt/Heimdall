@@ -4,6 +4,7 @@ import {
   CheckCircle2,
   HelpCircle,
   Home,
+  ListChecks,
   Loader2,
   Moon,
   Settings as SettingsIcon,
@@ -18,9 +19,11 @@ import { t } from './i18n/es'
 const HomeView = lazy(() => import('./routes/Home'))
 const SettingsView = lazy(() => import('./routes/Settings'))
 const HelpView = lazy(() => import('./routes/Help'))
+const ResultsView = lazy(() => import('./routes/Results'))
 
 const NAV: { id: View; label: string; icon: typeof Home }[] = [
   { id: 'home', label: t.nav.home, icon: Home },
+  { id: 'results', label: t.nav.results, icon: ListChecks },
   { id: 'settings', label: t.nav.settings, icon: SettingsIcon },
   { id: 'help', label: t.nav.help, icon: HelpCircle }
 ]
@@ -54,8 +57,23 @@ function AppBody() {
   // The stream is followed from here and not from the view: changing views
   // mid-correction would otherwise drop events, and a lost event is progress
   // the teacher never sees again.
+  //
+  // `run.end` also points at the artifact, which is where the result really
+  // lives: it is opened right away and the teacher lands on Resultados.
   useEffect(() => {
-    const offEvent = window.heimdall.onRunEvent((event) => useRun.getState().event(event))
+    const offEvent = window.heimdall.onRunEvent((event) => {
+      useRun.getState().event(event)
+      if (event.event !== 'run.end' || !event.artifact) return
+      window.heimdall
+        .readArtifact(event.artifact)
+        .then((artifact) => {
+          useRun.getState().setArtifact(artifact)
+          useApp.getState().setView('results')
+        })
+        .catch((error) =>
+          useRun.getState().artifactFailed(noticeFrom('No se pudo abrir el resultado', error))
+        )
+    })
     const offClosed = window.heimdall.onRunClosed((closed) => useRun.getState().closed(closed))
     return () => {
       offEvent()
@@ -65,6 +83,7 @@ function AppBody() {
 
   const views: Record<View, JSX.Element> = {
     home: <HomeView />,
+    results: <ResultsView />,
     settings: <SettingsView />,
     help: <HelpView />
   }

@@ -943,23 +943,26 @@
     },
     {
       "id": "T053",
-      "title": "Resultados: matriz, notas, causas tecnicas e incompletas (cierra D-8)",
+      "title": "Resultados: matriz, notas y causas tecnicas sobre el artefacto",
       "phase": 5,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "T052"
       ],
       "goal": "Que el profesor vea lo que el modelo real sabe y que un fallo tecnico nunca se lea como un cero.",
       "scope": [
-        "Lista de alumnos y matriz de resultados sobre el artefacto canonico",
+        "Leer el artefacto canonico al que apunta run.end y validar su schema_version",
+        "Lista de alumnos con su estado, su nota y el denominador del PLAN",
+        "Matriz alumno x comprobacion con los tres estados academicos",
         "UNEVALUATED como estado propio, con su causa tecnica y su detalle; se acabo inferirlo",
-        "Nota provisional y denominador visibles; INCOMPLETE nunca se publica como nota final",
-        "Avisos y salidas truncadas visibles",
-        "Filtros por estado, causa, alumno y comprobacion",
-        "Que ofrece la GUI ante un incompleto: reintentar ese alumno, marcarlo o dejarlo pendiente. Cierra D-8 con un ADR"
+        "Detalle de una comprobacion: comando, asercion, salidas acotadas y su truncamiento",
+        "Avisos de la ejecucion visibles",
+        "Filtros por estado, causa, alumno y comprobacion"
       ],
       "out_of_scope": [
+        "Que ofrece la GUI ante un incompleto y el ADR que cierra D-8 (T055)",
+        "Abrir ejecuciones anteriores (T054)",
         "Conversion a la escala del profesor mas alla de lo que ya habia",
         "Anticopia (D-5)"
       ],
@@ -967,10 +970,43 @@
         "Un alumno con la maquina apagada se ve como no evaluado con su causa, nunca como un 0",
         "Un examen incompleto no muestra nota final en ningun sitio",
         "Cada estado y cada causa del modelo tiene representacion visible y probada",
-        "Un ADR cierra D-8"
+        "Una salida truncada se ve como truncada, con los bytes que produjo de verdad"
+      ],
+      "tests": [
+        "gui/tests/results.test.ts: cada causa, cada estado academico, cada estado de alumno y cada estado del proceso remoto contrastados contra internal/model/enums.go",
+        "gui/tests/results.test.ts: scoreView, filtros, recuento y truncamiento",
+        "gui/tests/results.test.ts: parseArtifact rechaza un schema que no conoce",
+        "gui/scripts/lab-run.ts con OPEN_CHECK: prototipo y testdata/salida-grande abiertos desde la aplicacion"
+      ],
+      "notes": "La pantalla se abre sola al terminar una correccion, leyendo el artefacto al que apunta run.end."
+    },
+    {
+      "id": "T055",
+      "title": "Que ofrece la GUI ante un incompleto (cierra D-8)",
+      "phase": 5,
+      "status": "READY",
+      "priority": "P0",
+      "depends_on": [
+        "T053"
+      ],
+      "goal": "Que un incompleto tenga salida: repetir lo que fallo sin repetir el examen entero.",
+      "scope": [
+        "Decidir que ofrece la GUI ante un INCOMPLETE: reintentar ese alumno, marcarlo o dejarlo pendiente",
+        "ADR que cierra D-8 con la decision y su motivo",
+        "Reintento de los alumnos incompletos sobre el mismo PLAN, con artefacto propio",
+        "Que la pantalla diga de que ejecucion viene cada resultado"
+      ],
+      "out_of_scope": [
+        "Mezclar dos ejecuciones en un mismo artefacto: el artefacto es inmutable",
+        "Historico de ejecuciones (T054)"
+      ],
+      "acceptance": [
+        "Un ADR aceptado cierra D-8 y queda anotado en DECISIONS.md",
+        "Reintentar un alumno no cambia el denominador ni los pesos del PLAN",
+        "El profesor distingue siempre de que ejecucion sale cada nota"
       ],
       "tests": [],
-      "notes": "Aqui esta el principio 3 del proyecto. Detallar al llegar."
+      "notes": "Se separo de T053 al llegar: presentar y actuar son dos trabajos."
     },
     {
       "id": "T054",

@@ -1,6 +1,7 @@
 import { app, dialog, ipcMain, shell, type WebContents } from 'electron'
 import { IPC } from '../shared/ipc'
 import { detectEngine } from './engine'
+import { readArtifact } from './artifact'
 import { RunSession, resolveRunTarget } from './run'
 import { secretRefsOf } from './secrets'
 import { readSettings, writeSettings } from './store'
@@ -87,6 +88,11 @@ export function registerIpc(): void {
     // The values stay in this process only while stdin is written; the copy
     // the renderer sent dies with this call.
     for (const name of Object.keys(secrets)) secrets[name] = ''
+  })
+
+  ipcMain.handle(IPC.readArtifact, (_e, path: unknown) => {
+    if (typeof path !== 'string' || !path) throw new Error('No hay ningún resultado que abrir.')
+    return readArtifact(path)
   })
 
   ipcMain.handle(IPC.cancelRun, (): void => {

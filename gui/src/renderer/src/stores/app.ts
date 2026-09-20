@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import type { EngineStatus } from '../../../shared/types'
 
-export type View = 'home' | 'settings' | 'help'
+export type View = 'home' | 'results' | 'settings' | 'help'
 export type Theme = 'dark' | 'light'
 
 interface AppState {
