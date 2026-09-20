@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"evalon/internal/model"
+	"heimdall/internal/model"
 )
 
 // Kind is the assertion the teacher wrote, named as it appears in the

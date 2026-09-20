@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"evalon/internal/model"
-	"evalon/internal/plan"
-	"evalon/internal/ssh"
+	"heimdall/internal/model"
+	"heimdall/internal/plan"
+	"heimdall/internal/ssh"
 )
 
 // dialCounter is a dialer that records how many openings were in flight at

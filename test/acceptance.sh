@@ -11,7 +11,7 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-BIN="$ROOT/bin/evalon"
+BIN="$ROOT/bin/heimdall"
 PROTO="$ROOT/testdata/proto"
 BIG="$ROOT/testdata/salida-grande"
 BADKEY="$ROOT/testdata/clave-desconocida"

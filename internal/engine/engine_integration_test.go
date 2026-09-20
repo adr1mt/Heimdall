@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"evalon/internal/model"
-	"evalon/internal/plan"
+	"heimdall/internal/model"
+	"heimdall/internal/plan"
 )
 
 // The lab credentials are fictitious and only valid inside the container

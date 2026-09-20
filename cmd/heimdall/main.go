@@ -1,4 +1,4 @@
-// Command evalon evaluates systems-and-networking lab work over SSH.
+// Command heimdall evaluates systems-and-networking lab work over SSH.
 //
 // Subcommands: run, check, version.
 package main
@@ -32,14 +32,14 @@ func run(args []string, stdout, stderr io.Writer) int {
 	case "check":
 		return checkCmd(args[1:], stdout, stderr)
 	default:
-		fmt.Fprintf(stderr, "evalon: subcomando desconocido %q\n", args[0])
+		fmt.Fprintf(stderr, "heimdall: subcomando desconocido %q\n", args[0])
 		usage(stderr)
 		return exitInvalidConfig
 	}
 }
 
 func usage(w io.Writer) {
-	fmt.Fprint(w, `uso: evalon <subcomando>
+	fmt.Fprint(w, `uso: heimdall <subcomando>
 
   run                  evalua un examen contra el aula
   check <directorio>   resuelve el PLAN sin tocar ninguna maquina

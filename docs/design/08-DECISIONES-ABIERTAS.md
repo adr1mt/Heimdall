@@ -5,7 +5,6 @@ Solo las que de verdad lo están. Las cerradas están en `docs/adr/`.
 | # | Decisión | Por qué sigue abierta | Cuándo se puede cerrar |
 |---|---|---|---|
 | **D-5** | Detección de valores repetidos (anticopia) | Tiene valor pedagógico y hoy pone la nota a 0 automáticamente, cosa descartada. Falta decidir si se implementa como **marca** en el informe | Cuando haya un caso real; no bloquea nada |
-| **D-7** | Nombre del producto | Provisional `Evalon`. Afecta al módulo Go, al binario y al README | Antes del primer binario que salga del equipo |
 | **D-8** | Escala y conversión de nota en la GUI | El motor publica 0-100 entero y los números crudos. Falta decidir **cómo presenta la GUI un `INCOMPLETE`** y qué acción ofrece al profesor | Al adaptar la GUI, después del prototipo |
 | **D-9** | Formato definitivo de los eventos NDJSON | Deliberadamente aplazado: primero el escritor legacy. El modelo canónico ya fija qué información existe | Cuando la UAT pase con el motor nuevo |
 

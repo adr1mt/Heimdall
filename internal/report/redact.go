@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"evalon/internal/model"
+	"heimdall/internal/model"
 )
 
 // redact returns a copy of run with every known secret value replaced, plus a

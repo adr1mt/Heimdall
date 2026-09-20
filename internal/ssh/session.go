@@ -18,7 +18,7 @@ import (
 
 	"golang.org/x/crypto/ssh"
 
-	"evalon/internal/model"
+	"heimdall/internal/model"
 )
 
 const (

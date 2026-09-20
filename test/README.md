@@ -65,7 +65,7 @@ Son contenedores con systemd (`--systemd=always`) porque el examen pregunta a
 la tarjeta `enp2s0`, que el laboratorio crea como interfaz `dummy` con
 `10.0.0.1/8`.
 
-Credenciales, también ficticias: `usuario` / `EVALON_SECRET_RA2_TEST`. El aula
+Credenciales, también ficticias: `usuario` / `HEIMDALL_SECRET_RA2_TEST`. El aula
 de verdad usa `usuario`/`usuario`; aquí no, porque en desarrollo no se usan
 credenciales reales.
 

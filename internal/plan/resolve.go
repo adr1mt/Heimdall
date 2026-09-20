@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	"evalon/internal/model"
+	"heimdall/internal/model"
 )
 
 // File names of a project directory. Two files, as the editor of the GUI

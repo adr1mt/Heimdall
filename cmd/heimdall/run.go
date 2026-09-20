@@ -8,10 +8,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"evalon/internal/engine"
-	"evalon/internal/model"
-	"evalon/internal/plan"
-	"evalon/internal/report"
+	"heimdall/internal/engine"
+	"heimdall/internal/model"
+	"heimdall/internal/plan"
+	"heimdall/internal/report"
 )
 
 // runCmd evaluates a project against the classroom and writes the artifact.
@@ -30,19 +30,19 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 		return exitInvalidConfig
 	}
 	if fs.NArg() != 1 {
-		fmt.Fprintln(stderr, "uso: evalon run [--secrets=stdin|env] [--var=dir] <directorio del examen>")
+		fmt.Fprintln(stderr, "uso: heimdall run [--secrets=stdin|env] [--var=dir] <directorio del examen>")
 		return exitInvalidConfig
 	}
 
 	p, err := plan.Load(fs.Arg(0))
 	if err != nil {
-		fmt.Fprintf(stderr, "evalon run: la configuración no es válida\n\n%s\n", err)
+		fmt.Fprintf(stderr, "heimdall run: la configuración no es válida\n\n%s\n", err)
 		return exitInvalidConfig
 	}
 
 	secrets, err := readSecrets(*secretsMode, p)
 	if err != nil {
-		fmt.Fprintf(stderr, "evalon run: %s\n", err)
+		fmt.Fprintf(stderr, "heimdall run: %s\n", err)
 		return exitInvalidConfig
 	}
 	defer func() {
@@ -52,18 +52,18 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 	}()
 
 	if err := engine.CheckSecrets(p, secrets); err != nil {
-		fmt.Fprintf(stderr, "evalon run: faltan credenciales\n\n%s\n", err)
+		fmt.Fprintf(stderr, "heimdall run: faltan credenciales\n\n%s\n", err)
 		return exitInvalidConfig
 	}
 
 	runID, err := report.NewRunID()
 	if err != nil {
-		fmt.Fprintf(stderr, "evalon run: no se pudo generar el identificador de la ejecución: %s\n", err)
+		fmt.Fprintf(stderr, "heimdall run: no se pudo generar el identificador de la ejecución: %s\n", err)
 		return exitFailure
 	}
 	writer, err := report.New(*varDir, runID, values(secrets))
 	if err != nil {
-		fmt.Fprintf(stderr, "evalon run: %s\n", err)
+		fmt.Fprintf(stderr, "heimdall run: %s\n", err)
 		return exitFailure
 	}
 
@@ -90,11 +90,11 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 
 	path, err := writer.WriteFinal(result)
 	if err != nil {
-		fmt.Fprintf(stderr, "evalon run: no se pudo escribir el artefacto: %s\n", err)
+		fmt.Fprintf(stderr, "heimdall run: no se pudo escribir el artefacto: %s\n", err)
 		return exitFailure
 	}
 	if partialErr != nil {
-		fmt.Fprintf(stderr, "evalon run: aviso: no se pudo guardar algún parcial: %s\n", partialErr)
+		fmt.Fprintf(stderr, "heimdall run: aviso: no se pudo guardar algún parcial: %s\n", partialErr)
 	}
 
 	printSummary(stdout, result, path)

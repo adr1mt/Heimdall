@@ -182,7 +182,7 @@ fichero completo es [ejemplo-run.json](ejemplo-run.json), producido con
 ```bash
 make lab && make build
 printf '%s\n' '{"schema":1,"secrets":{"AULA_PASSWORD":"…"}}' \
-  | bin/evalon run --secrets=stdin --var=var testdata/proto
+  | bin/heimdall run --secrets=stdin --var=var testdata/proto
 ```
 
 Aquí se recortan tres comprobaciones repetidas de `alumne01` y cuatro de

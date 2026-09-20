@@ -5,7 +5,7 @@
 # 127.1.2.3 on purpose, never 127.0.0.x (F-01).
 set -euo pipefail
 
-IMAGE_PREFIX=evalonlab-ra2
+IMAGE_PREFIX=heimdalllab-ra2
 HOST=127.1.2.3
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 

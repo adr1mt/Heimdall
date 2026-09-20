@@ -15,7 +15,7 @@ Profesor
 Aplicación de escritorio (Teuton GUI adaptada, Electron)
    │  examen.yaml + aula.yaml + secretos por stdin
    ▼
-Motor Evalon (Go, binario único embebido)
+Motor Heimdall (Go, binario único embebido)
    │  SSH nativo
    ▼
 Máquinas del alumnado
@@ -65,7 +65,7 @@ La fase PLAN es anterior a cualquier conexión y no puede alterarse después.
 
 | Paquete | Responsabilidad | No hace |
 |---|---|---|
-| `cmd/evalon` | CLI (`run`, `check`, `version`), lectura de secretos, exit codes | Lógica de evaluación |
+| `cmd/heimdall` | CLI (`run`, `check`, `version`), lectura de secretos, exit codes | Lógica de evaluación |
 | `internal/plan` | Parseo y validación de los dos YAML, sustitución `${…}`, hashes, `PlanSummary` | Red, disco de salida |
 | `internal/model` | Tipos canónicos, `Classify`, `ComputeScore` | Red, disco, reloj |
 | `internal/ssh` | Sesión por alumno/host, `exec`, límites de salida, timeouts, `timeout` remoto | Interpretar resultados |

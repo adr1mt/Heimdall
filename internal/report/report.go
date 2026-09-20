@@ -12,7 +12,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"evalon/internal/model"
+	"heimdall/internal/model"
 )
 
 // Redacted replaces any secret value found on its way to the artifact.

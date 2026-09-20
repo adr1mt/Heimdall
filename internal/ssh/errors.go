@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	"evalon/internal/model"
+	"heimdall/internal/model"
 )
 
 // errOverflow stops the reader when a stream passes the hard limit.

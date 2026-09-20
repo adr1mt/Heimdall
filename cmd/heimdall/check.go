@@ -5,7 +5,7 @@ import (
 	"io"
 	"strconv"
 
-	"evalon/internal/plan"
+	"heimdall/internal/plan"
 )
 
 // checkCmd resolves the PLAN and prints it. It opens no connection and writes
@@ -13,13 +13,13 @@ import (
 // exact total weight before the exam starts (ADR-0002).
 func checkCmd(args []string, stdout, stderr io.Writer) int {
 	if len(args) != 1 {
-		fmt.Fprintln(stderr, "uso: evalon check <directorio del examen>")
+		fmt.Fprintln(stderr, "uso: heimdall check <directorio del examen>")
 		return exitInvalidConfig
 	}
 
 	p, err := plan.Load(args[0])
 	if err != nil {
-		fmt.Fprintf(stderr, "evalon check: la configuración no es válida\n\n%s\n", err)
+		fmt.Fprintf(stderr, "heimdall check: la configuración no es válida\n\n%s\n", err)
 		return exitInvalidConfig
 	}
 

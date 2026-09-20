@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"evalon/internal/assert"
-	"evalon/internal/model"
-	"evalon/internal/plan"
-	"evalon/internal/ssh"
+	"heimdall/internal/assert"
+	"heimdall/internal/model"
+	"heimdall/internal/plan"
+	"heimdall/internal/ssh"
 )
 
 // evalStudent runs every check of one student, in the PLAN's order, reusing

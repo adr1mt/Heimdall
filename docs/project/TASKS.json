@@ -24,8 +24,8 @@
       "goal": "Que exista un modulo Go que compila, se testea y se construye con un solo comando, sin logica de negocio.",
       "scope": [
         "Instalar Go >= 1.22 (no esta en el equipo) y dejar documentado como, en PROGRESS.md",
-        "go.mod con el modulo (nombre provisional evalon, ver D-7)",
-        "cmd/evalon/main.go con los subcomandos run, check y version (run y check solo imprimen 'no implementado' y salen con exit 2)",
+        "go.mod con el modulo heimdall",
+        "cmd/heimdall/main.go con los subcomandos run, check y version (run y check solo imprimen 'no implementado' y salen con exit 2)",
         "Tabla de exit codes como constantes: 0 ok, 2 config invalida, 3 parcial, 4 cancelado",
         "Makefile con check, test, build, lab",
         ".gitignore para bin/ y var/",
@@ -38,15 +38,15 @@
       ],
       "acceptance": [
         "make check pasa go vet y go test ./... sin errores y en menos de 10 s",
-        "make build produce bin/evalon",
-        "bin/evalon version imprime una version",
-        "bin/evalon run y bin/evalon check salen con exit 2 y mensaje explicito de no implementado",
+        "make build produce bin/heimdall",
+        "bin/heimdall version imprime una version",
+        "bin/heimdall run y bin/heimdall check salen con exit 2 y mensaje explicito de no implementado",
         "PROGRESS.md documenta la version de Go instalada y el comando exacto usado"
       ],
       "tests": [
         "go vet ./...",
         "go test ./...",
-        "make build && ./bin/evalon version"
+        "make build && ./bin/heimdall version"
       ],
       "notes": "Go NO esta instalado en el equipo: es lo primero y sin ello no hay medicion posible. Preferir el tarball oficial en una ruta bajo /mnt/datos si el gestor de paquetes no ofrece >= 1.22."
     },
@@ -174,7 +174,7 @@
         "Referencias ${MAYUSCULAS} solo validas en campos de autenticacion del inventario; error en cualquier otro sitio",
         "sha256 de examen e inventario, plan_hash del PLAN resuelto",
         "PlanSummary con check_count, total_weight, check_ids en orden y concurrency",
-        "evalon check: ejecuta solo el PLAN, imprime el resumen, exit 0 o 2, no escribe en var/ ni abre ninguna conexion"
+        "heimdall check: ejecuta solo el PLAN, imprime el resumen, exit 0 o 2, no escribe en var/ ni abre ninguna conexion"
       ],
       "out_of_scope": [
         "SSH",
@@ -188,12 +188,12 @@
         "Una contrasena literal en el inventario es error de PLAN, no aviso",
         "Un valor sustituido con espacios, comillas y ; entra tal cual como un unico argumento (test explicito)",
         "El PLAN produce identicos check_ids, orden y total_weight para todos los alumnos (test con alumnos de datos distintos)",
-        "evalon check sobre un proyecto valido imprime check_count y total_weight exactos y sale 0",
-        "evalon check sobre un proyecto invalido sale 2 y no crea ningun fichero en var/"
+        "heimdall check sobre un proyecto valido imprime check_count y total_weight exactos y sale 0",
+        "heimdall check sobre un proyecto invalido sale 2 y no crea ningun fichero en var/"
       ],
       "tests": [
         "go test ./internal/plan",
-        "bin/evalon check testdata/proto"
+        "bin/heimdall check testdata/proto"
       ],
       "notes": "Arregla de raiz F-02 (typo que encoge el denominador) y c14-check (total estimado). Invariantes 1 y 2."
     },
@@ -395,7 +395,7 @@
       ],
       "goal": "Poder ejecutar el prototipo de principio a fin desde la linea de comandos, con el secreto por un canal privado.",
       "scope": [
-        "evalon run con el directorio del proyecto",
+        "heimdall run con el directorio del proyecto",
         "--secrets=stdin: una linea JSON {\"schema\":1,\"secrets\":{...}}, se lee, se parsea, se pone el buffer a cero y se cierra stdin; aborta a los 5 s si no llega nada",
         "--secrets=env: solo las variables nombradas por las referencias del aula.yaml; referencia sin variable es error de PLAN",
         "Mensajes de error de configuracion a stderr con fichero y linea",
@@ -409,13 +409,13 @@
         "fachada legacy"
       ],
       "acceptance": [
-        "El prototipo completo corre con evalon run --secrets=stdin y produce var/run-<id>.json",
+        "El prototipo completo corre con heimdall run --secrets=stdin y produce var/run-<id>.json",
         "grep del secreto sobre var/, la salida de terminal y /proc/<pid>/cmdline con el proceso vivo: cero coincidencias",
         "--secrets=stdin sin datos aborta a los 5 s con exit 2",
         "Una referencia sin variable definida con --secrets=env es exit 2, no una contrasena vacia"
       ],
       "tests": [
-        "go test ./cmd/evalon",
+        "go test ./cmd/heimdall",
         "test/secrets.sh"
       ],
       "notes": "ADR-0009. El NDJSON saldra por stdout mas adelante, asi que stdin queda libre a proposito."
@@ -810,8 +810,7 @@
       "scope": [
         "migrador config.yaml + start.rb a los dos YAML con informe de lo no traducible",
         "editor del formato nuevo en la GUI",
-        "binario embebido para Linux y Windows",
-        "nombre definitivo (D-7)"
+        "binario embebido para Linux y Windows"
       ],
       "out_of_scope": [
         "Traducir construcciones del DSL que no tengan equivalente: se informan, no se adivinan"

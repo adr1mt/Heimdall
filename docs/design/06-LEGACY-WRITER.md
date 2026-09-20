@@ -32,7 +32,7 @@ datos; los tres de CLI los cubre una fachada mínima en el mismo paquete:
 
 | Punto | Qué hace la capa |
 |---|---|
-| C1 `teuton version` | `evalon --compat=teuton2 version` imprime `Teuton version 2.10.6 (evalon <ver>)`. Case con `/version\s+([\d.]+)/i` y con `looksLikeTeuton` |
+| C1 `teuton version` | `heimdall --compat=teuton2 version` imprime `Teuton version 2.10.6 (heimdall <ver>)`. Case con `/version\s+([\d.]+)/i` y con `looksLikeTeuton` |
 | C2 `teuton check` | Ejecuta el PLAN sin tocar máquinas e imprime la tabla «DSL Stats» con `\| Targets \| N \|`. Con PLAN declarativo **N es exacto**, no una estimación (arregla `c14-check`) |
 | C3 `run --export=json --cname --case` | Banderas aceptadas; `--case=1,3` selecciona alumnos por posición |
 | C4 progreso | Imprime `Started at …`, un carácter por comprobación (`.` PASS, `F` FAIL **y** UNEVALUATED, `S` alumno excluido), y `Finished in …`. Es lo que `scanProgressChunk` cuenta |

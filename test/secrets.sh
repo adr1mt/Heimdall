@@ -10,7 +10,7 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-BIN="$ROOT/bin/evalon"
+BIN="$ROOT/bin/heimdall"
 PROJECT="$ROOT/testdata/proto"
 SECRET="TEUTON_SECRET_TEST_12345"
 OUT="$(mktemp -d)"

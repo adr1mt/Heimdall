@@ -1,4 +1,4 @@
-<h1 align="center">Evalon</h1>
+<h1 align="center">Heimdall</h1>
 
 <p align="center">
   <strong>Corrige por SSH las prácticas de sistemas y redes de toda una clase.</strong><br>
@@ -13,8 +13,26 @@
 
 ---
 
-Sucesor de [Teuton](https://github.com/teuton-software/teuton), escrito desde
-cero en Go. El nombre es provisional.
+Heimdall es un motor de evaluación automática de prácticas de informática,
+pensado para sistemas, redes y servicios. Sucesor de
+[Teuton](https://github.com/teuton-software/teuton), escrito desde cero en Go.
+El nombre viene de Heimdall, el guardián de la mitología nórdica, conocido por
+su vigilancia constante.
+
+Los exámenes se escriben en YAML sencillo y legible. A partir de ellos Heimdall
+entra por SSH en las máquinas del alumnado, ejecuta las comprobaciones y
+produce los resultados y la calificación:
+
+```
+examen.yaml + aula.yaml  →  Heimdall  →  máquinas del alumnado  →  resultados
+```
+
+Comprueba, entre otras cosas, configuración de servicios, ficheros y sus
+parámetros, comandos y estados del sistema, DNS, DHCP y red, y el resultado
+concreto que se espera de cada ejercicio. Corrige un aula entera de forma
+concurrente, controlada y reproducible, y deja un informe detallado de cada
+comprobación. Hoy se usa desde la terminal; está diseñado para integrarse con
+una interfaz gráfica.
 
 > **Todavía no es una herramienta terminada.** El motor corrige exámenes reales
 > contra máquinas reales, pero no hay binario publicado ni interfaz gráfica
@@ -34,7 +52,7 @@ automatización ingenua tiene un fallo peor que el trabajo manual:
 Un cero así es indistinguible de un examen mal hecho. Eso es lo que este motor
 existe para no repetir.
 
-| | Teuton 2.10.6 | Evalon |
+| | Teuton 2.10.6 | Heimdall |
 |---|---|---|
 | 100 alumnos, un servidor | 2,1 s · 156 MB · **53 ceros** | 2,9 s · 14 MB · **0 ceros** |
 | Una máquina que suelta 300 MB | 2,8 s · **970 MB** | 0,2 s · **12 MB** |
@@ -119,7 +137,7 @@ se puede defender.
 ## Ponerlo en marcha
 
 ```bash
-make build          # binario en bin/evalon
+make build          # binario en bin/heimdall
 make check          # suite rápida: lógica pura, sin red (segundos)
 make lab            # laboratorio SSH en podman
 make test           # + integración y criterios de aceptación
@@ -129,8 +147,8 @@ make rendimiento    # mide escalado y memoria (no es un test)
 Corregir:
 
 ```bash
-evalon check ./examen-ra2                      # valida sin tocar ninguna máquina
-evalon run --secrets=stdin ./examen-ra2        # corrige
+heimdall check ./examen-ra2                      # valida sin tocar ninguna máquina
+heimdall run --secrets=stdin ./examen-ra2        # corrige
 ```
 
 Dependencias del módulo: `x/crypto/ssh` y `yaml.v3`. Ninguna más —los

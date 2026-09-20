@@ -6,7 +6,12 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última tarea terminada
 
-**T031 (cuántos alumnos a la vez, ya no a ojo).** Medido: una clase de 30
+**Cambio de nombre: el proyecto se llama Heimdall** (antes `Evalon`). Módulo,
+CLI, binario, documentación y scripts renombrados; `docs/research/` intacto por
+ser evidencia histórica. ADR-0014; D-7 queda cerrada. La carpeta del
+repositorio sigue llamándose `Evalon` hasta que se renombre a mano.
+
+Antes, **T031 (cuántos alumnos a la vez, ya no a ojo).** Medido: una clase de 30
 alumnos con máquina propia se corrige ahora en la mitad de tiempo (de 25 s a
 13 s), porque el motor lleva 16 alumnos a la vez en vez de 8. La memoria no lo
 paga: se queda en 11-16 MB siempre, tanto con 10 alumnos como con 100, y tanto
@@ -33,9 +38,9 @@ sin máquina.
 ## Estado actual
 
 - **Go 1.27.1** en `/mnt/datos/Applications/Claude/toolchains/go`; en shell no
-  interactiva hay que exportar el `PATH` a mano. `go.mod`: `module evalon`,
-  directiva `go 1.26`. Nombre provisional (D-7).
-- `cmd/evalon`: `check`, `run` y `version`. `run` acepta `--secrets=stdin|env`
+  interactiva hay que exportar el `PATH` a mano. `go.mod`: `module heimdall`,
+  directiva `go 1.26`.
+- `cmd/heimdall`: `check`, `run` y `version`. `run` acepta `--secrets=stdin|env`
   (por defecto `env`), `--var=dir`, `--concurrency=N` y
   `--host-concurrency=N`. Exit codes: 0 ok · 2 config inválida · 3 parcial · 4 cancelado · 1 ni se pudo escribir el informe.
   Los secretos entran por una línea JSON leída byte a byte, con corte a los 5 s

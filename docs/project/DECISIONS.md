@@ -22,11 +22,17 @@ evidencia. Nunca se edita un ADR aceptado en silencio.
 |---|---|---|
 | D-5 | Detección de valores repetidos (anticopia) | Cuando haya un caso real; no bloquea |
 | D-6 | Alumnos en paralelo por defecto (el tope por máquina ya está medido, ADR-0012) | T031 (fase 3) |
-| D-7 | Nombre del producto | T070 (fase 7), antes de que salga un binario del equipo |
 | D-8 | Presentación de `INCOMPLETE` en la GUI | T060 (fase 6) |
 | D-9 | Formato definitivo de los eventos NDJSON | T050 (fase 5) |
 
 ## Bitácora
+
+### 2026-09-20 · D-7 cerrada: el producto se llama Heimdall (ADR-0014)
+
+`Evalon` era nombre de trabajo. Se cierra ahora, en fase 3, porque todavía no
+hay binario publicado ni GUI adaptada: el cambio solo cuesta un renombrado
+interno. Módulo, CLI, binario y documentación pasan a `heimdall`.
+`docs/research/` queda intacto por ser evidencia histórica.
 
 ### 2026-09-20 · D-3 cerrada: identidad por ejecución (ADR-0011)
 

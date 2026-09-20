@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"evalon/internal/model"
+	"heimdall/internal/model"
 )
 
 // completed builds an execution that finished, with the given stdout.

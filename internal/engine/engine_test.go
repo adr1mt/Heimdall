@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"evalon/internal/model"
-	"evalon/internal/plan"
-	"evalon/internal/ssh"
+	"heimdall/internal/model"
+	"heimdall/internal/plan"
+	"heimdall/internal/ssh"
 )
 
 // fakeSession stands in for a machine. Every test says exactly what the

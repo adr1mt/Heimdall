@@ -10,11 +10,11 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-BIN="$ROOT/bin/evalon"
+BIN="$ROOT/bin/heimdall"
 EXAM="$ROOT/testdata/ra2"
 
 # Lab password: fictitious, public, only valid inside the container.
-SECRET="EVALON_SECRET_RA2_TEST"
+SECRET="HEIMDALL_SECRET_RA2_TEST"
 SECRETS_LINE="$(printf '{"schema":1,"secrets":{"AULA_PASSWORD":"%s"}}\n' "$SECRET")"
 
 # What alumne02 got wrong: gateway handed out by KEA, the blog alias, the TXT

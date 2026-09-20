@@ -5,7 +5,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"evalon/internal/model"
+	"heimdall/internal/model"
 )
 
 const (

@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"evalon/internal/model"
-	"evalon/internal/plan"
+	"heimdall/internal/model"
+	"heimdall/internal/plan"
 )
 
 // questionChecks are two checks without a command (M-11): the answer comes

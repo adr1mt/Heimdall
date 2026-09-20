@@ -16,9 +16,9 @@ import (
 	"sync"
 	"time"
 
-	"evalon/internal/model"
-	"evalon/internal/plan"
-	"evalon/internal/ssh"
+	"heimdall/internal/model"
+	"heimdall/internal/plan"
+	"heimdall/internal/ssh"
 )
 
 // Session is what the engine needs from an authenticated connection. The

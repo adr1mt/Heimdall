@@ -1,4 +1,4 @@
-module evalon
+module heimdall
 
 go 1.26.0
 

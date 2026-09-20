@@ -21,7 +21,7 @@ conexión SSH.
   PLAN; sustitución `${…}`; hashes; subcomando `check`.
 - Laboratorio SSH reproducible.
 
-**Salida**: `make check` en verde; `evalon check` imprime el denominador exacto
+**Salida**: `make check` en verde; `heimdall check` imprime el denominador exacto
 sin tocar ninguna máquina; un YAML mal escrito produce exit 2 con fichero y
 línea.
 
@@ -104,7 +104,6 @@ verde:
   informe de lo que no se puede traducir. Nunca silencioso.
 - Editor de exámenes de la GUI sobre el formato nuevo.
 - Binario embebido en la aplicación de escritorio, para Linux y Windows.
-- Nombre definitivo del producto (**D-7**).
 
 **Salida**: descargar la aplicación, ejecutarla y que funcione. Sin Ruby, sin
 gems, sin Go, sin Docker ni Podman, sin servicios externos.

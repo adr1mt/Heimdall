@@ -1,4 +1,4 @@
-# Evalon
+# Heimdall
 
 Motor de evaluación de prácticas de sistemas y redes por SSH, sucesor de
 [Teuton](https://github.com/teuton-software/teuton). Go, binario único, examen
@@ -6,7 +6,8 @@ declarativo en YAML, resultado canónico en JSON. La GUI existente
 ([teuton-gui](https://github.com/adr1mt/teuton-gui)) se **adapta**, no se
 reescribe.
 
-El nombre `Evalon` es provisional (D-7).
+El nombre está fijado (ADR-0014): Heimdall, el guardián que vigila sin
+descanso.
 
 ## Documentación autoritativa
 
@@ -89,7 +90,7 @@ El módulo Go todavía no existe (T001). Cuando exista:
 ```bash
 make check    # go vet + go test ./... (rápidos, sin red)
 make test     # + tests de integración SSH (requiere el laboratorio podman)
-make build    # binario en bin/evalon
+make build    # binario en bin/heimdall
 make lab      # levanta el laboratorio SSH de pruebas
 ```
 

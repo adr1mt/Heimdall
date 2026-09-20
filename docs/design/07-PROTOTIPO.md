@@ -25,7 +25,7 @@ Go: instalarlo primero (no está en el equipo). Versión mínima **1.22**.
 ## 2. Estructura del módulo
 
 ```
-cmd/evalon/main.go            CLI: run, check, version
+cmd/heimdall/main.go            CLI: run, check, version
 internal/plan/                lectura y validación de YAML, resolución del PLAN
 internal/model/               RunResult y tipos (04-MODELO-RESULTADO.md)
 internal/ssh/                 sesión, exec, límites de salida, timeouts
@@ -159,7 +159,7 @@ Un script `test/acceptance.sh` y tests en Go. Cada criterio se comprueba con
 | **A-4** | Aislamiento entre alumnos | `alumne01` tiene ≥ 3 comprobaciones con `cause == "NONE"` mientras `alumne02` está entero en `CONNECT_FAILED`; el artefacto contiene **los dos**; exit code 3 (parcial), no 1 |
 | **A-5** | Nada bloquea el run | El run completo termina en < 90 s medido con `/usr/bin/time`, con `p5-lento` (`sleep 30`, timeout 3 s) y un host inalcanzable dentro. `p5` sale `TIMEOUT` con `duration_ms` entre 3000 y 4000 |
 | **A-6** | Límite de memoria de la salida | Comprobación extra `["head","-c","300000000","/dev/zero"]` en un examen de prueba: `truncated == true`, `bytes` ≤ 65536, `bytes_total` > 65536, y RSS del proceso < 100 MB con `/usr/bin/time -v` |
-| **A-7** | Ningún secreto en ninguna parte | `grep -R 'EVALON_SECRET_PROTO' var/ salida.log` = 0 coincidencias, con la contraseña pasada por stdin; y `grep EVALON_SECRET_PROTO /proc/<pid>/cmdline` = 0 durante la ejecución (comprobado con el proceso vivo) |
+| **A-7** | Ningún secreto en ninguna parte | `grep -R 'HEIMDALL_SECRET_PROTO' var/ salida.log` = 0 coincidencias, con la contraseña pasada por stdin; y `grep HEIMDALL_SECRET_PROTO /proc/<pid>/cmdline` = 0 durante la ejecución (comprobado con el proceso vivo) |
 | **A-8** | El JSON explica cada resultado | Para **toda** comprobación: si `status != "UNEVALUATED"` entonces `assertion != null` y `execution.exit_code != null`; si `status == "UNEVALUATED"` entonces `cause != "NONE"` y `detail != ""`. Un solo `jq` que debe devolver 0 incumplimientos |
 | **A-9** | Artefacto parcial útil | Matar el proceso con `SIGKILL` a mitad: existe `var/run-<id>.partial.json`, es JSON válido y contiene al menos un alumno completo |
 | **A-10** | Legacy suficiente para arrancar la UAT | `resume.json` y `case-01.json` validan contra el esquema que `main/results.ts` parsea (test en Go con los mismos campos), `alumne02` sale con `grade: 0` **y** `conn_status` no vacío, y `case-01.json` trae `max_weight == 6` |

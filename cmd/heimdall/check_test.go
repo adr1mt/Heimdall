@@ -10,7 +10,7 @@ import (
 
 const protoProject = "../../testdata/proto"
 
-// evalon check must publish the exact number of checks and the exact total
+// heimdall check must publish the exact number of checks and the exact total
 // weight of the prototype (6, docs/design/07-PROTOTIPO.md §5) without opening
 // a single connection. This is the number the GUI used to guess (c14-check).
 func TestCheckPrintsThePlanOfTheValidProject(t *testing.T) {

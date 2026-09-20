@@ -13,7 +13,7 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-BIN="$ROOT/bin/evalon"
+BIN="$ROOT/bin/heimdall"
 
 # Lab password: fictitious, public, only valid inside the container.
 SECRET="TEUTON_SECRET_TEST_12345"

@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"evalon/internal/model"
+	"heimdall/internal/model"
 )
 
 // runWith builds a minimal but complete artifact with the given students.
@@ -152,8 +152,8 @@ func TestConcurrentRunsDoNotCollide(t *testing.T) {
 // TestPartialSurvivesSIGKILL covers F-16: a run killed outright still leaves
 // a readable partial with the students it had already finished.
 func TestPartialSurvivesSIGKILL(t *testing.T) {
-	if os.Getenv("EVALON_SUICIDE_DIR") != "" {
-		dir := os.Getenv("EVALON_SUICIDE_DIR")
+	if os.Getenv("HEIMDALL_SUICIDE_DIR") != "" {
+		dir := os.Getenv("HEIMDALL_SUICIDE_DIR")
 		w, err := New(dir, "01J0RUNDDDDDDDDDDDDDDDDDDD", nil)
 		if err != nil {
 			os.Exit(1)
@@ -170,7 +170,7 @@ func TestPartialSurvivesSIGKILL(t *testing.T) {
 
 	dir := t.TempDir()
 	cmd := exec.Command(os.Args[0], "-test.run", "TestPartialSurvivesSIGKILL")
-	cmd.Env = append(os.Environ(), "EVALON_SUICIDE_DIR="+dir)
+	cmd.Env = append(os.Environ(), "HEIMDALL_SUICIDE_DIR="+dir)
 	err := cmd.Run()
 	if err == nil {
 		t.Fatal("el subproceso terminó normalmente: no se le mató")

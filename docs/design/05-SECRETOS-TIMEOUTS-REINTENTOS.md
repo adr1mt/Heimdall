@@ -44,7 +44,7 @@ nada más.
 ### Uso CLI sin GUI
 
 ```bash
-AULA_PASSWORD='…' evalon run --secrets=env .
+AULA_PASSWORD='…' heimdall run --secrets=env .
 ```
 
 El motor lee **solo** las variables nombradas por las referencias del

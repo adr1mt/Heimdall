@@ -1,7 +1,7 @@
-# Evalon. Go toolchain lives outside PATH on the development machine; see
+# Heimdall. Go toolchain lives outside PATH on the development machine; see
 # docs/project/PROGRESS.md for how it was installed.
 GO ?= go
-BIN := bin/evalon
+BIN := bin/heimdall
 
 # Test SSH lab. See test/lab.sh.
 .PHONY: check test build lab lab-down lab-status lab-ra2 lab-ra2-down rendimiento clean
@@ -25,9 +25,9 @@ test: check build
 rendimiento: build
 	test/rendimiento.sh
 
-## build: single binary in bin/evalon.
+## build: single binary in bin/heimdall.
 build:
-	$(GO) build -o $(BIN) ./cmd/evalon
+	$(GO) build -o $(BIN) ./cmd/heimdall
 
 ## lab: bring up the podman SSH lab used by the integration tests.
 lab:

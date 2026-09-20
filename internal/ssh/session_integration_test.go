@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"evalon/internal/model"
+	"heimdall/internal/model"
 )
 
 const (

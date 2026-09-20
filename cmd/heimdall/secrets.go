@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"evalon/internal/plan"
+	"heimdall/internal/plan"
 )
 
 // secretsSchema is the version of the one-line JSON document read from stdin.

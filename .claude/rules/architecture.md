@@ -45,7 +45,7 @@ Permitidas en el módulo Go: `golang.org/x/crypto/ssh`, un parser YAML
 ## Estructura del módulo
 
 ```
-cmd/evalon/      CLI
+cmd/heimdall/      CLI
 internal/plan/   YAML, validación, resolución del PLAN
 internal/model/  tipos canónicos y funciones puras de nota
 internal/ssh/    sesión, exec, límites de salida, timeouts
