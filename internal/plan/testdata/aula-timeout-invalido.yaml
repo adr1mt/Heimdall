@@ -1,0 +1,8 @@
+aula: "Prueba"
+version: 1
+comun:
+  timeouts:
+    conexion: diez
+alumnos:
+  - id: alumne01
+    nombre: "Ana Ferrer"

@@ -1,0 +1,12 @@
+examen: "Prueba"
+version: 1
+hosts: [host1]
+grupos:
+  - grupo: "Uno"
+    comprobaciones:
+      - id: c1
+        descripcion: "Una comprobación"
+        en: host1
+        peligro: true
+        cmd: ["true"]
+        contiene: "x"

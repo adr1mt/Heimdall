@@ -1,0 +1,77 @@
+examen: "SMX2C · RA2 · Servicios de red (KEA + BIND)"
+version: 3
+hosts: [host1]
+
+por_defecto:
+  peso: 1
+  timeout: 20s
+
+grupos:
+  - grupo: "Red y DHCP"
+    comprobaciones:
+      - id: red-ip-servidor
+        descripcion: "El servidor tiene 10.0.0.1/8 en enp2s0"
+        en: host1
+        cmd: ["ip", "address", "show", "dev", "enp2s0"]
+        contiene: "10.0.0.1/8"
+
+      - id: kea-subnet
+        descripcion: "KEA declara la subred 10.0.0.0/8"
+        en: host1
+        cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
+        cerca_de:
+          ancla: '"subnet"'
+          lineas: 5
+          contiene: "10.0.0.0/8"
+
+      - id: kea-interfaz
+        descripcion: "KEA escucha en enp2s0"
+        en: host1
+        cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
+        contiene: "enp2s0"
+
+      - id: kea-servicio
+        descripcion: "El servicio kea-dhcp4 está activo"
+        en: host1
+        peso: 2
+        cmd: ["systemctl", "is-active", "kea-dhcp4-server"]
+        igual_a: "active"
+
+  - grupo: "DNS"
+    comprobaciones:
+      - id: dns-forwarder
+        descripcion: "Reenviador 9.9.9.9 configurado"
+        en: host1
+        cmd: ["cat", "/etc/bind/named.conf.options"]
+        cerca_de: { ancla: "forwarders", lineas: 5, contiene: "9.9.9.9" }
+
+      - id: dns-registro-alumno
+        descripcion: "El alumno tiene su registro A en la zona directa"
+        en: host1
+        cmd: ["cat", "/etc/bind/forward.examen.local"]
+        contiene: "${alumno.subdominio}"
+
+      - id: dns-sin-recursion-abierta
+        descripcion: "No se permite recursión desde cualquier origen"
+        en: host1
+        cmd: ["cat", "/etc/bind/named.conf.options"]
+        no_contiene: "allow-recursion { any; }"
+
+      - id: dns-activo
+        descripcion: "named responde"
+        en: host1
+        timeout: 10s
+        cmd: ["dig", "+short", "+time=3", "@127.0.0.1", "pc1.examen.local"]
+        igual_a: "10.1.1.100"
+
+  - grupo: "Cuestionario"
+    comprobaciones:
+      - id: q-puerto-https
+        descripcion: "Puerto por defecto de HTTPS"
+        valor: "${alumno.p1}"
+        igual_a: "443"
+
+      - id: q-mascara-24
+        descripcion: "Máscara /24 en decimal"
+        valor: "${alumno.p3}"
+        igual_a: "255.255.255.0"

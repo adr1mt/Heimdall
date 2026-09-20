@@ -89,3 +89,25 @@ Dos elecciones locales dentro del cálculo de la nota:
 `Classify` devuelve además un `detail` por defecto para cada causa. El motor
 puede sustituirlo por uno más concreto, nunca por vacío: una comprobación
 `UNEVALUATED` sin explicación deja al profesor sin saber qué hacer.
+
+### 2026-09-20 · T004 · El rechazo de claves desconocidas lo hace el paquete, no yaml.v3
+
+`TASKS.json` pedía `yaml.v3` con `KnownFields(true)`. No sirve para este
+formato: la opción es del decodificador de primer nivel y no llega a los tipos
+anidados, y además rechazaría los campos libres del alumno (`subdominio`, `p1`),
+que son legales y son justamente el material de la sustitución.
+
+En su lugar, `internal/plan` recorre el árbol del documento contra la forma de
+las structs y compara cada clave con las etiquetas `yaml`. El recorrido da tres
+cosas que `KnownFields` no daba: la línea exacta de cada clave desconocida,
+**todas** las de un fichero en una sola pasada, y el mensaje en español sin
+nombres de tipos de Go. El alumno es el único tipo que admite claves extra, y
+eso está escrito en un solo sitio.
+
+Dos elecciones menores del mismo paquete:
+
+1. `peso` y `timeout` tienen valores del motor (1 y 20s) cuando el examen no
+   trae `por_defecto:`. Son constantes documentadas, no ceros implícitos.
+2. `password:` existe en el esquema del inventario. Si no estuviera, una
+   contraseña literal saldría como «clave desconocida» en vez de como lo que
+   es. La valida el PLAN (T005); aquí solo se conserva para poder acusarla.

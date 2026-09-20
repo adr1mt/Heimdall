@@ -2,14 +2,14 @@
 
 Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
-**Actualizado**: 2026-09-19 · **Fase**: 0 — Bootstrap y contratos
+**Actualizado**: 2026-09-20 · **Fase**: 0 — Bootstrap y contratos
 
 ## Última tarea terminada
 
-**T003 — `Classify` y `ComputeScore` puros.** El camino de un error técnico
-hacia la nota está cerrado por construcción: solo hay `PASS` o `FAIL` si la
-causa es `NONE`, la ejecución terminó, hay código de salida y hay aserción.
-Cualquier otra combinación sale `UNEVALUATED`.
+**T004 — parseo estricto de `examen.yaml` y `aula.yaml`.** Los dos ficheros del
+profesor se leen con las claves en español. Una clave que el formato no conoce
+se rechaza con fichero y línea, y se listan todas las del fichero de una vez.
+Un `timeout` mal escrito es un error, nunca un valor por defecto silencioso.
 
 ## Estado actual
 
@@ -22,20 +22,26 @@ Cualquier otra combinación sale `UNEVALUATED`.
   · 4 cancelado; el 1 queda libre a propósito.
 - `internal/model` tiene el artefacto completo (T002) más `Classify`,
   `ComputeScore`, `StudentStatusOf` y `RunStatusOf`. Ni red, ni disco, ni
-  reloj: hay un test que parsea el paquete y lo comprueba.
-- `ComputeScore` y `StudentStatusOf` nunca devuelven `EXCLUDED` (sale del
-  inventario); `RunStatusOf` nunca devuelve `CANCELLED` ni `INVALID_CONFIG`.
-- El golden vive en `internal/model/testdata/`, no en el `testdata/` raíz, que
-  sigue reservado para exámenes e inventarios.
+  reloj: hay un test que parsea el paquete y lo comprueba. `EXCLUDED` sale del
+  inventario, nunca del cálculo.
+- `internal/plan` lee los dos YAML (T004): herencia de `comun:` host a host,
+  `por_defecto:` para peso y timeout, campos libres del alumno accesibles por
+  nombre. El esquema conoce `cerca_de`, `no_contiene` y `valor:` para no
+  perderlos al parsear; evaluarlos es de fase 2.
+- Única dependencia externa: `gopkg.in/yaml.v3`. Se descartó `go-cmp` en los
+  tests para no abrir un ADR por una comodidad.
+- Ficheros de prueba: el examen y el aula del diseño en `testdata/formato/`;
+  los malformados y el golden del modelo, junto a su paquete.
 - `Makefile` con `check`, `test`, `build`, `lab` y `lab-down`. `make lab`
   levanta `alu1` y `alu2` en `127.1.2.3:2201-2202` con podman.
 
 ## Pruebas ejecutadas
 
-`make check` verde en 0,4 s, 50 casos · `gofmt -l` sin salida. Se verificó por
-mutación: ignorar la causa cuando hay ejecución, publicar nota final con algo
-sin evaluar, dar 0 a quien no se pudo mirar, contar lo no evaluado como fallo y
-meter `os` en el paquete. Las cinco las detecta la suite.
+`make check` verde en 0,5 s · `gofmt -l` sin salida. En T004 se verificó por
+mutación: aceptar claves desconocidas, convertir un timeout mal formado en el
+valor por defecto, dejar que `por_defecto:` pise el valor propio de una
+comprobación, no heredar de `comun:` y descartar los campos libres del alumno.
+Las cinco las detecta la suite.
 
 ## Problemas conocidos
 
@@ -49,17 +55,18 @@ meter `os` en el paquete. Las cinco las detecta la suite.
   aborta la ejecución (F-11).
 - El golden es de redacción manual, con hashes de relleno; sale uno real en T013.
 
-## Decisiones inesperadas de esta sesión
+## Decisiones inesperadas de la sesión
 
-- Comparar pesos acumulados con una holgura de `1e-9`: un examen de
-  0,1 + 0,2 + 0,7 deja un residuo de coma flotante que, sin ella, negaría la
-  nota final a un alumno que la merece.
-- `Classify` devuelve `ENGINE_ERROR` ante una entrada contradictoria (causa
-  `NONE` sin ejecución completa) en vez de adivinar. Es un fallo nuestro y debe
-  poder contarse.
+- `KnownFields(true)` de yaml.v3 no vale para este formato: no llega a los
+  tipos anidados y rechazaría los campos libres del alumno. El paquete recorre
+  el árbol del YAML contra las structs y da la línea de cada clave desconocida.
+  Detalle en `DECISIONS.md`.
+- `password:` sigue en el esquema del inventario a propósito: sin él, una
+  contraseña literal saldría como «clave desconocida» y no como lo que es.
 
 ## Siguiente tarea recomendada
 
-Tres `READY` P0: **T004** (parseo de los dos YAML), **T007** (aserciones) y
-**T009** (escritura atómica); T006 es P1. Toca **T004**: es la que desbloquea
-T005 y, con ella, el subcomando `check`.
+Tres `READY` P0: **T005** (resolución del PLAN y subcomando `check`), **T007**
+(aserciones) y **T009** (escritura atómica); T006 es P1. Toca **T005**: cierra
+la fase 0 y es la que da al profesor el número de comprobaciones y el peso
+total sin encender ninguna máquina.

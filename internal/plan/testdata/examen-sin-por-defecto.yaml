@@ -1,0 +1,18 @@
+examen: "Prueba"
+version: 1
+hosts: [host1]
+grupos:
+  - grupo: "Uno"
+    comprobaciones:
+      - id: c1
+        descripcion: "Hereda los valores del motor"
+        en: host1
+        cmd: ["true"]
+        contiene: "x"
+      - id: c2
+        descripcion: "Los suyos propios"
+        en: host1
+        peso: 3
+        timeout: 5s
+        cmd: ["true"]
+        contiene: "x"

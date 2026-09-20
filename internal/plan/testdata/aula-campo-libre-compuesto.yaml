@@ -1,0 +1,12 @@
+aula: "Prueba"
+version: 1
+comun:
+  hosts:
+    host1: { puerto: 22 }
+alumnos:
+  - id: alumne01
+    nombre: "Ana Ferrer"
+    preguntas:
+      - "443"
+    hosts:
+      host1: { ip: "10.0.0.1" }

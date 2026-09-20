@@ -1,0 +1,13 @@
+examen: "Prueba"
+autor: "alguien"
+version: 1
+hosts: [host1]
+grupos:
+  - grupo: "Uno"
+    orden: 2
+    comprobaciones:
+      - id: c1
+        descripcion: "Una comprobación"
+        en: host1
+        cmd: ["true"]
+        cerca_de: { ancla: "a", lineas: 2, contiene: "b", extra: 1 }

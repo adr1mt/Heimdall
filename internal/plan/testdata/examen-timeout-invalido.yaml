@@ -1,0 +1,12 @@
+examen: "Prueba"
+version: 1
+hosts: [host1]
+grupos:
+  - grupo: "Uno"
+    comprobaciones:
+      - id: c1
+        descripcion: "Una comprobación"
+        en: host1
+        timeout: 20 segundos
+        cmd: ["true"]
+        contiene: "x"

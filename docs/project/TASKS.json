@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated": "2026-09-19",
+  "updated": "2026-09-20",
   "status_values": ["BLOCKED", "READY", "IN_PROGRESS", "DONE"],
   "rules": [
     "Se trabaja la tarea READY de mayor prioridad con todas sus depends_on en DONE.",
@@ -98,7 +98,7 @@
       "id": "T004",
       "title": "Parseo estricto de examen.yaml y aula.yaml",
       "phase": 0,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": ["T001"],
       "goal": "Leer los dos ficheros con claves en espanol, rechazando cualquier clave desconocida con fichero y linea.",
@@ -129,7 +129,7 @@
       "id": "T005",
       "title": "Resolucion del PLAN, sustitucion y subcomando check",
       "phase": 0,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P0",
       "depends_on": ["T004", "T002"],
       "goal": "Fijar el denominador y la lista de comprobaciones antes de tocar ninguna maquina, y poder verlo sin ejecutar nada.",
