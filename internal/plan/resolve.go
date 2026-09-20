@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"heimdall/internal/model"
@@ -96,8 +97,26 @@ type ResolvedCheck struct {
 // returns is a configuration error: the caller exits with code 2 and does not
 // touch a single machine.
 func Load(dir string) (*Plan, error) {
+	return LoadNamed(dir, "")
+}
+
+// LoadNamed resolves the PLAN reading the inventory from another file of the
+// same directory. It is what the GUI's --cname selects: one exam, several
+// classrooms. An empty name means aula.yaml. The name is a file name, never a
+// path: a separator in it is a configuration error.
+func LoadNamed(dir, inventoryName string) (*Plan, error) {
+	inventoryFile := InventoryFile
+	if inventoryName != "" {
+		if strings.ContainsAny(inventoryName, `/\`) || inventoryName == "." || inventoryName == ".." {
+			return nil, fmt.Errorf("el nombre del aula %q no es un nombre de fichero", inventoryName)
+		}
+		inventoryFile = inventoryName
+		if filepath.Ext(inventoryFile) == "" {
+			inventoryFile += ".yaml"
+		}
+	}
 	examPath := filepath.Join(dir, ExamFile)
-	inventoryPath := filepath.Join(dir, InventoryFile)
+	inventoryPath := filepath.Join(dir, inventoryFile)
 
 	exam, err := LoadExam(examPath)
 	if err != nil {

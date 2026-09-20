@@ -25,7 +25,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 
 	switch args[0] {
 	case "version":
-		fmt.Fprintln(stdout, version)
+		printVersion(stdout)
 		return exitOK
 	case "run":
 		return runCmd(args[1:], stdout, stderr)

@@ -29,6 +29,9 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 	concurrency := fs.Int("concurrency", 0, "alumnos en paralelo; 0 usa el del examen")
 	hostConcurrency := fs.Int("host-concurrency", 0, "conexiones que se abren a la vez contra una misma máquina; 0 usa el del examen")
 	compat := fs.String("compat", "", "escribe además los ficheros del formato antiguo: teuton2")
+	export := fs.String("export", "", "fachada para la GUI actual: json")
+	cname := fs.String("cname", "", "nombre del fichero de aula, sin la extensión; por defecto aula.yaml")
+	cases := fs.String("case", "", "posiciones de los alumnos del aula que se evalúan, p. ej. 1,3")
 	if err := fs.Parse(args); err != nil {
 		return exitInvalidConfig
 	}
@@ -40,10 +43,25 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 		fmt.Fprintf(stderr, "heimdall run: --compat=%s no existe; el único formato antiguo soportado es teuton2\n", *compat)
 		return exitInvalidConfig
 	}
+	// --export=json is how the GUI asks for a run: it wants the old files and
+	// the live progress. Any other format would end with the GUI reading a
+	// directory that nobody wrote, so it is an error here and not a surprise
+	// there (C9).
+	if *export != "" {
+		if *export != "json" {
+			fmt.Fprintf(stderr, "heimdall run: --export=%s no existe; este motor solo exporta json\n", *export)
+			return exitInvalidConfig
+		}
+		*compat = "teuton2"
+	}
 
-	p, err := plan.Load(fs.Arg(0))
+	p, err := plan.LoadNamed(fs.Arg(0), *cname)
 	if err != nil {
 		fmt.Fprintf(stderr, "heimdall run: la configuración no es válida\n\n%s\n", err)
+		return exitInvalidConfig
+	}
+	if err := selectCases(p, *cases); err != nil {
+		fmt.Fprintf(stderr, "heimdall run: %s\n", err)
 		return exitInvalidConfig
 	}
 
@@ -79,6 +97,11 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
+	var live *progress
+	if *export == "json" {
+		live = newProgress(stdout)
+	}
+
 	var partialErr error
 	result := engine.Run(ctx, p, engine.Options{
 		RunID:           runID,
@@ -87,6 +110,9 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 		Concurrency:     *concurrency,
 		HostConcurrency: *hostConcurrency,
 		OnStudentDone: func(run *model.RunResult) error {
+			if live != nil {
+				live.students(run)
+			}
 			if err := writer.WritePartial(run); err != nil {
 				partialErr = err
 				return err
@@ -94,6 +120,11 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 			return nil
 		},
 	})
+
+	if live != nil {
+		live.students(result)
+		live.finish()
+	}
 
 	path, err := writer.WriteFinal(result)
 	if err != nil {
@@ -111,7 +142,12 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 	}
 
 	printSummary(stdout, result, path)
-	return engine.ExitCode(result)
+
+	code := engine.ExitCode(result)
+	if *export == "json" {
+		code = legacyExitCode(code)
+	}
+	return code
 }
 
 // writeLegacy writes the files the current GUI reads, on top of the canonical

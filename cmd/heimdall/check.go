@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"strconv"
@@ -12,12 +13,18 @@ import (
 // no file: it is what lets the teacher see the exact number of checks and the
 // exact total weight before the exam starts (ADR-0002).
 func checkCmd(args []string, stdout, stderr io.Writer) int {
-	if len(args) != 1 {
-		fmt.Fprintln(stderr, "uso: heimdall check <directorio del examen>")
+	fs := flag.NewFlagSet("check", flag.ContinueOnError)
+	fs.SetOutput(stderr)
+	cname := fs.String("cname", "", "nombre del fichero de aula, sin la extensión; por defecto aula.yaml")
+	if err := fs.Parse(args); err != nil {
+		return exitInvalidConfig
+	}
+	if fs.NArg() != 1 {
+		fmt.Fprintln(stderr, "uso: heimdall check [--cname=aula] <directorio del examen>")
 		return exitInvalidConfig
 	}
 
-	p, err := plan.Load(args[0])
+	p, err := plan.LoadNamed(fs.Arg(0), *cname)
 	if err != nil {
 		fmt.Fprintf(stderr, "heimdall check: la configuración no es válida\n\n%s\n", err)
 		return exitInvalidConfig
@@ -44,6 +51,9 @@ func checkCmd(args []string, stdout, stderr io.Writer) int {
 	fmt.Fprintf(stdout, "Concurrencia:   %d alumnos a la vez, %d conexiones por máquina\n",
 		p.Summary.Concurrency, p.Summary.HostConcurrency)
 	fmt.Fprintf(stdout, "Hash del plan:  %s\n", p.Hash)
+	// The table the current GUI reads to size its progress bar (C2).
+	fmt.Fprintln(stdout)
+	printDSLStats(stdout, p)
 	return exitOK
 }
 

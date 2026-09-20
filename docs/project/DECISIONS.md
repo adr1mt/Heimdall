@@ -266,3 +266,28 @@ Dos decisiones menores:
    conserva el prefijo defensivo contra fórmulas (F-14).
 7. **Ninguna credencial en `case-NN.json`.** Teuton volcaba `host1_password`
    ahí; esta capa escribe dirección, puerto y usuario, y nada más.
+
+## T042 · La fachada de línea de órdenes que la GUI conduce
+
+1. **`version` dice las dos cosas.** `teuton version 2.10.6 (heimdall <ver>)`:
+   la primera parte es lo que la GUI busca para reconocer el binario
+   (`/version\s+([\d.]+)/i`), la segunda impide que nadie confunda el motor.
+2. **`--export=json` es la manera que tiene la GUI de pedir una ejecución.**
+   Implica los ficheros del formato antiguo (T040) y el progreso en vivo. No
+   hay más formatos: cualquier otro `--export` es error antes de tocar nada,
+   porque si no la GUI acabaría leyendo un directorio que nadie escribió (C9).
+3. **Una ejecución parcial sale con 0 bajo `--export=json`.** La GUI tira los
+   informes de cualquier ejecución que no termine con 0 (`lib/run.ts:446`) y un
+   alumno con la máquina apagada es el caso normal de un examen, que el motor
+   viejo también terminaba con 0. El estado parcial viaja por los informes, que
+   es donde la GUI lo lee. El artefacto canónico conserva la verdad y el código
+   de salida propio (0/2/3/4) sigue intacto sin la bandera.
+4. **El progreso se emite por alumno terminado, no por comprobación.** Es el
+   grano más fino que publica el motor hoy; la GUI solo cuenta caracteres, así
+   que su barra sigue siendo exacta. Desaparece cuando consuma NDJSON.
+5. **`--case=N,M` son posiciones del aula, y no mueven el denominador.**
+   Cambian a quién se evalúa, nunca qué se evalúa: los pesos y el número de
+   comprobaciones son los del PLAN.
+6. **`--cname=X` busca `X.yaml` en el mismo directorio.** Un nombre con
+   separadores de ruta es error de configuración, no una lectura fuera del
+   proyecto.

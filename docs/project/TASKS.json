@@ -731,7 +731,7 @@
       "id": "T042",
       "title": "Fachada CLI compatible con Teuton (C1-C4, C9)",
       "phase": 4,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T040"
@@ -753,14 +753,16 @@
         "el numero de targets de check coincide con las comprobaciones del PLAN",
         "un --export desconocido sale con error y codigo distinto de 0"
       ],
-      "tests": [],
+      "tests": [
+        "cmd/heimdall/compat_test.go"
+      ],
       "notes": "Capa temporal, como T040."
     },
     {
       "id": "T041",
       "title": "UAT: 40 escenarios e2e de la GUI contra el motor nuevo",
       "phase": 4,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P0",
       "depends_on": [
         "T040",
