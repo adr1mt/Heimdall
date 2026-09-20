@@ -1,6 +1,6 @@
 import { writeFileSync } from 'node:fs'
 import { basename } from 'node:path'
-import { app, dialog, ipcMain, shell, type WebContents } from 'electron'
+import { app, dialog, ipcMain, powerSaveBlocker, shell, type WebContents } from 'electron'
 import { IPC } from '../shared/ipc'
 import { detectEngine } from './engine'
 import { readArtifact } from './artifact'
@@ -9,7 +9,7 @@ import { listRuns, varDirOf } from './history'
 import { RunSession, resolveRunTarget } from './run'
 import { secretRefsOf } from './secrets'
 import { readSettings, writeSettings } from './store'
-import type { EngineStatus, RunClosed, RunRequest } from '../shared/types'
+import type { EngineStatus, ExamModeRequest, RunClosed, RunRequest } from '../shared/types'
 
 const FILTERS: Record<'exam' | 'class' | 'engine' | 'result', Electron.FileFilter[]> = {
   exam: [{ name: 'Examen', extensions: ['yaml', 'yml'] }],
@@ -29,6 +29,68 @@ function settingsDir(): string {
  * which artifact is which.
  */
 let session: RunSession | null = null
+
+/** Whether an engine is alive right now. The window asks before closing. */
+export function isRunActive(): boolean {
+  return session !== null
+}
+
+/**
+ * Stops the engine the way the teacher's «Detener» does. Used when the window
+ * is closed mid-correction: the child would otherwise outlive the
+ * application, and what it has corrected is kept because it is cancelled and
+ * not killed.
+ */
+export function cancelActiveRun(): void {
+  session?.cancel()
+}
+
+/**
+ * Exam mode, as this process sees it.
+ *
+ * It is kept here and not only in the renderer for two reasons. Closing the
+ * window has to ask even when the interface is stuck, and between two passes
+ * there is no engine at all for almost the whole interval, so «is something
+ * running» is not the question the window can ask. And the credentials of the
+ * class have to survive from one pass to the next without ever being written:
+ * they live in this variable and nowhere else, and they are wiped when the
+ * mode stops or the application quits (ADR-0009).
+ */
+let examMode = false
+let examSecrets: Record<string, string> = {}
+let keepAwakeId: number | null = null
+
+export function isExamModeActive(): boolean {
+  return examMode
+}
+
+/**
+ * Keeps the computer awake while the exam lasts. The teacher does not touch
+ * the keyboard —the application corrects on its own and the panel is
+ * projected—, so the desktop calls the computer idle and suspends it, and a
+ * suspended computer stops correcting the class. `prevent-display-sleep` and
+ * not `prevent-app-suspension`: the screen is projected and must stay on too.
+ */
+function setKeepAwake(active: boolean): void {
+  if (active) {
+    if (keepAwakeId === null || !powerSaveBlocker.isStarted(keepAwakeId)) {
+      keepAwakeId = powerSaveBlocker.start('prevent-display-sleep')
+    }
+    return
+  }
+  if (keepAwakeId !== null && powerSaveBlocker.isStarted(keepAwakeId)) {
+    powerSaveBlocker.stop(keepAwakeId)
+  }
+  keepAwakeId = null
+}
+
+/** Wipes the credentials of the exam and gives back control of suspension. */
+export function endExamMode(): void {
+  for (const name of Object.keys(examSecrets)) examSecrets[name] = ''
+  examSecrets = {}
+  examMode = false
+  setKeepAwake(false)
+}
 
 function readRunRequest(value: unknown): RunRequest {
   const raw = (value ?? {}) as Partial<RunRequest>
@@ -76,9 +138,30 @@ export function registerIpc(): void {
     typeof classPath === 'string' ? secretRefsOf(classPath) : []
   )
 
+  ipcMain.handle(IPC.setExamMode, (_e, request: unknown): void => {
+    const raw = (request ?? {}) as Partial<ExamModeRequest>
+    if (typeof raw.active !== 'boolean') throw new Error('El modo examen no es válido.')
+    if (!raw.active) {
+      endExamMode()
+      return
+    }
+    endExamMode()
+    for (const [name, secret] of Object.entries(raw.secrets ?? {})) {
+      if (typeof secret === 'string') examSecrets[name] = secret
+    }
+    examMode = true
+    setKeepAwake(true)
+  })
+
   ipcMain.handle(IPC.startRun, (event, request: unknown): void => {
+    // Last line of defence against two engines writing into the same var/.
+    // The renderer's timer already refuses to launch one on top of another;
+    // this one does not depend on the renderer being right.
     if (session) throw new Error('Ya hay una corrección en marcha.')
     const { examPath, classPath, secrets, retryFrom } = readRunRequest(request)
+    // Passes after the first carry no credentials: the teacher typed them
+    // once, when the exam started, and they have not left this process.
+    if (examMode && Object.keys(secrets).length === 0) Object.assign(secrets, examSecrets)
     const engine = readSettings(settingsDir()).enginePath
     const target = { ...resolveRunTarget(examPath, classPath), retryFrom }
     const sender = event.sender

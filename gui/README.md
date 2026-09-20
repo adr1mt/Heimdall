@@ -73,5 +73,18 @@ diálogo de ficheros del sistema, que no se puede pulsar desde un script.
 comprobación en Resultados. Al terminar reabre esa misma corrección desde el
 histórico y compara las dos pantallas (H-1). Desde la raíz: `make gui-lab`.
 
+Aceptación de T058, con el mismo laboratorio:
+
+```bash
+PROJECT=/ruta/al/examen HEIMDALL_ENGINE=../bin/heimdall \
+  LAB_SECRET_FILE=/ruta/al/fichero/con/la/clave CHAIN=1 npm run examen-lab
+```
+
+`examen-lab` enciende el modo examen desde la interfaz real y comprueba que la
+vuelta sale sola, que nunca hay dos motores a la vez, que el proyector tapa las
+direcciones de las máquinas y que cerrar la ventana con el examen en marcha
+pregunta antes. `CHAIN=1` espera además a la segunda vuelta de la cadena, que
+tarda un intervalo entero (5 min).
+
 Desde la raíz del repositorio: `make gui-check` (typecheck + tests) y
 `make gui-build`. `make check`, la suite del motor, no depende de este árbol.

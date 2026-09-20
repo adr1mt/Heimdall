@@ -25,6 +25,7 @@ const api: HeimdallApi = {
   secretRefs: (classPath) => ipcRenderer.invoke(IPC.secretRefs, classPath),
   startRun: (request: RunRequest) => ipcRenderer.invoke(IPC.startRun, request),
   cancelRun: () => ipcRenderer.invoke(IPC.cancelRun),
+  setExamMode: (request) => ipcRenderer.invoke(IPC.setExamMode, request),
   readArtifact: (path) => ipcRenderer.invoke(IPC.readArtifact, path),
   consolidate: (path) => ipcRenderer.invoke(IPC.consolidate, path),
   listRuns: (examPath) => ipcRenderer.invoke(IPC.listRuns, examPath),

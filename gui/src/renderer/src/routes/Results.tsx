@@ -42,9 +42,10 @@ import {
   toCsv
 } from '@/lib/export'
 import { attemptsText, chainTally, chainText, fromRunText } from '@/lib/chain'
+import { machineLiterals, maskerFor } from '@/lib/projector'
 import type { Consolidation, ConsolidatedCheck } from '../../../shared/consolidation'
 import type { AcademicStatus } from '../../../shared/events'
-import type { CheckResult, Stream, StudentResult } from '../../../shared/artifact'
+import type { CheckResult, RunResult, Stream, StudentResult } from '../../../shared/artifact'
 import { cn } from '@/lib/utils'
 import { t } from '@/i18n/es'
 
@@ -61,6 +62,7 @@ export default function ResultsView() {
   const [filters, setFilters] = useState<Filters>(NO_FILTERS)
   const [selected, setSelected] = useState<Selection | null>(null)
 
+  const mask = useMask(artifact)
   const rows = useMemo(() => (artifact ? filterRun(artifact, filters) : []), [artifact, filters])
   const causes = useMemo(() => (artifact ? causesIn(artifact) : []), [artifact])
 
@@ -124,7 +126,7 @@ export default function ResultsView() {
             </div>
             {artifact.warnings.map((warning, index) => (
               <p key={index} className="text-xs text-warning-strong/90">
-                <span className="font-mono">{warning.scope}</span> · {warning.message}
+                <span className="font-mono">{warning.scope}</span> · {mask(warning.message)}
               </p>
             ))}
           </div>
@@ -198,6 +200,27 @@ export default function ResultsView() {
       </div>
     </div>
   )
+}
+
+/**
+ * The masking in force for this correction.
+ *
+ * The literals come from the artifact itself —every machine it names— so a
+ * host called `alu1.aula` is covered as well as its address, and they are
+ * gathered once for the whole screen: the warnings, the commands and the
+ * output of every student all name the same machines.
+ */
+function useMask(artifact: RunResult | null): (text: string) => string {
+  const projector = useApp((s) => s.projector)
+  return useMemo(() => {
+    const values: (string | undefined)[] = []
+    for (const student of artifact?.students ?? []) {
+      for (const check of student.checks) {
+        values.push(check.execution?.host, check.execution?.address, check.execution?.user)
+      }
+    }
+    return maskerFor(projector, machineLiterals(values))
+  }, [projector, artifact])
 }
 
 /**
@@ -670,6 +693,10 @@ function CheckDetail({
   onClose: () => void
 }) {
   const execution = check.execution
+  const projector = useApp((s) => s.projector)
+  // The command and the output are the two places where the address of the
+  // machine travels in plain sight.
+  const mask = useMask(useRun((s) => s.artifact))
   return (
     <div className="space-y-3 rounded-md border border-border p-4">
       <div className="flex items-start justify-between gap-3">
@@ -738,19 +765,21 @@ function CheckDetail({
           <Field label={t.results.command}>
             {/* The argument vector as it was sent. No shell ever built it. */}
             <pre className="overflow-x-auto whitespace-pre-wrap break-all font-mono text-dense">
-              {execution.command.join(' ')}
+              {mask(execution.command.join(' '))}
             </pre>
           </Field>
           <p className="text-xs text-muted-foreground">
-            {t.results.machine}: {execution.user}@{execution.address} · {t.results.exit}:{' '}
+            {t.results.machine}:{' '}
+            {projector ? t.projector.masked : `${execution.user}@${execution.address}`} ·{' '}
+            {t.results.exit}:{' '}
             {execution.exit_code ?? '—'} · {t.results.duration}: {execution.duration_ms} ms ·{' '}
             {t.results.attempts}: {execution.connect_attempts}/{execution.command_attempts}
           </p>
           {REMOTE_TEXT[execution.remote_process] && (
             <p className="text-xs text-warning-strong">{REMOTE_TEXT[execution.remote_process]}</p>
           )}
-          <StreamBlock label={t.results.stdout} stream={execution.stdout} />
-          <StreamBlock label={t.results.stderr} stream={execution.stderr} />
+          <StreamBlock label={t.results.stdout} stream={execution.stdout} mask={mask} />
+          <StreamBlock label={t.results.stderr} stream={execution.stderr} mask={mask} />
         </>
       ) : (
         <p className="text-xs text-muted-foreground">{t.results.noExecution}</p>
@@ -769,13 +798,21 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 /** A student's output: untrusted data, shown as text and never as markup. */
-function StreamBlock({ label, stream }: { label: string; stream: Stream }) {
+function StreamBlock({
+  label,
+  stream,
+  mask
+}: {
+  label: string
+  stream: Stream
+  mask: (text: string) => string
+}) {
   const cut = truncationNote(stream)
   return (
     <Field label={label}>
       {stream.text ? (
         <pre className="max-h-48 overflow-auto whitespace-pre-wrap break-all rounded bg-muted p-2 font-mono text-dense">
-          {stream.text}
+          {mask(stream.text)}
         </pre>
       ) : (
         <p className="text-xs text-muted-foreground">{t.results.emptyStream}</p>

@@ -95,7 +95,7 @@
      en `rem`, así que este único número agranda el panel entero un 25 % —lo que
      hace falta para leerlo desde el fondo del aula— sin tocar ni un componente
      ni romper ninguna proporción. */
-  html.proyector {
+  html.projector {
     font-size: 20px;
   }
 

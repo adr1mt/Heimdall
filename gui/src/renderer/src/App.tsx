@@ -7,6 +7,7 @@ import {
   Home,
   ListChecks,
   Loader2,
+  Monitor,
   Moon,
   Settings as SettingsIcon,
   Sun,
@@ -15,6 +16,8 @@ import {
 import { useApp, noticeFrom, type View } from './stores/app'
 import { useRun } from './stores/run'
 import { cn } from './lib/utils'
+import { shouldStartPass } from './lib/exam'
+import { startCorrection } from './lib/start-run'
 import { t } from './i18n/es'
 
 const HomeView = lazy(() => import('./routes/Home'))
@@ -77,11 +80,35 @@ function AppBody() {
           useRun.getState().artifactFailed(noticeFrom('No se pudo abrir el resultado', error))
         )
     })
-    const offClosed = window.heimdall.onRunClosed((closed) => useRun.getState().closed(closed))
+    const offClosed = window.heimdall.onRunClosed((closed) => {
+      useRun.getState().closed(closed)
+      // The engine is gone: exam mode, if it is on, counts the interval from
+      // here and never from the start of the pass.
+      useApp.getState().examPassFinished()
+    })
     return () => {
       offEvent()
       offClosed()
     }
+  }, [])
+
+  // The exam-mode timer lives here, next to the event stream and for the same
+  // reason: changing views must not break the chain. It is the only place
+  // that launches a pass on its own.
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const app = useApp.getState()
+      if (!shouldStartPass(app.exam, useRun.getState().phase, Date.now())) return
+      // Marked as started BEFORE the launch: nothing is due again until this
+      // pass ends, so a slow start cannot let a second tick through.
+      app.examPassStarted()
+      void startCorrection({}).then((started) => {
+        // It could not even be launched. The chain is not left hanging: the
+        // next pass is due an interval from now, like any other.
+        if (!started) useApp.getState().examPassFinished()
+      })
+    }, 1000)
+    return () => clearInterval(timer)
   }, [])
 
   const views: Record<View, JSX.Element> = {
@@ -131,6 +158,7 @@ function AppBody() {
 
         <div className="space-y-3 px-4 pb-4">
           <EngineBadge />
+          <ProjectorToggle />
           <button
             onClick={toggleTheme}
             className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs text-sidebar-foreground/60 transition-colors hover:bg-white/5 hover:text-white"
@@ -174,6 +202,32 @@ function AppBody() {
         </div>
       </main>
     </div>
+  )
+}
+
+/**
+ * Projector mode. It is a switch and not a setting buried in Ajustes because
+ * it gets pressed with the class already looking at the screen.
+ */
+function ProjectorToggle() {
+  const projector = useApp((s) => s.projector)
+  const toggleProjector = useApp((s) => s.toggleProjector)
+
+  return (
+    <button
+      onClick={toggleProjector}
+      aria-pressed={projector}
+      title={projector ? t.projector.hintOn : t.projector.hintOff}
+      className={cn(
+        'flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs transition-colors',
+        projector
+          ? 'bg-primary/20 text-white'
+          : 'text-sidebar-foreground/60 hover:bg-white/5 hover:text-white'
+      )}
+    >
+      <Monitor className="h-4 w-4 shrink-0" />
+      {projector ? t.projector.off : t.projector.on}
+    </button>
   )
 }
 

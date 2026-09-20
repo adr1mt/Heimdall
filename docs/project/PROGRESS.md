@@ -6,15 +6,20 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T061 hecha**: la cadena consolidada ya se ve y se exporta desde la aplicación.
+**T058 hecha**: modo examen y modo proyector.
 
-En Resultados, una corrección que repite otra ofrece leer toda la cadena junta.
-El alumno que quedó entero en la segunda vuelta aparece con su nota final, y
-cada comprobación dice de qué corrección sale y qué se intentó antes. Las notas
-de la cadena se exportan con las mismas reglas que las de una corrección
-suelta: quien siga sin nota sale sin nota y con el motivo. Si el motor rechaza
-la cadena, en pantalla queda el motivo y ninguna nota. La aplicación no suma
-nada: llama al motor y enseña lo que publica (ADR-0019).
+El modo examen corrige la clase una y otra vez mientras dura la práctica, sin
+tocar nada: se elige cada cuántos minutos, sale la primera vuelta sola y la
+siguiente empieza cuando termina la anterior, nunca antes, así que no hay dos
+correcciones a la vez. La contraseña se escribe una sola vez y no vuelve a
+pedirse. Mientras el examen está en marcha el ordenador no se suspende ni se
+apaga la pantalla, y cerrar la ventana pregunta antes: si se cierra, lo
+corregido se conserva y lo que falte queda sin evaluar, nunca suspenso.
+
+El modo proyector agranda la pantalla un 25 % y tapa las direcciones de las
+máquinas allí donde salían —avisos, órdenes y salida del alumno—, de modo que
+proyectar la corrección no reparte el acceso a la máquina de un compañero. Los
+nombres se quedan: los eligió el profesor.
 
 ## Estado actual
 
@@ -34,9 +39,10 @@ nada: llama al motor y enseña lo que publica (ADR-0019).
   reintentos, identidades en memoria (ADR-0011), 64 kB por flujo, corte a 8 MB.
 - `test/lab.sh`: `alu1` en `127.1.2.3:2201`; el roto, en el 2299.
   `acceptance.sh` recorre A-1 a A-14 y `eventos.sh` E-1 a E-10.
-- `gui/`: árbol Node independiente; `make gui-check` (111 tests), `gui-build` y
-  `gui-lab`. Vistas: Inicio, Resultados, Histórico, Ajustes, Ayuda. Resultados
-  lleva lo que quedó sin comprobar, manda el reintento a Inicio, **exporta las
+- `gui/`: árbol Node independiente; `make gui-check` (125 tests), `gui-build` y
+  `gui-lab`. Vistas: Inicio, Resultados, Histórico, Ajustes, Ayuda. Inicio lleva
+  el **modo examen** (cadena de vueltas, una cada vez) y la barra lateral el
+  **modo proyector**. Resultados lleva lo que quedó sin comprobar, manda el reintento a Inicio, **exporta las
   notas a CSV** y, si repite otra corrección, **enseña y exporta la cadena
   consolidada** llamando a `heimdall consolidate`; la escala del profesor va con
   las preferencias de pantalla. El histórico lee `var/run-*.json` del examen, 50
@@ -45,12 +51,13 @@ nada: llama al motor y enseña lo que publica (ADR-0019).
 
 ## Pruebas ejecutadas
 
-`make check` y `make gui-check` (111 tests) verdes · `npm run typecheck` y
-`npm run build` sin errores · la aplicación real, abierta sobre una cadena de
-dos artefactos: la nota final en pantalla, cada comprobación con su corrección
-y sus intentos, y una cadena de otro examen rechazada con su motivo y sin
-ninguna nota. `make gui-lab`, `acceptance.sh`, `eventos.sh` y `make test` no se
-repitieron esta sesión.
+`make gui-check` (125 tests) y `make gui-lab` verdes · `npm run typecheck` y
+`npm run build` sin errores · `gui/scripts/examen-lab.ts` contra el laboratorio,
+con la aplicación construida: catorce criterios en verde, incluida la cadena
+real de dos vueltas con `CHAIN=1` (nunca más de un motor vivo en toda la
+cadena), el proyector sin ninguna dirección en pantalla y las dos respuestas
+del aviso al cerrar. `make check`, `acceptance.sh`, `eventos.sh` y `make test`
+no se repitieron esta sesión.
 
 ## Problemas conocidos
 
@@ -63,8 +70,11 @@ repitieron esta sesión.
   con artefactos: el laboratorio no puede encender una máquina apagada.
 - Un reintento exige el mismo PLAN: si lo que estaba mal era el `aula.yaml`,
   esa clase se corrige entera otra vez.
+- El modo examen corrige la clase entera en cada vuelta; no reintenta solo lo
+  que falló. El intervalo más corto que se ofrece es de 5 minutos.
+- El proyector tapa las máquinas, no los nombres del alumnado.
 
 ## Siguiente tarea recomendada
 
-**T058** (`READY`, P1): modo examen y modo proyector. Detrás, T059 cierra la
-fase 5 con el inventario de lo heredado.
+**T059** (`READY`, P1): inventario de lo heredado, conservado o retirado con su
+motivo. Cierra la fase 5 y abre T060, el borrado de la capa legacy.

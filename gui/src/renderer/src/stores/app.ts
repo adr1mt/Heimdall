@@ -1,6 +1,14 @@
 import { create } from 'zustand'
 import type { EngineStatus } from '../../../shared/types'
 import { DEFAULT_SCALE, type ScaleId } from '@/lib/export'
+import {
+  EXAM_OFF,
+  examStarted,
+  examStopped,
+  passFinished,
+  passStarted,
+  type ExamMode
+} from '@/lib/exam'
 
 export type View = 'home' | 'results' | 'history' | 'settings' | 'help'
 export type Theme = 'dark' | 'light'
@@ -27,6 +35,14 @@ interface AppState {
    * is the safe action and nothing here happens on its own (ADR-0018 §1).
    */
   retry: RetryRequest | null
+  /**
+   * Projector mode: everything a quarter bigger and the machine data covered.
+   * It is a preference of this computer and it changes nothing that is
+   * corrected, exported or written to disk.
+   */
+  projector: boolean
+  /** Exam mode: the class is corrected again and again while it is on. */
+  exam: ExamMode
 
   setTheme: (theme: Theme) => void
   toggleTheme: () => void
@@ -37,6 +53,13 @@ interface AppState {
   setNotice: (message: string | null) => void
   setScale: (scale: ScaleId) => void
   setRetry: (retry: RetryRequest | null) => void
+  toggleProjector: () => void
+  startExam: (everyMinutes: number) => void
+  stopExam: () => void
+  /** A pass has just been launched; the next one is due when it ends. */
+  examPassStarted: () => void
+  /** The engine is gone: schedule the next pass, if the mode is still on. */
+  examPassFinished: () => void
 }
 
 /** What the teacher asked to repeat, as the interface carries it around. */
@@ -52,6 +75,7 @@ export interface RetryRequest {
 const savedTheme: Theme = localStorage.getItem('heimdall-theme') === 'light' ? 'light' : 'dark'
 const savedScale: ScaleId =
   localStorage.getItem('heimdall-scale') === 'hundred' ? 'hundred' : DEFAULT_SCALE
+const savedProjector = localStorage.getItem('heimdall-projector') === '1'
 
 /**
  * The `dark` class is written here, next to the state change, and not in an
@@ -67,6 +91,17 @@ function applyTheme(theme: Theme): void {
 }
 applyTheme(savedTheme)
 
+/**
+ * The projector size is a change of the document's base type size, not of
+ * every rule in the interface: `rem` does the rest on its own.
+ */
+function applyProjector(on: boolean): void {
+  if (typeof document !== 'undefined') {
+    document.documentElement.classList.toggle('projector', on)
+  }
+}
+applyProjector(savedProjector)
+
 export const useApp = create<AppState>((set, get) => ({
   theme: savedTheme,
   view: 'home',
@@ -76,6 +111,8 @@ export const useApp = create<AppState>((set, get) => ({
   notice: null,
   scale: savedScale,
   retry: null,
+  projector: savedProjector,
+  exam: EXAM_OFF,
 
   setTheme: (theme) => {
     localStorage.setItem('heimdall-theme', theme)
@@ -92,7 +129,19 @@ export const useApp = create<AppState>((set, get) => ({
     localStorage.setItem('heimdall-scale', scale)
     set({ scale })
   },
-  setRetry: (retry) => set({ retry })
+  setRetry: (retry) => set({ retry }),
+
+  toggleProjector: () => {
+    const projector = !get().projector
+    localStorage.setItem('heimdall-projector', projector ? '1' : '0')
+    applyProjector(projector)
+    set({ projector })
+  },
+
+  startExam: (everyMinutes) => set({ exam: examStarted(everyMinutes, Date.now()) }),
+  stopExam: () => set({ exam: examStopped(get().exam) }),
+  examPassStarted: () => set({ exam: passStarted(get().exam) }),
+  examPassFinished: () => set({ exam: passFinished(get().exam, Date.now()) })
 }))
 
 /**

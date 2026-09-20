@@ -1116,7 +1116,7 @@
       "id": "T058",
       "title": "Modo examen y modo proyector",
       "phase": 5,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T054"
@@ -1136,14 +1136,18 @@
         "Cerrar la aplicacion con un examen en marcha pide confirmacion",
         "El modo examen no lanza dos motores a la vez"
       ],
-      "tests": [],
+      "tests": [
+        "gui/tests/exam.test.ts",
+        "gui/tests/projector.test.ts",
+        "gui/scripts/examen-lab.ts"
+      ],
       "notes": "Sale del reparto de T054 del 2026-09-20. §4 de docs/research/GUI-CONTRACT.md."
     },
     {
       "id": "T059",
       "title": "Inventario de lo heredado: conservado o retirado con su motivo",
       "phase": 5,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T054",

@@ -32,6 +32,16 @@ export interface RunRequest {
   retryFrom?: string
 }
 
+/** What the renderer asks for when exam mode is switched. */
+export interface ExamModeRequest {
+  active: boolean
+  /**
+   * Credential name → value, sent once when the mode starts. It is never
+   * written anywhere and it dies with the mode (ADR-0009).
+   */
+  secrets?: Record<string, string>
+}
+
 /**
  * The engine process is gone. A run that never saw `run.end` is unfinished,
  * whatever this says (contract §4).
@@ -66,6 +76,13 @@ export interface HeimdallApi {
    * Returns the path, or null if they cancelled the dialog.
    */
   saveCsv: (name: string, text: string) => Promise<string | null>
+  /**
+   * Turns exam mode on or off in the main process: it keeps the computer
+   * awake, makes closing the window ask first, and holds the credentials of
+   * the class for as long as the chain lasts so each pass does not have to
+   * ask for them again. Turning it off wipes them.
+   */
+  setExamMode: (request: ExamModeRequest) => Promise<void>
   cancelRun: () => Promise<void>
   /** Subscribes to the stream. Returns the unsubscribe function. */
   onRunEvent: (listener: (event: EngineEvent) => void) => () => void

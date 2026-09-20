@@ -208,6 +208,28 @@ export const t = {
     files:
       'El examen dice qué se comprueba. El aula dice a quién se comprueba. Las contraseñas no se escriben en el aula: solo va una referencia al nombre de la variable que las lleva.'
   },
+  projector: {
+    on: 'Modo proyector',
+    off: 'Salir del proyector',
+    hintOn: 'Las direcciones de las máquinas están tapadas.',
+    hintOff: 'Tapa las direcciones de las máquinas y agranda la letra.',
+    masked: 'máquina tapada'
+  },
+  exam: {
+    title: 'Modo examen',
+    hint:
+      'Corrige la clase una y otra vez mientras dura la práctica. Nunca hay dos correcciones a la vez: cada vuelta empieza cuando termina la anterior.',
+    start: 'Empezar el examen',
+    stop: 'Terminar el examen',
+    everyMinutes: (minutes: number) => `Cada ${minutes} min`,
+    running: (passes: number, minutes: number) =>
+      `${passes === 1 ? '1 vuelta' : `${passes} vueltas`}, cada ${minutes} min.`,
+    correcting: 'Corrigiendo ahora.',
+    nextIn: (seconds: number) =>
+      seconds >= 60
+        ? `Siguiente vuelta en ${Math.ceil(seconds / 60)} min.`
+        : `Siguiente vuelta en ${seconds} s.`
+  },
   theme: {
     toLight: 'Tema claro',
     toDark: 'Tema oscuro'

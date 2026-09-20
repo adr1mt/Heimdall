@@ -8,6 +8,7 @@ export const IPC = {
   secretRefs: 'run:secretRefs',
   startRun: 'run:start',
   cancelRun: 'run:cancel',
+  setExamMode: 'exam:setMode',
   readArtifact: 'run:artifact',
   consolidate: 'run:consolidate',
   listRuns: 'history:list',

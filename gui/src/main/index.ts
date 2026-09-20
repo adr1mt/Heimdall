@@ -1,5 +1,6 @@
 import { app, BrowserWindow, session, shell } from 'electron'
 import { join } from 'node:path'
+import { allowQuit, guardClose } from './close-guard'
 import { registerIpc } from './ipc'
 
 // Avoids the compositor/GPU hangs that are common on Linux (the usual cause
@@ -71,6 +72,8 @@ function createWindow(): void {
 
   win.on('ready-to-show', () => win.show())
 
+  guardClose(win)
+
   // Open external links in the system browser, safe schemes only.
   const isSafeExternal = (url: string): boolean => /^(https?|mailto):/i.test(url)
 
@@ -93,6 +96,8 @@ function createWindow(): void {
     win.loadFile(join(__dirname, '../renderer/index.html'))
   }
 }
+
+app.on('before-quit', allowQuit)
 
 // A single instance: the state of a run lives in this process's memory, and
 // two windows would overwrite each other's reports. The second one exits

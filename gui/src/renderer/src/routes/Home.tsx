@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { FileText, Play, RotateCcw, Square, Users } from 'lucide-react'
+import { FileText, Play, RotateCcw, Square, Timer, Users } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -17,6 +17,8 @@ import {
 import { useApp, noticeFrom } from '@/stores/app'
 import { useRun } from '@/stores/run'
 import { runPercent, type StudentProgress } from '@/lib/run-state'
+import { EXAM_INTERVALS, secondsLeft, type ExamMode } from '@/lib/exam'
+import { startCorrection } from '@/lib/start-run'
 import { t } from '@/i18n/es'
 
 export default function HomeView() {
@@ -28,6 +30,7 @@ export default function HomeView() {
   const setNotice = useApp((s) => s.setNotice)
   const retry = useApp((s) => s.retry)
   const setRetry = useApp((s) => s.setRetry)
+  const exam = useApp((s) => s.exam)
 
   const run = useRun()
   const busy = run.phase === 'starting' || run.phase === 'running'
@@ -77,18 +80,37 @@ export default function HomeView() {
         : null
 
   async function start(): Promise<void> {
-    if (!examPath || !classPath || missing) return
-    useRun.getState().begin()
+    if (missing) return
+    await startCorrection(secrets)
+    // The values leave the interface as soon as the engine has them.
+    setSecrets({})
+  }
+
+  /**
+   * Exam mode. The credentials are handed to the main process once, and the
+   * first pass is launched by the same timer that chains the rest: there is
+   * one way in, so there is one place where two engines could be started and
+   * it already refuses to.
+   */
+  async function startExamMode(minutes: number): Promise<void> {
+    if (missing) return
     try {
-      // The retry travels as the path of the previous artifact and nothing
-      // else: the engine decides what gets repeated (ADR-0018).
-      await window.heimdall.startRun({ examPath, classPath, secrets, retryFrom: retry?.artifactPath })
+      await window.heimdall.setExamMode({ active: true, secrets })
     } catch (error) {
-      useRun.getState().fail(noticeFrom('No se pudo empezar la corrección', error))
-    } finally {
-      // The values leave the interface as soon as the engine has them.
-      setSecrets({})
-      setRetry(null)
+      setNotice(noticeFrom('No se pudo activar el modo examen', error))
+      return
+    }
+    setSecrets({})
+    setRetry(null)
+    useApp.getState().startExam(minutes)
+  }
+
+  async function stopExamMode(): Promise<void> {
+    useApp.getState().stopExam()
+    try {
+      await window.heimdall.setExamMode({ active: false })
+    } catch (error) {
+      setNotice(noticeFrom('No se pudo desactivar el modo examen', error))
     }
   }
 
@@ -183,6 +205,13 @@ export default function HomeView() {
           {missing && !busy && <span className="text-xs text-muted-foreground">{missing}</span>}
         </div>
 
+        <ExamCard
+          exam={exam}
+          disabled={!!missing && !exam.active}
+          onStart={(minutes) => void startExamMode(minutes)}
+          onStop={() => void stopExamMode()}
+        />
+
         {run.phase !== 'idle' && <RunPanel percent={percent} />}
       </div>
 
@@ -197,6 +226,80 @@ export default function HomeView() {
         {t.run.confirmBody}
       </ConfirmDialog>
     </div>
+  )
+}
+
+/**
+ * Exam mode: the class is corrected again and again while the practice lasts.
+ *
+ * The countdown is shown because the teacher has to know whether what is on
+ * the screen is from a minute ago or from twenty, and because it is the only
+ * visible sign that the mode is still on between two passes.
+ */
+function ExamCard({
+  exam,
+  disabled,
+  onStart,
+  onStop
+}: {
+  exam: ExamMode
+  disabled: boolean
+  onStart: (minutes: number) => void
+  onStop: () => void
+}) {
+  const [minutes, setMinutes] = useState<number>(exam.everyMinutes)
+  const [left, setLeft] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (!exam.active) {
+      setLeft(null)
+      return
+    }
+    const tick = (): void => setLeft(secondsLeft(exam, Date.now()))
+    tick()
+    const timer = setInterval(tick, 1000)
+    return () => clearInterval(timer)
+  }, [exam])
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Timer className="h-4 w-4" />
+          {t.exam.title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <p className="text-xs text-muted-foreground">{t.exam.hint}</p>
+        {exam.active ? (
+          <>
+            <p className="text-sm">
+              {t.exam.running(exam.passes, exam.everyMinutes)}{' '}
+              {left === null ? t.exam.correcting : t.exam.nextIn(left)}
+            </p>
+            <Button variant="outline" size="sm" onClick={onStop}>
+              {t.exam.stop}
+            </Button>
+          </>
+        ) : (
+          <div className="flex flex-wrap items-center gap-2">
+            {EXAM_INTERVALS.map((value) => (
+              <Button
+                key={value}
+                variant={value === minutes ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setMinutes(value)}
+              >
+                {t.exam.everyMinutes(value)}
+              </Button>
+            ))}
+            <Button disabled={disabled} onClick={() => onStart(minutes)}>
+              {t.exam.start}
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   )
 }
 
