@@ -52,7 +52,13 @@ type PlanSummary struct {
 	CheckCount  int      `json:"check_count"`
 	TotalWeight float64  `json:"total_weight"`
 	CheckIDs    []string `json:"check_ids"` // in order
-	Concurrency int      `json:"concurrency"`
+
+	// Concurrency is how many students were evaluated at once and
+	// HostConcurrency how many sessions were opened at once against one
+	// destination machine. Both are published so the artifact says under
+	// which conditions the run happened.
+	Concurrency     int `json:"concurrency"`
+	HostConcurrency int `json:"host_concurrency"`
 }
 
 // StudentResult is everything the run found out about one student.

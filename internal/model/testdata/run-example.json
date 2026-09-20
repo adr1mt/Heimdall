@@ -25,7 +25,8 @@
       "dns-activo",
       "q-puerto-https"
     ],
-    "concurrency": 8
+    "concurrency": 8,
+    "host_concurrency": 4
   },
   "students": [
     {

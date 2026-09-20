@@ -21,10 +21,14 @@ const (
 	InventoryFile = "aula.yaml"
 )
 
-// DefaultConcurrency is the size of the worker pool of the prototype. It is
-// published in the PLAN so the artifact says under which conditions the run
-// happened.
-const DefaultConcurrency = 2
+// DefaultConcurrency is the size of the worker pool and DefaultHostConcurrency
+// the number of sessions that may be opened at the same time against one
+// destination machine. Both are published in the PLAN so the artifact says
+// under which conditions the run happened (ADR-0012).
+const (
+	DefaultConcurrency     = 8
+	DefaultHostConcurrency = 4
+)
 
 // Connection timeouts used when the inventory says nothing.
 const (
@@ -142,10 +146,11 @@ func Resolve(exam *Exam, inventory *Inventory, examPath, inventoryPath string) (
 		StudentBudget:  durationOr(inventory.Common.Timeouts.Student, DefaultStudentBudget),
 		Students:       students,
 		Summary: model.PlanSummary{
-			CheckCount:  len(checks),
-			TotalWeight: totalWeight(checks),
-			CheckIDs:    checkIDs(checks),
-			Concurrency: DefaultConcurrency,
+			CheckCount:      len(checks),
+			TotalWeight:     totalWeight(checks),
+			CheckIDs:        checkIDs(checks),
+			Concurrency:     DefaultConcurrency,
+			HostConcurrency: DefaultHostConcurrency,
 		},
 	}
 	plan.Hash = hashPlan(plan)

@@ -3,6 +3,8 @@ package engine
 import (
 	"context"
 	"fmt"
+	"net"
+	"strconv"
 	"strings"
 	"time"
 
@@ -70,7 +72,7 @@ func withBudget(ctx context.Context, budget time.Duration) (context.Context, con
 // the rest of the class carries on.
 func (r *runner) runChecks(runCtx, studentCtx context.Context, sp plan.StudentPlan, checks []model.CheckResult) {
 	done := 0
-	hosts := newHostPool(r, sp)
+	hosts := newHostPool(runCtx, r, sp)
 	defer hosts.closeAll()
 
 	defer func() {
@@ -275,13 +277,14 @@ func specOf(c plan.ResolvedCheck) (assert.Spec, error) {
 // that needed it all carry the same cause.
 type hostPool struct {
 	r        *runner
+	runCtx   context.Context // the run's own context, to tell cancelled from out of budget
 	student  plan.StudentPlan
 	sessions map[string]Session
 	failures map[string]*ssh.DialError
 	targets  map[string]plan.Host
 }
 
-func newHostPool(r *runner, sp plan.StudentPlan) *hostPool {
+func newHostPool(runCtx context.Context, r *runner, sp plan.StudentPlan) *hostPool {
 	targets := map[string]plan.Host{}
 	for _, c := range sp.Checks {
 		if c.Host != "" {
@@ -290,6 +293,7 @@ func newHostPool(r *runner, sp plan.StudentPlan) *hostPool {
 	}
 	return &hostPool{
 		r:        r,
+		runCtx:   runCtx,
 		student:  sp,
 		sessions: map[string]Session{},
 		failures: map[string]*ssh.DialError{},
@@ -313,6 +317,13 @@ func (h *hostPool) get(ctx context.Context, name string) (Session, *ssh.DialErro
 		return nil, derr
 	}
 
+	// Opening the session waits for a turn on that machine: past MaxStartups
+	// the server refuses connections, and a refusal of ours would reach the
+	// artifact as a check nobody could evaluate.
+	endpoint := net.JoinHostPort(target.IP, strconv.Itoa(target.Port))
+	if !h.r.gate.acquire(ctx, endpoint) {
+		return nil, h.waitCancelled(endpoint)
+	}
 	sess, derr := h.r.opts.Dial(ctx, ssh.Config{
 		Host:           name,
 		Address:        target.IP,
@@ -322,12 +333,29 @@ func (h *hostPool) get(ctx context.Context, name string) (Session, *ssh.DialErro
 		ConnectTimeout: h.r.plan.ConnectTimeout,
 		Keys:           h.r.keys,
 	})
+	h.r.gate.release(endpoint)
 	if derr != nil {
 		h.failures[name] = derr
 		return nil, derr
 	}
 	h.sessions[name] = sess
 	return sess, nil
+}
+
+// waitCancelled names what happened to a check whose turn to connect never
+// came: the teacher stopped the run, or this student ran out of budget while
+// queueing. Neither is ever an academic failure, and neither is remembered as
+// a failed host: the machine was never asked anything.
+func (h *hostPool) waitCancelled(endpoint string) *ssh.DialError {
+	if h.runCtx.Err() != nil {
+		return &ssh.DialError{Cause: model.CauseCancelled, Detail: ""}
+	}
+	return &ssh.DialError{
+		Cause: model.CauseTimeout,
+		Detail: fmt.Sprintf(
+			"el alumno %s agotó su presupuesto de %s esperando turno para conectar con %s",
+			h.student.ID, h.r.plan.StudentBudget, endpoint),
+	}
 }
 
 // closeAll ends the student's sessions and moves their warnings into the

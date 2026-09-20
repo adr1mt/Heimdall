@@ -623,7 +623,7 @@
       "id": "T030",
       "title": "Concurrencia acotada global y por host",
       "phase": 3,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T022"
@@ -640,14 +640,17 @@
       "acceptance": [
         "100 alumnos contra un host con MaxStartups por defecto: cero UNEVALUATED por rechazo de conexion"
       ],
-      "tests": [],
-      "notes": "Detallar al llegar."
+      "tests": [
+        "internal/engine/hostgate_test.go",
+        "test/carga.sh"
+      ],
+      "notes": "Tope por maquina en internal/engine/hostgate.go, solo sobre la apertura de sesion. Defaults 8 y 4, publicados en el artefacto (plan.host_concurrency) y ajustables con --concurrency y --host-concurrency. ADR-0012. Medido: 100 alumnos contra un host, 0 rechazos con tope y 38-49 sin el."
     },
     {
       "id": "T031",
       "title": "Mediciones de rendimiento y cierre de D-6",
       "phase": 3,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P2",
       "depends_on": [
         "T030"

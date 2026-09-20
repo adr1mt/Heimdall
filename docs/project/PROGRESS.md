@@ -2,29 +2,23 @@
 
 Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
-**Actualizado**: 2026-09-20 · **Fase**: 2 — Formato completo y robustez de ejecución
+**Actualizado**: 2026-09-20 · **Fase**: 3 — Concurrencia, cancelación y límites
 
 ## Última tarea terminada
 
-**T022 (el examen RA2 del curso, corregido entero).** El examen real de
-servicios de red —las dieciséis comprobaciones de KEA y BIND, con sus mismos
-pesos— se corrige de principio a fin contra un laboratorio de dos máquinas. La
-entrega completa saca 100 y la entrega con cuatro errores y el servidor DNS
-parado saca 69, y el informe dice de cada suspenso qué se esperaba y qué había.
-Al formato no le falta nada: las dieciséis se escriben sin inventar ninguna
-forma nueva de comprobar. Cierra la fase 2.
+**T030 (la corrección de una clase entera contra un solo servidor).** Cien
+alumnos examinándose sobre la misma máquina se corrigen sin que el motor pierda
+ni una comprobación: ahora abre como mucho cuatro conexiones a la vez contra un
+mismo destino y evalúa ocho alumnos en paralelo. Sin ese freno, el servidor
+rechazaba cerca de la mitad de las conexiones —39 a 49 de cada 100 en la
+medida— que es el fallo que en Teuton dejaba 53 ceros de 100. El informe dice
+con qué topes se corrigió y el profesor puede cambiarlos. ADR-0012; D-6 queda
+solo a falta de medir cuántos alumnos en paralelo convienen (T031).
 
-Antes, **T021** (identidad de las máquinas, D-3 cerrada). Como el alumnado
-examina sobre máquinas virtuales de usar y tirar, el motor deja de guardar la
-identidad de las máquinas entre exámenes: la apunta durante la corrección, la
-escribe en el informe y rechaza a la máquina que cambie de identidad a mitad.
-Nunca se toca el fichero de claves del profesor. La entrada con clave SSH se
-queda fuera: el aula usa contraseña (T023, sin empezar).
-
-Antes, **T020**: comprobar que algo **no** está, que un valor aparece **cerca**
-de otro, y corregir un cuestionario sin ejecutar nada en ninguna máquina.
-**T013**: ADR-0010 y `docs/design/ejemplo-run.json`. **T012**: los catorce
-criterios del hito, trece en verde, en `ACEPTACION-FASE1.md`.
+Antes, **T022**: el examen real de KEA y BIND corregido entero contra el
+laboratorio (100 y 69); cierra la fase 2. **T021**: identidad de las máquinas
+por ejecución (ADR-0011). **T020**: `no_contiene`, `cerca_de` y cuestionarios
+sin máquina.
 
 ## Estado actual
 
@@ -32,8 +26,8 @@ criterios del hito, trece en verde, en `ACEPTACION-FASE1.md`.
   interactiva hay que exportar el `PATH` a mano. `go.mod`: `module evalon`,
   directiva `go 1.26`. Nombre provisional (D-7).
 - `cmd/evalon`: `check`, `run` y `version`. `run` acepta `--secrets=stdin|env`
-  (por defecto `env`), `--var=dir` y `--concurrency=N`. Exit codes: 0 ok · 2
-  config inválida · 3 parcial · 4 cancelado · 1 ni se pudo escribir el informe.
+  (por defecto `env`), `--var=dir`, `--concurrency=N` y
+  `--host-concurrency=N`. Exit codes: 0 ok · 2 config inválida · 3 parcial · 4 cancelado · 1 ni se pudo escribir el informe.
   Los secretos entran por una línea JSON leída byte a byte, con corte a los 5 s
   y el buffer a cero, o por las variables que nombra el `aula.yaml` y solo esas.
   Nunca por `argv`.
@@ -44,8 +38,10 @@ criterios del hito, trece en verde, en `ACEPTACION-FASE1.md`.
   comprobación `valor:` no abre sesión y se anota `transport: "inventory"`.
   `internal/report`: escritura atómica, parciales, `latest.json`, ULID propio y
   redacción de secretos.
-- `internal/engine`: pool de 2, una sesión por host y alumno, presupuesto por
-  alumno, `panic` recuperado por alumno, parcial tras cada alumno, `ExitCode`
+- `internal/engine`: pool de 8 y 4 aperturas de sesión por máquina de destino
+  (`hostgate.go`, solo la apertura: una sesión abierta no cuenta para
+  `MaxStartups`), una sesión por host y alumno, presupuesto por alumno,
+  `panic` recuperado por alumno, parcial tras cada alumno, `ExitCode`
   (0/3/4). `CheckSecrets` antes de conectar.
 - `internal/ssh`: `Dial` con 2 reintentos y ninguno en `AUTH_FAILED` ni en un
   cambio de identidad; registro de identidades por ejecución, en memoria, con la
@@ -64,17 +60,15 @@ criterios del hito, trece en verde, en `ACEPTACION-FASE1.md`.
 
 `make check` verde · `gofmt -l` sin salida · `make test` verde contra el
 laboratorio: integración de `engine` y `ssh`, `test/secrets.sh`,
-`test/acceptance.sh` con 13 de los 14 criterios y `test/ra2.sh` con los 13
-suyos (examen RA2 entero, `make lab-ra2`). Además, contra el laboratorio:
-la anticomprobación de un alumno inalcanzable sale `UNEVALUATED` y nunca `PASS`,
+`test/acceptance.sh` con 13 de los 14 criterios, `test/ra2.sh` con los 13 suyos
+(examen RA2 entero, `make lab-ra2`) y `test/carga.sh` con A-15 (cien alumnos
+contra un host). Además, contra el laboratorio: la anticomprobación de un alumno inalcanzable sale `UNEVALUATED` y nunca `PASS`,
 y una máquina que cambia de identidad se rechaza con el motivo escrito.
 
 ## Problemas conocidos
 
 - Laboratorio en **`127.1.2.3`**, nunca `127.0.0.x` (F-01, criterio A-11).
-- Teuton se ejecuta con `HOME` aislado (`workspace/sshlab/fakehome`): una
-  entrada ed25519 en el `known_hosts` real lo tumba (F-12). Al motor nuevo ya no
-  le afecta: no lee ese fichero.
+- Teuton se ejecuta con `HOME` aislado (F-12); al motor nuevo no le afecta.
 - La e2e de la GUI falla entera (40/40) sin `npm run build` previo.
 - No subir el Teuton instalado (2.10.6) a 3.0.0 sin probar (F-11).
 - **A-10 sigue pendiente**: pide los ficheros del formato viejo, que los escribe
@@ -87,6 +81,7 @@ y una máquina que cambia de identidad se rechaza con el motivo escrito.
 
 ## Siguiente tarea recomendada
 
-Fase 2 cerrada. **T030** (concurrencia acotada global y por host, fase 3) queda
-`READY` al terminar T022. También sigue `READY` **T014** (P2): un examen mal
-escrito debe explicarse en español con fichero, línea y clave.
+**T031** (`READY`, P2): medir tiempo y memoria con 10, 30 y 100 alumnos y con
+salidas de 1/20/100/300 MB, fijar con eso cuántos alumnos en paralelo y cerrar
+D-6. También sigue `READY` **T014** (P2): un examen mal escrito debe explicarse
+en español con fichero, línea y clave.

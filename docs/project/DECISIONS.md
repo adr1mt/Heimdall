@@ -21,7 +21,7 @@ evidencia. Nunca se edita un ADR aceptado en silencio.
 | # | Decisión | Se cierra en |
 |---|---|---|
 | D-5 | Detección de valores repetidos (anticopia) | Cuando haya un caso real; no bloquea |
-| D-6 | Números de concurrencia por defecto | T031 (fase 3) |
+| D-6 | Alumnos en paralelo por defecto (el tope por máquina ya está medido, ADR-0012) | T031 (fase 3) |
 | D-7 | Nombre del producto | T070 (fase 7), antes de que salga un binario del equipo |
 | D-8 | Presentación de `INCOMPLETE` en la GUI | T060 (fase 6) |
 | D-9 | Formato definitivo de los eventos NDJSON | T050 (fase 5) |
@@ -196,3 +196,16 @@ Dos decisiones menores:
 5. **La ausencia del `timeout` de coreutils se prueba de verdad**: el test
    esconde el binario dentro del contenedor y lo restaura. Sin ganchos de
    prueba en el código de producción.
+
+## T030 · Topes de concurrencia
+
+1. **El tope por máquina cubre solo la apertura de la sesión, no los
+   comandos.** `MaxStartups` cuenta conexiones sin autenticar: una sesión ya
+   abierta no estorba a nadie. Poner ahí el comando serializaría la corrección
+   sin ninguna razón.
+2. **Esperar turno se pide contra el contexto del alumno.** Si se le agota el
+   presupuesto en la cola, la comprobación sale sin evaluar por tiempo, con el
+   motivo escrito, y la máquina no se apunta como caída: no se le llegó a
+   preguntar nada.
+3. **El valor por defecto del tope global sube de 2 a 8.** El 2 era del
+   prototipo vertical. El número definitivo lo mide T031.

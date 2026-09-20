@@ -25,6 +25,7 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 	secretsMode := fs.String("secrets", "env", "canal de los secretos: stdin o env")
 	varDir := fs.String("var", "var", "directorio donde se escribe el artefacto")
 	concurrency := fs.Int("concurrency", 0, "alumnos en paralelo; 0 usa el del examen")
+	hostConcurrency := fs.Int("host-concurrency", 0, "conexiones que se abren a la vez contra una misma máquina; 0 usa el del examen")
 	if err := fs.Parse(args); err != nil {
 		return exitInvalidConfig
 	}
@@ -73,10 +74,11 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 
 	var partialErr error
 	result := engine.Run(ctx, p, engine.Options{
-		RunID:         runID,
-		EngineVersion: version,
-		Secrets:       secrets,
-		Concurrency:   *concurrency,
+		RunID:           runID,
+		EngineVersion:   version,
+		Secrets:         secrets,
+		Concurrency:     *concurrency,
+		HostConcurrency: *hostConcurrency,
 		OnStudentDone: func(run *model.RunResult) error {
 			if err := writer.WritePartial(run); err != nil {
 				partialErr = err

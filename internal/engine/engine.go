@@ -56,6 +56,10 @@ type Options struct {
 	// Concurrency overrides the plan's. Zero uses the plan's.
 	Concurrency int
 
+	// HostConcurrency overrides the plan's cap on simultaneous connection
+	// openings against one destination machine. Zero uses the plan's.
+	HostConcurrency int
+
 	// Dial is the dialer. Nil means SSHDialer.
 	Dial Dialer
 
@@ -83,6 +87,13 @@ func Run(ctx context.Context, p *plan.Plan, opts Options) *model.RunResult {
 	if concurrency <= 0 {
 		concurrency = 1
 	}
+	hostConcurrency := opts.HostConcurrency
+	if hostConcurrency <= 0 {
+		hostConcurrency = p.Summary.HostConcurrency
+	}
+	if hostConcurrency <= 0 {
+		hostConcurrency = concurrency
+	}
 
 	run := &model.RunResult{
 		SchemaVersion: model.SchemaVersion,
@@ -96,8 +107,15 @@ func Run(ctx context.Context, p *plan.Plan, opts Options) *model.RunResult {
 		Students:      make([]model.StudentResult, len(p.Students)),
 	}
 	run.Plan.Concurrency = concurrency
+	run.Plan.HostConcurrency = hostConcurrency
 
-	r := &runner{plan: p, opts: opts, concurrency: concurrency, keys: ssh.NewHostKeys()}
+	r := &runner{
+		plan:        p,
+		opts:        opts,
+		concurrency: concurrency,
+		gate:        newHostGate(hostConcurrency),
+		keys:        ssh.NewHostKeys(),
+	}
 	r.evaluate(ctx, run)
 
 	run.FinishedAt = time.Now()
@@ -127,6 +145,10 @@ type runner struct {
 	plan        *plan.Plan
 	opts        Options
 	concurrency int
+
+	// gate bounds the simultaneous connection openings against one machine,
+	// shared by every worker: without it the pool itself produces zeros.
+	gate *hostGate
 
 	// keys is the identity every machine presented in this run, shared by
 	// every student: a machine that changes identity halfway through is not

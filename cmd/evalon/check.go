@@ -41,7 +41,8 @@ func checkCmd(args []string, stdout, stderr io.Writer) int {
 	fmt.Fprintf(stdout, "\n")
 	fmt.Fprintf(stdout, "Comprobaciones: %d\n", p.Summary.CheckCount)
 	fmt.Fprintf(stdout, "Peso total:     %s\n", formatWeight(p.Summary.TotalWeight))
-	fmt.Fprintf(stdout, "Concurrencia:   %d\n", p.Summary.Concurrency)
+	fmt.Fprintf(stdout, "Concurrencia:   %d alumnos a la vez, %d conexiones por máquina\n",
+		p.Summary.Concurrency, p.Summary.HostConcurrency)
 	fmt.Fprintf(stdout, "Hash del plan:  %s\n", p.Hash)
 	return exitOK
 }

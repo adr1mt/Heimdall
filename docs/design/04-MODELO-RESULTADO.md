@@ -65,7 +65,8 @@ type PlanSummary struct {
     CheckCount  int      `json:"check_count"`
     TotalWeight float64  `json:"total_weight"`
     CheckIDs    []string `json:"check_ids"`  // en orden; idéntico para todos
-    Concurrency int      `json:"concurrency"`
+    Concurrency     int `json:"concurrency"`
+    HostConcurrency int `json:"host_concurrency"`
 }
 
 type StudentResult struct {
@@ -217,7 +218,8 @@ byte.
       "p4-ausente",
       "p5-lento"
     ],
-    "concurrency": 2
+    "concurrency": 8,
+    "host_concurrency": 4
   },
   "students": [
     {

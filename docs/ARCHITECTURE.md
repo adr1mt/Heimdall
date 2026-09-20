@@ -162,8 +162,10 @@ Cada uno es comprobable y tiene su test:
   espera y jitter). Nunca tras enviar el comando. Nunca en `AUTH_FAILED`.
 - **Salida**: 64 kB conservados por flujo, corte duro a 8 MB, `bytes_total`
   siempre real, `truncated` explícito.
-- **Concurrencia**: tope global y tope por host de destino (mecanismo cerrado,
-  números por medir, D-6). Sin límite, la propia concurrencia produce ceros.
+- **Concurrencia**: tope global de alumnos a la vez (8) y tope de aperturas de
+  sesión simultáneas contra una misma máquina (4), ambos publicados en el
+  artefacto y ajustables desde la línea de órdenes (ADR-0012). Sin el segundo,
+  casi la mitad de una clase de 100 choca con `MaxStartups`.
 - **Aislamiento**: un contexto y un presupuesto por alumno. Un alumno roto no
   puede abortar la pasada ni alterar la nota de otro.
 

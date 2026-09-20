@@ -18,6 +18,7 @@ test: check build
 	test/secrets.sh
 	test/acceptance.sh
 	test/ra2.sh
+	test/carga.sh
 
 ## build: single binary in bin/evalon.
 build:
