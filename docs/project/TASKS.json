@@ -1427,6 +1427,38 @@
         "gui/scripts/examen-lab.ts: una sesion real de dos vueltas contra el laboratorio, con la mejor nota conservada y el finalizado fuera de la segunda"
       ],
       "notes": "Mitad de pantalla de la logica de sesion. No modifica T058 ni se mezcla con T059."
+    },
+    {
+      "id": "T065",
+      "title": "README: identidad publica propia y estado real del proyecto",
+      "phase": 5,
+      "status": "DONE",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Que la portada del repositorio presente Heimdall como proyecto propio e independiente y diga el estado real de la fase 5.",
+      "scope": [
+        "Quitar del README el encuadre comparativo con el motor viejo: sucesor, tabla comparativa, cifras de la comparacion y sus fallos como argumento",
+        "Presentar el motor por lo que hace: evaluador de infraestructura por SSH, en Go, definicion en YAML, concurrencia controlada, resultado por comprobacion y estados PASS/FAIL/UNEVALUATED, con los examenes como uso principal",
+        "Explicar brevemente el nombre",
+        "Estado real: fase 5, GUI en desarrollo avanzado con sus vistas, modo examen y modo proyector, y sin release ni empaquetado definitivo",
+        "Badges al dia y enlaces a arquitectura, ADR, roadmap, formato, contrato y estado"
+      ],
+      "out_of_scope": [
+        "Borrar o mover nada de docs/research/: la investigacion se queda donde esta",
+        "Tocar codigo, ADR, ROADMAP o PROGRESS"
+      ],
+      "acceptance": [
+        "grep -i teuton README.md no devuelve nada",
+        "El README no compara Heimdall con ningun otro motor",
+        "Lo que afirma el README coincide con PROGRESS.md, ROADMAP.md y TASKS.json: fase 5, GUI en desarrollo, sin release",
+        "Los comandos y rutas que cita existen en el Makefile y en el repositorio",
+        "docs/research/ sigue intacto",
+        "El README no describe el producto como corrector de practicas"
+      ],
+      "tests": [
+        "Revision manual del README contra PROGRESS.md, ROADMAP.md y el Makefile"
+      ],
+      "notes": "Pedida por Adria el 2026-09-20. Solo documentacion, commit propio."
     }
   ]
 }

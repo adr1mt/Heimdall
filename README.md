@@ -1,27 +1,30 @@
 <h1 align="center">Heimdall</h1>
 
 <p align="center">
-  <strong>Corrige por SSH las prácticas de sistemas y redes de toda una clase.</strong><br>
-  Un examen en YAML, un binario, un informe en JSON.
+  <strong>Comprueba por SSH, en muchas máquinas a la vez, que la infraestructura es la que se pidió.</strong><br>
+  Una definición en YAML, un binario, un informe en JSON.
 </p>
 
 <p align="center">
   <img alt="Go 1.26+" src="https://img.shields.io/badge/Go-1.26%2B-00ADD8?logo=go&logoColor=white">
-  <img alt="Estado: fase 3 de 8" src="https://img.shields.io/badge/estado-fase%203%20de%208-orange">
+  <img alt="Estado: fase 5 de 8" src="https://img.shields.io/badge/estado-fase%205%20de%208-orange">
   <img alt="Dos dependencias" src="https://img.shields.io/badge/dependencias-2-brightgreen">
 </p>
 
 ---
 
-Heimdall es un motor de evaluación automática de prácticas de informática,
-pensado para sistemas, redes y servicios. Sucesor de
-[Teuton](https://github.com/teuton-software/teuton), escrito desde cero en Go.
-El nombre viene de Heimdall, el guardián de la mitología nórdica, conocido por
-su vigilancia constante.
+Heimdall es un evaluador automático de infraestructura: comprueba sobre un
+conjunto de máquinas que los servicios, la configuración y la red están como se
+pidió, y puntúa el resultado. Está orientado a sistemas, redes y servicios, y
+su uso principal son los exámenes, donde cada máquina se evalúa y se califica
+por separado. Escrito en Go, un binario único.
 
-Los exámenes se escriben en YAML sencillo y legible. A partir de ellos Heimdall
-entra por SSH en las máquinas del alumnado, ejecuta las comprobaciones y
-produce los resultados y la calificación:
+El nombre viene de Heimdall, el guardián de la mitología nórdica, asociado a la
+vigilancia y la atención constante.
+
+La definición se escribe en YAML sencillo y legible. A partir de ella Heimdall
+entra por SSH en las máquinas, ejecuta las comprobaciones y produce los
+resultados y la calificación:
 
 ```
 examen.yaml + aula.yaml  →  Heimdall  →  máquinas del alumnado  →  resultados
@@ -29,40 +32,32 @@ examen.yaml + aula.yaml  →  Heimdall  →  máquinas del alumnado  →  result
 
 Comprueba, entre otras cosas, configuración de servicios, ficheros y sus
 parámetros, comandos y estados del sistema, DNS, DHCP y red, y el resultado
-concreto que se espera de cada ejercicio. Corrige un aula entera de forma
+concreto que se espera de cada punto. Recorre decenas de máquinas de forma
 concurrente, controlada y reproducible, y deja un informe detallado de cada
-comprobación. Hoy se usa desde la terminal; está diseñado para integrarse con
-una interfaz gráfica.
+comprobación.
 
-> **Todavía no es una herramienta terminada.** El motor corrige exámenes reales
-> contra máquinas reales, pero no hay binario publicado ni interfaz gráfica: la
-> aplicación propia, Heimdall GUI, se construye sobre el contrato nativo
-> (ADR-0016). Ver [ROADMAP](docs/ROADMAP.md).
+Cada comprobación termina en uno de tres estados —`PASS`, `FAIL` o
+`UNEVALUATED`—, de modo que un fallo real y un problema técnico del propio
+evaluador nunca se confunden: una máquina apagada no es un trabajo mal hecho.
 
-## El problema
+## Estado del proyecto
 
-Un examen de servicios en red se corrige entrando por SSH en la máquina de cada
-alumno y comprobando cosas: que el servicio escucha, que el fichero de
-configuración dice lo que debe, que el cliente resuelve. A mano son horas. Y la
-automatización ingenua tiene un fallo peor que el trabajo manual:
+En desarrollo, **fase 5 de 8** del [roadmap](docs/ROADMAP.md).
 
-> Con 100 alumnos contra un mismo servidor, Teuton dejaba **53 ceros**. Ninguno
-> era del alumnado: el servidor SSH rechazaba las conexiones antes de que nadie
-> escribiera una contraseña.
+- El motor evalúa y califica por SSH contra máquinas reales, en exámenes de
+  verdad.
+- La aplicación propia, **Heimdall GUI**, vive en [`gui/`](gui/) y está en
+  desarrollo avanzado: Inicio, Resultados, Histórico, Ajustes y Ayuda, con
+  **modo examen** —vueltas encadenadas mientras dura la sesión— y **modo
+  proyector** para enseñar el progreso en pantalla grande.
+- Todavía **no hay release para usuario final ni empaquetado definitivo**: se
+  compila desde el repositorio. El binario embebido en la aplicación llega en
+  la fase 7.
 
-Un cero así es indistinguible de un examen mal hecho. Eso es lo que este motor
-existe para no repetir.
+El estado detallado, sesión a sesión, está en
+[docs/project/PROGRESS.md](docs/project/PROGRESS.md).
 
-| | Teuton 2.10.6 | Heimdall |
-|---|---|---|
-| 100 alumnos, un servidor | 2,1 s · 156 MB · **53 ceros** | 2,9 s · 14 MB · **0 ceros** |
-| Una máquina que suelta 300 MB | 2,8 s · **970 MB** | 0,2 s · **12 MB** |
-| Un alumno con la máquina apagada | contagia al resto | no afecta a nadie |
-
-Medido en este equipo con `/usr/bin/time`: [`make rendimiento`](test/rendimiento.sh),
-[ADR-0013](docs/adr/0013-alumnos-en-paralelo.md).
-
-## El examen
+## La definición
 
 ```yaml
 examen: "Servidor DHCP y DNS"
@@ -92,9 +87,9 @@ grupos:
 
 Declarativo y nada más: sin condicionales, sin bucles, sin expresiones
 regulares y **sin shell**. Cada `cmd` es un vector de argumentos que llega
-literal a la máquina del alumno.
+literal a la máquina evaluada.
 
-El inventario (`aula.yaml`) dice quién es cada alumno y dónde está su máquina.
+El inventario (`aula.yaml`) dice a quién corresponde cada máquina y dónde está.
 Las contraseñas no van ahí: va una **referencia**, y el valor entra por stdin.
 
 ## El resultado
@@ -139,13 +134,21 @@ se puede defender.
 
 ```bash
 make build          # binario en bin/heimdall
-make check          # suite rápida: lógica pura, sin red (segundos)
+make check          # suite rápida del motor: lógica pura, sin red (segundos)
 make lab            # laboratorio SSH en podman
 make test           # + integración y criterios de aceptación
 make rendimiento    # mide escalado y memoria (no es un test)
 ```
 
-Corregir:
+La aplicación es un árbol Node aparte, con su propio ciclo:
+
+```bash
+make gui-check      # suite de la GUI
+make gui-build      # empaqueta la aplicación
+make gui-lab        # la arranca contra el laboratorio
+```
+
+Corregir desde la terminal:
 
 ```bash
 heimdall check ./examen-ra2                      # valida sin tocar ninguna máquina
@@ -163,10 +166,11 @@ necesita un [ADR](docs/adr/).
 | Cómo está montado | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | Por qué está montado así | [docs/adr/](docs/adr/) |
 | Hacia dónde va | [docs/ROADMAP.md](docs/ROADMAP.md) |
-| Formato del examen | [docs/design/02-FORMATO.md](docs/design/02-FORMATO.md) |
+| Formato de la definición | [docs/design/02-FORMATO.md](docs/design/02-FORMATO.md) |
 | Estados y cálculo de la nota | [docs/design/03-ESTADOS-Y-NOTA.md](docs/design/03-ESTADOS-Y-NOTA.md) |
-| Qué falló en Teuton y cómo se midió | [docs/research/](docs/research/) |
+| Contrato entre el motor y la aplicación | [docs/design/09-CONTRATO-GUI.md](docs/design/09-CONTRATO-GUI.md) |
 | Estado actual del trabajo | [docs/project/PROGRESS.md](docs/project/PROGRESS.md) |
+| Investigación previa y mediciones | [docs/research/](docs/research/) |
 
 ## Contexto
 
