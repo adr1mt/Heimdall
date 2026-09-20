@@ -1016,9 +1016,9 @@
     },
     {
       "id": "T057",
-      "title": "Vista consolidada de una cadena de correcciones",
+      "title": "Regla de consolidacion de una cadena de correcciones (motor)",
       "phase": 5,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T054",
@@ -1029,19 +1029,25 @@
         "Regla escrita de consolidacion: por comprobacion, el resultado de la ejecucion mas reciente que la evaluo",
         "Nota consolidada con el denominador del PLAN, que es el mismo en toda la cadena",
         "Cada resultado dice de que ejecucion sale y que intentos hubo antes",
+        "Subcomando consolidate: lee la cadena hacia atras y la publica por la salida estandar",
         "La consolidacion es una vista: no se escribe ningun artefacto nuevo"
       ],
       "out_of_scope": [
         "Reescribir o mezclar artefactos: cada ejecucion conserva el suyo (ADR-0007, ADR-0018)",
-        "Marcar o resolver a mano una comprobacion (fuera del MVP, ADR-0018 §6)"
+        "Marcar o resolver a mano una comprobacion (fuera del MVP, ADR-0018 6)",
+        "Ensenarla en la aplicacion (T061)"
       ],
       "acceptance": [
         "Un alumno con todo evaluado entre dos ejecuciones obtiene nota final, y se ve de donde sale cada parte",
         "Mientras quede una comprobacion sin evaluar en toda la cadena, no hay nota final",
-        "Una cadena con distinto plan_hash se rechaza y se dice por que"
+        "Una cadena con distinto plan_hash se rechaza y se dice por que",
+        "Consolidar no escribe ni modifica ningun fichero"
       ],
-      "tests": [],
-      "notes": "Sale de T055: el artefacto de un reintento parcial no da nota final por si solo, y eso es correcto. Consolidar es un trabajo aparte y necesita poder abrir ejecuciones anteriores (T054)."
+      "tests": [
+        "internal/model/consolidate_test.go",
+        "cmd/heimdall/consolidate_test.go"
+      ],
+      "notes": "Sale de T055. Dividida el 2026-09-20 en motor (T057) y pantalla (T061) al cerrar ADR-0019: la nota consolidada la calcula el motor, nunca la interfaz."
     },
     {
       "id": "T054",
@@ -1280,6 +1286,34 @@
       ],
       "tests": [],
       "notes": "La comparacion nota a nota con Teuton se retira: ya no hay dos motores que comparar (ADR-0016). Detallar al llegar."
+    },
+    {
+      "id": "T061",
+      "title": "Vista consolidada de una cadena en la aplicacion",
+      "phase": 5,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [
+        "T054",
+        "T057"
+      ],
+      "goal": "Que el profesor vea cerrada en pantalla la nota del alumno que termino en una segunda correccion.",
+      "scope": [
+        "Llamar a heimdall consolidate desde la aplicacion y ensenar el resultado",
+        "Cada comprobacion dice de que correccion sale y que intentos hubo antes",
+        "Exportar las notas de la cadena consolidada con las mismas reglas que una correccion suelta (T056)"
+      ],
+      "out_of_scope": [
+        "Calcular la nota en la interfaz: la publica el motor (ADR-0019)",
+        "Escribir ningun artefacto"
+      ],
+      "acceptance": [
+        "El alumno que quedo entero entre dos correcciones sale con nota final en pantalla",
+        "Una cadena que el motor rechaza se explica en pantalla y no ensena ninguna nota",
+        "Lo exportado de una cadena consolidada no inventa ninguna nota"
+      ],
+      "tests": [],
+      "notes": "Mitad de pantalla de T057, separada el 2026-09-20."
     }
   ]
 }

@@ -504,3 +504,23 @@ Dos decisiones menores:
    campos que empiezan como una fórmula salen prefijados (F-14).
 5. **La escala se guarda con las preferencias de pantalla, no con la
    corrección.** Es del profesor y de su máquina; ningún artefacto la nombra.
+
+## T057 · Consolidar una cadena
+
+1. **ADR-0019**, que cierra lo que ADR-0018 §5 dejó abierto: la regla es, por
+   comprobación, el resultado de la ejecución más reciente que la evaluó.
+2. **La nota consolidada la calcula el motor.** La GUI la tiene todo a mano y
+   aun así no suma: `ComputeScore` es la única definición de qué es una nota
+   (principio 12), y una segunda copia en TypeScript podría divergir en el
+   redondeo sin que nadie se entere.
+3. **Subcomando `consolidate`**, que escribe por la salida estándar y no toca
+   ningún fichero. Lleva `kind: "consolidation"` para que nada lo lea como un
+   artefacto.
+4. **Un eslabón que no se puede leer para la consolidación entera.** Media
+   cadena convertiría lo que falta en «sin evaluar» sin decirlo.
+5. **«Intentos» es lo que hubo antes.** Una comprobación que un reintento
+   posterior no seleccionó sale `NOT_RUN` en su artefacto y no se cuenta como
+   un intento más.
+6. **T057 se dividió en motor (T057) y pantalla (T061).** La regla y la nota
+   son de un sitio, la vista de otro, y mezclarlas en una tarea habría metido
+   el cálculo de la nota en la interfaz por comodidad.

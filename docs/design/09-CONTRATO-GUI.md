@@ -155,7 +155,31 @@ Prototipo de dos alumnos, uno correcto y uno con la máquina apagada, recortado:
 
 Alumne02 no saca un cero: sale **sin evaluar**, con la causa dicha.
 
-## 7. Cómo se verifica
+## 7. La consolidación de una cadena
+
+Aparte del flujo y del artefacto, el motor publica una tercera cosa que la GUI
+lee: la **consolidación** de una cadena de correcciones (ADR-0019).
+
+```
+heimdall consolidate <resultado.json>
+```
+
+Lee la cadena hacia atrás siguiendo `retry_of`, la escribe por `stdout` y no
+toca ningún fichero. Sale con `0` si en toda la cadena no queda nada por
+evaluar, `3` si queda algo y `2` si la cadena no es válida —otro `plan_hash`,
+un eslabón que no está—, con el motivo en `stderr`.
+
+Lo que imprime lleva `kind: "consolidation"` y su propia versión,
+`consolidation_version`, distinta de la del artefacto: **no es una ejecución y
+no puede leerse como tal**. Cada comprobación dice de qué ejecución sale
+(`from_run`) y qué intentos hubo antes (`attempts`). No lleva comandos ni
+salida de las máquinas: eso sigue en el artefacto de la ejecución que los
+produjo.
+
+La nota consolidada la calcula el motor con la misma función que la de una
+ejecución suelta. La GUI la enseña; no la suma.
+
+## 8. Cómo se verifica
 
 [`test/eventos.sh`](../../test/eventos.sh) es el consumidor de prueba: lee una
 ejecución entera del laboratorio con nada más que el flujo y el artefacto al

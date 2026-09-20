@@ -1,6 +1,6 @@
 // Command heimdall evaluates systems-and-networking lab work over SSH.
 //
-// Subcommands: run, check, version.
+// Subcommands: run, check, consolidate, version.
 package main
 
 import (
@@ -31,6 +31,8 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return runCmd(args[1:], stdout, stderr)
 	case "check":
 		return checkCmd(args[1:], stdout, stderr)
+	case "consolidate":
+		return consolidateCmd(args[1:], stdout, stderr)
 	default:
 		fmt.Fprintf(stderr, "heimdall: subcomando desconocido %q\n", args[0])
 		usage(stderr)
@@ -43,6 +45,7 @@ func usage(w io.Writer) {
 
   run                  evalua un examen contra el aula
   check <directorio>   resuelve el PLAN sin tocar ninguna maquina
+  consolidate <fich>   lee una cadena de correcciones como una sola
   version              imprime la version del motor
 `)
 }

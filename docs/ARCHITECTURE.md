@@ -64,7 +64,7 @@ La fase PLAN es anterior a cualquier conexión y no puede alterarse después.
 
 | Paquete | Responsabilidad | No hace |
 |---|---|---|
-| `cmd/heimdall` | CLI (`run`, `check`, `version`), lectura de secretos, exit codes | Lógica de evaluación |
+| `cmd/heimdall` | CLI (`run`, `check`, `consolidate`, `version`), lectura de secretos, exit codes | Lógica de evaluación |
 | `internal/plan` | Parseo y validación de los dos YAML, sustitución `${…}`, hashes, `PlanSummary` | Red, disco de salida |
 | `internal/model` | Tipos canónicos, `Classify`, `ComputeScore` | Red, disco, reloj |
 | `internal/ssh` | Sesión por alumno/host, `exec`, límites de salida, timeouts, `timeout` remoto | Interpretar resultados |
