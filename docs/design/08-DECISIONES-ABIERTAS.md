@@ -5,11 +5,13 @@ Solo las que de verdad lo están. Las cerradas están en `docs/adr/`.
 | # | Decisión | Por qué sigue abierta | Cuándo se puede cerrar |
 |---|---|---|---|
 | **D-5** | Detección de valores repetidos (anticopia) | Tiene valor pedagógico y hoy pone la nota a 0 automáticamente, cosa descartada. Falta decidir si se implementa como **marca** en el informe | Cuando haya un caso real; no bloquea nada |
-| **D-8** | Escala y conversión de nota en la GUI | El motor publica 0-100 entero y los números crudos. Falta decidir **cómo presenta la GUI un `INCOMPLETE`** y qué acción ofrece al profesor | Al adaptar la GUI, después del prototipo |
-| **D-9** | Formato definitivo de los eventos NDJSON | Deliberadamente aplazado: primero el escritor legacy. El modelo canónico ya fija qué información existe | Cuando la UAT pase con el motor nuevo |
+| **D-8** | Escala y conversión de nota en la GUI | El motor publica 0-100 entero y los números crudos. Falta decidir **cómo presenta la GUI un `INCOMPLETE`** y qué acción ofrece al profesor | En **T053**, al construir la pantalla de resultados de Heimdall GUI |
+| **D-9** | Formato definitivo de los eventos NDJSON | Ya no está aplazado: ADR-0016 lo pone primero, porque es el único canal con la GUI. El modelo canónico ya fija qué información existe | En **T050**, ahora |
 
 ## Lo que se ha cerrado en esta sesión y antes estaba abierto
 
+- **La compatibilidad con Teuton**: retirada. Heimdall es independiente y tiene
+  GUI propia sobre contrato nativo. ADR-0016, que sustituye a ADR-0008.
 - **D-1** (cómo se paran los comandos que no terminan): envoltura con `timeout`
   de coreutils cuando el host lo tiene, `remote_process: UNKNOWN` cuando no.
   Ver `05-SECRETOS-TIMEOUTS-REINTENTOS.md` §3.

@@ -35,8 +35,9 @@ comprobación. Hoy se usa desde la terminal; está diseñado para integrarse con
 una interfaz gráfica.
 
 > **Todavía no es una herramienta terminada.** El motor corrige exámenes reales
-> contra máquinas reales, pero no hay binario publicado ni interfaz gráfica
-> adaptada. Ver [ROADMAP](docs/ROADMAP.md).
+> contra máquinas reales, pero no hay binario publicado ni interfaz gráfica: la
+> aplicación propia, Heimdall GUI, se construye sobre el contrato nativo
+> (ADR-0016). Ver [ROADMAP](docs/ROADMAP.md).
 
 ## El problema
 

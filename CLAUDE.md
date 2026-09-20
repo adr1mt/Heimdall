@@ -1,10 +1,18 @@
 # Heimdall
 
-Motor de evaluación de prácticas de sistemas y redes por SSH, sucesor de
-[Teuton](https://github.com/teuton-software/teuton). Go, binario único, examen
-declarativo en YAML, resultado canónico en JSON. La GUI existente
-([teuton-gui](https://github.com/adr1mt/teuton-gui)) se **adapta**, no se
-reescribe.
+Sistema de evaluación de prácticas de sistemas y redes por SSH, sucesor de
+[Teuton](https://github.com/teuton-software/teuton) pero **independiente de él**
+(ADR-0016). Dos piezas en este repositorio:
+
+- **motor**: Go, binario único, examen declarativo en YAML, resultado canónico
+  en JSON;
+- **`gui/`**: Heimdall GUI, Electron, sobre el contrato nativo.
+
+La cadena es: Heimdall GUI → contrato nativo → motor → SSH → máquinas del
+alumnado. No hay compatibilidad con Teuton: ni CLI, ni ficheros, ni formatos, ni
+importación de exámenes antiguos. De
+[teuton-gui](https://github.com/adr1mt/teuton-gui) se conservan la base técnica,
+la apariencia y el flujo de trabajo, nunca su contrato.
 
 El nombre está fijado (ADR-0014): Heimdall, el guardián que vigila sin
 descanso.
@@ -38,8 +46,10 @@ Prioridad ante contradicciones: **ADR aceptado > `docs/design/` > `docs/research
 9. Simplicidad antes que sofisticación.
 10. Ninguna funcionalidad hipotética sin un caso de uso demostrado.
 11. Tests y evidencia antes de dar una tarea por terminada.
-12. El modelo canónico es la fuente de verdad; la compatibilidad con Teuton es
-    un adaptador temporal.
+12. El modelo canónico es la fuente de verdad; lo demás deriva de él.
+13. Heimdall tiene identidad propia. Ninguna limitación de Teuton ni de su GUI
+    condiciona el diseño. `internal/legacy` y la fachada `--compat`/`--export`
+    están **congeladas** para pruebas internas y se borran en T060.
 
 ## Empezar una sesión
 
@@ -62,8 +72,8 @@ condiciones:
 
 **Nunca se encadena una segunda tarea** si cualquiera de las dos toca:
 integridad de la nota, modelo de estados y resultados, SSH, concurrencia,
-cancelación, seguridad o secretos, contrato motor ↔ GUI, migración, o
-empaquetado y release.
+cancelación, seguridad o secretos, contrato motor ↔ GUI, o empaquetado y
+release.
 
 Un commit por tarea, siempre separado. El repositorio queda en estado válido
 después de cada uno.

@@ -1,6 +1,6 @@
 # ADR-0008 · Compatibilidad con Teuton como adaptador temporal
 
-- Estado: **aceptada** · 2026-09-19
+- Estado: **sustituida por [ADR-0016](0016-heimdall-independiente-de-teuton.md)** · 2026-09-20 (aceptada el 2026-09-19)
 - Contexto: `GUI-CONTRACT.md` §6, `06-LEGACY-WRITER.md`
 
 ## Contexto

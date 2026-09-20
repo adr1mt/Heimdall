@@ -22,10 +22,11 @@ que describe el sistema; esto describe **qué no se puede hacer**.
    `total_weight` son los mismos para todos los alumnos. Nada de lo que ocurra
    en una máquina puede alterarlos.
 
-5. **`internal/legacy` es capa temporal.** Solo la lee `--compat=teuton2`, solo
-   escribe hacia fuera, nunca influye en el cálculo de la nota y nunca se le
-   añade nada que la UAT de la GUI no exija. Se borra entera cuando la GUI
-   consuma el artefacto canónico.
+5. **`internal/legacy` está congelada** (ADR-0016). Solo la lee
+   `--compat=teuton2`, solo escribe hacia fuera y nunca influye en la nota. No
+   se le añade **nada**: ni un campo, ni una bandera, ni una corrección que no
+   sea una regresión del motor. Sirve para pruebas internas hasta que se borre
+   entera en T060. Ningún diseño nuevo la tiene en cuenta.
 
 6. **El artefacto canónico se escribe siempre**, con o sin `--compat`, incluso
    con cancelación o con todos los alumnos rotos. Única excepción: PLAN inválido.
@@ -52,12 +53,18 @@ internal/ssh/    sesión, exec, límites de salida, timeouts
 internal/engine/ worker pool, presupuesto por alumno, cancelación
 internal/assert/ aserciones
 internal/report/ escritura atómica del artefacto
-internal/legacy/ LegacyTeutonWriter (temporal)
+internal/legacy/ LegacyTeutonWriter (congelado, se borra en T060)
 testdata/        exámenes e inventarios de prueba
 test/            scripts de aceptación e integración
+gui/             Heimdall GUI (Electron, TypeScript)
 ```
 
 No se crean paquetes nuevos de primer nivel sin justificarlo en la tarea.
+
+`gui/` es un árbol Node independiente del módulo Go: `make check` no depende de
+él y su suite se ejecuta aparte. La GUI habla con el motor **solo** por el
+contrato nativo —argumentos, secretos por stdin, eventos NDJSON y artefacto
+canónico—; nunca lee `internal/legacy` ni ningún fichero de Teuton.
 
 ## Cambiar una decisión
 
@@ -74,4 +81,5 @@ Una decisión cerrada no se rediscute sin evidencia nueva.
 
 Telnet, monitorización, correo, SFTP, macros, `ProxyJump`, detección de copias,
 DSL ejecutable, expresiones regulares en aserciones, condicionales y bucles en
-el examen. Si aparece la necesidad, se abre un ADR; no se implementa de paso.
+el examen. Y, desde ADR-0016: leer `config.yaml` o `start.rb`, importar
+exámenes de Teuton y cualquier compatibilidad nueva con el motor viejo. Si aparece la necesidad, se abre un ADR; no se implementa de paso.

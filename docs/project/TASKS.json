@@ -5,13 +5,15 @@
     "BLOCKED",
     "READY",
     "IN_PROGRESS",
-    "DONE"
+    "DONE",
+    "DROPPED"
   ],
   "rules": [
     "Se trabaja la tarea READY de mayor prioridad con todas sus depends_on en DONE.",
     "Una tarea por sesion. Si crece, se divide aqui antes de implementarla.",
     "Al marcar DONE, pasar a READY las tareas cuyas dependencias queden satisfechas.",
-    "Las tareas de fase 2 en adelante son deliberadamente gruesas: se detallan al acercarse."
+    "DROPPED es una tarea retirada: no se trabaja y no se borra. Lleva dropped_reason y la fecha.",
+    "Las tareas de fase 5 en adelante son deliberadamente gruesas: se detallan al acercarse."
   ],
   "tasks": [
     {
@@ -725,7 +727,7 @@
         "internal/legacy (golden files y tabla de estados)",
         "cmd/heimdall TestRunWritesTheLegacyFilesOnlyWithCompat"
       ],
-      "notes": "Capa temporal: no se le anade nada que la UAT no exija."
+      "notes": "Capa temporal: no se le anade nada que la UAT no exija. Congelada el 2026-09-20 por ADR-0016; se borra en T060."
     },
     {
       "id": "T042",
@@ -756,14 +758,14 @@
       "tests": [
         "cmd/heimdall/compat_test.go"
       ],
-      "notes": "Capa temporal, como T040."
+      "notes": "Capa temporal congelada (ADR-0016): se conserva para pruebas internas, no recibe funcionalidad nueva y se borra en T060."
     },
     {
       "id": "T043",
       "title": "Leer el proyecto que monta la GUI: config.yaml y start.rb",
       "phase": 4,
-      "status": "READY",
-      "priority": "P0",
+      "status": "DROPPED",
+      "priority": "P2",
       "depends_on": [
         "T042"
       ],
@@ -783,14 +785,15 @@
         "La nota no cambia respecto al mismo examen en formato canonico"
       ],
       "tests": [],
-      "notes": "Comprobado el 2026-09-20: hoy sale exit 2 con \"no se puede leer examen.yaml\"."
+      "notes": "Comprobado el 2026-09-20: hoy sale exit 2 con \"no se puede leer examen.yaml\".",
+      "dropped_reason": "Retirada el 2026-09-20 por ADR-0016: Heimdall no lee config.yaml ni start.rb. No hay proyecto de Teuton que abrir; la GUI nueva escribe el formato nativo."
     },
     {
       "id": "T041",
       "title": "UAT: los escenarios e2e de la GUI que no necesitan una averia simulada",
       "phase": 4,
-      "status": "BLOCKED",
-      "priority": "P0",
+      "status": "DROPPED",
+      "priority": "P2",
       "depends_on": [
         "T040",
         "T042",
@@ -811,13 +814,14 @@
         "La lista de escenarios ejecutados y la de excluidos queda escrita, con el motivo de cada exclusion"
       ],
       "tests": [],
-      "notes": "npm run build ANTES o fallan las 40 con un error que no lo explica. Baseline 2026-09-20 con el teuton falso: 40 pasan, 2 saltadas (app empaquetada). Bloqueada por T043: hoy el motor lee examen.yaml y aula.yaml, y los proyectos que monta la suite son de Teuton (config.yaml y start.rb), asi que `run --export=json .` sale con 2 antes de evaluar nada."
+      "notes": "npm run build ANTES o fallan las 40 con un error que no lo explica. Baseline 2026-09-20 con el teuton falso: 40 pasan, 2 saltadas (app empaquetada). Bloqueada por T043: hoy el motor lee examen.yaml y aula.yaml, y los proyectos que monta la suite son de Teuton (config.yaml y start.rb), asi que `run --export=json .` sale con 2 antes de evaluar nada.",
+      "dropped_reason": "Retirada el 2026-09-20 por ADR-0016: la UAT de Teuton GUI deja de ser prueba de aceptacion del motor. La sustituyen los criterios A-1..A-15 y la suite de la GUI nueva sobre el contrato nativo."
     },
     {
       "id": "T044",
       "title": "Averias reales para los escenarios hostiles de la GUI",
       "phase": 4,
-      "status": "BLOCKED",
+      "status": "DROPPED",
       "priority": "P2",
       "depends_on": [
         "T041"
@@ -834,106 +838,279 @@
         "Cada modo hostil de la suite queda cubierto con una averia real o descartado por escrito con su motivo"
       ],
       "tests": [],
-      "notes": "Modos en uso: hang(5), slow(4), offline(2), truncate, crash, badgrades, mas crash/noreports/syntaxerror/staleresume en procedencia y emptyresume por setFakeMode."
+      "notes": "Modos en uso: hang(5), slow(4), offline(2), truncate, crash, badgrades, mas crash/noreports/syntaxerror/staleresume en procedencia y emptyresume por setFakeMode.",
+      "dropped_reason": "Retirada el 2026-09-20 por ADR-0016: los escenarios hostiles prueban las defensas de la GUI vieja ante el motor viejo. Las averias reales que si importan (maquina apagada, salida enorme, proceso colgado) ya estan cubiertas por A-3, A-8, A-15 y los tests de integracion."
     },
     {
       "id": "T050",
-      "title": "Contrato NDJSON motor-GUI y cierre de D-9",
+      "title": "Contrato nativo motor-GUI: eventos NDJSON y esquema del artefacto",
+      "phase": 4,
+      "status": "READY",
+      "priority": "P0",
+      "depends_on": [
+        "T032"
+      ],
+      "goal": "Publicar el unico canal por el que la GUI de Heimdall habla con el motor, antes de escribir una linea de GUI.",
+      "scope": [
+        "Eventos NDJSON por stdout con version de contrato: run.start con el total exacto de comprobaciones y los pesos, un evento por comprobacion con estado y causa tecnica, student.end, run.end",
+        "Documento de contrato en docs/design/ con la regla de compatibilidad: campos nuevos si, campos que cambian de significado no",
+        "Esquema estable del artefacto canonico para que la GUI no adivine",
+        "Bandera para activarlo y comportamiento por defecto documentado",
+        "ADR que cierre D-9"
+      ],
+      "out_of_scope": [
+        "Cualquier cambio en la capa legacy, que queda congelada (ADR-0016)",
+        "Codigo de GUI"
+      ],
+      "acceptance": [
+        "Un consumidor de prueba lee una ejecucion completa del laboratorio solo con los eventos y el artefacto: progreso, notas, incompletas y causas",
+        "El total de comprobaciones de run.start coincide con el denominador del PLAN",
+        "Los eventos no contienen ningun secreto ni ninguna salida sin acotar",
+        "Una ejecucion cancelada emite run.end con el estado real",
+        "El contrato esta versionado y documentado"
+      ],
+      "tests": [
+        "cmd/heimdall",
+        "internal/report",
+        "test/acceptance.sh"
+      ],
+      "notes": "Primera tarea del enfoque nativo (ADR-0016). Todo lo de fase 5 cuelga de aqui."
+    },
+    {
+      "id": "T051",
+      "title": "Semilla de gui/: Heimdall GUI sin una linea de Teuton",
+      "phase": 5,
+      "status": "BLOCKED",
+      "priority": "P0",
+      "depends_on": [
+        "T050"
+      ],
+      "goal": "Tener la aplicacion propia arrancando en gui/, con la base tecnica y visual de teuton-gui y ninguna dependencia de Teuton.",
+      "scope": [
+        "Copiar a gui/ la infraestructura que aporta: Electron, Vite, React, Tailwind, configuracion de tests, componentes, estilos y layouts",
+        "Renombrar producto, identificadores de aplicacion, iconos y textos a Heimdall",
+        "Borrar en el primer commit todo lo que hable con Teuton: resolucion del binario ruby, parseo de resume.json y case-NN.json, watchdog, parseFirstJsonValue, progreso por caracteres, editor de config.yaml y start.rb",
+        "Dejar los tests que sigan valiendo y retirar los que prueban el contrato viejo, con la lista escrita",
+        "Integrar gui/ en el Makefile sin romper make check"
+      ],
+      "out_of_scope": [
+        "Funcionalidad nueva de producto",
+        "Consumir todavia el contrato nativo (es T052)"
+      ],
+      "acceptance": [
+        "La aplicacion arranca y se ve, con su nombre y su identidad",
+        "grep -ri teuton en gui/src no devuelve nada",
+        "La suite de la GUI pasa entera y queda escrito que test se retiro y por que",
+        "make check del motor sigue en verde"
+      ],
+      "tests": [],
+      "notes": "La GUI vive dentro de este repositorio (decision del 2026-09-20). teuton-gui queda como referencia de solo lectura en workspace/."
+    },
+    {
+      "id": "T052",
+      "title": "La GUI lanza el motor y sigue la ejecucion por el contrato nativo",
+      "phase": 5,
+      "status": "BLOCKED",
+      "priority": "P0",
+      "depends_on": [
+        "T051"
+      ],
+      "goal": "Corregir desde la aplicacion, con progreso real, sin pasar por ningun fichero de Teuton.",
+      "scope": [
+        "Lanzar el binario con examen.yaml y aula.yaml y los secretos por stdin",
+        "Consumir los eventos NDJSON: barra de progreso por comprobacion, alumno a alumno",
+        "Cancelacion desde la GUI con artefacto parcial util",
+        "Aislamiento: la GUI nunca escribe un secreto en argv ni en disco sin cifrar"
+      ],
+      "out_of_scope": [
+        "Presentacion de resultados (T053)"
+      ],
+      "acceptance": [
+        "Un examen del laboratorio se corrige entero desde la aplicacion",
+        "La barra de progreso corresponde a comprobaciones reales, no a caracteres",
+        "Cancelar a mitad deja un resultado parcial legible y el motor sale con 4",
+        "Ninguna contrasena aparece en argv, logs ni ficheros de la GUI"
+      ],
+      "tests": [],
+      "notes": "Detallar al llegar."
+    },
+    {
+      "id": "T053",
+      "title": "Resultados: matriz, notas, causas tecnicas e incompletas (cierra D-8)",
+      "phase": 5,
+      "status": "BLOCKED",
+      "priority": "P0",
+      "depends_on": [
+        "T052"
+      ],
+      "goal": "Que el profesor vea lo que el modelo real sabe y que un fallo tecnico nunca se lea como un cero.",
+      "scope": [
+        "Lista de alumnos y matriz de resultados sobre el artefacto canonico",
+        "UNEVALUATED como estado propio, con su causa tecnica y su detalle; se acabo inferirlo",
+        "Nota provisional y denominador visibles; INCOMPLETE nunca se publica como nota final",
+        "Avisos y salidas truncadas visibles",
+        "Filtros por estado, causa, alumno y comprobacion",
+        "Que ofrece la GUI ante un incompleto: reintentar ese alumno, marcarlo o dejarlo pendiente. Cierra D-8 con un ADR"
+      ],
+      "out_of_scope": [
+        "Conversion a la escala del profesor mas alla de lo que ya habia",
+        "Anticopia (D-5)"
+      ],
+      "acceptance": [
+        "Un alumno con la maquina apagada se ve como no evaluado con su causa, nunca como un 0",
+        "Un examen incompleto no muestra nota final en ningun sitio",
+        "Cada estado y cada causa del modelo tiene representacion visible y probada",
+        "Un ADR cierra D-8"
+      ],
+      "tests": [],
+      "notes": "Aqui esta el principio 3 del proyecto. Detallar al llegar."
+    },
+    {
+      "id": "T054",
+      "title": "Historico, modo examen y analiticas sobre el modelo real",
       "phase": 5,
       "status": "BLOCKED",
       "priority": "P1",
       "depends_on": [
-        "T041"
+        "T053"
       ],
-      "goal": "Dar a la GUI eventos legibles por maquina y borrar el andamio de progreso.",
+      "goal": "Recuperar el resto del flujo de aula que ya funcionaba, ahora con datos completos.",
       "scope": [
-        "run.start con el total exacto",
-        "un evento por comprobacion con estado tecnico",
-        "ADR que cierre D-9"
+        "Historico de ejecuciones por clase leyendo los artefactos canonicos",
+        "Modo examen y modo proyector",
+        "Analiticas y utilidades que sigan teniendo sentido, revisadas una a una",
+        "Exportacion de notas"
       ],
       "out_of_scope": [
-        "Cambios en la GUI (fase 6)"
+        "Funciones nuevas sin caso de uso demostrado (principio 10)"
       ],
       "acceptance": [
-        "El contrato esta documentado y versionado",
-        "el motor lo emite a la vez que la capa legacy"
+        "El profesor abre una ejecucion anterior y ve lo mismo que el dia que la corrio",
+        "Cada utilidad heredada esta conservada o retirada con su motivo por escrito"
       ],
       "tests": [],
       "notes": "Detallar al llegar."
     },
     {
       "id": "T060",
-      "title": "Adaptacion de Teuton GUI y borrado de la capa legacy",
+      "title": "Borrado de la capa legacy en un commit",
       "phase": 6,
       "status": "BLOCKED",
       "priority": "P1",
       "depends_on": [
-        "T050"
+        "T054"
       ],
-      "goal": "Sustituir el andamio de la GUI modulo a modulo, con su suite en verde en cada paso.",
+      "goal": "Quitar el andamio en cuanto deja de sostener nada.",
       "scope": [
-        "progress.ts a NDJSON",
-        "results.ts al artefacto canonico",
-        "presentacion de INCOMPLETE (D-8)",
-        "borrado de internal/legacy en un solo commit"
+        "Borrar internal/legacy, --compat=teuton2 y la fachada --export=json, --cname, --case",
+        "Borrar docs/design/06-LEGACY-WRITER.md y las referencias a la compatibilidad",
+        "Actualizar ARCHITECTURE.md y las reglas"
       ],
       "out_of_scope": [
-        "Reescribir la GUI"
+        "Tocar docs/research/, que es evidencia historica"
       ],
       "acceptance": [
-        "Ningun test de la GUI lee resume.json ni case-NN.json",
-        "los 192 unitarios y los 40 e2e siguen en verde"
+        "grep -ri teuton en cmd/, internal/ y gui/src no devuelve ninguna dependencia",
+        "make check y make test en verde",
+        "La suite de la GUI en verde",
+        "Un solo commit"
       ],
       "tests": [],
-      "notes": "Se divide en varias tareas al llegar, una por modulo. Solo aqui se toca el repositorio de la GUI, y en su rama."
+      "notes": "ADR-0016. No se adelanta: hasta aqui la fachada sirve para pruebas internas."
     },
     {
       "id": "T070",
-      "title": "Migrador de proyectos Teuton y empaquetado del binario",
+      "title": "Rehacer los examenes del curso en formato nativo",
       "phase": 7,
       "status": "BLOCKED",
       "priority": "P1",
       "depends_on": [
-        "T060"
+        "T053"
+      ],
+      "goal": "Tener los examenes reales del curso escritos en el formato de Heimdall, sin migrador.",
+      "scope": [
+        "Reescribir cada examen del curso como examen.yaml y aula.yaml",
+        "Anotar lo que el formato nativo no sabe expresar todavia, como tarea, no como excepcion"
+      ],
+      "out_of_scope": [
+        "Migrador automatico de proyectos Teuton: retirado por ADR-0016"
+      ],
+      "acceptance": [
+        "Cada examen del curso corre completo contra el laboratorio",
+        "La lista de construcciones que no se han podido expresar esta escrita, o esta vacia"
+      ],
+      "tests": [],
+      "notes": "Los examenes son material real de aula: no se inventan datos ni notas."
+    },
+    {
+      "id": "T071",
+      "title": "Editor de examenes en la GUI sobre el formato nativo",
+      "phase": 7,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T070"
+      ],
+      "goal": "Que el profesor escriba y edite un examen sin abrir un editor de texto.",
+      "scope": [
+        "Edicion visual de examen.yaml y aula.yaml",
+        "Validacion con el propio motor (check) antes de guardar, con fichero y linea"
+      ],
+      "out_of_scope": [
+        "Importar examenes antiguos"
+      ],
+      "acceptance": [
+        "Un examen creado desde la GUI corre sin tocar un fichero a mano",
+        "Un examen invalido se senala en la GUI con el mensaje del motor"
+      ],
+      "tests": [],
+      "notes": "Detallar al llegar."
+    },
+    {
+      "id": "T072",
+      "title": "Empaquetado con el binario embebido para Linux y Windows",
+      "phase": 7,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T071"
       ],
       "goal": "Que el profesor descargue la aplicacion, la ejecute y funcione.",
       "scope": [
-        "migrador config.yaml + start.rb a los dos YAML con informe de lo no traducible",
-        "editor del formato nuevo en la GUI",
-        "binario embebido para Linux y Windows"
+        "Binario del motor embebido en la aplicacion, por plataforma",
+        "Paquetes de Linux y de Windows",
+        "La GUI usa el binario embebido y no uno del sistema"
       ],
-      "out_of_scope": [
-        "Traducir construcciones del DSL que no tengan equivalente: se informan, no se adivinan"
-      ],
+      "out_of_scope": [],
       "acceptance": [
-        "Instalacion sin Ruby, sin gems, sin Go, sin Docker ni Podman y sin servicios externos"
+        "Instalacion y ejecucion sin Ruby, sin gems, sin Go, sin Docker ni Podman y sin servicios externos, en Linux y en Windows"
       ],
       "tests": [],
       "notes": "Detallar al llegar."
     },
     {
       "id": "T080",
-      "title": "Hardening, comparacion de notas y release",
+      "title": "Hardening, auditoria de secretos y release",
       "phase": 8,
       "status": "BLOCKED",
       "priority": "P1",
       "depends_on": [
-        "T070"
+        "T060",
+        "T072"
       ],
-      "goal": "Cerrar los 16 modos de fallo documentados y demostrar que no hay regresion de notas.",
+      "goal": "Cerrar los 16 modos de fallo documentados y publicar la aplicacion.",
       "scope": [
         "repaso de FAILURE-MODES.md uno a uno",
-        "auditoria de secretos de extremo a extremo",
-        "comparacion nota a nota entre los dos motores como test",
+        "auditoria de secretos de extremo a extremo, motor y GUI",
         "documentacion de usuario y versionado"
       ],
       "out_of_scope": [],
       "acceptance": [
         "Cada modo de fallo esta corregido o documentado como aceptado, con su motivo",
-        "un examen real de aula corregido con el motor nuevo"
+        "un examen real de aula corregido con Heimdall, motor y GUI"
       ],
       "tests": [],
-      "notes": "Detallar al llegar."
+      "notes": "La comparacion nota a nota con Teuton se retira: ya no hay dos motores que comparar (ADR-0016). Detallar al llegar."
     }
   ]
 }

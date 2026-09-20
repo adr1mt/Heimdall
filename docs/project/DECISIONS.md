@@ -291,3 +291,30 @@ Dos decisiones menores:
 6. **`--cname=X` busca `X.yaml` en el mismo directorio.** Un nombre con
    separadores de ruta es error de configuración, no una lectura fuera del
    proyecto.
+
+## 2026-09-20 · Heimdall deja de ser compatible con Teuton (ADR-0016)
+
+1. **Se retira la compatibilidad, no se aplaza.** ADR-0008 aceptaba el
+   adaptador para conservar la red de seguridad de la UAT de la GUI. El precio
+   apareció entero en la fase 4: T043 obligaba al motor a leer `config.yaml` y
+   `start.rb`, y T044 a provocar averías que el motor no comete. Pasar esa UAT
+   probaba la imitación, no el motor.
+2. **El contrato nativo pasa a ser lo primero.** D-9 estaba aplazado detrás del
+   escritor legacy; ahora es T050, la única tarea `READY`, porque todo lo demás
+   cuelga de él.
+3. **La GUI vive en `gui/`, dentro de este repositorio.** Un solo release y el
+   contrato siempre en la misma versión que su consumidor, a cambio de tener Go
+   y Node en el mismo árbol.
+4. **Nace de `teuton-gui`, no lo continúa.** Se toma la base técnica y visual
+   —Electron, Vite, React, Tailwind, componentes, estilos, layouts, tests que
+   sigan valiendo— y se borra en el primer commit todo lo que hable con Teuton.
+   Reescribir desde cero costaba la suite de tests sin ganar nada.
+5. **La capa legacy se congela, no se borra hoy.** Sigue sirviendo para pruebas
+   internas y su borrado (T060) es un commit propio, cuando la GUI nativa esté
+   en verde. Borrarla ya dejaría el motor sin ningún consumidor durante toda la
+   fase 4.
+6. **T041, T043 y T044 quedan `DROPPED`, no eliminadas.** Una tarea retirada
+   con su motivo explica el camino; una tarea borrada lo esconde.
+7. **No hay migrador de exámenes.** Los exámenes del curso se rehacen en el
+   formato nativo (T070). Un traductor de un DSL ejecutable a un formato
+   declarativo es un compilador incompleto que solo se usaría una vez.

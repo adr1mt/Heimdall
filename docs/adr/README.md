@@ -12,7 +12,7 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 | [0005](0005-taxonomia-estados.md) | PASS / FAIL / UNEVALUATED más causa técnica |
 | [0006](0006-incompletas-sin-nota-final.md) | Una evaluación incompleta no produce nota final |
 | [0007](0007-json-canonico.md) | Un único modelo canónico en JSON |
-| [0008](0008-compat-teuton-temporal.md) | Compatibilidad con Teuton como adaptador temporal |
+| [0008](0008-compat-teuton-temporal.md) | ~~Compatibilidad con Teuton como adaptador temporal~~ · sustituida por 0016 |
 | [0009](0009-politica-de-secretos.md) | Los secretos van por stdin y nunca al resultado |
 | [0010](0010-ssh-nativo.md) | SSH nativo con `x/crypto/ssh`, no el binario `ssh` |
 | [0011](0011-identidad-de-las-maquinas.md) | La identidad de la máquina se fija por ejecución, no entre cursos |
@@ -20,3 +20,4 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 | [0013](0013-alumnos-en-paralelo.md) | 16 alumnos en paralelo, medido; cierra D-6 |
 | [0014](0014-nombre-heimdall.md) | El producto se llama Heimdall; cierra D-7 |
 | [0015](0015-causa-salida-desbordada.md) | Novena causa técnica: `OUTPUT_OVERFLOW` |
+| [0016](0016-heimdall-independiente-de-teuton.md) | Heimdall es un producto independiente, con GUI propia; sustituye a 0008 |

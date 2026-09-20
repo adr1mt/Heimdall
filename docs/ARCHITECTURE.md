@@ -12,8 +12,8 @@ historia está en [`research/`](research/); el detalle de cada pieza, en
 Profesor
    │
    ▼
-Aplicación de escritorio (Teuton GUI adaptada, Electron)
-   │  examen.yaml + aula.yaml + secretos por stdin
+Heimdall GUI (Electron, en `gui/`)
+   │  examen.yaml + aula.yaml + secretos por stdin · eventos NDJSON de vuelta
    ▼
 Motor Heimdall (Go, binario único embebido)
    │  SSH nativo
@@ -27,8 +27,7 @@ artefacto JSON.
 
 **Fuera del motor**: la interfaz, el almacén de credenciales, la conversión a la
 escala de nota del profesor, la resolución manual de evaluaciones incompletas,
-el histórico por clase y la exportación a Moodle (salvo la capa legacy
-temporal).
+el histórico por clase y la exportación de notas.
 
 Lo que no entra en el núcleo: telnet, monitorización, correo, SFTP, macros,
 detección de copias, DSL ejecutable.
@@ -56,7 +55,7 @@ aula.yaml  ──┴─► plan.Load ──(inválido)──► exit 2 · ficher
                     │
                     ▼
               report.WriteAtomic(var/run-<ulid>.json)
-                    └─(--compat=teuton2)─► legacy.Write(resume.json, case-NN.json)
+                    └─(congelado, ADR-0016)─► legacy.Write(...) solo con --compat=teuton2
 ```
 
 La fase PLAN es anterior a cualquier conexión y no puede alterarse después.
@@ -72,26 +71,28 @@ La fase PLAN es anterior a cualquier conexión y no puede alterarse después.
 | `internal/engine` | Worker pool, presupuesto por alumno, aislamiento, cancelación | Decidir notas |
 | `internal/assert` | `contiene`, `igual_a`, `no_contiene`, `exit_code`, `cerca_de` | Saber de notas |
 | `internal/report` | Escritura atómica, artefacto parcial, redacción de secretos | Calcular nada |
-| `internal/legacy` | `resume.json`, `case-NN.json`, `moodle.csv` y fachada CLI para la GUI actual | Leer ficheros de Teuton, influir en la nota |
+| `internal/legacy` | **Congelado (ADR-0016)**: ficheros y fachada de Teuton para pruebas internas, hasta que se borre en T060 | Recibir nada nuevo, influir en la nota |
+| `gui/` | Heimdall GUI: Electron sobre el contrato nativo | Calcular notas, hablar con SSH |
 
 ## 4. Separación motor / GUI
 
-El acoplamiento actual con Teuton GUI son 11 puntos (C1-C11,
-[GUI-CONTRACT.md](research/GUI-CONTRACT.md)); nueve son ficheros y exit codes.
-La migración va en tres pasos reversibles:
+Un solo canal, nativo, en una sola dirección (ADR-0016):
 
-1. El motor escribe el artefacto canónico **y** los ficheros legacy
-   (`--compat=teuton2`). La GUI funciona sin cambiar una línea y sus 40
-   escenarios e2e son la prueba de aceptación del motor.
-2. Se sustituye el progreso por caracteres (C4) por eventos NDJSON por stdout
-   (formato pendiente, D-9). Desaparece `lib/progress.ts`.
-3. Se sustituyen `resume.json` y `case-NN.json` por el artefacto canónico.
-   Cuando ningún test de la GUI los lea, `internal/legacy` se borra entero.
+```
+Heimdall GUI ──► examen.yaml + aula.yaml + secretos por stdin ──► motor
+Heimdall GUI ◄── eventos NDJSON (progreso, estado, causa) ──────── motor
+Heimdall GUI ◄── artefacto canónico JSON ──────────────────────── motor
+```
 
-Entre 500 y 700 líneas de la GUI son andamio que compensa defectos del motor
-viejo y desaparecen en ese camino. El resto de la GUI —modo examen, histórico,
-conversión de nota, modo proyector, aislamiento de seguridad— es lógica de aula
-y no se toca.
+El motor no sabe que existe una GUI: publica eventos y un artefacto. La GUI no
+sabe de SSH ni de notas: presenta lo que el modelo canónico dice. No hay
+compatibilidad con Teuton en ningún punto; `internal/legacy` está congelado y
+solo sirve para pruebas internas hasta que se borre.
+
+La GUI vive en `gui/`, en este repositorio, para que contrato y consumidor
+viajen siempre en la misma versión. Toma de `teuton-gui` la base técnica y
+visual y la experiencia de uso —lista de alumnos, matriz, progreso, filtros,
+histórico, modo examen, analíticas—, no su contrato.
 
 ## 5. Modelo de resultados
 
@@ -122,9 +123,7 @@ Detalle completo: [03-ESTADOS-Y-NOTA.md](design/03-ESTADOS-Y-NOTA.md) y
 ## 6. Fuente de verdad
 
 `var/run-<ulid>.json`, un fichero por ejecución, escritura atómica, nunca
-sobrescrito y nunca modificado. Todo lo demás —NDJSON, GUI, Moodle, HTML, la
-capa legacy— **deriva** de él; nada escribe hacia atrás. Un dato que solo exista
-en el formato legacy no existe.
+sobrescrito y nunca modificado. Todo lo demás —NDJSON, GUI, exportaciones— **deriva** de él; nada escribe hacia atrás. Un dato que solo exista en un formato derivado no existe.
 
 Mientras la ejecución corre, `var/run-<id>.partial.json` se reescribe
 atómicamente al cerrar cada alumno, para que un proceso muerto deje material

@@ -1,5 +1,10 @@
 # `LegacyTeutonWriter` — capa temporal eliminable
 
+> **Congelado (2026-09-20, [ADR-0016](../adr/0016-heimdall-independiente-de-teuton.md)).**
+> Heimdall no mantiene compatibilidad con Teuton. Este escritor y la fachada CLI
+> se conservan solo para pruebas internas, no reciben nada nuevo y se borran
+> enteros en T060. Este documento es descriptivo, no una especificación viva.
+
 > **CAPA TEMPORAL.** Existe para validar el motor nuevo contra la UAT de Teuton
 > GUI (40 escenarios) sin tocar la GUI. Se borra entera —paquete, tests y
 > bandera— cuando la GUI consuma el artefacto canónico. No se le añade ninguna

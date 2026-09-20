@@ -67,42 +67,55 @@ completos contra el laboratorio.
 `MaxStartups` por defecto —lo que Teuton no consigue (53 de 100)— y RSS plano
 respecto al tamaño de la salida. Cierra **D-6**.
 
-## Fase 4 — Compatibilidad con Teuton GUI y UAT
+## Fase 4 — Contrato nativo motor ↔ GUI
 
-`LegacyTeutonWriter` completo (`resume.json`, `case-NN.json`, `moodle.csv`) más
-la fachada CLI mínima (`version`, `check`, progreso por caracteres).
+El primer eslabón de la cadena definitiva. Eventos NDJSON por stdout, versionados:
+`run.start` con el total exacto de comprobaciones, un evento por comprobación con
+estado y causa técnica, `run.end` con el resumen. Más el artefacto canónico, que
+ya existe, como fuente de verdad del resultado. Cierra **D-9**.
 
-**Salida**: la GUI actual, **sin tocar una línea**, pasa sus 40 escenarios e2e
-apuntando al binario nuevo. Y golden files comparados campo a campo con salidas
-reales de Teuton.
+Se publica también un esquema estable del artefacto para que la GUI lo consuma
+sin adivinar.
 
-## Fase 5 — Contrato nativo motor ↔ GUI
+**Salida**: el contrato documentado, versionado y emitido por el motor; un
+consumidor de prueba lee una ejecución completa —progreso, incompletas y causas
+incluidas— sin leer ningún fichero de Teuton.
 
-Eventos NDJSON por stdout: `run.start` con el total exacto de comprobaciones, un
-evento por comprobación, estado técnico explícito. Cierra **D-9**.
+## Fase 5 — Heimdall GUI sobre el contrato nativo
 
-**Salida**: el contrato documentado y estable, con el motor emitiéndolo a la vez
-que la capa legacy.
+La aplicación propia, en `gui/`. Nace con `teuton-gui` como base técnica y
+visual: Electron, Vite, React, Tailwind, componentes, estilos, layouts y los
+tests que sigan aportando. Se elimina desde el primer commit toda dependencia
+conceptual y técnica de Teuton; la capa de motor se escribe directa sobre el
+contrato de la fase 4.
 
-## Fase 6 — Adaptación de Teuton GUI
+Se conserva la experiencia de uso: lista de alumnos, matriz de resultados,
+progreso de corrección, filtros, histórico, modo examen, presentación de notas
+y errores, analíticas. Y se aprovecha lo que Teuton GUI no podía mostrar:
+`UNEVALUATED` como tal y no inferido, la causa técnica de cada comprobación,
+la nota provisional, los avisos y los resultados parciales.
 
-Se adapta, no se reescribe. Módulo a módulo, cada uno con la suite existente en
-verde:
+Se cierra **D-8**: cómo presenta la GUI un `INCOMPLETE` y qué ofrece al
+profesor.
 
-1. `lib/progress.ts` → consumo de NDJSON.
-2. `results.ts` → artefacto canónico; `isUnevaluated` deja de ser inferencia.
-3. Presentación de `INCOMPLETE` y qué acción se ofrece al profesor (**D-8**).
-4. Se borran el watchdog, `parseFirstJsonValue`, el filtrado por ids y
-   `resolveViaLoginShell`.
+**Salida**: un examen completo corregido de principio a fin desde la aplicación,
+contra el laboratorio, sin que exista un solo fichero de Teuton por medio.
 
-**Salida**: ningún test de la GUI lee `resume.json` ni `case-NN.json`, y
-`internal/legacy` se elimina en un solo commit.
+## Fase 6 — Retirada de la capa legacy
 
-## Fase 7 — Migración de exámenes y empaquetado
+`internal/legacy`, `--compat=teuton2` y la fachada `--export=json`/`--cname`/
+`--case` se borran en un commit propio, junto con `06-LEGACY-WRITER.md` y las
+referencias que queden. Hasta ese momento están congeladas: sirven para pruebas
+internas y no reciben nada nuevo (ADR-0016).
 
-- Migrador de proyectos Teuton (`config.yaml` + `start.rb`) a los dos YAML, con
-  informe de lo que no se puede traducir. Nunca silencioso.
-- Editor de exámenes de la GUI sobre el formato nuevo.
+**Salida**: `grep -ri teuton` en el código del motor y de la GUI no devuelve
+ninguna dependencia, solo menciones históricas en `docs/research/`.
+
+## Fase 7 — Exámenes del curso y empaquetado
+
+- Los exámenes reales se rehacen en el formato nativo, uno a uno, con su
+  aula. No hay migrador automático (ADR-0016).
+- Editor de exámenes en la GUI sobre el formato nativo.
 - Binario embebido en la aplicación de escritorio, para Linux y Windows.
 
 **Salida**: descargar la aplicación, ejecutarla y que funcione. Sin Ruby, sin
@@ -114,8 +127,6 @@ gems, sin Go, sin Docker ni Podman, sin servicios externos.
   [research/FAILURE-MODES.md](research/FAILURE-MODES.md): cada uno, corregido o
   documentado como aceptado.
 - Auditoría de secretos de extremo a extremo.
-- Comparación nota a nota entre los dos motores sobre el mismo examen y la misma
-  aula, como test y no como revisión a ojo.
 - Documentación de usuario y versionado.
 
-**Salida**: un examen real de aula corregido con el motor nuevo.
+**Salida**: un examen real de aula corregido con Heimdall, motor y GUI.
