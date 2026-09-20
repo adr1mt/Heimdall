@@ -984,7 +984,7 @@
       "id": "T055",
       "title": "Que ofrece la GUI ante un incompleto (cierra D-8)",
       "phase": 5,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "T053"
@@ -1005,14 +1005,49 @@
         "Reintentar un alumno no cambia el denominador ni los pesos del PLAN",
         "El profesor distingue siempre de que ejecucion sale cada nota"
       ],
-      "tests": [],
+      "tests": [
+        "internal/engine/retry_test.go: solo se repite UNEVALUATED, el denominador sigue siendo el del PLAN, no hay nota final y el intento anterior no se borra",
+        "cmd/heimdall/retry_test.go: plan_hash distinto y artefacto ausente son exit 2; --retry no se combina con --case ni con la fachada congelada; se descartan los alumnos sin nada que repetir",
+        "gui/tests/results.test.ts: comprobaciones y peso por separado, alcance del reintento sin FAIL, procedencia de cada ejecución",
+        "gui/tests/run.test.ts: --retry nombra el artefacto anterior y nunca una lista de alumnos ni de comprobaciones",
+        "Laboratorio: corrección del prototipo y reintento sobre su artefacto; lo repetido es lo que quedó sin evaluar y nada más"
+      ],
       "notes": "Se separo de T053 al llegar: presentar y actuar son dos trabajos."
+    },
+    {
+      "id": "T057",
+      "title": "Vista consolidada de una cadena de correcciones",
+      "phase": 5,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T054",
+        "T055"
+      ],
+      "goal": "Cerrar la nota de un alumno que quedo entero entre dos ejecuciones, sin mezclar artefactos.",
+      "scope": [
+        "Regla escrita de consolidacion: por comprobacion, el resultado de la ejecucion mas reciente que la evaluo",
+        "Nota consolidada con el denominador del PLAN, que es el mismo en toda la cadena",
+        "Cada resultado dice de que ejecucion sale y que intentos hubo antes",
+        "La consolidacion es una vista: no se escribe ningun artefacto nuevo"
+      ],
+      "out_of_scope": [
+        "Reescribir o mezclar artefactos: cada ejecucion conserva el suyo (ADR-0007, ADR-0018)",
+        "Marcar o resolver a mano una comprobacion (fuera del MVP, ADR-0018 §6)"
+      ],
+      "acceptance": [
+        "Un alumno con todo evaluado entre dos ejecuciones obtiene nota final, y se ve de donde sale cada parte",
+        "Mientras quede una comprobacion sin evaluar en toda la cadena, no hay nota final",
+        "Una cadena con distinto plan_hash se rechaza y se dice por que"
+      ],
+      "tests": [],
+      "notes": "Sale de T055: el artefacto de un reintento parcial no da nota final por si solo, y eso es correcto. Consolidar es un trabajo aparte y necesita poder abrir ejecuciones anteriores (T054)."
     },
     {
       "id": "T054",
       "title": "Historico, modo examen y analiticas sobre el modelo real",
       "phase": 5,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T053"

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { FileText, Play, Square, Users } from 'lucide-react'
+import { FileText, Play, RotateCcw, Square, Users } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -26,6 +26,8 @@ export default function HomeView() {
   const setExamPath = useApp((s) => s.setExamPath)
   const setClassPath = useApp((s) => s.setClassPath)
   const setNotice = useApp((s) => s.setNotice)
+  const retry = useApp((s) => s.retry)
+  const setRetry = useApp((s) => s.setRetry)
 
   const run = useRun()
   const busy = run.phase === 'starting' || run.phase === 'running'
@@ -78,12 +80,15 @@ export default function HomeView() {
     if (!examPath || !classPath || missing) return
     useRun.getState().begin()
     try {
-      await window.heimdall.startRun({ examPath, classPath, secrets })
+      // The retry travels as the path of the previous artifact and nothing
+      // else: the engine decides what gets repeated (ADR-0018).
+      await window.heimdall.startRun({ examPath, classPath, secrets, retryFrom: retry?.artifactPath })
     } catch (error) {
       useRun.getState().fail(noticeFrom('No se pudo empezar la corrección', error))
     } finally {
       // The values leave the interface as soon as the engine has them.
       setSecrets({})
+      setRetry(null)
     }
   }
 
@@ -123,6 +128,20 @@ export default function HomeView() {
         </div>
         <p className="max-w-3xl text-xs text-muted-foreground">{t.home.sameFolder}</p>
 
+        {/* A retry is never silent: it says what it will repeat and it can be
+            called off without leaving this screen. */}
+        {retry && (
+          <div className="space-y-2 rounded-md bg-warning/10 p-4">
+            <p className="text-sm font-medium text-warning-strong">{t.run.retryTitle}</p>
+            <p className="text-xs text-warning-strong/90">
+              {t.run.retryBody(retry.checks, retry.students)}
+            </p>
+            <Button variant="ghost" size="sm" disabled={busy} onClick={() => setRetry(null)}>
+              {t.run.retryCancel}
+            </Button>
+          </div>
+        )}
+
         {classPath && (
           <Card>
             <CardHeader>
@@ -157,8 +176,8 @@ export default function HomeView() {
             </Button>
           ) : (
             <Button disabled={!!missing} onClick={() => void start()}>
-              <Play className="h-4 w-4" />
-              {run.phase === 'finished' ? t.run.again : t.run.start}
+              {retry ? <RotateCcw className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+              {retry ? t.run.retryStart : run.phase === 'finished' ? t.run.again : t.run.start}
             </Button>
           )}
           {missing && !busy && <span className="text-xs text-muted-foreground">{missing}</span>}
@@ -181,7 +200,7 @@ export default function HomeView() {
   )
 }
 
-/** What is happening, and what happened. The grades themselves are T053. */
+/** What is happening, and what happened. The grades are in Resultados. */
 function RunPanel({ percent }: { percent: number | null }) {
   const run = useRun()
   const expected = run.start?.expected_checks ?? 0

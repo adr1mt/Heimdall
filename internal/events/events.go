@@ -77,6 +77,11 @@ type RunStart struct {
 	ExpectedChecks int `json:"expected_checks"`
 
 	Students []StudentRef `json:"students"`
+
+	// RetryOf is set when this run repeats the unevaluated checks of an
+	// earlier one (ADR-0018), so the screen can say so while it runs and not
+	// only when the artifact is opened.
+	RetryOf *model.RetryRef `json:"retry_of,omitempty"`
 }
 
 // StudentStart says a worker has picked up a student.

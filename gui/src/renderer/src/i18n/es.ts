@@ -53,6 +53,11 @@ export const t = {
     needEngine: 'Primero hay que indicar dónde está el motor, en Ajustes.',
     needFiles: 'Elige el examen y el aula.',
     needSecrets: 'Faltan contraseñas por escribir.',
+    retryTitle: 'Reintento preparado',
+    retryBody: (checks: number, students: number) =>
+      `Se van a repetir ${checks} comprobaciones de ${students} alumnos. El resto de la clase no se toca.`,
+    retryStart: 'Repetir lo que falta',
+    retryCancel: 'Cancelar el reintento',
     classTitle: 'La clase',
     excluded: 'Excluido',
     waiting: 'En espera',
@@ -104,7 +109,23 @@ export const t = {
     emptyStream: 'sin salida',
     noExecution: 'El comando no llegó a ejecutarse.',
     noAssertion: 'No hubo ejecución completa que comparar.',
-    pick: 'Elige una comprobación de la matriz para verla en detalle.'
+    pick: 'Elige una comprobación de la matriz para verla en detalle.',
+    previous: 'El intento anterior'
+  },
+  pending: {
+    title: 'Qué ha quedado sin comprobar',
+    hint:
+      'Quedaron comprobaciones sin evaluar. Mientras falte alguna con peso, ese alumno no tiene nota final. Puedes dejarlo así y resolverlo más tarde, o repetir solo lo que no se pudo comprobar.',
+    checks: (missing: number, total: number) => `${missing} de ${total} comprobaciones sin evaluar`,
+    weight: (missing: number, total: number) => `${missing} de ${total} de peso sin evaluar`,
+    leave: 'Dejarlo pendiente',
+    left: 'Queda pendiente. La corrección no se ha tocado.',
+    retry: (checks: number, students: number) =>
+      `Repetir lo que falta (${checks} comprobaciones de ${students} alumnos)`,
+    confirmTitle: '¿Repetir lo que no se pudo comprobar?',
+    confirmBody:
+      'Se repiten solo las comprobaciones sin evaluar. Lo que salió bien y lo que salió mal no se vuelve a intentar, y esta corrección se conserva tal cual: el reintento se guarda aparte.',
+    confirmYes: 'Repetir'
   },
   settings: {
     title: 'Ajustes',

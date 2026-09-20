@@ -67,7 +67,7 @@ function AppBody() {
       window.heimdall
         .readArtifact(event.artifact)
         .then((artifact) => {
-          useRun.getState().setArtifact(artifact)
+          useRun.getState().setArtifact(artifact, event.artifact)
           useApp.getState().setView('results')
         })
         .catch((error) =>

@@ -2,6 +2,7 @@ import type { AcademicStatus, Score, StudentStatus } from '../../../shared/event
 import type {
   Cause,
   CheckResult,
+  PreviousAttempt,
   RemoteProcess,
   RunResult,
   Stream,
@@ -170,4 +171,102 @@ export function tally(checks: CheckResult[]): { pass: number; fail: number; unev
     fail: checks.filter((c) => c.status === 'FAIL').length,
     unevaluated: checks.filter((c) => c.status === 'UNEVALUATED').length
   }
+}
+
+/**
+ * What one student still has no result for, in the two units that are not
+ * interchangeable: how many checks, and how much weight.
+ *
+ * They are kept apart on purpose (ADR-0018 §7). «Falta 1 de 12» reads as
+ * nothing; if that one check is worth 4 of the 10 points of the exam, it is
+ * not nothing. The weights come from the score the engine published, never
+ * from adding anything up here.
+ */
+export interface Pending {
+  student: StudentResult
+  /** Checks with no academic result in this run. */
+  checks: number
+  /** Checks the PLAN gave this student. */
+  checkTotal: number
+  /** Weight with no academic result. */
+  weight: number
+  /** The PLAN's total weight: the denominator, the same for everybody. */
+  weightTotal: number
+}
+
+/**
+ * The students this run left with something unevaluated, in the PLAN's order.
+ * An excluded student is not pending: they were never going to be evaluated.
+ *
+ * It counts every unevaluated check, weighted or not, because that is exactly
+ * what a retry would execute again. A check of weight 0 is a diagnostic and
+ * does not hold back a final grade, so a student can be here with a grade
+ * already closed; the row says so by itself, because its missing weight is 0.
+ */
+export function pendingStudents(run: RunResult): Pending[] {
+  const out: Pending[] = []
+  for (const student of run.students) {
+    if (student.status === 'EXCLUDED') continue
+    const checks = student.checks.filter((c) => c.status === 'UNEVALUATED').length
+    if (checks === 0) continue
+    out.push({
+      student,
+      checks,
+      checkTotal: student.checks.length,
+      weight: student.score.unevaluated,
+      weightTotal: student.score.total
+    })
+  }
+  return out
+}
+
+/**
+ * What a retry of this run would repeat: the students with something left and
+ * the checks that would actually be executed again. Null when there is
+ * nothing to repeat, which is what hides the offer instead of greying it out.
+ *
+ * Only UNEVALUATED is counted. A FAIL is never repeated automatically
+ * (ADR-0018 §2).
+ */
+export function retryScope(run: RunResult): { students: number; checks: number } | null {
+  const pending = pendingStudents(run)
+  if (pending.length === 0) return null
+  return {
+    students: pending.length,
+    checks: pending.reduce((total, p) => total + p.checks, 0)
+  }
+}
+
+/**
+ * Where this run's results come from, in one sentence. A teacher looking at
+ * two screens a minute apart has to be able to tell which correction each
+ * grade belongs to.
+ */
+export function originText(run: RunResult): string {
+  const when = dateText(run.finished_at)
+  if (!run.retry_of) return `Corrección del ${when}`
+  const before = dateText(run.retry_of.run_at)
+  return `Reintento del ${when} · repite ${run.retry_of.checks} comprobaciones de ${run.retry_of.students} alumnos de la corrección del ${before}`
+}
+
+/** What a check was in the run this one repeated, in one sentence. */
+export function previousText(previous: PreviousAttempt): string {
+  const what =
+    previous.status === 'UNEVALUATED'
+      ? `quedó sin evaluar: ${CAUSE_TEXT[previous.cause].toLowerCase()}`
+      : `salió ${STATUS_TEXT[previous.status].toLowerCase()}`
+  return `En el intento anterior ${what}.`
+}
+
+/** A timestamp of the artifact as the teacher reads dates. */
+export function dateText(iso: string): string {
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return iso
+  return date.toLocaleString('es-ES', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }

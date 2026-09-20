@@ -22,3 +22,4 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 | [0015](0015-causa-salida-desbordada.md) | Novena causa técnica: `OUTPUT_OVERFLOW` |
 | [0016](0016-heimdall-independiente-de-teuton.md) | Heimdall es un producto independiente, con GUI propia; sustituye a 0008 |
 | [0017](0017-contrato-nativo-ndjson.md) | Contrato nativo motor ↔ GUI: eventos NDJSON y esquema del artefacto; cierra D-9 |
+| [0018](0018-reintento-de-lo-no-evaluado.md) | Ante un incompleto: dejar pendiente o repetir solo lo no evaluado; cierra D-8 |

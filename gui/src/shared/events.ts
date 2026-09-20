@@ -57,6 +57,8 @@ export interface RunStartEvent extends Envelope {
   plan: PlanSummary
   expected_checks: number
   students: StudentRef[]
+  /** Set when this run repeats what an earlier one left unevaluated. */
+  retry_of?: { run_id: string; artifact: string; run_at: string; students: number; checks: number }
 }
 
 export interface StudentStartEvent extends Envelope {

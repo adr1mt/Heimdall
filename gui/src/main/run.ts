@@ -25,6 +25,8 @@ export interface RunTarget {
   dir: string
   /** Classroom file name inside it, for --cname. */
   className: string
+  /** Previous artifact to repeat, for --retry. Absent in a normal run. */
+  retryFrom?: string
 }
 
 /**
@@ -49,14 +51,18 @@ export function resolveRunTarget(examPath: string, classPath: string): RunTarget
  * is readable with `ps` by any user of the machine (ADR-0009).
  */
 export function runArgs(target: RunTarget): string[] {
-  return [
+  const args = [
     'run',
     '--secrets=stdin',
     '--events=ndjson',
     `--var=${join(target.dir, 'var')}`,
-    `--cname=${target.className}`,
-    target.dir
+    `--cname=${target.className}`
   ]
+  // The engine picks what gets repeated, out of the artifact it is given: the
+  // interface never sends a list of checks (ADR-0018).
+  if (target.retryFrom) args.push(`--retry=${target.retryFrom}`)
+  args.push(target.dir)
+  return args
 }
 
 /** The one-line document the engine reads from stdin. */

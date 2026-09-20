@@ -51,6 +51,30 @@ type RunResult struct {
     Plan     PlanSummary     `json:"plan"`
     Students []StudentResult `json:"students"`
     Warnings []Warning       `json:"warnings,omitempty"`
+
+    // RetryOf está solo si esta ejecución repitió lo que otra dejó sin
+    // evaluar (ADR-0018). Es procedencia; ninguna función de nota lo mira.
+    RetryOf *RetryRef `json:"retry_of,omitempty"`
+}
+
+// RetryRef nombra la ejecución repetida. El PLAN es el mismo: los plan_hash
+// se compararon antes de la primera conexión.
+type RetryRef struct {
+    RunID    string    `json:"run_id"`
+    Artifact string    `json:"artifact"`
+    RunAt    time.Time `json:"run_at"`
+    Students int       `json:"students"`
+    Checks   int       `json:"checks"`
+}
+
+// PreviousAttempt es una comprobación tal como la dejó la ejecución anterior.
+// No lleva ejecución ni aserción: eso vive en el artefacto de aquella.
+type PreviousAttempt struct {
+    RunID      string         `json:"run_id"`
+    Status     AcademicStatus `json:"status"`
+    Cause      Cause          `json:"cause"`
+    Detail     string         `json:"detail,omitempty"`
+    FinishedAt time.Time      `json:"finished_at"`
 }
 
 // SourceRef identifica el fichero de entrada tal como estaba al ejecutar.
@@ -439,3 +463,8 @@ El aviso final anota la identidad de la máquina que sí respondió, con su huel
 5. `var/latest.json` es un enlace simbólico al último `run-*.json`. Comodidad
    para la CLI; ningún consumidor debe depender de él.
 6. **Nunca contiene secretos.** Ver `05-SECRETOS-TIMEOUTS-REINTENTOS.md`.
+7. **Un reintento no reescribe nada.** Repetir las comprobaciones que otra
+   ejecución dejó sin evaluar produce un artefacto nuevo, con su `run_id`, su
+   `retry_of` y un `previous` por comprobación. Las que no se repiten salen
+   `UNEVALUATED` con causa `NOT_RUN`: su resultado sigue viviendo en el
+   artefacto de aquella ejecución y no se copia aquí (ADR-0018).

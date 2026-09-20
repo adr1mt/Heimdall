@@ -427,3 +427,36 @@ Dos decisiones menores:
 7. **Una salida cortada se ve cortada**, con los bytes guardados y los que el
    comando sacó de verdad. Es la única manera de que se note que el examen pide
    más salida de la que se puede leer.
+
+## T055 · Qué se ofrece ante un incompleto
+
+1. **Dejarlo pendiente es lo normal y es lo que pasa si no se toca nada.** La
+   aplicación no reintenta por su cuenta ni marca nada por su cuenta. Un
+   incompleto es un estado legítimo de un examen; quedarse ahí no necesita
+   justificación, repetir sí. ADR-0018.
+2. **Se repite solo lo que no se pudo evaluar.** Un `FAIL` no se vuelve a
+   intentar nunca de forma automática: sería darle a un alumno intentos que el
+   resto de la clase no tuvo. Eso obliga a que el reintento sea por
+   comprobación y no por alumno.
+3. **Un reintento no borra el intento anterior.** El artefacto nuevo lleva de
+   dónde viene y, comprobación a comprobación, qué era y por qué causa la vez
+   anterior. Es rastro, no resultado: las funciones de nota no lo miran.
+4. **El PLAN del reintento es el mismo PLAN, comprobado por `plan_hash` antes
+   de tocar ninguna máquina.** Si el examen o el aula han cambiado, el
+   reintento no empieza: exit 2. La consecuencia práctica es que el reintento
+   sirve cuando se arregla la máquina, no cuando se arregla el `aula.yaml`.
+5. **Nada automático fabrica una nota.** Lo que no se repite sale sin evaluar
+   con causa «no se llegó a ejecutar», nunca suspenso, y mientras quede algo
+   sin evaluar no hay nota final. Eso deja el artefacto de un reintento parcial
+   sin nota final a propósito: consolidar una cadena de correcciones es T057 y
+   necesita una regla escrita y probada, no un atajo en la pantalla.
+6. **Marcar o resolver a mano queda fuera del MVP.** Obligaría a un resultado
+   que no viene del motor y a defender en cada vista que no se confunde con uno
+   real. Si vuelve, será como dice ADR-0006: artefacto aparte, con autor y
+   fecha, y conservando intacto lo que dijo el motor.
+7. **Comprobaciones y peso se enseñan como dos cifras distintas.** «Falta 1 de
+   3» y «falta 7 de 10 de peso» son la misma situación contada de dos maneras,
+   y con una sola se lee un agujero grande como pequeño.
+8. **El reintento no abre ninguna vía nueva hacia los secretos.** Viaja como la
+   ruta del artefacto anterior y nada más; el motor decide qué repite. Los
+   comandos del detalle siguen siendo los que publica el artefacto, ya saneados.

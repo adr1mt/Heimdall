@@ -72,6 +72,47 @@ type Options struct {
 	// Progress is told what the run is doing while it happens, so the caller
 	// can publish it. Nil means nobody is watching.
 	Progress *Progress
+
+	// Retry, when set, restricts this run to the checks an earlier run left
+	// unevaluated (ADR-0018). Nil is an ordinary run.
+	Retry *Retry
+}
+
+// Retry is the selection of a repeat run: which checks are executed again and
+// what each of them was in the run being repeated.
+//
+// It decides what the engine *executes*. It has no say in what anything is
+// worth: the PLAN is the same PLAN —the hashes were compared before the run
+// started— so the weights and the denominator are untouched (ADR-0004).
+type Retry struct {
+	// Ref is copied into the artifact so it says where it came from.
+	Ref model.RetryRef
+
+	// Previous is student id → check id → what that check was last time.
+	// Every check of the PLAN that the earlier run reported is in here,
+	// whatever its status.
+	Previous map[string]map[string]model.PreviousAttempt
+}
+
+// at returns what a check was in the run being repeated, or nil if that run
+// never reported it.
+func (r *Retry) at(studentID, checkID string) *model.PreviousAttempt {
+	if r == nil {
+		return nil
+	}
+	previous, ok := r.Previous[studentID][checkID]
+	if !ok {
+		return nil
+	}
+	return &previous
+}
+
+// Repeat reports whether a check is executed again. Only an UNEVALUATED one
+// is: a FAIL already has a result and repeating it would hand that student
+// attempts the rest of the class did not get.
+func (r *Retry) Repeat(studentID, checkID string) bool {
+	previous := r.at(studentID, checkID)
+	return previous != nil && previous.Status == model.Unevaluated
 }
 
 // Progress is the live report of a run. Every function is called from the
@@ -119,6 +160,10 @@ func Run(ctx context.Context, p *plan.Plan, opts Options) *model.RunResult {
 		PlanHash:      p.Hash,
 		Plan:          p.Summary,
 		Students:      make([]model.StudentResult, len(p.Students)),
+	}
+	if opts.Retry != nil {
+		ref := opts.Retry.Ref
+		run.RetryOf = &ref
 	}
 	run.Plan.Concurrency = concurrency
 	run.Plan.HostConcurrency = hostConcurrency

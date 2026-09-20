@@ -34,7 +34,8 @@ function readRunRequest(value: unknown): RunRequest {
   for (const [name, secret] of Object.entries(raw.secrets ?? {})) {
     if (typeof secret === 'string') secrets[name] = secret
   }
-  return { examPath: raw.examPath, classPath: raw.classPath, secrets }
+  const retryFrom = typeof raw.retryFrom === 'string' && raw.retryFrom ? raw.retryFrom : undefined
+  return { examPath: raw.examPath, classPath: raw.classPath, secrets, retryFrom }
 }
 
 export function registerIpc(): void {
@@ -71,9 +72,9 @@ export function registerIpc(): void {
 
   ipcMain.handle(IPC.startRun, (event, request: unknown): void => {
     if (session) throw new Error('Ya hay una corrección en marcha.')
-    const { examPath, classPath, secrets } = readRunRequest(request)
+    const { examPath, classPath, secrets, retryFrom } = readRunRequest(request)
     const engine = readSettings(settingsDir()).enginePath
-    const target = resolveRunTarget(examPath, classPath)
+    const target = { ...resolveRunTarget(examPath, classPath), retryFrom }
     const sender = event.sender
 
     session = new RunSession(engine, target, secrets, {

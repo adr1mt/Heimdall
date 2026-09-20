@@ -40,6 +40,23 @@ describe('runArgs', () => {
     expect(args).toContain('--var=/aula/p1/var')
     expect(args[args.length - 1]).toBe('/aula/p1')
   })
+
+  it('does not ask for a retry unless one was asked for', () => {
+    expect(args.some((a) => a.startsWith('--retry='))).toBe(false)
+  })
+
+  it('names the previous artifact and nothing else when repeating', () => {
+    const retry = runArgs({
+      dir: '/aula/p1',
+      className: 'smx2.yaml',
+      retryFrom: '/aula/p1/var/run-01M2Y.json'
+    })
+    expect(retry).toContain('--retry=/aula/p1/var/run-01M2Y.json')
+    // The engine picks which checks get repeated; the interface never sends a
+    // list of students or of checks (ADR-0018).
+    expect(retry.some((a) => a.startsWith('--case='))).toBe(false)
+    expect(retry[retry.length - 1]).toBe('/aula/p1')
+  })
 })
 
 describe('secretsLine', () => {

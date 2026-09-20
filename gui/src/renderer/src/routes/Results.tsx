@@ -1,14 +1,16 @@
 import { useMemo, useState } from 'react'
-import { AlertTriangle, X } from 'lucide-react'
+import { AlertTriangle, RotateCcw, X } from 'lucide-react'
 import {
   Badge,
   Button,
+  ConfirmDialog,
   Input,
   Segmented,
   SegmentedItem,
   SectionTitle,
   ViewHeader
 } from '@/components/ui'
+import { useApp } from '@/stores/app'
 import { useRun } from '@/stores/run'
 import {
   CAUSE_TEXT,
@@ -19,10 +21,15 @@ import {
   causesIn,
   filterRun,
   hasFilters,
+  originText,
+  pendingStudents,
+  previousText,
+  retryScope,
   scoreView,
   tally,
   truncationNote,
-  type Filters
+  type Filters,
+  type Pending
 } from '@/lib/results'
 import type { AcademicStatus } from '../../../shared/events'
 import type { CheckResult, Stream, StudentResult } from '../../../shared/artifact'
@@ -37,6 +44,7 @@ interface Selection {
 
 export default function ResultsView() {
   const artifact = useRun((s) => s.artifact)
+  const artifactPath = useRun((s) => s.artifactPath)
   const problem = useRun((s) => s.artifactProblem)
   const [filters, setFilters] = useState<Filters>(NO_FILTERS)
   const [selected, setSelected] = useState<Selection | null>(null)
@@ -86,7 +94,11 @@ export default function ResultsView() {
               artifact.plan.total_weight
             )}
           </p>
+          {/* Which correction these grades come from, always. */}
+          <p className="text-xs text-muted-foreground">{originText(artifact)}</p>
         </div>
+
+        <PendingPanel artifactPath={artifactPath} />
 
         {artifact.warnings && artifact.warnings.length > 0 && (
           <div className="space-y-1.5 rounded-md bg-warning/10 p-3">
@@ -168,6 +180,90 @@ export default function ResultsView() {
           <p className="text-xs text-muted-foreground">{t.results.pick}</p>
         )}
       </div>
+    </div>
+  )
+}
+
+/**
+ * What was left unchecked, and the only two things the teacher may do about
+ * it: nothing, or repeat what could not be evaluated (ADR-0018).
+ *
+ * Leaving it pending is the default and it is the safe one, so it is the
+ * plain button and the retry is the one that asks for confirmation. Nothing
+ * here can turn an unevaluated check into a fail or invent a final grade:
+ * this panel starts a new run of the engine and that is all it does.
+ */
+function PendingPanel({ artifactPath }: { artifactPath: string | null }) {
+  const artifact = useRun((s) => s.artifact)
+  const setRetry = useApp((s) => s.setRetry)
+  const setView = useApp((s) => s.setView)
+  const [dismissed, setDismissed] = useState(false)
+  const [confirm, setConfirm] = useState(false)
+
+  const pending = useMemo(() => (artifact ? pendingStudents(artifact) : []), [artifact])
+  const scope = useMemo(() => (artifact ? retryScope(artifact) : null), [artifact])
+
+  if (!artifact || pending.length === 0) return null
+  if (dismissed) return <p className="text-xs text-muted-foreground">{t.pending.left}</p>
+
+  function repeat(): void {
+    setConfirm(false)
+    if (!artifactPath || !scope) return
+    setRetry({ artifactPath, students: scope.students, checks: scope.checks })
+    setView('home')
+  }
+
+  return (
+    <div className="space-y-3 rounded-md bg-warning/10 p-4">
+      <div className="flex items-center gap-2 text-sm font-medium text-warning-strong">
+        <AlertTriangle className="h-4 w-4" />
+        {t.pending.title}
+      </div>
+      <p className="max-w-3xl text-xs text-warning-strong/90">{t.pending.hint}</p>
+
+      <div className="space-y-1.5">
+        {pending.map((row) => (
+          <PendingRow key={row.student.student_id} row={row} />
+        ))}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Button variant="outline" size="sm" onClick={() => setDismissed(true)}>
+          {t.pending.leave}
+        </Button>
+        {scope && artifactPath && (
+          <Button variant="ghost" size="sm" onClick={() => setConfirm(true)}>
+            <RotateCcw className="h-4 w-4" />
+            {t.pending.retry(scope.checks, scope.students)}
+          </Button>
+        )}
+      </div>
+
+      <ConfirmDialog
+        open={confirm}
+        title={t.pending.confirmTitle}
+        confirmLabel={t.pending.confirmYes}
+        onConfirm={repeat}
+        onCancel={() => setConfirm(false)}
+      >
+        {t.pending.confirmBody}
+      </ConfirmDialog>
+    </div>
+  )
+}
+
+/**
+ * One pending student, said in both units. Checks and weight are printed
+ * apart because they are not the same measure: the checks do not weigh the
+ * same, and one cipher alone invites reading a big hole as a small one
+ * (ADR-0018 §7).
+ */
+function PendingRow({ row }: { row: Pending }) {
+  return (
+    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-xs">
+      <span className="font-medium">{row.student.name}</span>
+      <span className="text-muted-foreground">{t.pending.checks(row.checks, row.checkTotal)}</span>
+      <span className="text-muted-foreground">{t.pending.weight(row.weight, row.weightTotal)}</span>
     </div>
   )
 }
@@ -299,6 +395,15 @@ function CheckDetail({
       </div>
 
       {check.detail && <p className="text-sm">{check.detail}</p>}
+
+      {check.previous && (
+        <Field label={t.results.previous}>
+          <p className="text-dense">{previousText(check.previous)}</p>
+          {check.previous.detail && (
+            <p className="text-xs text-muted-foreground">{check.previous.detail}</p>
+          )}
+        </Field>
+      )}
 
       {check.assertion ? (
         <Field label={t.results.assertion}>

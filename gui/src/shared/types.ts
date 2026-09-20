@@ -22,6 +22,12 @@ export interface RunRequest {
   classPath: string
   /** Credential name → value. It is never written anywhere (ADR-0009). */
   secrets: Record<string, string>
+  /**
+   * Path of a previous artifact whose unevaluated checks are repeated. The
+   * engine decides what that means; the interface only names the file
+   * (ADR-0018).
+   */
+  retryFrom?: string
 }
 
 /**

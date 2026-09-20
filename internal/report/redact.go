@@ -51,6 +51,9 @@ func Redact(run *model.RunResult, secrets []string) (*model.RunResult, error) {
 				scrub(&a.Expected)
 				scrub(&a.Found)
 			}
+			if pv := c.Previous; pv != nil {
+				scrub(&pv.Detail)
+			}
 		}
 	}
 	for i := range out.Warnings {

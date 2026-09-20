@@ -93,8 +93,14 @@ func (r *runner) runChecks(runCtx, studentCtx context.Context, sp plan.StudentPl
 		r.warn(model.Warning{Scope: "student:" + sp.ID, Code: "ENGINE_ERROR", Message: detail})
 	}()
 
+	retry := r.opts.Retry
 	for i, c := range sp.Checks {
 		switch {
+		case retry != nil && !retry.Repeat(sp.ID, c.ID):
+			// A repeat run only executes what was left unevaluated. This one
+			// already had a result last time, so it is not touched and it is
+			// not copied either: it stays where it was written (ADR-0018 §5).
+			checks[i] = skeleton(c, model.CauseNotRun, notRepeated(retry.at(sp.ID, c.ID)))
 		case runCtx.Err() != nil:
 			checks[i] = skeleton(c, model.CauseCancelled, "")
 		case studentCtx.Err() != nil:
@@ -104,8 +110,26 @@ func (r *runner) runChecks(runCtx, studentCtx context.Context, sp plan.StudentPl
 		default:
 			checks[i] = r.runCheck(runCtx, studentCtx, sp, hosts, c)
 		}
+		checks[i].Previous = retry.at(sp.ID, c.ID)
 		done = i + 1
 		r.checkDone(sp.ID, checks[i])
+	}
+}
+
+// notRepeated explains, in the artifact of a repeat run, why a check was not
+// executed again. Naming what it was last time is what keeps the sentence
+// from reading as a second failure of the same check.
+func notRepeated(previous *model.PreviousAttempt) string {
+	if previous == nil {
+		return "no se repitió: esta comprobación no estaba en la corrección anterior"
+	}
+	switch previous.Status {
+	case model.Pass:
+		return "no se repitió: en la corrección anterior salió bien"
+	case model.Fail:
+		return "no se repitió: en la corrección anterior salió mal y un fallo no se vuelve a intentar"
+	default:
+		return "no se repitió"
 	}
 }
 

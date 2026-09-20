@@ -15,6 +15,12 @@ interface AppState {
   classPath: string | null
   /** One operational notice on screen, or null. */
   notice: string | null
+  /**
+   * The correction the next run repeats, when the teacher asked for it. Null
+   * is the ordinary case and also the default: leaving an incomplete pending
+   * is the safe action and nothing here happens on its own (ADR-0018 §1).
+   */
+  retry: RetryRequest | null
 
   setTheme: (theme: Theme) => void
   toggleTheme: () => void
@@ -23,6 +29,17 @@ interface AppState {
   setExamPath: (path: string | null) => void
   setClassPath: (path: string | null) => void
   setNotice: (message: string | null) => void
+  setRetry: (retry: RetryRequest | null) => void
+}
+
+/** What the teacher asked to repeat, as the interface carries it around. */
+export interface RetryRequest {
+  /** Artifact of the run being repeated. The engine reads it, not us. */
+  artifactPath: string
+  /** Students with something left, for the sentence on screen. */
+  students: number
+  /** Checks that will actually be executed again. */
+  checks: number
 }
 
 const savedTheme: Theme = localStorage.getItem('heimdall-theme') === 'light' ? 'light' : 'dark'
@@ -48,6 +65,7 @@ export const useApp = create<AppState>((set, get) => ({
   examPath: null,
   classPath: null,
   notice: null,
+  retry: null,
 
   setTheme: (theme) => {
     localStorage.setItem('heimdall-theme', theme)
@@ -59,7 +77,8 @@ export const useApp = create<AppState>((set, get) => ({
   setEngine: (engine) => set({ engine }),
   setExamPath: (examPath) => set({ examPath }),
   setClassPath: (classPath) => set({ classPath }),
-  setNotice: (notice) => set({ notice })
+  setNotice: (notice) => set({ notice }),
+  setRetry: (retry) => set({ retry })
 }))
 
 /** Turns anything thrown into a sentence the teacher can read. */

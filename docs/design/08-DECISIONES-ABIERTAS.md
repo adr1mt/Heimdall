@@ -5,10 +5,12 @@ Solo las que de verdad lo están. Las cerradas están en `docs/adr/`.
 | # | Decisión | Por qué sigue abierta | Cuándo se puede cerrar |
 |---|---|---|---|
 | **D-5** | Detección de valores repetidos (anticopia) | Tiene valor pedagógico y hoy pone la nota a 0 automáticamente, cosa descartada. Falta decidir si se implementa como **marca** en el informe | Cuando haya un caso real; no bloquea nada |
-| **D-8** | Escala y conversión de nota en la GUI | El motor publica 0-100 entero y los números crudos. Falta decidir **cómo presenta la GUI un `INCOMPLETE`** y qué acción ofrece al profesor | En **T053**, al construir la pantalla de resultados de Heimdall GUI |
 
 ## Lo que se ha cerrado en esta sesión y antes estaba abierto
 
+- **D-8** (qué ofrece la GUI ante un `INCOMPLETE`): dejarlo pendiente por
+  defecto, o repetir **solo** las comprobaciones sin evaluar, en una ejecución
+  aparte con su propio artefacto. Sin marcar a mano en el MVP. ADR-0018.
 - **D-9** (formato de los eventos NDJSON): cinco eventos por `stdout` con
   `--events=ndjson`, más el esquema del artefacto. ADR-0017.
 - **La compatibilidad con Teuton**: retirada. Heimdall es independiente y tiene

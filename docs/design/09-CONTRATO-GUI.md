@@ -39,6 +39,12 @@ printf '%s' "$SECRETS_JSON" | heimdall run --secrets=stdin --events=ndjson --var
   Pedir ambos es error de configuración (exit 2).
 - Los secretos viajan por `stdin` en una línea JSON. Nunca por `argv`
   (ADR-0009).
+- `--retry=<artefacto>` repite **solo las comprobaciones que aquella ejecución
+  dejó `UNEVALUATED`** (ADR-0018). El motor elige qué se repite leyendo ese
+  fichero: la GUI nombra el artefacto y nada más, nunca una lista de alumnos ni
+  de comprobaciones. Si el `plan_hash` no coincide con el PLAN recién resuelto,
+  es error de configuración (exit 2) y no se toca ninguna máquina.
+  `--retry` no se combina con `--compat`, `--export` ni `--case`.
 
 Códigos de salida, sin cambios: `0` todo evaluado · `2` configuración inválida
 · `3` ejecución parcial · `4` cancelada · `1` ni se pudo escribir.
@@ -73,9 +79,13 @@ ninguna máquina.
 | `plan` | El PLAN: `check_count`, `total_weight`, `check_ids`, concurrencias |
 | `expected_checks` | `check_count` × alumnos no excluidos. El **total de la barra de progreso**, nunca el denominador |
 | `students` | Todos los alumnos, con `excluded`, para dibujar la clase entera de una vez |
+| `retry_of` | Opcional. Presente solo si la ejecución repite lo que otra dejó sin evaluar: `run_id`, `artifact`, `run_at`, `students` y `checks` |
 
 `plan.check_count` es el denominador y no se mueve: ni una avería, ni una
-cancelación, ni un alumno roto lo cambian (ADR-0004).
+cancelación, ni un alumno roto lo cambian (ADR-0004). Un reintento tampoco: en
+él siguen llegando `check.end` de todas las comprobaciones del PLAN, y las que
+no se repiten llegan `UNEVALUATED` con causa `NOT_RUN`, así que
+`expected_checks` sigue siendo exacto y la barra no miente.
 
 ### `student.start`
 

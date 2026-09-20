@@ -70,6 +70,28 @@ export interface AssertionResult {
   where?: string
 }
 
+/**
+ * What this same check was in the run that this one repeated. It is a record,
+ * not a result: no grade is computed from it, and the run it names still holds
+ * its own artifact with the full evidence (ADR-0018).
+ */
+export interface PreviousAttempt {
+  run_id: string
+  status: AcademicStatus
+  cause: Cause
+  detail?: string
+  finished_at: string
+}
+
+/** The run this one repeated, and how much of it. */
+export interface RetryRef {
+  run_id: string
+  artifact: string
+  run_at: string
+  students: number
+  checks: number
+}
+
 export interface CheckResult {
   check_id: string
   group: string
@@ -80,6 +102,7 @@ export interface CheckResult {
   detail?: string
   execution: ExecutionResult | null
   assertion: AssertionResult | null
+  previous?: PreviousAttempt
 }
 
 export interface StudentResult {
@@ -106,6 +129,8 @@ export interface RunResult {
   plan: PlanSummary
   students: StudentResult[]
   warnings?: Warning[]
+  /** Set when this run repeated what an earlier one left unevaluated. */
+  retry_of?: RetryRef
 }
 
 /**

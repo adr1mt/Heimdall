@@ -30,6 +30,8 @@ var types = map[string]any{
 	"Stream":          model.Stream{},
 	"AssertionResult": model.AssertionResult{},
 	"Warning":         model.Warning{},
+	"RetryRef":        model.RetryRef{},
+	"PreviousAttempt": model.PreviousAttempt{},
 }
 
 func loadSchema(t *testing.T) map[string]any {

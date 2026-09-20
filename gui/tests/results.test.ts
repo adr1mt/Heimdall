@@ -10,6 +10,10 @@ import {
   causesIn,
   checkMatches,
   filterRun,
+  originText,
+  pendingStudents,
+  previousText,
+  retryScope,
   scoreView,
   tally,
   truncationNote,
@@ -211,5 +215,170 @@ describe('parseArtifact', () => {
   it('no acepta un fichero que no es un resultado', () => {
     expect(() => parseArtifact('no es json')).toThrow(/JSON/)
     expect(() => parseArtifact(JSON.stringify({ schema_version: 1 }))).toThrow(/incompleto/)
+  })
+})
+
+// Un aula donde las comprobaciones no pesan lo mismo: es el caso en que
+// contar comprobaciones y contar peso dicen cosas distintas.
+const PESOS: RunResult = {
+  ...RUN,
+  plan: { ...RUN.plan, check_count: 3, total_weight: 10, check_ids: ['a', 'b', 'c'] },
+  students: [
+    {
+      student_id: 'alumne01',
+      name: 'Alumna Uno',
+      status: 'PARTIAL',
+      started_at: 't',
+      finished_at: 't',
+      score: score({ obtained: 3, evaluable: 3, total: 10, unevaluated: 7, provisional_score: 100, status: 'INCOMPLETE' }),
+      checks: [
+        check({ check_id: 'a', weight: 2, status: 'PASS' }),
+        check({ check_id: 'b', weight: 1, status: 'PASS' }),
+        check({ check_id: 'c', weight: 7, status: 'UNEVALUATED', cause: 'CONNECT_FAILED' })
+      ]
+    },
+    {
+      student_id: 'alumne02',
+      name: 'Alumne Dos',
+      status: 'OK',
+      started_at: 't',
+      finished_at: 't',
+      score: score({ obtained: 10, evaluable: 10, total: 10, unevaluated: 0, final_score: 100, status: 'COMPLETE' }),
+      checks: [
+        check({ check_id: 'a', weight: 2 }),
+        check({ check_id: 'b', weight: 1 }),
+        check({ check_id: 'c', weight: 7 })
+      ]
+    },
+    {
+      student_id: 'alumne03',
+      name: 'Alumne Tres',
+      status: 'EXCLUDED',
+      started_at: 't',
+      finished_at: 't',
+      score: score({ total: 10, unevaluated: 0, status: 'EXCLUDED' }),
+      checks: []
+    }
+  ]
+}
+
+describe('qué ha quedado sin comprobar', () => {
+  it('cuenta comprobaciones y peso por separado, porque no son la misma medida', () => {
+    const [uno] = pendingStudents(PESOS)
+    expect(uno.student.student_id).toBe('alumne01')
+    // Una sola comprobación de tres, pero siete décimas del examen.
+    expect(uno.checks).toBe(1)
+    expect(uno.checkTotal).toBe(3)
+    expect(uno.weight).toBe(7)
+    expect(uno.weightTotal).toBe(10)
+  })
+
+  it('deja fuera a quien no tiene nada sin evaluar y a quien estaba excluido', () => {
+    expect(pendingStudents(PESOS).map((p) => p.student.student_id)).toEqual(['alumne01'])
+  })
+
+  it('cuenta lo mismo que el motor repetiría, también un diagnóstico sin peso', () => {
+    // Un alumno con nota cerrada y una comprobación de peso 0 sin evaluar: el
+    // motor la repetiría, así que la pantalla no puede callársela. Que no le
+    // falta nota lo dice su propio peso pendiente, que es 0.
+    const conDiagnostico: RunResult = {
+      ...PESOS,
+      students: [
+        {
+          ...PESOS.students[1],
+          checks: [
+            check({ check_id: 'a', weight: 2 }),
+            check({ check_id: 'b', weight: 1 }),
+            check({ check_id: 'c', weight: 7 }),
+            check({ check_id: 'd', weight: 0, status: 'UNEVALUATED', cause: 'TIMEOUT' })
+          ]
+        }
+      ]
+    }
+    const [fila] = pendingStudents(conDiagnostico)
+    expect(fila.checks).toBe(1)
+    expect(fila.weight).toBe(0)
+    expect(fila.student.score.final_score).toBe(100)
+    expect(retryScope(conDiagnostico)).toEqual({ students: 1, checks: 1 })
+  })
+
+  it('el peso que falta sale del motor, no de sumar nada aquí', () => {
+    expect(pendingStudents(PESOS)[0].weight).toBe(PESOS.students[0].score.unevaluated)
+  })
+
+  it('un incompleto no tiene nota final en ningún caso', () => {
+    for (const pending of pendingStudents(PESOS)) {
+      expect(pending.student.score.final_score).toBeNull()
+    }
+  })
+})
+
+describe('qué se ofrece repetir', () => {
+  it('cuenta solo lo que quedó sin evaluar, nunca un fallo', () => {
+    // alumne01 tiene dos PASS y un UNEVALUATED: se repite uno.
+    expect(retryScope(PESOS)).toEqual({ students: 1, checks: 1 })
+  })
+
+  it('no ofrece nada cuando no quedó nada sin evaluar', () => {
+    const entera: RunResult = { ...PESOS, students: [PESOS.students[1]] }
+    expect(retryScope(entera)).toBeNull()
+  })
+
+  it('un FAIL no entra en el reintento', () => {
+    const conFallo: RunResult = {
+      ...PESOS,
+      students: [
+        {
+          ...PESOS.students[0],
+          checks: [
+            check({ check_id: 'a', weight: 2, status: 'FAIL' }),
+            check({ check_id: 'b', weight: 1, status: 'FAIL' }),
+            check({ check_id: 'c', weight: 7, status: 'UNEVALUATED', cause: 'TIMEOUT' })
+          ]
+        }
+      ]
+    }
+    expect(retryScope(conFallo)).toEqual({ students: 1, checks: 1 })
+  })
+})
+
+describe('de qué ejecución sale cada nota', () => {
+  it('una corrección normal se nombra por su fecha', () => {
+    const text = originText({ ...PESOS, finished_at: '2026-09-20T10:30:00+02:00' })
+    expect(text).toMatch(/^Corrección del /)
+    expect(text).not.toMatch(/[Rr]eintento/)
+  })
+
+  it('un reintento dice de qué corrección viene y cuánto repitió', () => {
+    const text = originText({
+      ...PESOS,
+      finished_at: '2026-09-20T11:00:00+02:00',
+      retry_of: {
+        run_id: '01M2Y',
+        artifact: 'var/run-01M2Y.json',
+        run_at: '2026-09-20T10:30:00+02:00',
+        students: 3,
+        checks: 5
+      }
+    })
+    expect(text).toMatch(/Reintento/)
+    expect(text).toMatch(/5 comprobaciones de 3 alumnos/)
+  })
+
+  it('conserva la causa del intento anterior, no solo que lo hubo', () => {
+    expect(
+      previousText({
+        run_id: '01M2Y',
+        status: 'UNEVALUATED',
+        cause: 'CONNECT_FAILED',
+        finished_at: 't'
+      })
+    ).toMatch(/no se pudo conectar con la máquina/i)
+  })
+
+  it('dice también lo que ya tenía resultado', () => {
+    expect(
+      previousText({ run_id: '01M2Y', status: 'FAIL', cause: 'NONE', finished_at: 't' })
+    ).toMatch(/salió mal/)
   })
 })

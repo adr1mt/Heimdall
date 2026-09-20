@@ -34,11 +34,12 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 	export := fs.String("export", "", "fachada para la GUI actual: json")
 	cname := fs.String("cname", "", "nombre del fichero de aula, sin la extensión; por defecto aula.yaml")
 	cases := fs.String("case", "", "posiciones de los alumnos del aula que se evalúan, p. ej. 1,3")
+	retryFrom := fs.String("retry", "", "repite solo las comprobaciones que quedaron sin evaluar en el artefacto indicado")
 	if err := fs.Parse(args); err != nil {
 		return exitInvalidConfig
 	}
 	if fs.NArg() != 1 {
-		fmt.Fprintln(stderr, "uso: heimdall run [--secrets=stdin|env] [--var=dir] [--events=ndjson] <directorio del examen>")
+		fmt.Fprintln(stderr, "uso: heimdall run [--secrets=stdin|env] [--var=dir] [--events=ndjson] [--retry=artefacto] <directorio del examen>")
 		return exitInvalidConfig
 	}
 	if *eventStream != "" && *eventStream != "ndjson" {
@@ -65,6 +66,21 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 		*compat = "teuton2"
 	}
 
+	// A repeat run is a run of this engine on this contract. The frozen
+	// facade is not taught anything new (principio 13), and a positional
+	// selection on top of a selection by result would leave the teacher
+	// guessing which one won.
+	if *retryFrom != "" {
+		switch {
+		case *compat != "" || *export != "":
+			fmt.Fprintln(stderr, "heimdall run: --retry no se combina con --compat ni con --export")
+			return exitInvalidConfig
+		case *cases != "":
+			fmt.Fprintln(stderr, "heimdall run: --retry ya elige a quién repite; no se combina con --case")
+			return exitInvalidConfig
+		}
+	}
+
 	p, err := plan.LoadNamed(fs.Arg(0), *cname)
 	if err != nil {
 		fmt.Fprintf(stderr, "heimdall run: la configuración no es válida\n\n%s\n", err)
@@ -73,6 +89,23 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 	if err := selectCases(p, *cases); err != nil {
 		fmt.Fprintf(stderr, "heimdall run: %s\n", err)
 		return exitInvalidConfig
+	}
+
+	// The repeat run is resolved whole before anything is dialled: a previous
+	// artifact from another exam is a configuration error, not a class full of
+	// surprises (ADR-0018 §4).
+	var retry *engine.Retry
+	if *retryFrom != "" {
+		before, err := readArtifact(*retryFrom)
+		if err != nil {
+			fmt.Fprintf(stderr, "heimdall run: %s\n", err)
+			return exitInvalidConfig
+		}
+		retry, err = planRetry(p, before, *retryFrom)
+		if err != nil {
+			fmt.Fprintf(stderr, "heimdall run: %s\n", err)
+			return exitInvalidConfig
+		}
 	}
 
 	secrets, err := readSecrets(*secretsMode, p)
@@ -117,7 +150,7 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 	var stream *events.Emitter
 	if *eventStream == "ndjson" {
 		stream = events.New(stdout, values(secrets))
-		stream.RunStart(runStartOf(runID, p))
+		stream.RunStart(runStartOf(runID, p, retry))
 	}
 
 	var partialErr error
@@ -128,6 +161,7 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 		Concurrency:     *concurrency,
 		HostConcurrency: *hostConcurrency,
 		Progress:        progressTo(stream),
+		Retry:           retry,
 		OnStudentDone: func(run *model.RunResult) error {
 			if live != nil {
 				live.students(run)
@@ -205,7 +239,7 @@ func progressTo(stream *events.Emitter) *engine.Progress {
 
 // runStartOf describes the run before it touches a machine. Everything here
 // comes from the PLAN, which is already fixed and will not move (ADR-0002).
-func runStartOf(runID string, p *plan.Plan) events.RunStart {
+func runStartOf(runID string, p *plan.Plan, retry *engine.Retry) events.RunStart {
 	students := make([]events.StudentRef, 0, len(p.Students))
 	evaluable := 0
 	for _, sp := range p.Students {
@@ -219,7 +253,13 @@ func runStartOf(runID string, p *plan.Plan) events.RunStart {
 			evaluable++
 		}
 	}
+	var retryOf *model.RetryRef
+	if retry != nil {
+		ref := retry.Ref
+		retryOf = &ref
+	}
 	return events.RunStart{
+		RetryOf:        retryOf,
 		RunID:          runID,
 		EngineVersion:  version,
 		Exam:           p.Exam,

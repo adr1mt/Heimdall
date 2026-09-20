@@ -37,6 +37,22 @@ type RunResult struct {
 	Plan     PlanSummary     `json:"plan"`
 	Students []StudentResult `json:"students"`
 	Warnings []Warning       `json:"warnings,omitempty"`
+
+	// RetryOf is set when this run repeated the unevaluated checks of an
+	// earlier one (ADR-0018). It is provenance: it says where this run came
+	// from and it has no part in any grade.
+	RetryOf *RetryRef `json:"retry_of,omitempty"`
+}
+
+// RetryRef names the run this one repeated and how much of it. The PLAN is
+// the same one —the hashes were compared before the first connection— so the
+// denominator and the weights of both runs are identical.
+type RetryRef struct {
+	RunID    string    `json:"run_id"`
+	Artifact string    `json:"artifact"` // path the previous artifact was read from
+	RunAt    time.Time `json:"run_at"`   // when that run finished
+	Students int       `json:"students"` // students with something to repeat
+	Checks   int       `json:"checks"`   // checks selected to repeat
 }
 
 // SourceRef identifies an input file as it stood when the run started.
@@ -108,6 +124,23 @@ type CheckResult struct {
 	Execution *ExecutionResult `json:"execution"`
 	// Assertion is null when there was no complete execution to compare.
 	Assertion *AssertionResult `json:"assertion"`
+
+	// Previous is what this same check was in the run this one retried, when
+	// there was one (ADR-0018). A retry must not erase the evidence of the
+	// attempt before it. It is never read by Classify or ComputeScore: it is
+	// a record, not a result.
+	Previous *PreviousAttempt `json:"previous,omitempty"`
+}
+
+// PreviousAttempt is one check as an earlier run left it. It carries no
+// execution and no assertion: those live in that run's own artifact, which
+// this one never rewrites.
+type PreviousAttempt struct {
+	RunID      string         `json:"run_id"`
+	Status     AcademicStatus `json:"status"`
+	Cause      Cause          `json:"cause"`
+	Detail     string         `json:"detail,omitempty"`
+	FinishedAt time.Time      `json:"finished_at"`
 }
 
 // ExecutionResult states the facts about the process. It knows nothing about
