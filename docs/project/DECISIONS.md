@@ -135,3 +135,18 @@ Dos elecciones menores del mismo paquete:
 `testdata/proto/` se crea aquí, antes de T012, porque el subcomando `check`
 necesitaba un proyecto válido de verdad contra el que probarse. T012 lo dará
 por bueno o lo corregirá al escribir la aceptación del hito.
+
+### 2026-09-20 · Aserciones (T007) y escritura del artefacto (T009)
+
+Dos decisiones menores:
+
+1. **`assert.Eval` devuelve error, no un resultado.** Cuando la ejecución no se
+   completó, o cuando la aserción es de las que aún no se evalúan (`cerca_de`,
+   `no_contiene`, `valor:`), no se produce un `AssertionResult` con
+   `matched: false`. Un «no coincide» inventado es indistinguible de un
+   suspenso legítimo y sería el camino más corto para que una avería o un hueco
+   del motor acabase en la nota.
+2. **El ULID se implementa en el repositorio** (26 caracteres, Crockford
+   base32) en vez de añadir la dependencia que `architecture.md` permitía. Son
+   cuarenta líneas y no hay nada más que necesitemos de esa librería; la regla
+   de simplicidad pesa más que el permiso.

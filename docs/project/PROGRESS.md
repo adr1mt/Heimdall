@@ -6,9 +6,11 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última tarea terminada
 
-**T005 — resolución del PLAN y subcomando `check`.** `evalon check <directorio>`
-dice cuántas comprobaciones tiene el examen y cuánto pesan en total, sin abrir
-ninguna conexión y sin escribir nada. Fase 0 cerrada.
+**T007 (aserciones) y T009 (escritura del resultado).** El motor ya sabe decir
+si una comprobación se cumple o no, y ya sabe guardar el resultado de una
+tanda sin perderlo: dos correcciones a la vez no se pisan el fichero y si el
+programa muere a media tanda queda lo ya corregido. Falta el trozo que se
+conecta a las máquinas (T008), y para eso hace falta el laboratorio (T006).
 
 ## Estado actual
 
@@ -21,6 +23,15 @@ ninguna conexión y sin escribir nada. Fase 0 cerrada.
   `ComputeScore`, `StudentStatusOf` y `RunStatusOf`. Ni red, ni disco, ni
   reloj: hay un test que parsea el paquete y lo comprueba. `EXCLUDED` sale del
   inventario, nunca del cálculo.
+- `internal/assert` evalúa `contiene`, `igual_a` y `exit_code` como funciones
+  puras sobre `ExecutionResult`. `Eval` devuelve error si la ejecución no se
+  completó: sin ejecución fiable no hay comparación, y por tanto no hay FAIL.
+  Un tipo de aserción desconocido es error, nunca «no coincide».
+- `internal/report` escribe `var/run-<ulid>.json` con temporal y `rename`,
+  `var/run-<ulid>.partial.json` por alumno, `var/latest.json` como symlink.
+  ULID propio (26 caracteres, sin dependencia nueva). Filtro de redacción:
+  sustituye los secretos conocidos por `[oculto]` y añade un `Warning`
+  `SECRET_REDACTED`; trabaja sobre una copia, no toca el artefacto del motor.
 - `internal/plan` lee los dos YAML (T004) y resuelve el PLAN (T005): las nueve
   validaciones del §5, sustitución `${alumno.X}` y `${host.ip|puerto|usuario}`,
   hashes del examen, del aula y del plan resuelto. El esquema conoce
@@ -36,13 +47,13 @@ ninguna conexión y sin escribir nada. Fase 0 cerrada.
 
 ## Pruebas ejecutadas
 
-`make check` verde en 0,7 s · `gofmt -l` sin salida. `./bin/evalon check
-testdata/proto` imprime 5 comprobaciones y peso 6 y sale 0; el proyecto
-inválido sale 2 sin crear `var/`. Verificado por mutación en T004 (5 casos) y
-en T005: referencia ausente convertida en cadena vacía, secreto admitido en el
-examen y en un campo libre, peso negativo, contraseña literal, dos aserciones,
-alumno excluido con comprobaciones y aula sin alumnos evaluables. Las ocho las
-detecta la suite.
+`make check` verde · `gofmt -l` sin salida · `go test -race -count=2
+./internal/report` verde: 8 tandas simultáneas dejan 8 ficheros completos y
+ningún temporal; un subproceso que se manda un SIGKILL deja un `partial.json`
+válido con el alumno ya terminado; un secreto inyectado en un stderr simulado
+sale como `[oculto]` con su aviso. `./bin/evalon check testdata/proto` imprime
+5 comprobaciones y peso 6 y sale 0; el proyecto inválido sale 2 sin crear
+`var/`. Verificado por mutación en T004 (5 casos) y T005 (8 casos).
 
 ## Problemas conocidos
 
@@ -58,16 +69,13 @@ detecta la suite.
 
 ## Decisiones inesperadas de la sesión
 
-- Una aserción por comprobación, exactamente una: el diseño hablaba de
-  «aserciones incompatibles» sin decir cuáles.
-- El alumno excluido no se resuelve: no se le piden hosts ni campos. Pedírselos
-  empujaría a inventar datos de inventario.
-- `${alumno.X}` ve también `id`, `nombre` y `moodle_id`.
-- Las cuatro, con su motivo, en `DECISIONS.md`.
+- `assert.Eval` devuelve error, no un resultado «no coincide», cuando la
+  ejecución no se completó o la aserción no está soportada.
+- ULID implementado en el propio repo en vez de añadir una dependencia.
+- Anteriores (una aserción por comprobación, alumno excluido sin resolver,
+  `${alumno.X}` sobre `id`/`nombre`/`moodle_id`) y sus motivos: `DECISIONS.md`.
 
 ## Siguiente tarea recomendada
 
-Fase 0 cerrada (T001-T005). Quedan `READY`: **T007** (aserciones, P0), **T009**
-(escritura atómica, P0) y **T006** (laboratorio SSH, P1). Toca **T007**: es
-lógica pura, se prueba sin máquinas y T010 la necesita. T006 hay que hacerlo
-antes que T008, que es lo único que toca red.
+**T006** (laboratorio SSH, P1) es la única `READY`. Desbloquea T008 (sesión
+SSH), que a su vez desbloquea T010 y el resto de la fase 1.
