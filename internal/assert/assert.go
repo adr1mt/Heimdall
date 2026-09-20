@@ -27,6 +27,13 @@ const (
 	KindEquals Kind = "equals"
 	// KindExitCode is `exit_code`: the process ended with that status.
 	KindExitCode Kind = "exit_code"
+	// KindNotContains is `no_contiene`: the forbidden text is nowhere in
+	// stdout. It is an anti-check: it passes by absence, which is why it
+	// may never be evaluated without a complete execution (K-7).
+	KindNotContains Kind = "not_contains"
+	// KindNear is `cerca_de`: the expected text appears within the N lines
+	// that follow an anchor line. It replaces `grep -A N`.
+	KindNear Kind = "near"
 )
 
 // Spec is the assertion of one resolved check: the kind and the expected
@@ -38,6 +45,10 @@ type Spec struct {
 	Expected string
 	// ExitCode is the status for exit_code.
 	ExitCode int
+	// Anchor and Lines are the window of near: the line the anchor appears
+	// on plus Lines more. Expected is what must show up inside it.
+	Anchor string
+	Lines  int
 }
 
 // ErrNotCompleted is returned when Eval is asked to compare an execution that
@@ -65,6 +76,10 @@ func Eval(exec model.ExecutionResult, spec Spec) (model.AssertionResult, error) 
 		return evalContains(exec.Stdout.Text, spec.Expected), nil
 	case KindEquals:
 		return evalEquals(exec.Stdout.Text, spec.Expected), nil
+	case KindNotContains:
+		return evalNotContains(exec.Stdout.Text, spec.Expected), nil
+	case KindNear:
+		return evalNear(exec.Stdout.Text, spec), nil
 	case KindExitCode:
 		return evalExitCode(exec.ExitCode, spec.ExitCode)
 	default:
@@ -100,6 +115,60 @@ func evalEquals(stdout, expected string) model.AssertionResult {
 	return res
 }
 
+// evalNotContains passes when the forbidden text is absent. When it is
+// present the check fails and the line is reported, because "it is there" is
+// the whole finding and the teacher wants to see where.
+//
+// The refusal of an incomplete execution in Eval is what makes this safe: a
+// machine that never answered produces no output, and empty output must never
+// be read as "the forbidden text is absent" (K-7).
+func evalNotContains(stdout, forbidden string) model.AssertionResult {
+	res := model.AssertionResult{Kind: string(KindNotContains), Expected: forbidden}
+	i := strings.Index(stdout, forbidden)
+	if i < 0 {
+		res.Matched = true
+		return res
+	}
+	res.Found = forbidden
+	res.Where = "stdout línea " + strconv.Itoa(lineOf(stdout, i))
+	return res
+}
+
+// evalNear looks for the expected text in the window that starts at a line
+// containing the anchor and covers spec.Lines lines more, for every line the
+// anchor appears on. That is what `grep -A N` did, minus the shell.
+func evalNear(stdout string, spec Spec) model.AssertionResult {
+	res := model.AssertionResult{
+		Kind:     string(KindNear),
+		Expected: fmt.Sprintf("«%s» %s «%s»", spec.Expected, window(spec.Lines), spec.Anchor),
+	}
+	lines := strings.Split(stdout, "\n")
+	anchored := false
+	for i, line := range lines {
+		if !strings.Contains(line, spec.Anchor) {
+			continue
+		}
+		anchored = true
+		end := i + spec.Lines
+		if end >= len(lines) {
+			end = len(lines) - 1
+		}
+		for j := i; j <= end; j++ {
+			if strings.Contains(lines[j], spec.Expected) {
+				res.Matched = true
+				res.Found = spec.Expected
+				res.Where = fmt.Sprintf("stdout línea %d, con el ancla en la línea %d",
+					j+1, i+1)
+				return res
+			}
+		}
+	}
+	if !anchored {
+		res.Where = fmt.Sprintf("el ancla %q no aparece en stdout", spec.Anchor)
+	}
+	return res
+}
+
 // evalExitCode compares the exit status. A completed execution always carries
 // one; if it does not, that is a bug of the engine and it is reported as
 // such, never as a failed check.
@@ -111,6 +180,19 @@ func evalExitCode(got *int, want int) (model.AssertionResult, error) {
 	res.Found = strconv.Itoa(*got)
 	res.Matched = *got == want
 	return res, nil
+}
+
+// window says in words how far the search reaches, because the teacher reads
+// this sentence in the report without the exam at hand.
+func window(lines int) string {
+	switch lines {
+	case 0:
+		return "en la misma línea que"
+	case 1:
+		return "en la línea siguiente a"
+	default:
+		return fmt.Sprintf("en las %d líneas siguientes a", lines)
+	}
 }
 
 // lineOf returns the 1-based line of byte offset i.

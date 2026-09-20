@@ -1,0 +1,53 @@
+# Aula de prueba del cuestionario E1. Alumnado ficticio: aquí no van datos
+# reales de clase (.claude/rules/security.md).
+#
+# Las respuestas son campos libres del alumno. Un cuestionario no necesita
+# hosts: ninguna comprobación ejecuta nada.
+aula: "Aula de prueba · cuestionario"
+version: 1
+
+comun:
+  timeouts:
+    conexion: 10s
+    alumno: 1m
+
+alumnos:
+  - id: alumne01
+    nombre: "Alumna Uno"
+    p1: "443"
+    p2: "22"
+    p3: "255.255.255.0"
+    p4: "DHCP"
+    p5: "53"
+    p6: "127.0.0.1"
+    p7: "2"
+    p8: "A"
+    p9: "10.0.0.0/8"
+    p10: "ip route show"
+
+  - id: alumne02
+    nombre: "Alumne Dos"
+    p1: "443"
+    p2: "23"
+    p3: "255.255.0.0"
+    p4: "DHCP"
+    p5: "53"
+    p6: "127.0.0.1"
+    p7: "4"
+    p8: "CNAME"
+    p9: "10.0.0.0/8"
+    p10: "route -n"
+
+  - id: alumne03
+    nombre: "Alumna Tres"
+    excluido: true
+    p1: "443"
+    p2: "22"
+    p3: "255.255.255.0"
+    p4: "DHCP"
+    p5: "53"
+    p6: "127.0.0.1"
+    p7: "2"
+    p8: "A"
+    p9: "10.0.0.0/8"
+    p10: "ip route show"

@@ -111,6 +111,10 @@ func (r *runner) runCheck(runCtx, studentCtx context.Context, sp plan.StudentPla
 		return skeleton(c, model.CauseEngineError, err.Error())
 	}
 
+	if len(c.Cmd) == 0 {
+		return inventoryCheck(c, spec)
+	}
+
 	sess, dialErr := hosts.get(studentCtx, c.Host)
 	if dialErr != nil {
 		return skeleton(c, dialErr.Cause, dialErr.Detail)
@@ -140,6 +144,48 @@ func (r *runner) runCheck(runCtx, studentCtx context.Context, sp plan.StudentPla
 	out.Status, out.Cause = status, finalCause
 	out.Detail = detail
 	if out.Detail == "" {
+		out.Detail = fallback
+	}
+	return out
+}
+
+// inventoryTransport is what the artifact records for a check that read its
+// value from aula.yaml instead of from a machine (04-MODELO-RESULTADO.md §2).
+const inventoryTransport = "inventory"
+
+// inventoryCheck evaluates a check that has no command (M-11): the answer is
+// already in aula.yaml and the assertion compares it directly. Nothing is
+// executed, here or on any machine, which is the whole point of the
+// primitive: the questionnaire used to run the student's answer through a
+// shell on the teacher's computer.
+//
+// It still goes through the four layers. The execution it records is real in
+// the only sense that matters for the artifact: it says where the value came
+// from, so a PASS can be audited like any other.
+func inventoryCheck(c plan.ResolvedCheck, spec assert.Spec) model.CheckResult {
+	zero := 0
+	exec := &model.ExecutionResult{
+		Transport:       inventoryTransport,
+		StartedAt:       time.Now(),
+		Completed:       true,
+		ExitCode:        &zero,
+		Stdout:          model.Stream{Text: c.Value, Bytes: int64(len(c.Value)), BytesTotal: int64(len(c.Value))},
+		ConnectAttempts: 0,
+		CommandAttempts: 0,
+		RemoteProcess:   model.RemoteFinished,
+	}
+
+	out := skeleton(c, model.CauseNone, "")
+	out.Execution = exec
+	assertion, err := assert.Eval(*exec, spec)
+	if err != nil {
+		return failedAssertion(out, err)
+	}
+	out.Assertion = &assertion
+
+	status, cause, fallback := model.Classify(out.Execution, out.Assertion, model.CauseNone)
+	out.Status, out.Cause = status, cause
+	if status == model.Unevaluated {
 		out.Detail = fallback
 	}
 	return out
@@ -201,17 +247,22 @@ func skeleton(c plan.ResolvedCheck, cause model.Cause, detail string) model.Chec
 // An assertion this version does not evaluate is said out loud: turning it
 // into a failed check would cost the student marks for a hole of ours.
 func specOf(c plan.ResolvedCheck) (assert.Spec, error) {
-	if len(c.Cmd) == 0 {
-		return assert.Spec{}, fmt.Errorf(
-			"la comprobación %q no tiene cmd: y las comprobaciones sin comando todavía no están implementadas", c.ID)
-	}
 	switch {
 	case c.Contains != nil:
 		return assert.Spec{Kind: assert.KindContains, Expected: *c.Contains}, nil
+	case c.NotContains != nil:
+		return assert.Spec{Kind: assert.KindNotContains, Expected: *c.NotContains}, nil
 	case c.Equals != nil:
 		return assert.Spec{Kind: assert.KindEquals, Expected: *c.Equals}, nil
 	case c.ExitCode != nil:
 		return assert.Spec{Kind: assert.KindExitCode, ExitCode: *c.ExitCode}, nil
+	case c.Near != nil:
+		return assert.Spec{
+			Kind:     assert.KindNear,
+			Expected: c.Near.Contains,
+			Anchor:   c.Near.Anchor,
+			Lines:    c.Near.Lines,
+		}, nil
 	default:
 		return assert.Spec{}, fmt.Errorf(
 			"la aserción de la comprobación %q todavía no está implementada", c.ID)

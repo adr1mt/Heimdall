@@ -208,6 +208,33 @@ func validateExam(exam *Exam, errs *[]error) []Check {
 					check.ID))
 			}
 
+			// A check without a command has no process, so there is no
+			// exit status to compare. Caught here, in the PLAN, and not at
+			// run time: an exam that cannot be evaluated must not reach any
+			// machine.
+			if !hasCmd && check.ExitCode != nil {
+				*errs = append(*errs, errf(check.Line,
+					"la comprobación %q compara el código de salida, pero no ejecuta ningún comando",
+					check.ID))
+			}
+
+			// cerca_de needs its three parts: an anchor to look for, a
+			// window that is not negative, and something to find inside it.
+			if n := check.Near; n != nil {
+				switch {
+				case n.Anchor == "":
+					*errs = append(*errs, errf(check.Line,
+						"el cerca_de de %q no tiene ancla:", check.ID))
+				case n.Contains == "":
+					*errs = append(*errs, errf(check.Line,
+						"el cerca_de de %q no dice qué debe contener", check.ID))
+				case n.Lines < 0:
+					*errs = append(*errs, errf(check.Line,
+						"el cerca_de de %q tiene lineas: %d, que no puede ser negativo",
+						check.ID, n.Lines))
+				}
+			}
+
 			// 6. no assertion, or more than one.
 			switch n := countAssertions(check); {
 			case n == 0:

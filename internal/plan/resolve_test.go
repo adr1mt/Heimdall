@@ -248,6 +248,31 @@ func TestPlanValidations(t *testing.T) {
 			want: "tiene 2 aserciones", where: "examen.yaml:13",
 		},
 		{
+			name: "valor: comparando el código de salida",
+			exam: strings.Replace(validExam,
+				"        en: host1\n        cmd: [\"hostname\"]\n        contiene: \"alu\"",
+				"        valor: \"${alumno.usuario}\"\n        exit_code: 0", 1),
+			want: "no ejecuta ningún comando", where: "examen.yaml:8",
+		},
+		{
+			name: "cerca_de sin ancla",
+			exam: strings.Replace(validExam, "        contiene: \"alu\"",
+				"        cerca_de: { lineas: 5, contiene: \"alu\" }", 1),
+			want: "no tiene ancla", where: "examen.yaml:8",
+		},
+		{
+			name: "cerca_de sin nada que buscar",
+			exam: strings.Replace(validExam, "        contiene: \"alu\"",
+				"        cerca_de: { ancla: \"subnet\", lineas: 5 }", 1),
+			want: "no dice qué debe contener", where: "examen.yaml:8",
+		},
+		{
+			name: "cerca_de con una ventana negativa",
+			exam: strings.Replace(validExam, "        contiene: \"alu\"",
+				"        cerca_de: { ancla: \"subnet\", lineas: -1, contiene: \"alu\" }", 1),
+			want: "no puede ser negativo", where: "examen.yaml:8",
+		},
+		{
 			name: "7 · peso negativo",
 			exam: strings.Replace(validExam, "        peso: 2", "        peso: -1", 1),
 			want: "peso negativo", where: "examen.yaml:13",

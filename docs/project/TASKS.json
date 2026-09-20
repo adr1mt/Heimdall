@@ -510,7 +510,7 @@
       "id": "T020",
       "title": "Aserciones restantes y comprobaciones sin comando",
       "phase": 2,
-      "status": "BLOCKED",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T013"
@@ -541,7 +541,7 @@
       "id": "T021",
       "title": "Politica de known_hosts cerrada y autenticacion por clave",
       "phase": 2,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T013"

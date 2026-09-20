@@ -1,0 +1,66 @@
+# E1 de docs/design/01-TRADUCCION-EXAMENES.md: el cuestionario de redes.
+#
+# Las respuestas del alumno están en aula.yaml y la comprobación las lee de
+# allí: no hay comando, ni en la máquina del alumno ni en la del profesor. El
+# examen original ejecutaba diez `echo` con los datos del alumno dentro de una
+# cadena de shell en el equipo del profesor.
+examen: "Cuestionario de redes"
+version: 1
+hosts: []
+
+por_defecto:
+  peso: 1
+
+grupos:
+  - grupo: "Cuestionario de redes"
+    comprobaciones:
+      - id: p1
+        descripcion: "Puerto por defecto de HTTPS"
+        valor: "${alumno.p1}"
+        igual_a: "443"
+
+      - id: p2
+        descripcion: "Puerto por defecto de SSH"
+        valor: "${alumno.p2}"
+        igual_a: "22"
+
+      - id: p3
+        descripcion: "Máscara /24 en decimal"
+        valor: "${alumno.p3}"
+        igual_a: "255.255.255.0"
+
+      - id: p4
+        descripcion: "Protocolo que reparte direcciones automáticamente"
+        valor: "${alumno.p4}"
+        igual_a: "DHCP"
+
+      - id: p5
+        descripcion: "Puerto por defecto de DNS"
+        valor: "${alumno.p5}"
+        igual_a: "53"
+
+      - id: p6
+        descripcion: "Dirección de bucle local"
+        valor: "${alumno.p6}"
+        igual_a: "127.0.0.1"
+
+      - id: p7
+        descripcion: "Número de hosts útiles en una /30"
+        valor: "${alumno.p7}"
+        igual_a: "2"
+
+      - id: p8
+        descripcion: "Registro DNS que asocia un nombre a una IPv4"
+        valor: "${alumno.p8}"
+        igual_a: "A"
+
+      - id: p9
+        descripcion: "Rango privado de clase A"
+        peso: 2
+        valor: "${alumno.p9}"
+        igual_a: "10.0.0.0/8"
+
+      - id: p10
+        descripcion: "Comando que muestra la tabla de rutas"
+        valor: "${alumno.p10}"
+        contiene: "ip route"

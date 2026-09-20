@@ -2,21 +2,26 @@
 
 Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
-**Actualizado**: 2026-09-20 · **Fase**: 1 — Rebanada vertical
+**Actualizado**: 2026-09-20 · **Fase**: 2 — Formato completo y robustez de ejecución
 
 ## Última tarea terminada
 
-**T013 (la fase 1, registrada).** El ejemplo del modelo de resultado ya no es
-una redacción a mano: es la salida real del laboratorio
-(`docs/design/ejemplo-run.json`). Se cierra la duda sobre cómo hablamos con las
-máquinas de los alumnos (ADR-0010) con mediciones, no con preferencias: un
-examen con una máquina apagada y un comando eterno dentro acaba en 4,8 s, y un
-alumno que escupe 300 MB deja el motor en 15,5 MB, igual que uno que escupe 1.
-El profesor puede ver resultados parciales a los 3,2 s.
+**T020 (las comprobaciones que faltaban).** El motor ya entiende los dos
+exámenes reales del curso enteros. Tres cosas nuevas: comprobar que algo **no**
+está (una configuración insegura, por ejemplo), comprobar que un valor aparece
+**cerca** de otro dentro de un fichero, y corregir un cuestionario leyendo las
+respuestas del aula **sin ejecutar nada** en ninguna máquina. Lo último quita el
+riesgo que tenía el sistema viejo, que lanzaba las respuestas del alumno dentro
+de una orden en el equipo del profesor. Comprobado contra el laboratorio: un
+alumno con la máquina apagada **no** aprueba las comprobaciones de «esto no debe
+estar», que es la trampa evidente.
 
-Antes, **T012**: un script comprueba solo, uno por uno, los catorce criterios
-del hito (trece en verde, A-10 espera al formato viejo). Salida literal en
-`docs/design/ACEPTACION-FASE1.md`.
+Antes, **T013**: el ejemplo del modelo de resultado pasa a ser salida real del
+laboratorio (`docs/design/ejemplo-run.json`) y se cierra con mediciones la
+forma de hablar con las máquinas (ADR-0010).
+
+Antes, **T012**: los catorce criterios del hito comprobados uno por uno (trece
+en verde; A-10 espera al formato viejo). Salida en `ACEPTACION-FASE1.md`.
 
 ## Estado actual
 
@@ -32,12 +37,12 @@ del hito (trece en verde, A-10 espera al formato viejo). Salida literal en
 - `internal/model`: artefacto completo, `Classify`, `ComputeScore`,
   `StudentStatusOf`, `RunStatusOf`. Puro. `internal/plan`: los dos YAML, las
   nueve validaciones del §5, sustituciones y hashes. `internal/assert`:
-  `contiene`, `igual_a`, `exit_code`, puras. `internal/report`: escritura
+  `contiene`, `no_contiene`, `igual_a`, `exit_code` y `cerca_de`, puras. Una
+  comprobación `valor:` no abre sesión y se anota `transport: "inventory"`. `internal/report`: escritura
   atómica, parciales, `latest.json`, ULID propio y redacción de secretos.
 - `internal/engine`: pool de 2, una sesión por host y alumno, presupuesto por
   alumno, `panic` recuperado por alumno, parcial tras cada alumno, `ExitCode`
-  (0/3/4). Las aserciones que faltan y las comprobaciones `valor:` salen
-  `ENGINE_ERROR` explicado (T020). `CheckSecrets` antes de conectar.
+  (0/3/4). `CheckSecrets` antes de conectar.
 - `internal/ssh`: `Dial` con 2 reintentos y ninguno en `AUTH_FAILED`;
   `known_hosts` propio en `var/` con TOFU (D-3, provisional); sin pty, 64 kB por
   flujo, corte duro a 8 MB, envoltura `timeout -k 5s N` con aviso si no la hay.
@@ -45,16 +50,19 @@ del hito (trece en verde, A-10 espera al formato viejo). Salida literal en
   `127.1.2.3:2201`, idempotente; el alumno roto usa el puerto cerrado 2299.
   Credenciales ficticias en `test/README.md`.
 - `testdata/`: `proto/` (5 comprobaciones, peso 6, idéntico al §5 y verificado),
-  `salida-grande/` (A-6) y `clave-desconocida/` (A-13). `test/acceptance.sh`
+  `salida-grande/` (A-6), `clave-desconocida/` (A-13), `formato/` (E2) y
+  `cuestionario/` (E1, diez preguntas sin ninguna máquina). `test/acceptance.sh`
   (`make test`) recorre A-1 a A-14 con `jq` y `/usr/bin/time`, una línea por
   criterio; A-2, A-3 y A-14 también como test puro en `internal/model`.
 
 ## Pruebas ejecutadas
 
 `make check` verde · `gofmt -l` sin salida · `make test` verde contra el
-laboratorio: integración de `engine` y `ssh` (22 tests), `test/secrets.sh` y
-`test/acceptance.sh` con 13 de los 14 criterios en verde, los cinco que protegen
-la nota incluidos. Salida literal en `docs/design/ACEPTACION-FASE1.md`.
+laboratorio: integración de `engine` y `ssh`, `test/secrets.sh` y
+`test/acceptance.sh` con 13 de los 14 criterios, los cinco que protegen la nota
+incluidos. Además, las dos aserciones nuevas y el cuestionario ejecutados a mano
+contra el laboratorio: la anticomprobación del alumno inalcanzable sale
+`UNEVALUATED`, nunca `PASS`.
 
 ## Problemas conocidos
 
@@ -70,6 +78,9 @@ la nota incluidos. Salida literal en `docs/design/ACEPTACION-FASE1.md`.
 
 ## Siguiente tarea recomendada
 
-**T014** (mensajes de error del YAML sin jerga de Go, P2), ya `READY`. Un examen
-mal escrito debe explicarse en español con fichero, línea y clave; hoy un valor
-del tipo equivocado escupe el nombre de un tipo interno.
+**T021** (política de claves de host y entrada por clave SSH, P1), ya `READY`.
+Cierra D-3, que es de seguridad y no puede quedarse en provisional. Después,
+T022 ejecuta un examen real completo contra el laboratorio.
+
+También sigue `READY` **T014** (P2): un examen mal escrito debe explicarse en
+español con fichero, línea y clave.
