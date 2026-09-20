@@ -209,3 +209,17 @@ Dos decisiones menores:
    preguntar nada.
 3. **El valor por defecto del tope global sube de 2 a 8.** El 2 era del
    prototipo vertical. El número definitivo lo mide T031.
+
+## T031 · Mediciones y cierre de D-6
+
+1. **El tope global por defecto sube de 8 a 16.** Medido: 30 alumnos con
+   máquina propia pasan de 24,7 s a 13,4 s por 1 MB más de memoria. ADR-0013.
+2. **`test/rendimiento.sh` no es un test.** Mide y publica una tabla; solo
+   falla si una medida pierde una comprobación. Que una máquina sea más lenta
+   otro día no puede romper la suite.
+3. **La medida que decide no es la de cien alumnos contra un servidor**, donde
+   manda el tope por destino, sino la de treinta alumnos con máquina propia y
+   un comando que tarda. Es el caso en el que el profesor espera.
+4. **`seq` como generador de salida grande**: un único vector de argumentos,
+   sin shell ni tubería, y texto de verdad en vez de bytes nulos.
+

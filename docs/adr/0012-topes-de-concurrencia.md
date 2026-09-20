@@ -1,8 +1,8 @@
 # ADR-0012 · Dos topes de concurrencia: 8 alumnos a la vez, 4 conexiones por máquina
 
 - Estado: **aceptada** · 2026-09-20
-- Acota **D-6** de `08-DECISIONES-ABIERTAS.md`; el cierre queda en T031, con
-  las mediciones de 10/30/100 alumnos y de memoria
+- Acota **D-6** de `08-DECISIONES-ABIERTAS.md`; el tope global que fija aquí
+  queda medido y subido a 16 por ADR-0013, que cierra D-6
 - Contexto: `FAILURE-MODES.md` F-05, `PROPOSAL.md` §D-6, `PERFORMANCE.md` §6,
   ADR-0010
 
@@ -69,6 +69,6 @@ Que el número medido de rechazos (38–49) se parezca tanto al de Teuton (53 de
   servidor que aguante más sube `--host-concurrency`; los números quedan escritos
   en el artefacto de esa corrección.
 - No hay reparto adaptativo. Si aparece la necesidad, ADR nuevo.
-- El tope por máquina, **4**, está medido. El tope global, **8**, todavía no:
+- El tope por máquina, **4**, está medido. El tope global, **8**, no lo estaba:
   esta medición fija cuántas conexiones aguanta un servidor, no cuántos alumnos
-  conviene llevar a la vez. Eso lo mide T031, y es quien cierra D-6.
+  conviene llevar a la vez. Medido en ADR-0013, que lo sube a **16**.

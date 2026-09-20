@@ -25,8 +25,11 @@ const (
 // the number of sessions that may be opened at the same time against one
 // destination machine. Both are published in the PLAN so the artifact says
 // under which conditions the run happened (ADR-0012).
+//
+// 16 is measured, not guessed: a class of 30 students on their own machines
+// takes 24,7 s at 8 and 13,4 s at 16, for 1 MB more memory (ADR-0013).
 const (
-	DefaultConcurrency     = 8
+	DefaultConcurrency     = 16
 	DefaultHostConcurrency = 4
 )
 

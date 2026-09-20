@@ -6,14 +6,22 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última tarea terminada
 
-**T014 (los errores del examen se leen en español).** Un examen mal escrito ya
+**T031 (cuántos alumnos a la vez, ya no a ojo).** Medido: una clase de 30
+alumnos con máquina propia se corrige ahora en la mitad de tiempo (de 25 s a
+13 s), porque el motor lleva 16 alumnos a la vez en vez de 8. La memoria no lo
+paga: se queda en 11-16 MB siempre, tanto con 10 alumnos como con 100, y tanto
+si una máquina contesta 1 MB como si contesta 300. Teuton llegaba a 970 MB con
+esos 300 MB. Cien alumnos contra un solo servidor siguen en 3 s y sin un solo
+cero técnico. ADR-0013 y `make rendimiento`; D-6 queda cerrada.
+
+Antes, **T014 (los errores del examen se leen en español).** Un examen mal escrito ya
 no contesta con jerga del motor: `cerca_de: 3` dice «la clave "cerca_de" debe
 ser un bloque de claves», con el fichero y la línea. El motor comprueba la
 forma de cada valor antes de leerlo, así que ningún mensaje de la librería de
 YAML llega al profesor. Verificado con un test de tabla que prueba un valor del
 tipo equivocado en cada clave de `examen.yaml` y de `aula.yaml`.
 
-Antes, **T030**: cien alumnos contra un mismo servidor se corrigen sin perder
+**T030**: cien alumnos contra un mismo servidor se corrigen sin perder
 ni una comprobación, con cuatro conexiones a la vez por máquina y ocho alumnos
 en paralelo (ADR-0012).
 
@@ -40,7 +48,7 @@ sin máquina.
   comprobación `valor:` no abre sesión y se anota `transport: "inventory"`.
   `internal/report`: escritura atómica, parciales, `latest.json`, ULID propio y
   redacción de secretos.
-- `internal/engine`: pool de 8 y 4 aperturas de sesión por máquina de destino
+- `internal/engine`: pool de 16 y 4 aperturas de sesión por máquina de destino
   (`hostgate.go`, solo la apertura: una sesión abierta no cuenta para
   `MaxStartups`), una sesión por host y alumno, presupuesto por alumno,
   `panic` recuperado por alumno, parcial tras cada alumno, `ExitCode`
@@ -81,6 +89,6 @@ y una máquina que cambia de identidad se rechaza con el motivo escrito.
 
 ## Siguiente tarea recomendada
 
-**T031** (`READY`, P2): medir tiempo y memoria con 10, 30 y 100 alumnos y con
-salidas de 1/20/100/300 MB, fijar con eso cuántos alumnos en paralelo y cerrar
-D-6.
+**T032** (`READY`, P2): una máquina que contesta más de 8 MB deja hoy la
+comprobación sin evaluar por conexión perdida; hay que aprovechar los 64 kB
+que sí se leyeron. Nadie suspende por ello, así que no corre prisa.

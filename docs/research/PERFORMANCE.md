@@ -92,16 +92,28 @@ Tiempo hasta que Teuton se rinde, medido en `s03-sshfail` (modo secuencial):
 Los 30 s de una IP muerta son el único timeout que existe, y solo cubre la
 conexión. Cuatro alumnos con averías tardaron 38 s en total.
 
-## 6. Qué medir del motor nuevo
+## 6. El motor nuevo, medido
 
-Para poder comparar de verdad, el sucesor debe medirse con **los mismos
-proyectos** de `evidence/proyectos/` y publicar:
+Ya no es una lista de deberes: `test/rendimiento.sh` la ejecuta. Mismo
+laboratorio, mismo `/usr/bin/time`. Las tres tablas y la decisión que sale de
+ellas están en **ADR-0013**; aquí queda la comparación con lo de arriba.
 
-1. tiempo y RSS con 10 / 30 / 100 alumnos, con y sin límite de concurrencia;
-2. RSS con salidas de 1 / 20 / 100 / 300 MB, que debe quedar **plana** si el
-   tope de salida funciona;
-3. reparto de notas con 100 alumnos contra un solo host con `MaxStartups`
-   por defecto: el objetivo es **0 ceros por causa técnica**, que es
-   exactamente lo que Teuton no consigue;
-4. tiempo hasta el primer evento NDJSON (la GUI hoy no sabe nada hasta que
-   empiezan a llegar los puntos).
+| | Teuton 2.10.6 | Evalon |
+|---|---|---|
+| 100 alumnos, un servidor | 2,09 s · 156 MB · **53 ceros** | 2,86 s · 14 MB · **0 ceros** |
+| 300 MB de salida | 2,75 s · **970 MB** | 0,19 s · **12 MB** |
+| 30 alumnos, 6 s de comando | — | 24,7 s con 8 · **13,4 s con 16** |
+
+Tres lecturas:
+
+1. **Los ceros técnicos han desaparecido.** Es el punto del ejercicio: los 53
+   ceros de Teuton no los producían los alumnos.
+2. **La memoria es plana.** Teuton pagaba 3,2 veces el tamaño de la salida del
+   alumno y no conservaba nada de ella; el motor nuevo se queda en 11-16 MB
+   con 1 MB o con 300, y sí conserva los primeros 64 kB.
+3. **El tope global es lo único que el profesor espera.** Con máquina por
+   alumno el escalado es casi perfecto, así que ese número se sube a 16
+   (ADR-0013) y el resto queda en manos de `--concurrency`.
+
+Queda sin medir lo que aún no existe: el tiempo hasta el primer evento NDJSON,
+que depende del formato de eventos (D-9).

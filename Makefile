@@ -4,7 +4,7 @@ GO ?= go
 BIN := bin/evalon
 
 # Test SSH lab. See test/lab.sh.
-.PHONY: check test build lab lab-down lab-status lab-ra2 lab-ra2-down clean
+.PHONY: check test build lab lab-down lab-status lab-ra2 lab-ra2-down rendimiento clean
 
 ## check: fast suite. No network, no disk. Must stay under 10 s.
 check:
@@ -19,6 +19,11 @@ test: check build
 	test/acceptance.sh
 	test/ra2.sh
 	test/carga.sh
+
+## rendimiento: measure scaling instead of guessing it (ADR-0013). Needs make lab.
+## Not part of make test: it is slow and it must not fail for being slow.
+rendimiento: build
+	test/rendimiento.sh
 
 ## build: single binary in bin/evalon.
 build:

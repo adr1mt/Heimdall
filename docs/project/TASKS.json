@@ -650,7 +650,7 @@
       "id": "T031",
       "title": "Mediciones de rendimiento y cierre de D-6",
       "phase": 3,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [
         "T030"
@@ -667,6 +667,35 @@
       ],
       "tests": [],
       "notes": "Detallar al llegar."
+    },
+    {
+      "id": "T032",
+      "title": "Una salida desbordada no debe dejar la comprobación sin evaluar",
+      "phase": 3,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [
+        "T031"
+      ],
+      "goal": "Aprovechar los 64 kB que sí se leyeron en vez de perder la comprobación.",
+      "scope": [
+        "Hoy, una salida de más de 8 MB corta la sesión y la comprobación sale UNEVALUATED con CONNECTION_LOST",
+        "Decidir si la asercion se evalua sobre lo conservado, marcado como truncado, o si sigue sin evaluar",
+        "Detectado midiendo T031: ver ADR-0013"
+      ],
+      "out_of_scope": [
+        "Subir el tope de 8 MB",
+        "Conservar mas de 64 kB"
+      ],
+      "acceptance": [
+        "El motivo que llega al artefacto nombra el desbordamiento, no una conexion perdida",
+        "Ningun alumno suspende por una salida enorme",
+        "Test de integracion sobre testdata/salida-grande"
+      ],
+      "tests": [
+        "go test -tags=integration ./internal/engine"
+      ],
+      "notes": "Detectado al medir el escalado por tamano de salida (T031)."
     },
     {
       "id": "T040",

@@ -17,3 +17,4 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 | [0010](0010-ssh-nativo.md) | SSH nativo con `x/crypto/ssh`, no el binario `ssh` |
 | [0011](0011-identidad-de-las-maquinas.md) | La identidad de la máquina se fija por ejecución, no entre cursos |
 | [0012](0012-topes-de-concurrencia.md) | Dos topes de concurrencia: 8 alumnos a la vez, 4 conexiones por máquina |
+| [0013](0013-alumnos-en-paralelo.md) | 16 alumnos en paralelo, medido; cierra D-6 |
