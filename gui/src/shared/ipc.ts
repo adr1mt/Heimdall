@@ -4,5 +4,11 @@ export const IPC = {
   getEnginePath: 'settings:getEnginePath',
   setEnginePath: 'settings:setEnginePath',
   pickFile: 'dialog:pickFile',
-  openExternal: 'shell:openExternal'
+  openExternal: 'shell:openExternal',
+  secretRefs: 'run:secretRefs',
+  startRun: 'run:start',
+  cancelRun: 'run:cancel',
+  // Pushed from the main process while a run is alive.
+  runEvent: 'run:event',
+  runClosed: 'run:closed'
 } as const

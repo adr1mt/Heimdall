@@ -368,3 +368,34 @@ Dos decisiones menores:
    por defecto en vez de impedir arrancar.
 4. **`gui/` es un árbol Node independiente.** `make check` no lo toca;
    `make gui-check` corre su typecheck y su suite.
+
+## T052 · La GUI lanza el motor
+
+1. **La aplicación entrega un directorio, no dos rutas.** El motor toma un
+   directorio con `examen.yaml` dentro y el aula por `--cname`. La GUI, que
+   deja elegir dos ficheros, comprueba antes de arrancar que el examen se llama
+   `examen.yaml` y que el aula está en su misma carpeta, y si no lo dice en
+   castellano. Aceptar rutas sueltas habría exigido tocar el CLI del motor por
+   comodidad de la interfaz.
+2. **Las contraseñas se piden por el nombre que el aula usa.** La aplicación
+   lee el `aula.yaml` y busca las referencias `${MAYUSCULAS}`; por cada una
+   pide un valor. No valida nada: el motor sigue siendo quien rechaza una
+   contraseña literal en el inventario o una referencia sin valor. Una
+   referencia que la GUI no viera acaba en error de configuración, nunca en una
+   nota equivocada.
+3. **Los secretos solo viven en memoria.** Viajan del campo de la interfaz al
+   proceso principal y de ahí a `stdin` del motor, en una línea. No entran en
+   `argv`, no se guardan en los ajustes y se borran al terminar la corrección o
+   al cambiar de aula. `gui/scripts/secretos.sh` lo comprueba mirando `argv` y
+   el entorno de todos los procesos vivos durante la corrección.
+4. **La barra cuenta comprobaciones, no caracteres.** El total es
+   `expected_checks` de `run.start` y cada `check.end` avanza uno. Es la
+   diferencia con la GUI vieja, que contaba texto porque no tenía otra cosa.
+5. **Una ejecución que no ve `run.end` está inacabada.** Aunque el proceso
+   salga con 0. Se dice en pantalla, con lo que el motor escribió en `stderr`.
+6. **Detener manda `SIGINT`, no mata.** Es lo que el motor espera: cancela,
+   escribe el artefacto parcial y sale con 4. Matarlo tiraría todo lo ya
+   corregido.
+7. **Nada rojo por un fallo técnico.** Un alumno con comprobaciones sin
+   evaluar sale en ámbar y con el recuento escrito; el verde es solo para quien
+   terminó entero (principio 3).

@@ -912,7 +912,7 @@
       "id": "T052",
       "title": "La GUI lanza el motor y sigue la ejecucion por el contrato nativo",
       "phase": 5,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "T051"
@@ -933,14 +933,19 @@
         "Cancelar a mitad deja un resultado parcial legible y el motor sale con 4",
         "Ninguna contrasena aparece en argv, logs ni ficheros de la GUI"
       ],
-      "tests": [],
-      "notes": "Detallar al llegar."
+      "tests": [
+        "gui/tests/run.test.ts: argv, secretos por stdin, troceo del flujo y eventos desconocidos",
+        "gui/tests/run-state.test.ts: la barra sobre comprobaciones reales, alumnos entrelazados, contrato desconocido y ejecucion sin cerrar",
+        "gui/scripts/secretos.sh (make gui-lab): correccion entera del laboratorio desde la aplicacion, S-0 a S-4",
+        "gui/scripts/lab-run.ts con CANCEL_MS: detener a mitad deja artefacto CANCELLED y el motor sale con 4"
+      ],
+      "notes": "La GUI lanza el motor con un directorio: examen.yaml fijo y el aula por --cname en la misma carpeta. Las contraseñas se piden por referencia del aula y solo viven en memoria."
     },
     {
       "id": "T053",
       "title": "Resultados: matriz, notas, causas tecnicas e incompletas (cierra D-8)",
       "phase": 5,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P0",
       "depends_on": [
         "T052"

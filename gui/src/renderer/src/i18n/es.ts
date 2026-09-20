@@ -29,8 +29,49 @@ export const t = {
     classHint: 'Quién es cada alumno y cómo se llega a su máquina.',
     choose: 'Elegir…',
     none: 'Sin elegir',
-    pending:
-      'Corregir desde aquí llega con la siguiente entrega. Hoy la aplicación comprueba que el motor está instalado y recuerda los dos ficheros con los que vas a trabajar.'
+    sameFolder: 'El examen tiene que llamarse «examen.yaml» y el aula estar en su misma carpeta.'
+  },
+  credentials: {
+    title: 'Credenciales',
+    hint:
+      'El aula solo nombra las contraseñas; los valores los pones aquí y no se guardan en ningún sitio.',
+    none: 'Este aula no pide ninguna contraseña.',
+    placeholder: 'Contraseña'
+  },
+  run: {
+    start: 'Corregir',
+    again: 'Corregir otra vez',
+    cancel: 'Detener',
+    cancelling: 'Deteniendo…',
+    confirmTitle: '¿Detener la corrección?',
+    confirmBody:
+      'Se guardará lo corregido hasta ahora. Lo que quede sin comprobar aparecerá sin evaluar, no suspenso.',
+    confirmYes: 'Detener',
+    starting: 'Arrancando el motor…',
+    progress: (done: number, total: number) => `${done} de ${total} comprobaciones`,
+    needEngine: 'Primero hay que indicar dónde está el motor, en Ajustes.',
+    needFiles: 'Elige el examen y el aula.',
+    needSecrets: 'Faltan contraseñas por escribir.',
+    classTitle: 'La clase',
+    excluded: 'Excluido',
+    waiting: 'En espera',
+    inProgress: 'Corrigiendo',
+    artifact: 'Resultado guardado en',
+    resultsPending: 'Las notas, alumno a alumno, llegan con la siguiente entrega.',
+    status: {
+      COMPLETE: 'Corregida la clase entera.',
+      PARTIAL: 'Corrección terminada con alumnos sin evaluar del todo.',
+      CANCELLED: 'Corrección detenida; queda guardado lo hecho hasta ahora.',
+      INVALID_CONFIG: 'La configuración no es válida; no se ha tocado ninguna máquina.'
+    },
+    student: {
+      OK: 'Evaluado',
+      PARTIAL: 'Parcial',
+      NOT_EVALUATED: 'Sin evaluar',
+      EXCLUDED: 'Excluido'
+    },
+    counts: (pass: number, fail: number, unevaluated: number) =>
+      `${pass} bien · ${fail} mal · ${unevaluated} sin evaluar`
   },
   settings: {
     title: 'Ajustes',

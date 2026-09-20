@@ -11,6 +11,7 @@ import {
   X
 } from 'lucide-react'
 import { useApp, noticeFrom, type View } from './stores/app'
+import { useRun } from './stores/run'
 import { cn } from './lib/utils'
 import { t } from './i18n/es'
 
@@ -49,6 +50,18 @@ function AppBody() {
       .then(setEngine)
       .catch((error) => setNotice(noticeFrom('No se pudo comprobar el motor', error)))
   }, [setEngine, setNotice])
+
+  // The stream is followed from here and not from the view: changing views
+  // mid-correction would otherwise drop events, and a lost event is progress
+  // the teacher never sees again.
+  useEffect(() => {
+    const offEvent = window.heimdall.onRunEvent((event) => useRun.getState().event(event))
+    const offClosed = window.heimdall.onRunClosed((closed) => useRun.getState().closed(closed))
+    return () => {
+      offEvent()
+      offClosed()
+    }
+  }, [])
 
   const views: Record<View, JSX.Element> = {
     home: <HomeView />,

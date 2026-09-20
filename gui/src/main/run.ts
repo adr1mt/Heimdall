@@ -1,0 +1,169 @@
+import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process'
+import { basename, dirname, join } from 'node:path'
+import { parseEvent, type EngineEvent } from '../shared/events'
+
+/** The exam file the engine looks for inside the directory it is given. */
+const EXAM_FILE = 'examen.yaml'
+
+/** The version of the one-line JSON document the engine reads from stdin. */
+const SECRETS_SCHEMA = 1
+
+/**
+ * Longest line accepted from the stream. The contract's events are small and
+ * carry no output from a student's machine, so anything past this is a broken
+ * engine and not a long run: the line is dropped instead of growing this
+ * process without bound.
+ */
+const MAX_LINE = 1 << 20
+
+/** How much of stderr is kept to explain a failure. Not a log. */
+const MAX_STDERR = 8 << 10
+
+/** What the engine is asked to evaluate. */
+export interface RunTarget {
+  /** Directory handed to `heimdall run`. */
+  dir: string
+  /** Classroom file name inside it, for --cname. */
+  className: string
+}
+
+/**
+ * Works out the directory and the classroom name from the two files the
+ * teacher picked. The engine takes a directory, not two paths: the exam has a
+ * fixed name and the classroom travels as a name inside the same directory.
+ * Anything else is told here, in Spanish, before a single machine is touched.
+ */
+export function resolveRunTarget(examPath: string, classPath: string): RunTarget {
+  if (basename(examPath) !== EXAM_FILE) {
+    throw new Error(`El examen tiene que llamarse «${EXAM_FILE}»; has elegido «${basename(examPath)}».`)
+  }
+  const dir = dirname(examPath)
+  if (dirname(classPath) !== dir) {
+    throw new Error('El examen y el aula tienen que estar en la misma carpeta.')
+  }
+  return { dir, className: basename(classPath) }
+}
+
+/**
+ * The argument vector. No shell, ever, and no secret in it: a password in argv
+ * is readable with `ps` by any user of the machine (ADR-0009).
+ */
+export function runArgs(target: RunTarget): string[] {
+  return [
+    'run',
+    '--secrets=stdin',
+    '--events=ndjson',
+    `--var=${join(target.dir, 'var')}`,
+    `--cname=${target.className}`,
+    target.dir
+  ]
+}
+
+/** The one-line document the engine reads from stdin. */
+export function secretsLine(secrets: Record<string, string>): string {
+  return `${JSON.stringify({ schema: SECRETS_SCHEMA, secrets })}\n`
+}
+
+/**
+ * Splits a byte stream into lines. The stream arrives in chunks that have
+ * nothing to do with line boundaries, and half an event is not an event.
+ */
+export class LineSplitter {
+  private buffer = ''
+  private overflowed = false
+
+  push(chunk: string, onLine: (line: string) => void): void {
+    this.buffer += chunk
+    let index = this.buffer.indexOf('\n')
+    while (index >= 0) {
+      const line = this.buffer.slice(0, index)
+      this.buffer = this.buffer.slice(index + 1)
+      if (!this.overflowed) onLine(line)
+      this.overflowed = false
+      index = this.buffer.indexOf('\n')
+    }
+    if (this.buffer.length > MAX_LINE) {
+      // Drop the runaway line and everything until the next newline.
+      this.buffer = ''
+      this.overflowed = true
+    }
+  }
+
+  /** The last line, when the engine ended without a final newline. */
+  flush(onLine: (line: string) => void): void {
+    if (this.buffer && !this.overflowed) onLine(this.buffer)
+    this.buffer = ''
+    this.overflowed = false
+  }
+}
+
+export interface RunCallbacks {
+  onEvent: (event: EngineEvent) => void
+  /** The process is gone. `stderr` is the tail the engine wrote, if any. */
+  onClose: (exitCode: number | null, stderr: string) => void
+}
+
+/**
+ * One engine process. It exists while a correction is running and it is the
+ * only thing in the application that knows a password, for as long as it takes
+ * to write one line into the engine's stdin.
+ */
+export class RunSession {
+  private child: ChildProcessWithoutNullStreams
+  private stderr = ''
+  private cancelled = false
+
+  constructor(enginePath: string, target: RunTarget, secrets: Record<string, string>, cb: RunCallbacks) {
+    this.child = spawn(enginePath, runArgs(target), {
+      cwd: target.dir,
+      stdio: ['pipe', 'pipe', 'pipe']
+    })
+
+    // The secrets leave this process here and nowhere else: one line into the
+    // engine's stdin, and the pipe is closed straight away.
+    this.child.stdin.on('error', () => {
+      // A engine that died before reading loses the line; the exit code and
+      // stderr already explain it and there is nothing to add.
+    })
+    this.child.stdin.end(secretsLine(secrets))
+
+    const stream = new LineSplitter()
+    this.child.stdout.setEncoding('utf-8')
+    this.child.stdout.on('data', (chunk: string) => {
+      stream.push(chunk, (line) => {
+        const event = parseEvent(line)
+        if (event) cb.onEvent(event)
+      })
+    })
+
+    this.child.stderr.setEncoding('utf-8')
+    this.child.stderr.on('data', (chunk: string) => {
+      if (this.stderr.length < MAX_STDERR) this.stderr += chunk
+    })
+
+    const finish = (code: number | null): void => {
+      stream.flush((line) => {
+        const event = parseEvent(line)
+        if (event) cb.onEvent(event)
+      })
+      cb.onClose(code, this.stderr.slice(0, MAX_STDERR))
+    }
+
+    this.child.on('error', (error) => {
+      this.stderr = `${error.message}\n${this.stderr}`
+      finish(null)
+    })
+    this.child.on('close', (code) => finish(code))
+  }
+
+  /**
+   * Stops the run the way the engine expects: the same signal Ctrl-C sends, so
+   * it cancels, writes the partial artifact and exits with 4. Killing it
+   * outright would throw away everything already corrected.
+   */
+  cancel(): void {
+    if (this.cancelled) return
+    this.cancelled = true
+    this.child.kill('SIGINT')
+  }
+}

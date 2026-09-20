@@ -22,7 +22,8 @@
     "typecheck": "npm run typecheck:node && npm run typecheck:web && npm run typecheck:test",
     "verify:preload": "node scripts/verify-preload.mjs",
     "icon": "python3 scripts/make-icon.py",
-    "screenshot": "esbuild scripts/screenshot.ts --bundle --platform=node --format=esm --outfile=/tmp/heimdall-shot.mjs --external:electron && node_modules/electron/dist/electron /tmp/heimdall-shot.mjs --no-sandbox"
+    "screenshot": "esbuild scripts/screenshot.ts --bundle --platform=node --format=esm --outfile=/tmp/heimdall-shot.mjs --external:electron && node_modules/electron/dist/electron /tmp/heimdall-shot.mjs --no-sandbox",
+    "lab-run": "esbuild scripts/lab-run.ts --bundle --platform=node --format=esm --outfile=/tmp/heimdall-lab-run.mjs --external:electron && node_modules/electron/dist/electron /tmp/heimdall-lab-run.mjs --no-sandbox"
   },
   "build": {
     "appId": "net.xeill.elpuig.heimdall",
