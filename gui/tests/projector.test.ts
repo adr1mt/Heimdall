@@ -23,6 +23,15 @@ describe('modo proyector', () => {
     expect(maskMachines('host alu10.aula', literals)).not.toContain('.aula')
   })
 
+  it('tapa la máquina del motivo técnico de una comprobación que no se ejecutó', () => {
+    // Sin ejecución el artefacto no nombra ninguna máquina: lo único que queda
+    // es la dirección que el motivo escribe, con su puerto.
+    const masked = maskMachines('no se ha podido conectar con 127.1.2.3:2299', [])
+    expect(masked).not.toContain('127.1.2.3')
+    expect(masked).not.toContain('2299')
+    expect(masked).toContain('no se ha podido conectar con')
+  })
+
   it('no toca la salida del alumno más allá de la máquina', () => {
     const masked = maskMachines('uid=1000(alumno) gid=1000', machineLiterals(['127.1.2.3']))
     expect(masked).toBe('uid=1000(alumno) gid=1000')

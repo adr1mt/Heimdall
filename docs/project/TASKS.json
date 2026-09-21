@@ -1464,7 +1464,7 @@
       "id": "T066",
       "title": "El proyector tapa tambien la maquina que aparece en el motivo tecnico",
       "phase": 5,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T064"

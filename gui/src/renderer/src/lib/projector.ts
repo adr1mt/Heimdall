@@ -2,9 +2,11 @@
  * Projector mode: what can be shown on the classroom screen.
  *
  * The results screen carries the address of every machine, the command that
- * was sent to it —which contains that address— and the output the machine
- * printed. Projected in front of the class, that hands whoever is looking the
- * way into a classmate's machine, and it says whose machine each row is.
+ * was sent to it —which contains that address—, the output the machine
+ * printed and the technical reason of a check that could not run, which names
+ * the machine it could not reach. Projected in front of the class, that hands
+ * whoever is looking the way into a classmate's machine, and it says whose
+ * machine each row is.
  *
  * Names are NOT touched. The teacher chose to correct a named class and needs
  * the names to talk to the class; what gets covered is the machine, which is
@@ -14,7 +16,8 @@
  * is born without them (ADR-0009) and a password can never reach a command.
  */
 
-const IPV4 = /\b\d{1,3}(?:\.\d{1,3}){3}\b/g
+/** An address, with the port when it carries one: `127.1.2.3` or `127.1.2.3:2299`. */
+const IPV4 = /\b\d{1,3}(?:\.\d{1,3}){3}(?::\d{1,5})?\b/g
 const HIDDEN_ADDRESS = '•••.•••.•••.•••'
 const HIDDEN = '••••••'
 

@@ -260,9 +260,13 @@ app.whenReady().then(async () => {
   await wait(600)
   await js(`[...document.querySelectorAll('aside button')].find(b => b.textContent.trim() === 'Modo proyector').click()`)
   await wait(400)
-  // Open a check, which is where the command and the output live.
+  // Open a check, which is where the command, the output and the technical
+  // reason live. The last one belongs to the student whose machine never
+  // answered: there the reason names the machine and there is no command to
+  // read it from (T066).
   await js(`(() => {
-    const cell = [...document.querySelectorAll('main button')].find(b => /^[a-z]+\\d+-/.test(b.textContent.trim()))
+    const cells = [...document.querySelectorAll('main button')].filter(b => /^[a-z]+\\d+-/.test(b.textContent.trim()))
+    const cell = cells[cells.length - 1]
     if (cell) cell.click()
     return !!cell
   })()`)

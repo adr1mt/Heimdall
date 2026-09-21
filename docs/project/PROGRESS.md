@@ -6,8 +6,14 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T064 hecha**: durante el examen la pantalla ya enseña lo que vale cada
-alumno, no la última vuelta suelta.
+**T066 hecha**: con el proyector encendido ya no se lee la dirección de la
+máquina de nadie. Faltaba taparla en el motivo técnico de una comprobación
+—«no se ha podido conectar con tal dirección»—, que es lo único que queda en
+pantalla cuando la máquina ni siquiera respondió. Fuera del proyector el motivo
+se sigue leyendo entero.
+
+**T064 hecha** (sesión anterior): durante el examen la pantalla ya enseña lo
+que vale cada alumno, no la última vuelta suelta.
 
 En Inicio, mientras dura el examen, hay un panel con la clase: la nota con la
 que se queda cada uno, de qué vuelta sale, quién ha terminado —y que ya no se
@@ -18,11 +24,6 @@ desde ahí, con una columna que dice de qué vuelta sale cada nota.
 Ninguna de esas notas se calcula en la aplicación: se le piden al motor con las
 vueltas de este examen, y viajan con la vuelta siguiente para que deje fuera a
 los terminados.
-
-Por el camino, dos fallos de verdad. Uno arreglado: una vuelta que dejaba fuera
-a un alumno terminado rompía la pantalla de Resultados. Otro abierto, **T066**:
-el motivo técnico de una máquina apagada enseña su dirección sin tapar en el
-proyector. Se ve ahora porque antes la pantalla se rompía antes de llegar ahí.
 
 ## Estado actual
 
@@ -46,7 +47,7 @@ proyector. Se ve ahora porque antes la pantalla se rompía antes de llegar ahí.
   identidades en memoria (ADR-0011), 64 kB por flujo, corte a 8 MB.
 - `test/lab.sh`: `alu1` en `127.1.2.3:2201`, el roto en el 2299. `acceptance.sh`
   (A-1 a A-14), `eventos.sh` (E-1 a E-10) y `sesion.sh` (S-1 a S-8).
-- `gui/`: árbol Node independiente; `make gui-check` (143 tests), `gui-build` y
+- `gui/`: árbol Node independiente; `make gui-check` (144 tests), `gui-build` y
   `gui-lab`. Vistas: Inicio, Resultados, Histórico, Ajustes, Ayuda. Inicio
   lleva el **modo examen** (vueltas encadenadas, una cada vez) y **el panel de
   la sesión**, que llama a `heimdall session` con las vueltas de este examen y
@@ -58,10 +59,11 @@ proyector. Se ve ahora porque antes la pantalla se rompía antes de llegar ahí.
 
 ## Pruebas ejecutadas
 
-`make check` verde. `make gui-check` verde (143 pruebas). `make gui-build`
-verde. `gui/scripts/examen-lab.ts` contra el laboratorio con dos vueltas
-reales: E-1 a E-7, S-1 a S-5 y C-1 a C-3 en verde; **P-1 y P-2 en rojo**, que
-es el fallo del proyector anotado en T066. `acceptance.sh`, `eventos.sh`,
+`make check` verde. `make gui-check` verde (144 pruebas). `make gui-build`
+verde. `gui/scripts/examen-lab.ts` contra el laboratorio: E-1 a E-5, **P-1 a
+P-3**, C-1 a C-3 y S-5 en verde, con el proyector abriendo la comprobación de
+un alumno cuya máquina no respondió (T066). La cadena (E-6, E-7, S-1 a S-4) no
+se repitió esta sesión; quedó verde antes. `acceptance.sh`, `eventos.sh`,
 `sesion.sh` y `make test` no se repitieron esta sesión; quedaron verdes antes.
 
 ## Problemas conocidos
@@ -74,8 +76,7 @@ es el fallo del proyector anotado en T066. `acceptance.sh`, `eventos.sh`,
 - Un reintento exige el mismo PLAN: si lo que fallaba era el `aula.yaml`, esa
   clase se corrige entera otra vez.
 - Intervalo mínimo del modo examen, 5 minutos.
-- El proyector tapa las máquinas, no los nombres del alumnado, y **no tapa la
-  dirección que aparece en el motivo técnico** (T066).
+- El proyector tapa las máquinas, no los nombres del alumnado.
 - El panel de la sesión se borra al empezar un examen nuevo: las vueltas del
   examen anterior no son de esta sesión.
 

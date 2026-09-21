@@ -425,6 +425,8 @@ function ChainCheckDetail({
   onClose: () => void
 }) {
   const attempts = attemptsText(check.attempts)
+  // The technical reason names the machine that could not be reached.
+  const mask = useMask(useRun((s) => s.artifact))
   return (
     <div className="space-y-3 rounded-md border border-border p-4">
       <div className="flex items-start justify-between gap-3">
@@ -456,7 +458,7 @@ function ChainCheckDetail({
         </span>
       </div>
 
-      {check.detail && <p className="text-sm">{check.detail}</p>}
+      {check.detail && <p className="text-sm">{mask(check.detail)}</p>}
 
       <p className="text-xs text-muted-foreground">{fromRunText(check)}</p>
 
@@ -694,8 +696,8 @@ function CheckDetail({
 }) {
   const execution = check.execution
   const projector = useApp((s) => s.projector)
-  // The command and the output are the two places where the address of the
-  // machine travels in plain sight.
+  // The command, the output and the technical reason of a check are where the
+  // address of the machine travels in plain sight.
   const mask = useMask(useRun((s) => s.artifact))
   return (
     <div className="space-y-3 rounded-md border border-border p-4">
@@ -729,13 +731,13 @@ function CheckDetail({
         {check.group && <span className="text-xs text-muted-foreground">{check.group}</span>}
       </div>
 
-      {check.detail && <p className="text-sm">{check.detail}</p>}
+      {check.detail && <p className="text-sm">{mask(check.detail)}</p>}
 
       {check.previous && (
         <Field label={t.results.previous}>
           <p className="text-dense">{previousText(check.previous)}</p>
           {check.previous.detail && (
-            <p className="text-xs text-muted-foreground">{check.previous.detail}</p>
+            <p className="text-xs text-muted-foreground">{mask(check.previous.detail)}</p>
           )}
         </Field>
       )}
