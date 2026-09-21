@@ -119,6 +119,32 @@ export const t = {
     removeColumnTitle: (name: string) => `¿Quitar la columna «${name}»?`,
     removeColumnBody: 'Se borra lo que cada alumno tuviera en ella.',
     columnAdd: 'Añadir',
+    // Pegar desde una hoja de cálculo: la lista ya existe en el registro o en
+    // Moodle, así que se pega y se enseña antes de guardar nada.
+    paste: 'Pegar alumnos',
+    pasteTitle: 'Pegar desde una hoja de cálculo',
+    pasteHint:
+      'Copia las filas del grupo y pégalas aquí. El orden de las columnas es el de la tabla: identificador, nombre, correo, máquina, puerto y usuario. Si pegas la fila de títulos, se leen por su nombre.',
+    pastePlaceholder: 'alu1\tAlumna Uno\talu1@instituto\t10.0.0.1\t\talumno',
+    pasteLabel: 'Filas pegadas',
+    pastePreview: 'Esto es lo que se va a añadir',
+    pasteNothing: 'Todavía no has pegado nada.',
+    pasteNoneUsable: 'Ninguna fila está completa. No se añade nada.',
+    pasteAdd: (students: number) =>
+      students === 1 ? 'Añadir 1 alumno' : `Añadir ${students} alumnos`,
+    pasteIncomplete: (rows: number) =>
+      rows === 1
+        ? '1 fila está incompleta y no se añadirá.'
+        : `${rows} filas están incompletas y no se añadirán.`,
+    pasteDuplicates: (rows: number) =>
+      rows === 1
+        ? '1 fila repite un identificador que ya está y no se añadirá.'
+        : `${rows} filas repiten identificadores que ya están y no se añadirán.`,
+    pasteNewColumns: (columns: string[]) =>
+      `Se añadirán como columnas propias: ${columns.join(', ')}.`,
+    pasteMissing: (missing: string[]) => `Falta: ${missing.join(', ')}.`,
+    pasteAdded: (students: number) =>
+      students === 1 ? 'Se ha añadido 1 alumno.' : `Se han añadido ${students} alumnos.`,
     loadFailed: 'No se pudieron leer las clases',
     saveFailed: 'No se pudo guardar la clase',
     blocked: 'Mientras el fichero de clases no se pueda leer, no se guarda nada.'

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Copy, Pencil, Plus, Trash2, Users } from 'lucide-react'
+import { ClipboardPaste, Copy, Pencil, Plus, Trash2, Users } from 'lucide-react'
 import {
   Button,
   Card,
@@ -19,6 +19,8 @@ import {
   type ClassGroup,
   type ClassStudent
 } from '../../../shared/classes'
+import { duplicatesIn, readPaste, studentsOf } from '../../../shared/paste'
+import { cn } from '@/lib/utils'
 import { t } from '@/i18n/es'
 
 /**
@@ -192,6 +194,7 @@ function ClassEditor({
   const problem = problemWith(draft, others)
   const [addingColumn, setAddingColumn] = useState(false)
   const [removingColumn, setRemovingColumn] = useState<string | null>(null)
+  const [pasting, setPasting] = useState(false)
 
   function setStudent(index: number, patch: Partial<ClassStudent>): void {
     onChange({
@@ -221,6 +224,10 @@ function ClassEditor({
                 <Plus className="h-4 w-4" />
                 {t.classes.addColumn}
               </Button>
+              <Button variant="ghost" size="sm" onClick={() => setPasting(true)}>
+                <ClipboardPaste className="h-4 w-4" />
+                {t.classes.paste}
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
@@ -249,12 +256,39 @@ function ClassEditor({
           />
         )}
 
+        {/* Apuntar a veintiséis alumnos a mano son ciento cincuenta campos.
+            La lista ya existe en el registro o en Moodle: se pega, se enseña
+            entera y solo entonces se guarda (T116). */}
+        {pasting && (
+          <StudentPaster
+            draft={draft}
+            onCancel={() => setPasting(false)}
+            onAdd={(students, columns) => {
+              onChange({
+                ...draft,
+                columns: [...draft.columns, ...columns],
+                students: [
+                  // Una clase nueva empieza con una fila vacía en pantalla;
+                  // pegar sobre ella la dejaría ahí, incompleta y bloqueando
+                  // el guardado.
+                  ...draft.students.filter((student) => student.id.trim() !== ''),
+                  ...students
+                ]
+              })
+              setPasting(false)
+            }}
+          />
+        )}
+
+        {/* Identificador y nombre se quedan fijos al desplazar: con nueve
+            columnas propias, al llegar a la última se estaban tecleando
+            números sin saber de quién eran (T117). */}
         <div className="overflow-x-auto">
           <table className="w-full min-w-max border-separate border-spacing-x-2 border-spacing-y-1">
             <thead>
               <tr className="text-left text-micro uppercase tracking-[0.09em] text-muted-foreground">
-                <th className="font-normal">{t.classes.col.id}</th>
-                <th className="font-normal">{t.classes.col.name}</th>
+                <th className={cn('font-normal', STICKY_ID)}>{t.classes.col.id}</th>
+                <th className={cn('font-normal', STICKY_NAME)}>{t.classes.col.name}</th>
                 <th className="font-normal">{t.classes.col.contact}</th>
                 <th className="font-normal">{t.classes.col.host}</th>
                 <th className="font-normal" title={t.classes.portHint}>
@@ -283,14 +317,14 @@ function ClassEditor({
             <tbody>
               {draft.students.map((student, index) => (
                 <tr key={index}>
-                  <td className="w-28">
+                  <td className={cn('w-28', STICKY_ID)}>
                     <Input
                       aria-label={t.classes.col.id}
                       value={student.id}
                       onChange={(e) => setStudent(index, { id: e.target.value })}
                     />
                   </td>
-                  <td className="w-44">
+                  <td className={cn('w-44', STICKY_NAME)}>
                     <Input
                       aria-label={t.classes.col.name}
                       value={student.name}
@@ -438,6 +472,126 @@ function ColumnAdder({
         </Button>
       </div>
       {problem && <p className="text-xs text-warning-strong">{problem}</p>}
+    </div>
+  )
+}
+
+/**
+ * Las dos columnas que dicen de quién es la fila, fijas a la izquierda.
+ *
+ * El fondo es obligatorio: sin él, lo que se desplaza por debajo se lee a
+ * través de la celda fija. El desplazamiento es el de la tabla —`w-28` más el
+ * espaciado de la primera columna—, así que el hueco entre las dos se ve
+ * igual parado que desplazado.
+ */
+const STICKY_ID = 'sticky left-0 z-20 bg-background'
+const STICKY_NAME = 'sticky left-[120px] z-20 bg-background'
+
+/**
+ * Pegar a los alumnos desde una hoja de cálculo.
+ *
+ * Todo se enseña antes de guardar nada: qué alumno sale de cada fila, cuál
+ * está incompleta y por qué, y cuántos entran de verdad. Una fila a la que le
+ * falta algo se señala en rojo y se queda fuera; nadie acaba con medio alumno
+ * guardado (T116).
+ *
+ * Una contraseña pegada no se lee nunca, se llame como se llame: una clase es
+ * una agenda y ahí no entra ningún secreto (ADR-0009).
+ */
+function StudentPaster({
+  draft,
+  onAdd,
+  onCancel
+}: {
+  draft: ClassGroup
+  onAdd: (students: ClassStudent[], columns: string[]) => void
+  onCancel: () => void
+}) {
+  const [text, setText] = useState('')
+  const paste = readPaste(text, draft.columns)
+  const students = studentsOf(paste, draft.students)
+  const incomplete = paste.rows.filter((row) => row.missing.length > 0).length
+  const repeated = duplicatesIn(paste, draft.students)
+
+  return (
+    <div className="space-y-3 rounded-md border border-border p-3">
+      <SectionTitle hint={t.classes.pasteHint}>{t.classes.pasteTitle}</SectionTitle>
+
+      <textarea
+        autoFocus
+        aria-label={t.classes.pasteLabel}
+        placeholder={t.classes.pastePlaceholder}
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') onCancel()
+        }}
+        className="h-32 w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-dense focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      />
+
+      {paste.warnings.map((warning) => (
+        <p key={warning} className="text-xs text-warning-strong">
+          {warning}
+        </p>
+      ))}
+
+      {paste.rows.length === 0 ? (
+        <p className="text-xs text-muted-foreground">{t.classes.pasteNothing}</p>
+      ) : (
+        <div className="space-y-2">
+          <p className="text-xs text-muted-foreground">{t.classes.pastePreview}</p>
+          <div className="max-h-64 overflow-auto rounded-md border border-border">
+            <table className="w-full text-dense">
+              <tbody>
+                {paste.rows.map((row, index) => (
+                  <tr
+                    key={index}
+                    className={cn(
+                      'border-b border-border/60 last:border-0',
+                      row.missing.length > 0 && 'bg-destructive/10 text-destructive-strong'
+                    )}
+                  >
+                    <td className="px-2 py-1 font-mono">{row.student.id || '—'}</td>
+                    <td className="px-2 py-1">{row.student.name || '—'}</td>
+                    <td className="px-2 py-1 font-mono">{row.student.host || '—'}</td>
+                    <td className="px-2 py-1 font-mono">{row.student.user || '—'}</td>
+                    <td className="px-2 py-1 text-xs">
+                      {row.missing.length > 0 ? t.classes.pasteMissing(row.missing) : ''}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {incomplete > 0 && (
+            <p className="text-xs text-warning-strong">{t.classes.pasteIncomplete(incomplete)}</p>
+          )}
+          {repeated > 0 && (
+            <p className="text-xs text-warning-strong">{t.classes.pasteDuplicates(repeated)}</p>
+          )}
+          {paste.newColumns.length > 0 && (
+            <p className="text-xs text-muted-foreground">
+              {t.classes.pasteNewColumns(paste.newColumns)}
+            </p>
+          )}
+          {students.length === 0 && (
+            <p className="text-xs text-warning-strong">{t.classes.pasteNoneUsable}</p>
+          )}
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          size="sm"
+          disabled={students.length === 0}
+          onClick={() => onAdd(students, paste.newColumns)}
+        >
+          {t.classes.pasteAdd(students.length)}
+        </Button>
+        <Button variant="ghost" size="sm" onClick={onCancel}>
+          {t.classes.cancel}
+        </Button>
+      </div>
     </div>
   )
 }

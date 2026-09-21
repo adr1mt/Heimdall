@@ -1810,7 +1810,7 @@
       "title": "Clases: pegar desde una hoja de calculo",
       "phase": 6,
       "package": "P2",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T107"
@@ -1837,7 +1837,7 @@
       "title": "Clases: identificador y nombre fijos al desplazar la tabla",
       "phase": 6,
       "package": "P2",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [
         "T107"
@@ -1855,7 +1855,9 @@
         "Con nueve columnas propias y la tabla desplazada al final, identificador y nombre siguen visibles",
         "Con pocas columnas la tabla se ve igual que antes"
       ],
-      "tests": [],
+      "tests": [
+        "gui/tests/classes-import.test.ts"
+      ],
       "notes": "Observado en la revision visual de Clases del 2026-09-21: al desplazar hasta p8 se editan numeros sin saber de quien son. No bloquea P2: va despues de T115 y T116."
     },
     {
