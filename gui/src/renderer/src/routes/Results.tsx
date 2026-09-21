@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
-import { AlertTriangle, Download, Layers, RotateCcw, X } from 'lucide-react'
+import { AlertTriangle, Download, Grid3x3, Layers, List, RotateCcw, X } from 'lucide-react'
 import {
   Badge,
   Button,
   ConfirmDialog,
   Input,
+  Meter,
+  MetaChip,
   Segmented,
   SegmentedItem,
   SectionTitle,
@@ -41,6 +43,8 @@ import {
   scaleOf,
   toCsv
 } from '@/lib/export'
+import { classSummary, needsAttention, shortName, type ClassSummary } from '@/lib/summary'
+import { buildMatrix, type MatrixRow } from '@/lib/matrix'
 import { attemptsText, chainTally, chainText, fromRunText } from '@/lib/chain'
 import { machineLiterals, maskerFor } from '@/lib/projector'
 import type { Consolidation, ConsolidatedCheck } from '../../../shared/consolidation'
@@ -55,16 +59,42 @@ interface Selection {
   checkId: string
 }
 
+/**
+ * The two ways of reading the same correction, never two sections.
+ *
+ * The list answers «how is each student doing», the matrix «which check is
+ * failing everybody». They are the same data and the same filters: switching
+ * is a question, not a navigation.
+ */
+type Mode = 'list' | 'matrix'
+
 export default function ResultsView() {
   const artifact = useRun((s) => s.artifact)
   const artifactPath = useRun((s) => s.artifactPath)
   const problem = useRun((s) => s.artifactProblem)
+  const passMark = useApp((s) => s.passMark)
   const [filters, setFilters] = useState<Filters>(NO_FILTERS)
+  const [attentionOnly, setAttentionOnly] = useState(false)
+  const [mode, setMode] = useState<Mode>('list')
   const [selected, setSelected] = useState<Selection | null>(null)
+  const [openStudent, setOpenStudent] = useState<string | null>(null)
 
   const mask = useMask(artifact)
-  const rows = useMemo(() => (artifact ? filterRun(artifact, filters) : []), [artifact, filters])
   const causes = useMemo(() => (artifact ? causesIn(artifact) : []), [artifact])
+  const summary = useMemo(
+    () => (artifact ? classSummary(artifact, passMark) : null),
+    [artifact, passMark]
+  )
+
+  // The students on screen: the filters narrow the checks, «requieren
+  // atención» narrows the class. Both views read this same list, so the two
+  // modes can never disagree about who is there.
+  const rows = useMemo(() => {
+    if (!artifact) return []
+    const filtered = filterRun(artifact, filters)
+    if (!attentionOnly) return filtered
+    return filtered.filter((row) => needsAttention(row.student, passMark))
+  }, [artifact, filters, attentionOnly, passMark])
 
   const chosen = useMemo(() => {
     if (!artifact || !selected) return null
@@ -93,26 +123,127 @@ export default function ResultsView() {
     )
   }
 
+  const filtering = hasFilters(filters) || attentionOnly
+
+  function clear(): void {
+    setFilters(NO_FILTERS)
+    setAttentionOnly(false)
+  }
+
   return (
     <div className="flex h-full flex-col">
-      <ViewHeader title={t.results.title} />
-      <div className="min-h-0 flex-1 space-y-5 overflow-auto p-6">
-        <div className="space-y-1">
-          <p className="text-sm">
-            {artifact.exam.path.split('/').pop()} · {artifact.inventory.path.split('/').pop()}
-          </p>
-          <p className="text-xs text-muted-foreground">
+      <ViewHeader
+        title={t.results.title}
+        meta={
+          <MetaChip>
             {t.results.plan(
               artifact.students.length,
               artifact.plan.check_count,
               artifact.plan.total_weight
             )}
-          </p>
-          {/* Which correction these grades come from, always. */}
-          <p className="text-xs text-muted-foreground">{originText(artifact)}</p>
+          </MetaChip>
+        }
+        actions={
+          <>
+            <Input
+              className="w-56"
+              placeholder={t.results.filterText}
+              value={filters.text}
+              onChange={(e) => setFilters({ ...filters, text: e.target.value })}
+            />
+            <Segmented>
+              <SegmentedItem active={mode === 'list'} onClick={() => setMode('list')}>
+                <List className="h-3.5 w-3.5" />
+                {t.results.modeList}
+              </SegmentedItem>
+              <SegmentedItem active={mode === 'matrix'} onClick={() => setMode('matrix')}>
+                <Grid3x3 className="h-3.5 w-3.5" />
+                {t.results.modeMatrix}
+              </SegmentedItem>
+            </Segmented>
+            <ExportButton />
+          </>
+        }
+      />
+
+      <div className="min-h-0 flex-1 space-y-4 overflow-auto p-6">
+        {summary && (
+          <KpiStrip
+            summary={summary}
+            passMark={passMark}
+            attentionOnly={attentionOnly}
+            onAttention={() => setAttentionOnly((on) => !on)}
+          />
+        )}
+
+        <div className="flex flex-wrap items-center gap-2">
+          <Segmented>
+            {(['ALL', 'PASS', 'FAIL', 'UNEVALUATED'] as const).map((status) => (
+              <SegmentedItem
+                key={status}
+                active={filters.status === status}
+                onClick={() => setFilters({ ...filters, status })}
+              >
+                {status === 'ALL' ? t.results.filterAll : STATUS_TEXT[status]}
+              </SegmentedItem>
+            ))}
+          </Segmented>
+          {causes.length > 0 && (
+            <select
+              className="h-8 rounded-md border border-input bg-background px-2 text-xs"
+              aria-label={t.results.filterCause}
+              value={filters.cause}
+              onChange={(e) => setFilters({ ...filters, cause: e.target.value as Filters['cause'] })}
+            >
+              <option value="ALL">
+                {t.results.filterCause}: {t.results.filterAll.toLowerCase()}
+              </option>
+              {causes.map((cause) => (
+                <option key={cause} value={cause}>
+                  {CAUSE_TEXT[cause]}
+                </option>
+              ))}
+            </select>
+          )}
+          {filtering && (
+            <Button variant="ghost" size="sm" onClick={clear}>
+              {t.results.clear}
+            </Button>
+          )}
+          <span className="ml-auto text-micro text-muted-foreground">{originText(artifact)}</span>
         </div>
 
-        <ExportButton />
+        {rows.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{t.results.noMatches}</p>
+        ) : mode === 'list' ? (
+          <div className="grid gap-1.5 xl:grid-cols-2">
+            {rows.map(({ student, checks }) => (
+              <StudentRow
+                key={student.student_id}
+                student={student}
+                checks={checks}
+                open={openStudent === student.student_id}
+                selected={selected}
+                onToggle={() =>
+                  setOpenStudent((current) =>
+                    current === student.student_id ? null : student.student_id
+                  )
+                }
+                onPick={(checkId) => setSelected({ studentId: student.student_id, checkId })}
+              />
+            ))}
+          </div>
+        ) : (
+          <MatrixView rows={rows} selected={selected} onPick={setSelected} />
+        )}
+
+        {chosen && (
+          <CheckDetail
+            student={chosen.student}
+            check={chosen.check}
+            onClose={() => setSelected(null)}
+          />
+        )}
 
         <PendingPanel artifactPath={artifactPath} />
 
@@ -131,75 +262,257 @@ export default function ResultsView() {
             ))}
           </div>
         )}
-
-        <div className="flex flex-wrap items-center gap-3">
-          <Input
-            className="max-w-xs"
-            placeholder={t.results.filterText}
-            value={filters.text}
-            onChange={(e) => setFilters({ ...filters, text: e.target.value })}
-          />
-          <Segmented>
-            {(['ALL', 'PASS', 'FAIL', 'UNEVALUATED'] as const).map((status) => (
-              <SegmentedItem
-                key={status}
-                active={filters.status === status}
-                onClick={() => setFilters({ ...filters, status })}
-              >
-                {status === 'ALL' ? t.results.filterAll : STATUS_TEXT[status]}
-              </SegmentedItem>
-            ))}
-          </Segmented>
-          {causes.length > 0 && (
-            <select
-              className="h-9 rounded-md border border-input bg-background px-2 text-sm"
-              aria-label={t.results.filterCause}
-              value={filters.cause}
-              onChange={(e) => setFilters({ ...filters, cause: e.target.value as Filters['cause'] })}
-            >
-              <option value="ALL">{t.results.filterCause}: {t.results.filterAll.toLowerCase()}</option>
-              {causes.map((cause) => (
-                <option key={cause} value={cause}>
-                  {CAUSE_TEXT[cause]}
-                </option>
-              ))}
-            </select>
-          )}
-          {hasFilters(filters) && (
-            <Button variant="ghost" size="sm" onClick={() => setFilters(NO_FILTERS)}>
-              {t.results.clear}
-            </Button>
-          )}
-        </div>
-
-        {rows.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{t.results.noMatches}</p>
-        ) : (
-          <div className="space-y-2">
-            {rows.map(({ student, checks }) => (
-              <StudentRow
-                key={student.student_id}
-                student={student}
-                checks={checks}
-                selected={selected}
-                onPick={(checkId) => setSelected({ studentId: student.student_id, checkId })}
-              />
-            ))}
-          </div>
-        )}
-
-        {chosen ? (
-          <CheckDetail
-            student={chosen.student}
-            check={chosen.check}
-            onClose={() => setSelected(null)}
-          />
-        ) : (
-          <p className="text-xs text-muted-foreground">{t.results.pick}</p>
-        )}
       </div>
     </div>
   )
+}
+
+/**
+ * How the class is doing, before any detail. Three readings and no more: the
+ * fourth number nobody looks at is what pushed the students off the screen.
+ *
+ * «Requieren atención» is the only one that is a button, because it is the
+ * only one that is a question with an answer: who do I walk over to.
+ */
+function KpiStrip({
+  summary,
+  passMark,
+  attentionOnly,
+  onAttention
+}: {
+  summary: ClassSummary
+  passMark: number
+  attentionOnly: boolean
+  onAttention: () => void
+}) {
+  return (
+    <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3">
+      <Reading
+        value={`${summary.passed}/${summary.graded}`}
+        label={t.results.kpiPassed}
+        hint={t.results.kpiPassedHint(summary.graded, summary.students)}
+      />
+      <Reading
+        value={summary.average === null ? '—' : summary.average.toLocaleString('es-ES')}
+        label={t.results.kpiAverage}
+        hint={summary.average === null ? t.results.kpiNoGrades : t.results.kpiAverageHint(passMark)}
+      />
+      <button
+        type="button"
+        aria-pressed={attentionOnly}
+        onClick={onAttention}
+        className={cn(
+          'flex items-baseline gap-3 bg-background px-4 py-3 text-left transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
+          attentionOnly && 'bg-accent'
+        )}
+      >
+        <span
+          className={cn(
+            'text-figure font-bold tabular-nums',
+            summary.attention > 0 ? 'text-warning-strong' : 'text-muted-foreground'
+          )}
+        >
+          {summary.attention}
+        </span>
+        <span className="min-w-0">
+          <span className="block text-micro uppercase tracking-[0.09em] text-muted-foreground">
+            {t.results.kpiAttention}
+          </span>
+          <span className="block text-xs text-muted-foreground">{t.results.kpiAttentionHint}</span>
+        </span>
+      </button>
+    </div>
+  )
+}
+
+function Reading({ value, label, hint }: { value: string; label: string; hint: string }) {
+  return (
+    <div className="flex items-baseline gap-3 bg-background px-4 py-3">
+      <span className="text-figure font-bold tabular-nums">{value}</span>
+      <span className="min-w-0">
+        <span className="block text-micro uppercase tracking-[0.09em] text-muted-foreground">
+          {label}
+        </span>
+        <span className="block text-xs text-muted-foreground">{hint}</span>
+      </span>
+    </div>
+  )
+}
+
+/**
+ * The matrix: checks down, students across, as Teutón GUI had it.
+ *
+ * Amber is never red. A check nobody could evaluate is a technical incident
+ * and an entire amber column is a machine that did not answer, which is the
+ * opposite reaction to a column of failures (principio 3).
+ */
+function MatrixView({
+  rows,
+  selected,
+  onPick
+}: {
+  rows: { student: StudentResult; checks: CheckResult[] }[]
+  selected: Selection | null
+  onPick: (selection: Selection) => void
+}) {
+  const matrix = useMemo(() => buildMatrix(rows), [rows])
+  const names = useMemo(() => {
+    const taken: string[] = []
+    return matrix.students.map((student) => {
+      const short = shortName(student.name, taken)
+      taken.push(short.split(' ')[0])
+      return short
+    })
+  }, [matrix])
+
+  return (
+    <div className="space-y-2">
+      <Legend />
+      <div className="overflow-auto rounded-md border border-border">
+        <table className="w-full border-collapse text-left">
+          <thead>
+            <tr className="border-b border-border bg-secondary/40">
+              <th className="sticky left-0 z-10 bg-secondary/40 px-3 py-2 text-micro uppercase tracking-[0.09em] text-muted-foreground">
+                {t.results.matrixCheck}
+              </th>
+              {names.map((name, index) => (
+                <th
+                  key={matrix.students[index].student_id}
+                  className="px-1 py-2 text-center text-xs font-semibold"
+                  title={matrix.students[index].name}
+                >
+                  {name}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {matrix.rows.map((row) => (
+              <MatrixRowView
+                key={row.checkId}
+                row={row}
+                students={matrix.students}
+                selected={selected}
+                onPick={onPick}
+              />
+            ))}
+            <tr className="border-t border-border bg-secondary/40">
+              <th className="sticky left-0 z-10 bg-secondary/40 px-3 py-2 text-xs font-semibold">
+                {t.results.matrixScore}
+              </th>
+              {matrix.students.map((student) => {
+                const score = scoreView(student.score)
+                return (
+                  <td
+                    key={student.student_id}
+                    className="px-1 py-2 text-center text-xs font-semibold tabular-nums"
+                  >
+                    {score.value === null ? (
+                      <span className="text-muted-foreground">—</span>
+                    ) : (
+                      <span className={score.kind === 'provisional' ? 'text-warning-strong' : ''}>
+                        {score.value}
+                      </span>
+                    )}
+                  </td>
+                )
+              })}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+function MatrixRowView({
+  row,
+  students,
+  selected,
+  onPick
+}: {
+  row: MatrixRow
+  students: StudentResult[]
+  selected: Selection | null
+  onPick: (selection: Selection) => void
+}) {
+  return (
+    <tr className="border-b border-border last:border-0">
+      <th
+        scope="row"
+        className="sticky left-0 z-10 max-w-xs truncate bg-background px-3 py-1.5 text-left text-xs font-normal"
+        title={`${row.group} · ${row.description}`}
+      >
+        {row.description}{' '}
+        <span className="text-muted-foreground">{t.results.matrixWeight(row.weight)}</span>
+      </th>
+      {row.cells.map((check, index) => {
+        const student = students[index]
+        if (!check) {
+          return (
+            <td key={student.student_id} className="px-1 py-1.5 text-center">
+              <span
+                className="inline-block rounded px-1.5 py-0.5 text-glyph text-muted-foreground"
+                title={t.results.legendMissing}
+              >
+                ·
+              </span>
+            </td>
+          )
+        }
+        const active =
+          selected?.studentId === student.student_id && selected.checkId === check.check_id
+        return (
+          <td key={student.student_id} className="px-1 py-1.5 text-center">
+            <button
+              type="button"
+              onClick={() => onPick({ studentId: student.student_id, checkId: check.check_id })}
+              title={`${student.name} · ${row.description} · ${STATUS_TEXT[check.status]}${check.cause !== 'NONE' ? ` · ${CAUSE_TEXT[check.cause]}` : ''}`}
+              aria-label={`${student.name}, ${row.description}: ${STATUS_TEXT[check.status]}`}
+              className={cn(
+                'inline-flex h-6 w-7 items-center justify-center rounded text-glyph font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                cellTone(check.status),
+                active && 'ring-2 ring-ring'
+              )}
+            >
+              {GLYPH[check.status]}
+            </button>
+          </td>
+        )
+      })}
+    </tr>
+  )
+}
+
+/** The three academic states, spelled out once above the grid. */
+function Legend() {
+  return (
+    <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+      {(['PASS', 'FAIL', 'UNEVALUATED'] as const).map((status) => (
+        <span key={status} className="flex items-center gap-1.5">
+          <span
+            className={cn(
+              'inline-flex h-5 w-6 items-center justify-center rounded text-glyph font-bold',
+              cellTone(status)
+            )}
+          >
+            {GLYPH[status]}
+          </span>
+          {status === 'PASS'
+            ? t.results.legendPass
+            : status === 'FAIL'
+              ? t.results.legendFail
+              : t.results.legendUnevaluated}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+const GLYPH: Record<AcademicStatus, string> = {
+  PASS: 'OK',
+  FAIL: '✕',
+  UNEVALUATED: '?'
 }
 
 /**
@@ -605,63 +918,93 @@ function PendingRow({ row }: { row: Pending }) {
 function StudentRow({
   student,
   checks,
+  open,
   selected,
+  onToggle,
   onPick
 }: {
   student: StudentResult
   checks: CheckResult[]
+  open: boolean
   selected: Selection | null
+  onToggle: () => void
   onPick: (checkId: string) => void
 }) {
   const score = scoreView(student.score)
   const counts = tally(student.checks)
+  // The technical reason is read without opening anything: a machine that did
+  // not answer looks exactly like a student who did nothing, and the teacher
+  // has to tell them apart from the row itself.
+  const cause = student.checks.find((check) => check.cause !== 'NONE')?.cause
 
   return (
-    <div className="rounded-md border border-border p-3">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">{student.name}</span>
-          <Badge variant={badgeOf(student.status)}>{STUDENT_TEXT[student.status]}</Badge>
-        </div>
-        <div className="flex items-baseline gap-2">
-          {score.value == null ? (
-            <span className="text-sm text-muted-foreground">{t.results.noGrade}</span>
-          ) : (
-            <>
-              <span className="text-lg font-semibold tabular-nums">{score.value}</span>
-              {score.kind === 'provisional' && (
-                <span className="text-xs text-warning-strong">{t.results.provisional}</span>
-              )}
-            </>
+    <div className={cn('rounded-md border border-border', open && 'ring-1 ring-ring')}>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+      >
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-sm font-medium">{student.name}</span>
+          {cause && (
+            <span className="block truncate text-micro text-warning-strong">{CAUSE_TEXT[cause]}</span>
           )}
-          <span className="text-micro text-muted-foreground">{score.note}</span>
+        </span>
+        <Meter
+          className="hidden w-24 shrink-0 sm:block"
+          value={counts.pass}
+          total={student.checks.length}
+          tone={counts.pass === student.checks.length && counts.pass > 0 ? 'pass' : 'neutral'}
+        />
+        <span className="w-10 shrink-0 text-right text-micro tabular-nums text-muted-foreground">
+          {t.results.passedOf(counts.pass, student.checks.length)}
+        </span>
+        <span className="w-12 shrink-0 text-right">
+          {score.value === null ? (
+            <span className="text-sm text-muted-foreground">—</span>
+          ) : (
+            <span
+              className={cn(
+                'text-sm font-semibold tabular-nums',
+                score.kind === 'provisional' && 'text-warning-strong'
+              )}
+              title={score.note}
+            >
+              {score.value}
+            </span>
+          )}
+        </span>
+        <Badge variant={badgeOf(student.status)}>{STUDENT_TEXT[student.status]}</Badge>
+      </button>
+
+      {open && (
+        <div className="space-y-2 border-t border-border p-3">
+          <p className="text-micro text-muted-foreground">
+            {t.run.counts(counts.pass, counts.fail, counts.unevaluated)} · {score.note}
+          </p>
+          <div className="flex flex-wrap gap-1">
+            {checks.map((check) => (
+              <button
+                key={check.check_id}
+                type="button"
+                onClick={() => onPick(check.check_id)}
+                title={`${check.check_id} · ${STATUS_TEXT[check.status]}${check.cause !== 'NONE' ? ` · ${CAUSE_TEXT[check.cause]}` : ''}`}
+                aria-label={`${check.check_id}: ${STATUS_TEXT[check.status]}`}
+                className={cn(
+                  'max-w-[14rem] truncate rounded px-2 py-1 text-micro font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  cellTone(check.status),
+                  selected?.studentId === student.student_id &&
+                    selected.checkId === check.check_id &&
+                    'ring-2 ring-ring'
+                )}
+              >
+                {check.check_id}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
-
-      <p className="mt-1 text-micro text-muted-foreground">
-        {counts.pass} bien · {counts.fail} mal · {counts.unevaluated} sin evaluar
-      </p>
-
-      <div className="mt-2 flex flex-wrap gap-1">
-        {checks.map((check) => (
-          <button
-            key={check.check_id}
-            type="button"
-            onClick={() => onPick(check.check_id)}
-            title={`${check.check_id} · ${STATUS_TEXT[check.status]}${check.cause !== 'NONE' ? ` · ${CAUSE_TEXT[check.cause]}` : ''}`}
-            aria-label={`${check.check_id}: ${STATUS_TEXT[check.status]}`}
-            className={cn(
-              'max-w-[14rem] truncate rounded px-2 py-1 text-micro font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-              cellTone(check.status),
-              selected?.studentId === student.student_id &&
-                selected.checkId === check.check_id &&
-                'ring-2 ring-ring'
-            )}
-          >
-            {check.check_id}
-          </button>
-        ))}
-      </div>
+      )}
     </div>
   )
 }

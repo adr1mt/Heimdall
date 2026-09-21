@@ -9,6 +9,8 @@ export default function SettingsView() {
   const engine = useApp((s) => s.engine)
   const scale = useApp((s) => s.scale)
   const setScale = useApp((s) => s.setScale)
+  const passMark = useApp((s) => s.passMark)
+  const setPassMark = useApp((s) => s.setPassMark)
   const setEngine = useApp((s) => s.setEngine)
   const setNotice = useApp((s) => s.setNotice)
   const [path, setPath] = useState('')
@@ -97,6 +99,25 @@ export default function SettingsView() {
           <p className="mt-2 text-xs text-muted-foreground">
             {t.settings.scaleExample(toScale(87, scaleOf(scale)))}
           </p>
+        </section>
+
+        {/* La marca de aprobado no toca ninguna nota: decide qué cuenta como
+            aprobado el resumen de la clase, y nada más. */}
+        <section className="max-w-2xl">
+          <SectionTitle hint={t.settings.passHint}>{t.settings.passSection}</SectionTitle>
+          <label className="flex items-center gap-3">
+            <span className="text-sm">{t.settings.passLabel}</span>
+            <Input
+              type="number"
+              min={0}
+              max={100}
+              value={passMark}
+              aria-label={t.settings.passLabel}
+              onChange={(e) => setPassMark(Number(e.target.value))}
+              className="w-24 tabular-nums"
+            />
+            <span className="text-sm text-muted-foreground">/ 100</span>
+          </label>
         </section>
 
         <section className="max-w-2xl">

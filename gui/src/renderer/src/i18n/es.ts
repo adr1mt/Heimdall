@@ -118,7 +118,34 @@ export const t = {
     noExecution: 'El comando no llegó a ejecutarse.',
     noAssertion: 'No hubo ejecución completa que comparar.',
     pick: 'Elige una comprobación de la matriz para verla en detalle.',
-    previous: 'El intento anterior'
+    previous: 'El intento anterior',
+    // Cabecera de clase: los tres números que se leen antes que nada.
+    kpiPassed: 'Aprobados',
+    kpiPassedHint: (graded: number, students: number) =>
+      `${graded} de ${students} alumnos con nota final`,
+    kpiAverage: 'Nota media',
+    kpiAverageHint: (mark: number) => `Aprobado a partir de ${mark} sobre 100`,
+    kpiAttention: 'Requieren atención',
+    kpiAttentionHint: 'Avería técnica primero, después quien va por debajo',
+    kpiNoGrades: 'Todavía sin ninguna nota final',
+    modeList: 'Lista',
+    modeMatrix: 'Matriz',
+    // Lista densa: una fila por alumno.
+    colStudent: 'Alumno',
+    colPassed: 'Superadas',
+    colScore: 'Nota',
+    colState: 'Estado',
+    passedOf: (pass: number, total: number) => `${pass}/${total}`,
+    openDetail: 'Ver sus comprobaciones',
+    closeDetail: 'Cerrar',
+    // Matriz.
+    matrixCheck: 'Comprobación',
+    matrixScore: 'Nota',
+    matrixWeight: (weight: number) => `×${weight}`,
+    legendPass: 'superada',
+    legendFail: 'fallada',
+    legendUnevaluated: 'sin evaluar',
+    legendMissing: 'sin dato'
   },
   export: {
     button: 'Exportar notas…',
@@ -198,6 +225,10 @@ export const t = {
     scaleHint:
       'Con qué escala se escriben las notas al exportarlas. La corrección guardada no cambia: el motor siempre calcula sobre 100 y la conversión es solo para la hoja que te llevas.',
     scaleExample: (example: string) => `Un 87 sobre 100 se exporta como ${example}.`,
+    passSection: 'Marca de aprobado',
+    passHint:
+      'Desde qué nota, sobre las 100 que publica el motor, se cuenta a un alumno como aprobado. Solo afecta a lo que resume la pantalla: ninguna nota cambia.',
+    passLabel: 'Aprobado a partir de',
     aboutSection: 'Acerca de',
     about:
       'Heimdall corrige prácticas de sistemas y redes conectándose por SSH a las máquinas del alumnado.',

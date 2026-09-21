@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import type { EngineStatus } from '../../../shared/types'
 import { DEFAULT_SCALE, type ScaleId } from '@/lib/export'
+import { DEFAULT_PASS_MARK } from '@/lib/summary'
 import {
   EXAM_OFF,
   examStarted,
@@ -32,6 +33,12 @@ interface AppState {
    */
   scale: ScaleId
   /**
+   * The mark from which the teacher counts a grade as a pass, over the 0-100
+   * the engine publishes. It only decides what the class summary counts: no
+   * grade changes, and an artifact never learns about it.
+   */
+  passMark: number
+  /**
    * The correction the next run repeats, when the teacher asked for it. Null
    * is the ordinary case and also the default: leaving an incomplete pending
    * is the safe action and nothing here happens on its own (ADR-0018 §1).
@@ -62,6 +69,7 @@ interface AppState {
   setClassPath: (path: string | null) => void
   setNotice: (message: string | null) => void
   setScale: (scale: ScaleId) => void
+  setPassMark: (mark: number) => void
   setRetry: (retry: RetryRequest | null) => void
   toggleProjector: () => void
   startExam: (everyMinutes: number) => void
@@ -88,6 +96,24 @@ const savedTheme: Theme = localStorage.getItem('heimdall-theme') === 'light' ? '
 const savedScale: ScaleId =
   localStorage.getItem('heimdall-scale') === 'hundred' ? 'hundred' : DEFAULT_SCALE
 const savedProjector = localStorage.getItem('heimdall-projector') === '1'
+const savedPassMark = readPassMark(localStorage.getItem('heimdall-pass-mark'))
+
+/**
+ * The saved mark, or the default when there is none.
+ *
+ * Nothing saved is not a zero: `Number(null)` is 0, and that turned the first
+ * run on a new computer into a class where everybody passed.
+ */
+function readPassMark(saved: string | null): number {
+  if (saved === null || saved.trim() === '') return DEFAULT_PASS_MARK
+  return clampMark(Number(saved))
+}
+
+/** A mark outside 0-100 is not a mark: the saved value is never trusted. */
+function clampMark(value: number): number {
+  if (!Number.isFinite(value)) return DEFAULT_PASS_MARK
+  return Math.min(100, Math.max(0, Math.round(value)))
+}
 
 /**
  * The `dark` class is written here, next to the state change, and not in an
@@ -122,6 +148,7 @@ export const useApp = create<AppState>((set, get) => ({
   classPath: null,
   notice: null,
   scale: savedScale,
+  passMark: savedPassMark,
   retry: null,
   projector: savedProjector,
   exam: EXAM_OFF,
@@ -144,6 +171,11 @@ export const useApp = create<AppState>((set, get) => ({
   setScale: (scale) => {
     localStorage.setItem('heimdall-scale', scale)
     set({ scale })
+  },
+  setPassMark: (mark) => {
+    const passMark = clampMark(mark)
+    localStorage.setItem('heimdall-pass-mark', String(passMark))
+    set({ passMark })
   },
   setRetry: (retry) => set({ retry }),
 
