@@ -1945,7 +1945,7 @@
       "id": "T067",
       "title": "Un aula sin contrasenas tambien se puede corregir desde la aplicacion",
       "phase": 5,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [],
       "goal": "Que un examen cuyo aula no pide ninguna contrasena se corrija desde la GUI, como se corrige desde la linea de comandos.",
@@ -1962,7 +1962,13 @@
         "Un aula que si pide contrasenas se sigue corrigiendo igual que hoy",
         "Ningun secreto aparece en argv, ni en el artefacto, ni en los logs"
       ],
-      "tests": [],
+      "tests": [
+        "cmd/heimdall: TestRunCorrectsAClassroomWithoutPasswordsThroughStdin",
+        "cmd/heimdall: TestRunRejectsAnEmptyEnvelopeWhenTheClassroomAsksForAPassword",
+        "cmd/heimdall: TestSecretsFromStdin (sobre vacio y sin campo, validos)",
+        "gui/tests/ipc-run.test.ts: Corregir y modo examen, con y sin contrasena",
+        "gui/tests/run.test.ts: el sobre de un aula sin contrasenas"
+      ],
       "notes": "Encontrado el 2026-09-21 probando el modo examen de T105 contra el cuestionario (testdata/cuestionario, sin hosts): «heimdall run: los secretos de stdin no traen ninguna clave en \"secrets\"», exit 2. Afecta igual a Corregir. Toca secretos y el contrato motor-GUI: una tarea por sesion, sin encadenar."
     }
   ]

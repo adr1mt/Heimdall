@@ -63,8 +63,14 @@ func secretsFromStdin() (map[string]string, error) {
 	if doc.Schema != secretsSchema {
 		return nil, fmt.Errorf("los secretos de stdin declaran schema %d, se esperaba %d", doc.Schema, secretsSchema)
 	}
-	if len(doc.Secrets) == 0 {
-		return nil, fmt.Errorf("los secretos de stdin no traen ninguna clave en \"secrets\"")
+	// An empty map is a legitimate answer: a classroom whose machines need no
+	// password asks for nothing. Whether what arrived covers what the PLAN
+	// needs is decided in one place, engine.CheckSecrets, which names every
+	// missing reference (security rule 7). Refusing an empty map here would
+	// leave such a classroom impossible to correct from the GUI, which always
+	// speaks through stdin.
+	if doc.Secrets == nil {
+		doc.Secrets = map[string]string{}
 	}
 	return doc.Secrets, nil
 }

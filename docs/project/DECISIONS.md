@@ -27,6 +27,19 @@ evidencia. Nunca se edita un ADR aceptado en silencio.
 
 ## Bitácora
 
+### 2026-09-21 · T067: un sobre de secretos vacío es una respuesta válida
+
+Un aula cuyas máquinas no piden ninguna contraseña mandaba
+`{"schema":1,"secrets":{}}` y el motor lo rechazaba como error de
+configuración, así que ese examen solo se podía corregir desde la línea de
+órdenes con `--secrets=env`. Se arregla en el motor y en un solo sitio: leer el
+sobre es leerlo, y quien decide si lo que ha llegado cubre lo que el PLAN pide
+sigue siendo `engine.CheckSecrets`, que nombra cada referencia que falte. No
+llegar nada por stdin sigue siendo error (exit 2): son dos cosas distintas.
+
+La política de secretos no cambia (ADR-0009) y el contrato sigue en la versión
+1: el motor acepta ahora un sobre que antes rechazaba y nada más.
+
 ### 2026-09-20 · D-7 cerrada: el producto se llama Heimdall (ADR-0014)
 
 `Evalon` era nombre de trabajo. Se cierra ahora, en fase 3, porque todavía no

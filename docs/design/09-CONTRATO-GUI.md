@@ -38,7 +38,10 @@ printf '%s' "$SECRETS_JSON" | heimdall run --secrets=stdin --events=ndjson --var
 - `--events` y `--export` son incompatibles: los dos escriben en `stdout`.
   Pedir ambos es error de configuración (exit 2).
 - Los secretos viajan por `stdin` en una línea JSON. Nunca por `argv`
-  (ADR-0009).
+  (ADR-0009). El sobre es `{"schema":1,"secrets":{…}}` y se manda **siempre**,
+  también cuando el aula no pide ninguna contraseña: entonces `secrets` va
+  vacío y el motor lo acepta. Que falte una credencial que el PLAN sí pide es
+  error de configuración (exit 2) y el motor la nombra.
 - `--retry=<artefacto>` repite **solo las comprobaciones que aquella ejecución
   dejó `UNEVALUATED`** (ADR-0018). El motor elige qué se repite leyendo ese
   fichero: la GUI nombra el artefacto y nada más, nunca una lista de alumnos ni

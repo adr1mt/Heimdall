@@ -6,20 +6,23 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
+**T067**: un examen cuya aula no pide ninguna contraseña ya se corrige entero
+desde la aplicación, con Corregir y en modo examen. Antes el motor daba por
+error que no llegara ninguna credencial; ahora «no hace falta ninguna» es una
+respuesta válida y sigue siendo error que falte una que el aula sí pide, con el
+nombre de la que falta. Nada cambia para las aulas con contraseña.
+
 **Dirección fijada**: Teutón GUI (`workspace/teuton-gui`) es la referencia
 canónica de interfaz. La fase 6 la realinea en cinco paquetes: P1 visual, P2
 clases y proyectos, P3 editor, P4 uso en clase, P5 protección. Un paquete por
 sesión; nota, motor, SSH, secretos, persistencia y contrato, una tarea.
 
-**P1 hecho** (T100–T105): la barra lateral lleva Inicio, Clases, Exámenes,
-Resultados, Analíticas e Histórico, con lo aún no construido desactivado.
-Resultados abre con cómo va la clase y una fila por alumno —quince caben donde
-antes cuatro tarjetas— y vuelve la matriz, comprobaciones por alumnado, con la
-nota al pie de cada columna; las dos son la misma sección. Los bloques técnicos
-se anuncian en un renglón. Inicio dice qué examen y qué clase hay por su
-nombre, con la ruta en detalles avanzados, y durante el examen una tira con
-vuelta, siguiente, activos, finalizados y progreso. La marca de aprobado está
-en Ajustes y no cambia ninguna nota.
+**P1 hecho** (T100–T105): barra lateral con Inicio, Clases, Exámenes,
+Resultados, Analíticas e Histórico, desactivado lo que aún no existe.
+Resultados abre con cómo va la clase, una fila por alumno y la matriz de
+comprobaciones; los bloques técnicos, en un renglón. Inicio dice qué examen y
+qué clase hay por su nombre, y durante el examen la tira de la sesión. La marca
+de aprobado está en Ajustes y no cambia ninguna nota.
 
 ## Estado actual
 
@@ -33,23 +36,21 @@ en Ajustes y no cambia ninguna nota.
   presupuesto, reintento, `ExcludeFinished`) y `ssh` (ADR-0011, 64 kB, 8 MB).
 - `test/lab.sh`: `alu1` en `127.1.2.3:2201`, el roto en el 2299.
   `acceptance.sh` (A-1…A-14), `eventos.sh` (E-1…E-10), `sesion.sh` (S-1…S-8).
-- `gui/`: árbol Node independiente; `make gui-check` (160 tests), `gui-build`,
+- `gui/`: árbol Node independiente; `make gui-check` (167 tests), `gui-build`,
   `gui-lab`. Vistas vivas: Inicio (modo examen y panel de sesión), Resultados
   (Lista y Matriz, exportación, reintento, cadena), Histórico, Ajustes, Ayuda.
   Modo proyector en la barra lateral.
 
 ## Pruebas ejecutadas
 
-`make gui-check` (160), `typecheck` y `build` verdes. Las pantallas nuevas,
+`make check` verde. `make gui-check` (167) y `typecheck` verdes. El aula sin
+contraseñas, corregida con el motor real sobre `testdata/cuestionario`. Las pantallas nuevas,
 miradas con el motor real sobre `testdata/cuestionario` ampliado a 15 alumnos
 ficticios. `make check`, los scripts de aceptación y `make test` no se
 repitieron esta sesión; quedaron verdes antes.
 
 ## Problemas conocidos
 
-- **T067 (P0)**: un aula que no pide ninguna contraseña no se puede corregir
-  desde la aplicación; la GUI manda siempre los secretos por stdin y el motor
-  rechaza un mapa vacío.
 - Laboratorio en **`127.1.2.3`**, nunca `127.0.0.x` (F-01, A-11).
 - **A-10**: los ficheros legacy se escriben, pero la aceptación lo marca `PEND`;
   se cierra o se retira en T060.

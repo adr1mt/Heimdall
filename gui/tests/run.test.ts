@@ -71,6 +71,14 @@ describe('secretsLine', () => {
   })
 })
 
+describe('el sobre de un aula sin contraseñas', () => {
+  it('es el mismo sobre, con «secrets» vacío', () => {
+    // Un aula cuyas máquinas no piden contraseña no pide nada, y eso se dice
+    // entero: el motor lo acepta y decide con el PLAN si le basta.
+    expect(JSON.parse(secretsLine({}))).toEqual({ schema: 1, secrets: {} })
+  })
+})
+
 describe('LineSplitter', () => {
   it('rebuilds lines that arrive cut in the middle', () => {
     const lines: string[] = []

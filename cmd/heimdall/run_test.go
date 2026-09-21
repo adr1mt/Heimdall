@@ -88,6 +88,9 @@ func TestRunRejectsAnInvalidPlan(t *testing.T) {
 
 // The stdin document is a single JSON line with an explicit schema. A wrong
 // schema or a malformed line is a configuration error, never a silent default.
+// An envelope with no keys is not malformed: it is what a classroom that needs
+// no password says, and engine.CheckSecrets is the one that decides whether
+// that covers the PLAN.
 func TestSecretsFromStdin(t *testing.T) {
 	cases := []struct {
 		name  string
@@ -99,7 +102,8 @@ func TestSecretsFromStdin(t *testing.T) {
 		{"no trailing newline", `{"schema":1,"secrets":{"AULA_PASSWORD":"secreto-ficticio"}}`, "secreto-ficticio", true},
 		{"wrong schema", `{"schema":2,"secrets":{"AULA_PASSWORD":"x"}}`, "schema", false},
 		{"not json", `AULA_PASSWORD=x`, "JSON", false},
-		{"empty secrets", `{"schema":1,"secrets":{}}`, "secrets", false},
+		{"empty secrets", `{"schema":1,"secrets":{}}`, "", true},
+		{"no secrets field", `{"schema":1}`, "", true},
 		{"empty line", "\n", "no llegó ningún secreto", false},
 	}
 	for _, tc := range cases {

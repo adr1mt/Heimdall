@@ -27,6 +27,13 @@ El motor se lanza con `--secrets=stdin`. Lee **una** línea, la parsea, pone el
 buffer a cero y cierra stdin. Si `--secrets=stdin` está y no llega nada en 5 s,
 aborta con error de configuración.
 
+Un aula cuyas máquinas no piden ninguna contraseña manda el sobre igual, con
+`secrets` vacío: `{"schema":1,"secrets":{}}`. Es una respuesta válida, no un
+error. Quien decide si lo que ha llegado cubre lo que el PLAN necesita es
+`engine.CheckSecrets`, en un solo sitio, y nombra cada referencia que falte. No
+llegar **nada** por stdin sigue siendo error de configuración: son dos cosas
+distintas.
+
 ### Por qué stdin y no las alternativas
 
 | Vía | Veredicto |
