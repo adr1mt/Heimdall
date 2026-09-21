@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { ChevronDown } from 'lucide-react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
@@ -192,6 +193,54 @@ export function SegmentedItem({
       )}
       {...props}
     />
+  )
+}
+
+// ---- Bloque plegado ----
+/**
+ * Un bloque técnico que se anuncia en una línea y se abre cuando hace falta.
+ *
+ * Los avisos del motor —huella de la máquina, host, mensajes internos— son
+ * información que no se puede perder y que tampoco puede mandar en la
+ * pantalla: media pantalla de diagnóstico empuja a la clase fuera de la vista.
+ * Aquí ocupan un renglón hasta que alguien pregunta, y abiertos siguen
+ * diciéndolo todo.
+ */
+export function Foldaway({
+  icon,
+  summary,
+  tone = 'neutral',
+  defaultOpen = false,
+  children
+}: {
+  icon?: React.ReactNode
+  /** Lo que se lee sin abrir: qué hay y cuánto. */
+  summary: React.ReactNode
+  tone?: 'neutral' | 'warning'
+  defaultOpen?: boolean
+  children: React.ReactNode
+}) {
+  const [open, setOpen] = React.useState(defaultOpen)
+  return (
+    <div className={cn('rounded-md', tone === 'warning' ? 'bg-warning/10' : 'border border-border')}>
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+        className={cn(
+          'flex w-full items-center gap-2 px-3 py-2 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
+          tone === 'warning' ? 'text-warning-strong' : 'text-foreground'
+        )}
+      >
+        {icon}
+        <span className="min-w-0 flex-1 truncate">{summary}</span>
+        <span className="shrink-0 text-xs font-normal text-muted-foreground">
+          {open ? 'Ocultar' : 'Ver'}
+        </span>
+        <ChevronDown className={cn('h-4 w-4 shrink-0 transition-transform', open && 'rotate-180')} />
+      </button>
+      {open && <div className="space-y-3 px-3 pb-3">{children}</div>}
+    </div>
   )
 }
 

@@ -4,6 +4,7 @@ import {
   Badge,
   Button,
   ConfirmDialog,
+  Foldaway,
   Input,
   Meter,
   MetaChip,
@@ -250,17 +251,17 @@ export default function ResultsView() {
         <ChainPanel artifactPath={artifactPath} />
 
         {artifact.warnings && artifact.warnings.length > 0 && (
-          <div className="space-y-1.5 rounded-md bg-warning/10 p-3">
-            <div className="flex items-center gap-2 text-sm font-medium text-warning-strong">
-              <AlertTriangle className="h-4 w-4" />
-              {t.results.warnings}
-            </div>
+          <Foldaway
+            tone="warning"
+            icon={<AlertTriangle className="h-4 w-4 shrink-0" />}
+            summary={t.results.warningsFolded(artifact.warnings.length)}
+          >
             {artifact.warnings.map((warning, index) => (
               <p key={index} className="text-xs text-warning-strong/90">
                 <span className="font-mono">{warning.scope}</span> · {mask(warning.message)}
               </p>
             ))}
-          </div>
+          </Foldaway>
         )}
       </div>
     </div>
@@ -621,11 +622,10 @@ function ChainPanel({ artifactPath }: { artifactPath: string | null }) {
   }
 
   return (
-    <div className="space-y-3 rounded-md border border-border p-4">
-      <div className="flex items-center gap-2 text-sm font-medium">
-        <Layers className="h-4 w-4" />
-        {t.chain.title}
-      </div>
+    <Foldaway
+      icon={<Layers className="h-4 w-4 shrink-0" />}
+      summary={`${t.chain.title} · ${t.chain.folded}`}
+    >
       <p className="max-w-3xl text-xs text-muted-foreground">{t.chain.hint}</p>
 
       <Button variant="outline" size="sm" disabled={loading} onClick={() => void read()}>
@@ -642,7 +642,7 @@ function ChainPanel({ artifactPath }: { artifactPath: string | null }) {
       )}
 
       {chain && !problem && <ChainResult chain={chain} />}
-    </div>
+    </Foldaway>
   )
 }
 
@@ -860,11 +860,11 @@ function PendingPanel({ artifactPath }: { artifactPath: string | null }) {
   }
 
   return (
-    <div className="space-y-3 rounded-md bg-warning/10 p-4">
-      <div className="flex items-center gap-2 text-sm font-medium text-warning-strong">
-        <AlertTriangle className="h-4 w-4" />
-        {t.pending.title}
-      </div>
+    <Foldaway
+      tone="warning"
+      icon={<AlertTriangle className="h-4 w-4 shrink-0" />}
+      summary={`${t.pending.title}: ${t.pending.folded(pending.length)}`}
+    >
       <p className="max-w-3xl text-xs text-warning-strong/90">{t.pending.hint}</p>
 
       <div className="space-y-1.5">
@@ -894,7 +894,7 @@ function PendingPanel({ artifactPath }: { artifactPath: string | null }) {
       >
         {t.pending.confirmBody}
       </ConfirmDialog>
-    </div>
+    </Foldaway>
   )
 }
 

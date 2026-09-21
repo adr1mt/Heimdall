@@ -93,6 +93,9 @@ export const t = {
     plan: (students: number, checks: number, weight: number) =>
       `${students} alumnos · ${checks} comprobaciones · ${weight} de peso total`,
     warnings: 'Avisos de la ejecución',
+    // Plegado: lo técnico se anuncia en un renglón y se abre a voluntad.
+    warningsFolded: (count: number) =>
+      count === 1 ? '1 aviso técnico' : `${count} avisos técnicos`,
     filterText: 'Buscar alumno o comprobación…',
     filterAll: 'Todo',
     filterCause: 'Causa técnica',
@@ -160,6 +163,7 @@ export const t = {
   },
   chain: {
     title: 'La nota de toda la cadena',
+    folded: 'Esta corrección repite otra anterior',
     hint:
       'Esta corrección repite otra anterior. Leyéndolas juntas, quien completó lo que faltaba en una segunda vuelta tiene ya su nota final. No se toca ni se reescribe ninguna corrección: es una lectura, y la nota la cierra el motor.',
     show: 'Ver la nota de toda la cadena',
@@ -180,6 +184,10 @@ export const t = {
   },
   pending: {
     title: 'Qué ha quedado sin comprobar',
+    folded: (students: number) =>
+      students === 1
+        ? '1 alumno con algo sin comprobar'
+        : `${students} alumnos con algo sin comprobar`,
     hint:
       'Quedaron comprobaciones sin evaluar. Mientras falte alguna con peso, ese alumno no tiene nota final. Puedes dejarlo así y resolverlo más tarde, o repetir solo lo que no se pudo comprobar.',
     checks: (missing: number, total: number) => `${missing} de ${total} comprobaciones sin evaluar`,
