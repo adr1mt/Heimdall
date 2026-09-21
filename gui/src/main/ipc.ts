@@ -126,6 +126,19 @@ function readRunRequest(value: unknown): RunRequest {
  * on without it would mean correcting somebody else's list, and a list of
  * students is not something to guess at (principio 2).
  */
+/**
+ * The saved classes for a reading that is not a correction. A classes file
+ * that cannot be read is already reported, loudly, in «Clases»; here it only
+ * means the history names the files instead of the classes.
+ */
+function savedClasses(): ClassGroup[] {
+  try {
+    return readClasses(settingsDir())
+  } catch {
+    return []
+  }
+}
+
 function groupOf(classId: unknown): ClassGroup {
   const group = readClasses(settingsDir()).find((other) => other.id === classId)
   if (!group) throw new Error('La clase que se iba a corregir ya no está guardada.')
@@ -257,7 +270,7 @@ export function registerIpc(): void {
   // lists the artifacts already on disk.
   ipcMain.handle(IPC.listRuns, (_e, examPath: unknown) => {
     if (typeof examPath !== 'string' || !examPath) return []
-    return listRuns(varDirOf(examPath))
+    return listRuns(varDirOf(examPath), savedClasses())
   })
 
   // Writing the grades out. The renderer built the text and chose the scale;

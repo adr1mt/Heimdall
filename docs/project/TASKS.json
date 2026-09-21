@@ -1748,7 +1748,7 @@
       "title": "Inicio: abrir, crear y recientes de proyectos",
       "phase": 6,
       "package": "P2",
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T115"
@@ -1781,7 +1781,7 @@
       "title": "Corregir: proyecto abierto mas clase elegida",
       "phase": 6,
       "package": "P2",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T107"
@@ -1803,7 +1803,7 @@
         "El modo examen sigue funcionando igual que antes de la mudanza"
       ],
       "tests": [],
-      "notes": "Referencia: workspace/teuton-gui, solo lectura. Un profesor que sabe usar Teuton GUI tiene que reconocer esta pantalla sin aprender nada."
+      "notes": "Referencia: workspace/teuton-gui, solo lectura. Un profesor que sabe usar Teuton GUI tiene que reconocer esta pantalla sin aprender nada. Hecha el 2026-09-21. La peticion de correccion lleva la clase, no un fichero de aula: el proceso principal escribe el aula de esa clase antes de cada correccion. El aula generada gana «usuario» en el alumno, que es lo que lee ${alumno.usuario}. Los guiones del laboratorio (lab-run, examen-lab) abren el examen en Inicio y eligen la clase en Corregir."
     },
     {
       "id": "T116",
@@ -1857,6 +1857,33 @@
       ],
       "tests": [],
       "notes": "Observado en la revision visual de Clases del 2026-09-21: al desplazar hasta p8 se editan numeros sin saber de quien son. No bloquea P2: va despues de T115 y T116."
+    },
+    {
+      "id": "T118",
+      "title": "Proyector: el detalle tecnico de una comprobacion no se abre en el guion",
+      "phase": 6,
+      "package": "P4",
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Que la comprobacion P-2 vuelva a demostrar que el modo proyector tapa la maquina.",
+      "scope": [
+        "Averiguar por que el guion examen-lab ya no encuentra el detalle tecnico de una comprobacion en Resultados",
+        "Comprobar a mano que el modo proyector sigue tapando la maquina en ese detalle",
+        "Dejar P-2 comprobando lo que la pantalla ensenia hoy"
+      ],
+      "out_of_scope": [
+        "Rediseniar Resultados",
+        "Debilitar la comprobacion para que pase"
+      ],
+      "acceptance": [
+        "P-2 pasa contra el laboratorio",
+        "Queda escrito si el tapado estaba roto o solo lo estaba el guion"
+      ],
+      "tests": [
+        "gui/scripts/examen-lab.ts"
+      ],
+      "notes": "Visto el 2026-09-21 al ejecutar examen-lab en T115. El cambio de T115 no toca Resultados ni el modo proyector; E-5 era una comprobacion caduca desde el rediseno de T103 y se actualizo, P-2 queda pendiente de mirar."
     },
     {
       "id": "T109",

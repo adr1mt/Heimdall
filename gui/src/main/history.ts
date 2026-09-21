@@ -1,6 +1,8 @@
 import { readdir, readFile, stat } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { parseArtifact } from '../shared/artifact'
+import { classNameOf } from '../shared/aula'
+import type { ClassGroup } from '../shared/classes'
 import type { RunSummary } from '../shared/history'
 import { MAX_ARTIFACT, tooBigMessage } from './artifact'
 
@@ -29,7 +31,7 @@ export function varDirOf(examPath: string): string {
  * holds nothing, is an empty history and not a failure: a project that has
  * never been corrected is an ordinary state.
  */
-export async function listRuns(varDir: string): Promise<RunSummary[]> {
+export async function listRuns(varDir: string, classes: ClassGroup[] = []): Promise<RunSummary[]> {
   let names: string[]
   try {
     names = await readdir(varDir)
@@ -54,7 +56,7 @@ export async function listRuns(varDir: string): Promise<RunSummary[]> {
 
   const runs: RunSummary[] = []
   for (const file of files.slice(0, MAX_RUNS)) {
-    runs.push(await summarise(file.path, file.mtimeMs, file.size))
+    runs.push(await summarise(file.path, file.mtimeMs, file.size, classes))
   }
   // The artifact's own clock, not the file's: a copied directory keeps the
   // order of the corrections and not the order they were copied in.
@@ -62,7 +64,12 @@ export async function listRuns(varDir: string): Promise<RunSummary[]> {
   return runs
 }
 
-async function summarise(path: string, mtimeMs: number, size: number): Promise<RunSummary> {
+async function summarise(
+  path: string,
+  mtimeMs: number,
+  size: number,
+  classes: ClassGroup[]
+): Promise<RunSummary> {
   const fallback: RunSummary = {
     path,
     at: new Date(mtimeMs).toISOString(),
@@ -86,7 +93,9 @@ async function summarise(path: string, mtimeMs: number, size: number): Promise<R
       runId: run.run_id,
       status: run.status,
       exam: baseName(run.exam?.path),
-      classroom: baseName(run.inventory?.path),
+      // The class by its name, never «aula-heimdall-<id>.yaml»: the teacher
+      // corrected «2SMX A», and the file is an artifact of ours (ADR-0022).
+      classroom: classNameOf(baseName(run.inventory?.path), classes),
       students: run.students.length,
       checks: run.plan.check_count,
       retryOf: run.retry_of?.run_id ?? null,

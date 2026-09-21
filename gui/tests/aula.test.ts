@@ -3,7 +3,14 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { writeGeneratedAula } from '../src/main/aula'
-import { GENERATED_MARK, aulaFileName, aulaYaml, isGeneratedName } from '../src/shared/aula'
+import {
+  GENERATED_MARK,
+  GENERATED_PREFIX,
+  aulaFileName,
+  aulaYaml,
+  classNameOf,
+  isGeneratedName
+} from '../src/shared/aula'
 import type { ClassGroup } from '../src/shared/classes'
 
 function project(): string {
@@ -37,6 +44,20 @@ describe('el nombre del aula generada', () => {
     expect(isGeneratedName('aula.yaml')).toBe(false)
     expect(isGeneratedName('aula-2smx-c.yaml')).toBe(false)
     expect(isGeneratedName(aulaFileName(group()))).toBe(true)
+  })
+})
+
+describe('cómo se llama el aula de una corrección guardada', () => {
+  it('es el nombre de la clase de la que salió', () => {
+    expect(classNameOf(`${GENERATED_PREFIX}c1.yaml`, [{ ...group(), id: 'c1' }])).toBe('2SMX C')
+  })
+
+  it('es el fichero cuando la clase ya no está, en vez de inventarse una', () => {
+    expect(classNameOf(`${GENERATED_PREFIX}c9.yaml`, [])).toBe(`${GENERATED_PREFIX}c9.yaml`)
+  })
+
+  it('no toca el nombre de un aula escrita a mano', () => {
+    expect(classNameOf('aula.yaml', [{ ...group(), id: 'c1' }])).toBe('aula.yaml')
   })
 })
 

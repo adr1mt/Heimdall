@@ -40,6 +40,20 @@ export function isGeneratedName(fileName: string): boolean {
   return fileName.startsWith(GENERATED_PREFIX) && fileName.endsWith('.yaml')
 }
 
+/**
+ * What to call the classroom of a finished correction on screen.
+ *
+ * A generated file is named after the class it came from, so the name of the
+ * class is what goes on screen. A class that was deleted, or a classroom
+ * written by hand, keeps its file name: making one up would be inventing the
+ * class a grade came from.
+ */
+export function classNameOf(fileName: string | null, classes: ClassGroup[]): string | null {
+  if (!fileName || !isGeneratedName(fileName)) return fileName
+  const id = fileName.slice(GENERATED_PREFIX.length, -'.yaml'.length)
+  return classes.find((group) => group.id === id)?.name ?? fileName
+}
+
 /** The default SSH port. A class only says the port when it is not this one. */
 const DEFAULT_PORT = 22
 

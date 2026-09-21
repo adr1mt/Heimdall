@@ -6,25 +6,27 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**P2 redefinido.** Un examen no pertenece a una clase: el mismo «Examen DHCP»
-se corrige con 2SMX C y con 2SMX D. El flujo será abrir proyecto → Corregir →
-elegir clase → corregir. Teutón GUI es la referencia funcional directa y no se
-inventa modelo nuevo.
+**T115 hecho: corregir es elegir la clase y pulsar.** «Corregir» es una
+sección propia: el examen abierto, la clase entre las guardadas, las
+credenciales de esa corrección, el avance y el panel de sesión. Inicio se queda
+solo con el examen. **Ya no se elige ningún fichero de aula**: la petición
+lleva la clase y la aplicación escribe su aula antes de cada corrección
+(ADR-0022). El histórico dice el nombre de la clase, no el fichero generado.
 
-**T107 hecho**: la aplicación escribe el aula a partir de la clase elegida, y
-el profesor no ve ningún fichero. Nombre reservado por clase, así que un aula
-escrita a mano nunca se pisa, y se rehace en cada corrección, así que un cambio
-de IP llega solo (ADR-0022). La clase gana el puerto y **columnas propias**
-—`subdominio`, `p1`…`p10`—, que es lo que ya tenía Teutón GUI y lo que hace que
-cualquier clase sirva para cualquier examen.
+El aula generada gana `usuario` en el alumno: sin eso, un examen que dice
+`${alumno.usuario}` no se podía corregir desde una clase.
 
-**T106** (ADR-0021): pantalla de Clases con crear, editar, duplicar y eliminar,
-guardadas fuera del repositorio y sin contraseñas. Se conserva entera; solo cae
-el selector de clase que quedó en Inicio, que se muda a Corregir en T115.
+**Revisión visual de Clases** antes de T115, con la aplicación construida. De
+ahí sale **T117**: con muchas columnas propias, al desplazar la tabla se pierde
+de vista de quién es cada fila. No bloquea P2.
+
+**P2**: un examen no pertenece a una clase; el mismo examen se corrige con
+2SMX C y con 2SMX D. T106 (Clases, ADR-0021) y T107 (aula generada, ADR-0022)
+siguen enteros.
 
 **Dirección**: Teutón GUI (`workspace/teuton-gui`) es la referencia canónica de
-interfaz. Fase 6: P1 visual (hecho, T100–T105), P2 clases y proyectos, P3
-editor, P4 uso en clase, P5 protección.
+interfaz. Fase 6: P1 visual (hecho), P2 clases y proyectos, P3 editor, P4 uso
+en clase, P5 protección.
 
 ## Estado actual
 
@@ -37,40 +39,39 @@ editor, P4 uso en clase, P5 protección.
   `assert`, `report` atómico, `events`, `engine` y `ssh` (ADR-0011).
 - `test/lab.sh`: `alu1` en `127.1.2.3:2201`, el roto en el 2299. `acceptance.sh`
   (A-1…A-14), `eventos.sh` (E-1…E-10), `sesion.sh` (S-1…S-8).
-- `gui/`: árbol Node independiente; `make gui-check` (167 tests), `gui-build`,
-  `gui-lab`. Vistas vivas: Inicio (modo examen y panel de sesión), Resultados
-  (Lista y Matriz, exportación, reintento, cadena), Histórico, Ajustes, Ayuda.
-  Modo proyector en la barra lateral. Clases (T106) guarda los grupos en
-  `classes.json`, en el directorio de datos de usuario (ADR-0021), y de cada
-  clase sale su aula dentro de la carpeta del examen (T107, ADR-0022).
+- `gui/`: árbol Node independiente; `make gui-check` (219 tests), `gui-build`,
+  `gui-lab`. Vistas vivas: Inicio (el examen abierto), **Corregir** (clase,
+  credenciales, modo examen, avance y sesión), Clases, Resultados (Lista y
+  Matriz, exportación, reintento, cadena), Histórico, Ajustes, Ayuda. Modo
+  proyector en la barra lateral. Las clases viven en `classes.json`, en el
+  directorio de datos de usuario (ADR-0021), y de cada clase sale su aula
+  dentro de la carpeta del examen (ADR-0022).
 
 ## Pruebas ejecutadas
 
-`make check` verde. `make gui-check` (213) y `typecheck` verdes. El aula
-generada, probada contra el motor real: `check` en verde con el examen de RA2 y
-con el cuestionario (que pide `p1`…`p10`), y **el examen del prototipo
-corregido de verdad con dos clases distintas sobre el laboratorio**, cada una
-con su artefacto y sus alumnos. Cero apariciones de la contraseña en toda la
-carpeta del examen. El aula escrita a mano, intacta después de generar. La
-pantalla de Clases con columnas propias, mirada con la aplicación construida.
-Los scripts de aceptación y `make test` no se repitieron esta sesión.
+`make gui-check` (219) y `typecheck` verdes. Contra el laboratorio, con la
+aplicación construida y el flujo nuevo: `make gui-lab` entero verde (S-0…S-4,
+H-1, X-1, X-2); el mismo examen corregido con **dos clases distintas**, cada
+una con su artefacto y sus alumnos, sin elegir más fichero que el examen; el
+modo examen E-1…E-5 verde; el histórico enseñando «Laboratorio». **P-2 del
+guion del examen falla** (el detalle técnico de una comprobación no se abre en
+Resultados): apuntado como T118, no lo toca T115. `make check` y `make test` no
+se repitieron esta sesión.
 
 ## Problemas conocidos
 
 - Laboratorio en **`127.1.2.3`**, nunca `127.0.0.x` (F-01, A-11).
-- **A-10**: los ficheros legacy se escriben, pero la aceptación lo marca `PEND`;
-  se cierra o se retira en T060.
-- Un reintento exige el mismo PLAN.
-- Intervalo mínimo del modo examen, 5 minutos.
+- **A-10**: legacy escrito pero marcado `PEND`; se cierra o se retira en T060.
+- Un reintento exige el mismo PLAN. Intervalo mínimo del modo examen, 5 min.
 - El proyector tapa las máquinas, no los nombres del alumnado.
-- Inicio todavía pide dos ficheros: lo arreglan T115 (Corregir con selector de
-  clase) y T108 (Inicio = proyectos).
-- El histórico enseña el nombre del fichero de aula, que ahora es generado y
-  feo. Tiene que decir el nombre de la clase: se arregla en T115.
+- Inicio todavía pide el fichero del examen: lo arregla T108 (Inicio =
+  proyectos).
+- P-2 del guion `examen-lab` en rojo; no se ha averiguado desde cuándo (T118).
 - Los datos de alumnado quedan fuera de toda copia de seguridad hasta T113.
 
 ## Siguiente tarea recomendada
 
-Resto del **paquete P2** en una sesión: **T107** (pegar desde una hoja de
-cálculo y generar el aula desde la clase) y **T108** (espacio de trabajo de
-exámenes). Pendiente de fase 5 y sin fecha: **T059**.
+Resto del **paquete P2**: **T116** (pegar una clase desde una hoja de cálculo)
+y **T108** (Inicio como lista de proyectos). Después, **T117** (fijar
+identificador y nombre al desplazar la tabla de Clases) y **T118**. Pendiente
+de fase 5 y sin fecha: **T059**.
