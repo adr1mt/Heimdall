@@ -9,6 +9,7 @@
     "email": "adriamt@elpuig.xeill.net"
   },
   "license": "MPL-2.0",
+  "homepage": "https://github.com/adr1mt/Heimdall",
   "type": "module",
   "scripts": {
     "dev": "electron-vite dev",
@@ -25,6 +26,7 @@
     "screenshot": "esbuild scripts/screenshot.ts --bundle --platform=node --format=esm --outfile=/tmp/heimdall-shot.mjs --external:electron && node_modules/electron/dist/electron /tmp/heimdall-shot.mjs --no-sandbox",
     "lab-run": "esbuild scripts/lab-run.ts --bundle --platform=node --format=esm --outfile=/tmp/heimdall-lab-run.mjs --external:electron && node_modules/electron/dist/electron /tmp/heimdall-lab-run.mjs --no-sandbox",
     "examen-lab": "esbuild scripts/examen-lab.ts --bundle --platform=node --format=esm --outfile=/tmp/heimdall-examen-lab.mjs --external:electron && node_modules/electron/dist/electron /tmp/heimdall-examen-lab.mjs --no-sandbox",
+    "dist": "electron-vite build && npm run verify:preload && electron-builder --linux",
     "editor-lab": "esbuild scripts/editor-lab.ts --bundle --platform=node --format=esm --outfile=/tmp/heimdall-editor-lab.mjs --external:electron && node_modules/electron/dist/electron /tmp/heimdall-editor-lab.mjs --no-sandbox"
   },
   "build": {
@@ -44,6 +46,10 @@
       {
         "from": "build/icon.png",
         "to": "icon.png"
+      },
+      {
+        "from": "../bin/heimdall",
+        "to": "heimdall"
       }
     ],
     "linux": {

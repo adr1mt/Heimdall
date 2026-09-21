@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { chmodSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { detectEngine, parseEngineVersion } from '../src/main/engine'
+import { bundledEnginePath, detectEngine, parseEngineVersion } from '../src/main/engine'
 
 function fakeEngine(name: string, body: string): string {
   const dir = mkdtempSync(join(tmpdir(), 'heimdall-gui-'))
@@ -56,5 +56,27 @@ describe('detectEngine', () => {
   it('rejects an engine that fails without identifying itself', async () => {
     const path = fakeEngine('roto', 'exit 1')
     expect((await detectEngine(path)).found).toBe(false)
+  })
+})
+
+describe('bundledEnginePath', () => {
+  it('finds the engine that travels inside the application', () => {
+    const path = fakeEngine('heimdall', 'echo "heimdall 9.9.9"')
+    const resources = join(path, '..')
+    expect(bundledEnginePath(resources)).toBe(join(resources, 'heimdall'))
+  })
+
+  it('answers nothing when the application carries no engine', () => {
+    expect(bundledEnginePath(mkdtempSync(join(tmpdir(), 'heimdall-sin-motor-')))).toBeNull()
+  })
+
+  it('answers nothing when there are no resources at all', () => {
+    expect(bundledEnginePath(undefined)).toBeNull()
+  })
+
+  it('does not take a file without execute permission for the engine', () => {
+    const path = fakeEngine('heimdall', 'echo "heimdall 9.9.9"')
+    chmodSync(path, 0o644)
+    expect(bundledEnginePath(join(path, '..'))).toBeNull()
   })
 })

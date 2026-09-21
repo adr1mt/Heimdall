@@ -1252,7 +1252,7 @@
       "id": "T072",
       "title": "Empaquetado con el motor embebido para Linux",
       "phase": 6,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T109"
@@ -1270,7 +1270,11 @@
         "Instalacion y ejecucion en Linux sin Ruby, sin gems, sin Go, sin Docker ni Podman y sin servicios externos",
         "Con el motor del sistema ausente, la aplicacion corrige igual"
       ],
-      "tests": [],
+      "tests": [
+        "gui/tests/engine.test.ts",
+        "gui/tests/store.test.ts",
+        "gui/scripts/paquete.sh"
+      ],
       "notes": "Antes cubria Linux y Windows. La prioridad es Linux (decision del 2026-09-21).",
       "package": "P5"
     },
@@ -2040,7 +2044,7 @@
       "title": "Actualizacion automatica que nunca interrumpe",
       "phase": 6,
       "package": "P5",
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P2",
       "depends_on": [
         "T072"

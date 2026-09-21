@@ -4,7 +4,7 @@ GO ?= go
 BIN := bin/heimdall
 
 # Test SSH lab. See test/lab.sh.
-.PHONY: check test build lab lab-down lab-status lab-ra2 lab-ra2-down rendimiento gui-check gui-build gui-lab gui-editor clean
+.PHONY: check test build lab lab-down lab-status lab-ra2 lab-ra2-down rendimiento gui-check gui-build gui-dist gui-paquete gui-lab gui-editor clean
 
 ## check: fast suite. No network, no disk. Must stay under 10 s.
 check:
@@ -59,6 +59,16 @@ gui-check:
 ## gui-build: compile the GUI into gui/out.
 gui-build:
 	cd gui && npm run build
+
+## gui-dist: AppImage and .deb in gui/dist, with the engine inside. The
+## teacher installs that and needs nothing else (T072).
+gui-dist: build
+	cd gui && npm run dist
+
+## gui-paquete: check the built package works on a machine with nothing
+## installed (T072). Needs `make gui-dist` and `make lab`.
+gui-paquete:
+	cd gui && ./scripts/paquete.sh
 
 ## gui-lab: correct a lab exam through the built application and check that no
 ## password leaks out of memory. Needs `make build`, `make gui-build` and

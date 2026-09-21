@@ -88,3 +88,15 @@ tarda un intervalo entero (5 min).
 
 Desde la raíz del repositorio: `make gui-check` (typecheck + tests) y
 `make gui-build`. `make check`, la suite del motor, no depende de este árbol.
+
+## Empaquetado
+
+`make gui-dist` compila el motor y deja en `gui/dist` un AppImage y un `.deb`
+con el binario dentro, en `resources/heimdall`. Sin nada guardado en ajustes,
+la aplicación usa ese motor: quien instala el paquete no instala nada más. Una
+ruta elegida a mano en Ajustes manda siempre sobre el motor embebido.
+
+`make gui-paquete` comprueba el paquete ya construido: que lleva el motor, que
+ese motor corrige igual que el compilado del repositorio con el entorno vacío
+y que la aplicación arranca sin ningún `heimdall` en el `PATH`. Necesita
+`make gui-dist` y `make lab`.

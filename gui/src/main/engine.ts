@@ -1,8 +1,33 @@
 import { execFile } from 'node:child_process'
+import { accessSync, constants } from 'node:fs'
+import { join } from 'node:path'
 import type { EngineStatus } from '../shared/types'
 
-/** Default: the bare binary name, looked up in the system PATH. */
+/** Last resort: the bare binary name, looked up in the system PATH. */
 export const DEFAULT_ENGINE_PATH = 'heimdall'
+
+/**
+ * The engine that travels inside the application, when there is one.
+ *
+ * The packaged application ships the binary next to its resources, so a
+ * teacher who installs it has an engine without installing anything else. In
+ * development and in the tests there are no resources, and this answers null.
+ */
+export function bundledEnginePath(resourcesDir = process.resourcesPath): string | null {
+  if (!resourcesDir) return null
+  const path = join(resourcesDir, 'heimdall')
+  try {
+    accessSync(path, constants.X_OK)
+    return path
+  } catch {
+    return null
+  }
+}
+
+/** With nothing chosen: the engine inside the application, else the PATH. */
+export function defaultEnginePath(): string {
+  return bundledEnginePath() ?? DEFAULT_ENGINE_PATH
+}
 
 /**
  * The engine version inside the line `heimdall version` prints.
