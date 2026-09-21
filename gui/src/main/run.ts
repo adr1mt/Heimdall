@@ -36,20 +36,19 @@ export interface RunTarget {
 }
 
 /**
- * Works out the directory and the classroom name from the two files the
- * teacher picked. The engine takes a directory, not two paths: the exam has a
- * fixed name and the classroom travels as a name inside the same directory.
- * Anything else is told here, in Spanish, before a single machine is touched.
+ * The folder the engine is handed, out of the exam the teacher opened. The
+ * engine takes a directory, not a path, and the exam has a fixed name inside
+ * it. Anything else is told here, in Spanish, before a single machine is
+ * touched.
+ *
+ * The classroom is not asked for: it is written into this same folder from
+ * the chosen class, before the run (ADR-0022).
  */
-export function resolveRunTarget(examPath: string, classPath: string): RunTarget {
+export function projectDirOf(examPath: string): string {
   if (basename(examPath) !== EXAM_FILE) {
     throw new Error(`El examen tiene que llamarse «${EXAM_FILE}»; has elegido «${basename(examPath)}».`)
   }
-  const dir = dirname(examPath)
-  if (dirname(classPath) !== dir) {
-    throw new Error('El examen y el aula tienen que estar en la misma carpeta.')
-  }
-  return { dir, className: basename(classPath) }
+  return dirname(examPath)
 }
 
 /**

@@ -2,11 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { NAV_FOOTER, NAV_MAIN, comingSoon, isReady } from '../src/renderer/src/lib/nav'
 
 describe('navegación', () => {
-  it('lleva las seis secciones de trabajo en su orden', () => {
+  it('lleva las siete secciones de trabajo en su orden', () => {
     expect(NAV_MAIN.map((entry) => entry.id)).toEqual([
       'home',
       'classes',
       'exams',
+      'correct',
       'results',
       'analytics',
       'history'
@@ -19,7 +20,7 @@ describe('navegación', () => {
 
   it('no ofrece como abrible una sección que todavía no está', () => {
     for (const id of ['exams', 'analytics'] as const) expect(isReady(id)).toBe(false)
-    for (const id of ['home', 'classes', 'results', 'history', 'settings', 'help'] as const) {
+    for (const id of ['home', 'classes', 'correct', 'results', 'history', 'settings', 'help'] as const) {
       expect(isReady(id)).toBe(true)
     }
   })

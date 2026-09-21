@@ -13,6 +13,7 @@ export type View =
   | 'home'
   | 'classes'
   | 'exams'
+  | 'correct'
   | 'results'
   | 'analytics'
   | 'history'
@@ -32,6 +33,7 @@ export const NAV_MAIN: NavEntry[] = [
   { id: 'home', label: t.nav.home, ready: true },
   { id: 'classes', label: t.nav.classes, ready: true },
   { id: 'exams', label: t.nav.exams, ready: false },
+  { id: 'correct', label: t.nav.correct, ready: true },
   { id: 'results', label: t.nav.results, ready: true },
   { id: 'analytics', label: t.nav.analytics, ready: false },
   { id: 'history', label: t.nav.history, ready: true }

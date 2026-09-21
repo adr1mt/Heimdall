@@ -1,821 +1,91 @@
-import { useCallback, useEffect, useState } from 'react'
-import {
-  Download,
-  FileText,
-  FolderOpen,
-  Layers,
-  Play,
-  RotateCcw,
-  Square,
-  Timer,
-  Users
-} from 'lucide-react'
-import {
-  Badge,
-  Button,
-  Card,
-  CardContent,
-  ConfirmDialog,
-  Foldaway,
-  Input,
-  Meter,
-  ProgressBar,
-  SectionTitle,
-  Segmented,
-  SegmentedItem,
-  ViewHeader
-} from '@/components/ui'
-import { useApp, messageOf, noticeFrom } from '@/stores/app'
-import { useClasses, groupById } from '@/stores/classes'
-import { groupLine, type ClassGroup } from '../../../shared/classes'
-import { useRun } from '@/stores/run'
-import { runPercent, type StudentProgress } from '@/lib/run-state'
-import { EXAM_INTERVALS, secondsLeft, type ExamMode } from '@/lib/exam'
-import {
-  SESSION_STATUS_TEXT,
-  fromRoundText,
-  nextRoundText,
-  roundLines,
-  sessionTally,
-  sessionText
-} from '@/lib/session'
-import { scoreView } from '@/lib/results'
-import { scaleOf, sessionCsv, sessionCsvName, sessionExportSummary } from '@/lib/export'
-import { startCorrection } from '@/lib/start-run'
-import type { Session } from '../../../shared/session'
-import type { ClassDescription, Description } from '../../../shared/describe'
+import { useEffect, useState } from 'react'
+import { ArrowRight, FileText, FolderOpen } from 'lucide-react'
+import { Button, Card, CardContent, ViewHeader } from '@/components/ui'
+import { useApp, noticeFrom } from '@/stores/app'
+import type { Description } from '../../../shared/describe'
 import { t } from '@/i18n/es'
 
+/**
+ * Inicio: the exam that is open.
+ *
+ * Correcting lives in «Corregir», with the class: the same exam is corrected
+ * with 2SMX C and with 2SMX D, so it belongs to neither. Until T108 turns
+ * this into the list of projects, the exam is still opened as a file.
+ */
 export default function HomeView() {
   const examPath = useApp((s) => s.examPath)
-  const classPath = useApp((s) => s.classPath)
-  const engine = useApp((s) => s.engine)
   const setExamPath = useApp((s) => s.setExamPath)
-  const setClassPath = useApp((s) => s.setClassPath)
   const setNotice = useApp((s) => s.setNotice)
-  const classId = useApp((s) => s.classId)
-  const setClassId = useApp((s) => s.setClassId)
-  const retry = useApp((s) => s.retry)
-  const setRetry = useApp((s) => s.setRetry)
-  const exam = useApp((s) => s.exam)
+  const setView = useApp((s) => s.setView)
 
-  const run = useRun()
-  const busy = run.phase === 'starting' || run.phase === 'running'
-
-  // The saved classes, so Inicio can say which class is chosen by its name
-  // and not by the file underneath it.
-  const groups = useClasses((s) => s.groups)
-  const classesLoaded = useClasses((s) => s.loaded)
-  const loadClasses = useClasses((s) => s.load)
-  useEffect(() => {
-    if (!classesLoaded) void loadClasses()
-  }, [classesLoaded, loadClasses])
-  const group = groupById(groups, classId)
-
-  /** What the two chosen files are called, for the screen. */
-  const [described, setDescribed] = useState<Description>({ exam: null, classroom: null })
+  /** What the chosen exam is called, for the screen. */
+  const [described, setDescribed] = useState<Description>({ exam: null })
 
   useEffect(() => {
-    if (!examPath && !classPath) {
-      setDescribed({ exam: null, classroom: null })
+    if (!examPath) {
+      setDescribed({ exam: null })
       return
     }
     let current = true
     window.heimdall
-      .describe({ examPath, classPath })
+      .describe({ examPath })
       .then((description) => {
         if (current) setDescribed(description)
       })
       // A name is for reading: if it cannot be read the path is still there,
       // and the file's real error arrives whole when the engine reads it.
       .catch(() => {
-        if (current) setDescribed({ exam: null, classroom: null })
+        if (current) setDescribed({ exam: null })
       })
     return () => {
       current = false
     }
-  }, [examPath, classPath])
+  }, [examPath])
 
-  /** Credential names the classroom asks for, and what the teacher typed. */
-  const [refs, setRefs] = useState<string[]>([])
-  const [secrets, setSecrets] = useState<Record<string, string>>({})
-  const [confirmStop, setConfirmStop] = useState(false)
-
-  useEffect(() => {
-    if (!classPath) {
-      setRefs([])
-      setSecrets({})
-      return
-    }
-    let current = true
-    window.heimdall
-      .secretRefs(classPath)
-      .then((names) => {
-        if (!current) return
-        setRefs(names)
-        setSecrets({})
-      })
-      .catch((error) => setNotice(noticeFrom('No se pudo leer el aula', error)))
-    return () => {
-      current = false
-    }
-  }, [classPath, setNotice])
-
-  async function pick(kind: 'exam' | 'class'): Promise<void> {
+  async function pick(): Promise<void> {
     try {
-      const picked = await window.heimdall.pickFile(kind)
-      if (!picked) return
-      if (kind === 'exam') setExamPath(picked)
-      else setClassPath(picked)
+      const picked = await window.heimdall.pickFile('exam')
+      if (picked) setExamPath(picked)
     } catch (error) {
       setNotice(noticeFrom('No se pudo abrir el fichero', error))
     }
   }
 
-  const missing = !engine?.found
-    ? t.run.needEngine
-    : !examPath || !classPath
-      ? t.run.needFiles
-      : refs.some((name) => !secrets[name])
-        ? t.run.needSecrets
-        : null
-
-  async function start(): Promise<void> {
-    if (missing) return
-    await startCorrection(secrets)
-    // The values leave the interface as soon as the engine has them.
-    setSecrets({})
-  }
-
-  /**
-   * Exam mode. The credentials are handed to the main process once, and the
-   * first pass is launched by the same timer that chains the rest: there is
-   * one way in, so there is one place where two engines could be started and
-   * it already refuses to.
-   */
-  async function startExamMode(minutes: number): Promise<void> {
-    if (missing) return
-    try {
-      await window.heimdall.setExamMode({ active: true, secrets })
-    } catch (error) {
-      setNotice(noticeFrom('No se pudo activar el modo examen', error))
-      return
-    }
-    setSecrets({})
-    setRetry(null)
-    useApp.getState().startExam(minutes)
-  }
-
-  async function stopExamMode(): Promise<void> {
-    useApp.getState().stopExam()
-    try {
-      await window.heimdall.setExamMode({ active: false })
-    } catch (error) {
-      setNotice(noticeFrom('No se pudo desactivar el modo examen', error))
-    }
-  }
-
-  async function stop(): Promise<void> {
-    setConfirmStop(false)
-    useRun.getState().cancelRequested()
-    try {
-      await window.heimdall.cancelRun()
-    } catch (error) {
-      setNotice(noticeFrom('No se pudo detener la corrección', error))
-    }
-  }
-
-  const percent = runPercent(run)
-  const examSession = useExamSession()
-
   return (
     <div className="flex h-full flex-col">
       <ViewHeader title={t.home.title} />
       <div className="min-h-0 flex-1 space-y-5 overflow-auto p-6">
-        <div className="grid gap-4 md:grid-cols-2">
-          <PickCard
-            icon={<FileText className="h-4 w-4" />}
-            title={t.home.exam}
-            name={described.exam?.name ?? null}
-            meta={
-              described.exam?.checks == null ? null : t.home.examMeta(described.exam.checks)
-            }
-            path={examPath}
-            disabled={busy}
-            onPick={() => void pick('exam')}
-          />
-          <ClassCard
-            group={group}
-            groups={groups}
-            missingClass={classId !== null && group === null}
-            classPath={classPath}
-            classroom={described.classroom}
-            refs={refs}
-            secrets={secrets}
-            disabled={busy}
-            onChoose={setClassId}
-            onPickFile={() => void pick('class')}
-            onSecret={(name, value) => setSecrets((prev) => ({ ...prev, [name]: value }))}
-          />
-        </div>
+        <PickCard
+          icon={<FileText className="h-4 w-4" />}
+          title={t.home.exam}
+          name={described.exam?.name ?? null}
+          meta={described.exam?.checks == null ? null : t.home.examMeta(described.exam.checks)}
+          path={examPath}
+          onPick={() => void pick()}
+        />
+        <p className="text-xs text-muted-foreground">{t.home.examFile}</p>
 
-        {/* A retry is never silent: it says what it will repeat and it can be
-            called off without leaving this screen. */}
-        {retry && (
-          <div className="space-y-2 rounded-md bg-warning/10 p-4">
-            <p className="text-sm font-medium text-warning-strong">{t.run.retryTitle}</p>
-            <p className="text-xs text-warning-strong/90">
-              {t.run.retryBody(retry.checks, retry.students)}
-            </p>
-            <Button variant="ghost" size="sm" disabled={busy} onClick={() => setRetry(null)}>
-              {t.run.retryCancel}
+        {examPath && (
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">{t.home.nextStep}</p>
+            <Button onClick={() => setView('correct')}>
+              <ArrowRight className="h-4 w-4" />
+              {t.home.goToCorrect}
             </Button>
           </div>
         )}
-
-        <div>
-          <SectionTitle>{t.home.action}</SectionTitle>
-          <div className="flex flex-wrap items-center gap-3">
-            {busy ? (
-              <Button
-                variant="destructive"
-                disabled={run.cancelling}
-                onClick={() => setConfirmStop(true)}
-              >
-                <Square className="h-4 w-4" />
-                {run.cancelling ? t.run.cancelling : t.run.cancel}
-              </Button>
-            ) : (
-              <Button disabled={!!missing} onClick={() => void start()}>
-                {retry ? <RotateCcw className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                {retry ? t.run.retryStart : run.phase === 'finished' ? t.run.again : t.run.start}
-              </Button>
-            )}
-            <ExamControl
-              exam={exam}
-              disabled={!!missing && !exam.active}
-              onStart={(minutes) => void startExamMode(minutes)}
-              onStop={() => void stopExamMode()}
-            />
-            {missing && !busy && <span className="text-xs text-muted-foreground">{missing}</span>}
-          </div>
-          <p className="mt-2 text-xs text-muted-foreground">
-            {exam.active ? t.exam.hint : t.home.sameFolder}
-          </p>
-        </div>
-
-        {exam.active && (
-          <ExamStrip exam={exam} percent={percent} session={examSession.session} />
-        )}
-
-        <SessionPanel {...examSession} />
-
-        {run.phase !== 'idle' && <RunPanel percent={percent} />}
       </div>
-
-      <ConfirmDialog
-        open={confirmStop}
-        title={t.run.confirmTitle}
-        confirmLabel={t.run.confirmYes}
-        destructive
-        onConfirm={() => void stop()}
-        onCancel={() => setConfirmStop(false)}
-      >
-        {t.run.confirmBody}
-      </ConfirmDialog>
     </div>
   )
 }
 
 /**
- * Exam mode, as two buttons and an interval. It lives next to «Corregir»
- * because both are the same decision —correct now, or keep correcting— and
- * the teacher takes it once, with the class already in the room.
- */
-function ExamControl({
-  exam,
-  disabled,
-  onStart,
-  onStop
-}: {
-  exam: ExamMode
-  disabled: boolean
-  onStart: (minutes: number) => void
-  onStop: () => void
-}) {
-  const [minutes, setMinutes] = useState<number>(exam.everyMinutes)
-
-  if (exam.active) {
-    return (
-      <Button variant="outline" onClick={onStop}>
-        <Timer className="h-4 w-4" />
-        {t.exam.stop}
-      </Button>
-    )
-  }
-
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      <Button variant="outline" disabled={disabled} onClick={() => onStart(minutes)}>
-        <Timer className="h-4 w-4" />
-        {t.exam.start}
-      </Button>
-      <Segmented>
-        {EXAM_INTERVALS.map((value) => (
-          <SegmentedItem key={value} active={value === minutes} onClick={() => setMinutes(value)}>
-            {t.exam.everyMinutes(value)}
-          </SegmentedItem>
-        ))}
-      </Segmented>
-    </div>
-  )
-}
-
-/**
- * What is going on while the exam lasts, in the five readings that answer it
- * without opening anything: which round this is, how long until the next one,
- * how many students are still being corrected, how many have finished and how
- * far the round in flight has got.
+ * The exam, by its name.
  *
- * The countdown is what says the mode is still on between two rounds; the
- * finished ones are the engine's word (ADR-0020), never counted here.
- */
-function ExamStrip({
-  exam,
-  percent,
-  session
-}: {
-  exam: ExamMode
-  percent: number | null
-  session: Session | null
-}) {
-  const [left, setLeft] = useState<number | null>(null)
-
-  useEffect(() => {
-    const tick = (): void => setLeft(secondsLeft(exam, Date.now()))
-    tick()
-    const timer = setInterval(tick, 1000)
-    return () => clearInterval(timer)
-  }, [exam])
-
-  const tally = session ? sessionTally(session) : null
-  const active = tally ? tally.graded + tally.open - tally.finished : null
-
-  return (
-    <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-5">
-      <Reading value={String(exam.passes)} label={t.exam.roundLabel} hint={t.exam.ofMinutes(exam.everyMinutes)} />
-      <Reading
-        value={left === null ? t.exam.nowCorrecting : left >= 60 ? `${Math.ceil(left / 60)} min` : `${left} s`}
-        label={t.exam.nextLabel}
-      />
-      <Reading value={active === null ? '—' : String(Math.max(active, 0))} label={t.exam.activeLabel} />
-      <Reading value={tally === null ? '—' : String(tally.finished)} label={t.exam.finishedLabel} />
-      <Reading value={percent === null ? '—' : `${percent}%`} label={t.exam.progressLabel} />
-    </div>
-  )
-}
-
-function Reading({ value, label, hint }: { value: string; label: string; hint?: string }) {
-  return (
-    <div className="bg-background px-4 py-3">
-      <div className="text-figure font-bold tabular-nums">{value}</div>
-      <div className="text-micro uppercase tracking-[0.09em] text-muted-foreground">{label}</div>
-      {hint && <div className="text-xs text-muted-foreground">{hint}</div>}
-    </div>
-  )
-}
-
-/**
- * The exam as a whole: what each student's grade is worth right now, which
- * round it comes from and who has already finished.
- *
- * It is read after every round, from the engine, with the rounds of this exam
- * and nothing else. Not a single number on this panel was worked out here: the
- * best round, the state and the grade are the engine's (ADR-0020, principio
- * 12), and while a round is running the previous answer stays on screen
- * instead of a blank.
- */
-function useExamSession(): {
-  rounds: string[]
-  session: Session | null
-  problem: string | null
-  loading: boolean
-} {
-  const rounds = useApp((s) => s.examRounds)
-  const [session, setSession] = useState<Session | null>(null)
-  const [problem, setProblem] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-
-  const read = useCallback(async (paths: string[]): Promise<void> => {
-    if (paths.length === 0) {
-      setSession(null)
-      setProblem(null)
-      return
-    }
-    setLoading(true)
-    try {
-      setSession(await window.heimdall.session(paths))
-      setProblem(null)
-    } catch (error) {
-      setProblem(t.session.refused(messageOf(error)))
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    void read(rounds)
-  }, [rounds, read])
-
-  return { rounds, session, problem, loading }
-}
-
-/**
- * The exam as a whole, student by student. It is read once, by the view, and
- * shown in two places: the strip up top and this panel.
- */
-function SessionPanel({
-  rounds,
-  session,
-  problem,
-  loading
-}: {
-  rounds: string[]
-  session: Session | null
-  problem: string | null
-  loading: boolean
-}) {
-  if (rounds.length === 0) return null
-
-  return (
-    <div className="space-y-3 rounded-md border border-border p-4">
-      <div className="flex items-center gap-2 text-sm font-medium">
-        <Layers className="h-4 w-4" />
-        {t.session.title}
-      </div>
-      <p className="max-w-3xl text-xs text-muted-foreground">{t.session.hint}</p>
-
-      {loading && <p className="text-xs text-muted-foreground">{t.session.loading}</p>}
-
-      {problem && (
-        <p role="alert" className="rounded-md bg-destructive/10 p-3 text-sm text-destructive-strong">
-          {problem}
-        </p>
-      )}
-
-      {session && !problem && (
-        <>
-          <div className="space-y-0.5">
-            <p className="text-xs text-muted-foreground">{sessionText(session)}</p>
-            <p className="text-xs text-muted-foreground">
-              {t.session.tally(
-                sessionTally(session).graded,
-                sessionTally(session).finished,
-                sessionTally(session).open
-              )}
-            </p>
-          </div>
-
-          <SessionExportButton session={session} />
-
-          <div className="space-y-2">
-            {session.students.map((student) => {
-              const score = scoreView(student.score)
-              const next = nextRoundText(student)
-              return (
-                <div key={student.student_id} className="space-y-1 rounded-md border border-border p-3">
-                  <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">{student.name}</span>
-                      <Badge
-                        variant={
-                          student.status === 'FINISHED'
-                            ? 'success'
-                            : student.status === 'EXCLUDED'
-                              ? 'outline'
-                              : undefined
-                        }
-                      >
-                        {SESSION_STATUS_TEXT[student.status]}
-                      </Badge>
-                    </div>
-                    <div className="flex items-baseline gap-2">
-                      {student.from_round === 0 ? (
-                        <span className="text-sm text-muted-foreground">{t.results.noGrade}</span>
-                      ) : (
-                        <span className="text-lg font-semibold tabular-nums">{score.value}</span>
-                      )}
-                      <span className="text-micro text-muted-foreground">
-                        {fromRoundText(student)}
-                      </span>
-                    </div>
-                  </div>
-                  {next && <p className="text-xs text-muted-foreground">{next}</p>}
-                  <details>
-                    <summary className="cursor-pointer text-xs text-muted-foreground">
-                      {t.session.rounds}
-                    </summary>
-                    <div className="mt-1 space-y-0.5">
-                      {roundLines(student).map((line, index) => (
-                        <p key={index} className="text-micro text-muted-foreground">
-                          {line}
-                        </p>
-                      ))}
-                    </div>
-                  </details>
-                </div>
-              )
-            })}
-          </div>
-        </>
-      )}
-    </div>
-  )
-}
-
-/** The session's grades, out of the application, with the engine's numbers. */
-function SessionExportButton({ session }: { session: Session }) {
-  const scaleId = useApp((s) => s.scale)
-  const setNotice = useApp((s) => s.setNotice)
-  const [confirm, setConfirm] = useState(false)
-  const scale = scaleOf(scaleId)
-
-  async function save(): Promise<void> {
-    setConfirm(false)
-    try {
-      const path = await window.heimdall.saveCsv(sessionCsvName(session), sessionCsv(session, scale))
-      setNotice(path ? t.export.saved(path) : t.export.cancelled)
-    } catch (error) {
-      setNotice(noticeFrom(t.export.failed, error))
-    }
-  }
-
-  return (
-    <div>
-      <Button variant="outline" size="sm" onClick={() => setConfirm(true)}>
-        <Download className="h-4 w-4" />
-        {t.session.export}
-      </Button>
-      <ConfirmDialog
-        open={confirm}
-        title={t.session.exportTitle}
-        confirmLabel={t.export.yes}
-        onConfirm={() => void save()}
-        onCancel={() => setConfirm(false)}
-      >
-        <span className="space-y-2 block">
-          <span className="block">{sessionExportSummary(session, scale)}</span>
-          <span className="block">{t.session.exportHint}</span>
-          <span className="block text-xs text-muted-foreground">{t.export.scale(scale.label)}</span>
-        </span>
-      </ConfirmDialog>
-    </div>
-  )
-}
-
-/** What is happening, and what happened. The grades are in Resultados. */
-function RunPanel({ percent }: { percent: number | null }) {
-  const run = useRun()
-  const expected = run.start?.expected_checks ?? 0
-
-  return (
-    <div className="space-y-4">
-      <ProgressBar
-        percent={percent}
-        label={expected > 0 ? t.run.progress(run.done, expected) : t.run.starting}
-      />
-
-      {run.problem && (
-        <p role="alert" className="whitespace-pre-wrap rounded-md bg-destructive/10 p-3 text-sm text-destructive-strong">
-          {run.problem}
-        </p>
-      )}
-
-      {run.end && (
-        <div className="space-y-1 text-sm">
-          <p>{t.run.status[run.end.status]}</p>
-          {run.end.artifact && (
-            <p className="truncate font-mono text-dense text-muted-foreground" title={run.end.artifact}>
-              {t.run.artifact} {run.end.artifact}
-            </p>
-          )}
-          <p className="text-xs text-muted-foreground">{t.run.resultsPending}</p>
-        </div>
-      )}
-
-      {run.students.length > 0 && (
-        <div className="space-y-2">
-          <SectionTitle>{t.run.classTitle}</SectionTitle>
-          <div className="grid gap-2 md:grid-cols-2">
-            {run.students.map((student) => (
-              <StudentRow key={student.studentId} student={student} checks={run.start?.plan.check_count ?? 0} />
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function StudentRow({ student, checks }: { student: StudentProgress; checks: number }) {
-  const label = student.excluded
-    ? t.run.excluded
-    : student.status
-      ? t.run.student[student.status]
-      : student.done > 0
-        ? t.run.inProgress
-        : t.run.waiting
-
-  // Green only when the student ended with everything evaluated. Nothing here
-  // is ever red: a check left unevaluated is a technical problem, not a fail
-  // (principio 3), and a red bar in front of the class says the opposite.
-  const tone = student.status === 'OK' ? 'pass' : 'neutral'
-  const badge =
-    student.status === 'OK'
-      ? 'success'
-      : student.status === 'NOT_EVALUATED' || student.status === 'PARTIAL'
-        ? 'warning'
-        : student.status === 'EXCLUDED' || student.excluded
-          ? 'outline'
-          : undefined
-
-  return (
-    <div className="space-y-1.5 rounded-md border border-border p-3">
-      <div className="flex items-center justify-between gap-2">
-        <span className="truncate text-sm font-medium">{student.name}</span>
-        <Badge variant={badge}>{label}</Badge>
-      </div>
-      {!student.excluded && (
-        <>
-          <Meter value={student.done} total={checks} tone={tone} />
-          <p className="text-micro text-muted-foreground">
-            {t.run.counts(student.pass, student.fail, student.unevaluated)}
-          </p>
-        </>
-      )}
-    </div>
-  )
-}
-
-/**
- * The class being corrected, by its name.
- *
- * What the teacher recognises is «2SMX A · 15 alumnos», not a path: the class
- * is theirs and lasts the whole course, and they wrote it down once in
- * «Clases». The classroom file is what the engine still receives, so it stays
- * one click away inside «detalles avanzados», together with the credentials it
- * asks for.
- *
- * Those details open on their own when something is missing there: burying a
- * reason why «Corregir» is greyed out would be worse than showing a path.
- */
-function ClassCard({
-  group,
-  groups,
-  missingClass,
-  classPath,
-  classroom,
-  refs,
-  secrets,
-  disabled,
-  onChoose,
-  onPickFile,
-  onSecret
-}: {
-  group: ClassGroup | null
-  groups: ClassGroup[]
-  /** A class was chosen and is no longer there. */
-  missingClass: boolean
-  classPath: string | null
-  classroom: ClassDescription | null
-  refs: string[]
-  secrets: Record<string, string>
-  disabled: boolean
-  onChoose: (id: string | null) => void
-  onPickFile: () => void
-  onSecret: (name: string, value: string) => void
-}) {
-  const setNotice = useApp((s) => s.setNotice)
-  const setView = useApp((s) => s.setView)
-  const pending = !classPath || refs.some((name) => !secrets[name])
-
-  async function openFolder(): Promise<void> {
-    if (!classPath) return
-    try {
-      await window.heimdall.openFolder(classPath)
-    } catch (error) {
-      setNotice(noticeFrom(t.home.folderFailed, error))
-    }
-  }
-
-  return (
-    <Card>
-      <CardContent className="space-y-3 pt-5">
-        <div className="flex items-center gap-2 text-micro uppercase tracking-[0.09em] text-muted-foreground">
-          <Users className="h-4 w-4" />
-          {t.home.classroom}
-        </div>
-
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <p className="min-w-0 truncate text-name font-semibold">
-            {group ? (
-              groupLine(group)
-            ) : (
-              <span className="text-muted-foreground">
-                {missingClass ? t.home.classGone : t.home.classNone}
-              </span>
-            )}
-          </p>
-          {groups.length === 0 ? (
-            <Button variant="outline" size="sm" onClick={() => setView('classes')}>
-              {t.home.goToClasses}
-            </Button>
-          ) : (
-            <select
-              aria-label={t.home.classPick}
-              disabled={disabled}
-              value={group?.id ?? ''}
-              onChange={(e) => onChoose(e.target.value || null)}
-              className="h-9 rounded-md border border-input bg-background px-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
-            >
-              <option value="">{t.home.classNone}</option>
-              {groups.map((other) => (
-                <option key={other.id} value={other.id}>
-                  {other.name}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-
-        <Foldaway summary={t.home.advanced} defaultOpen={pending}>
-          <div className="space-y-2">
-            <p className="text-micro uppercase tracking-[0.09em] text-muted-foreground">
-              {t.home.classFile}
-            </p>
-            {classPath ? (
-              <>
-                <p className="text-sm">
-                  {classroom?.name ?? t.home.unnamed}
-                  {classroom?.students != null && (
-                    <span className="text-muted-foreground"> · {t.home.classMeta(classroom.students)}</span>
-                  )}
-                </p>
-                <p className="break-all font-mono text-dense text-muted-foreground">{classPath}</p>
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">{t.home.classFileNone}</p>
-            )}
-            <p className="text-xs text-muted-foreground">{t.home.classFileHint}</p>
-            <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" disabled={disabled} onClick={onPickFile}>
-                {classPath ? t.home.change : t.home.choose}
-              </Button>
-              {classPath && (
-                <Button variant="ghost" size="sm" onClick={() => void openFolder()}>
-                  <FolderOpen className="h-4 w-4" />
-                  {t.home.openFolder}
-                </Button>
-              )}
-            </div>
-          </div>
-
-          {classPath && (
-            <div className="space-y-2 border-t border-border pt-3">
-              <p className="text-micro uppercase tracking-[0.09em] text-muted-foreground">
-                {t.credentials.title}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {refs.length > 0 ? t.credentials.hint : t.credentials.none}
-              </p>
-              {refs.map((name) => (
-                <label key={name} className="flex items-center gap-3">
-                  <span className="w-56 shrink-0 truncate font-mono text-dense">{name}</span>
-                  <Input
-                    type="password"
-                    autoComplete="off"
-                    disabled={disabled}
-                    placeholder={t.credentials.placeholder}
-                    value={secrets[name] ?? ''}
-                    onChange={(e) => onSecret(name, e.target.value)}
-                  />
-                </label>
-              ))}
-            </div>
-          )}
-        </Foldaway>
-      </CardContent>
-    </Card>
-  )
-}
-
-/**
- * One of the two things a correction needs, by its name.
- *
- * The name comes from the file itself —what the teacher called the exam and
- * the class— because that is what they recognise; the path is what the
- * computer needs and it waits inside «detalles avanzados», where it is still
- * one click away when something has to be looked at on disk.
+ * The name comes from the file itself —what the teacher called the exam—
+ * because that is what they recognise; the path is what the computer needs
+ * and it waits inside «detalles avanzados», where it is still one click away
+ * when something has to be looked at on disk.
  */
 function PickCard({
   icon,
@@ -823,7 +93,6 @@ function PickCard({
   name,
   meta,
   path,
-  disabled,
   onPick
 }: {
   icon: React.ReactNode
@@ -831,7 +100,6 @@ function PickCard({
   name: string | null
   meta: string | null
   path: string | null
-  disabled: boolean
   onPick: () => void
 }) {
   const setNotice = useApp((s) => s.setNotice)
@@ -859,7 +127,7 @@ function PickCard({
             </p>
             {path && meta && <p className="text-xs text-muted-foreground">{meta}</p>}
           </div>
-          <Button variant="outline" size="sm" disabled={disabled} onClick={onPick}>
+          <Button variant="outline" size="sm" onClick={onPick}>
             {path ? t.home.change : t.home.choose}
           </Button>
         </div>

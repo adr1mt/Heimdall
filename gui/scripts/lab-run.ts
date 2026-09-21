@@ -11,6 +11,7 @@ import { app, BrowserWindow, dialog } from 'electron'
 import { join, resolve } from 'node:path'
 import { readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { registerIpc } from '../src/main/ipc'
+import { openExamAndClass, writeLabClass } from './lab-flow'
 import { writeSettings } from '../src/main/store'
 
 const root = process.cwd()
@@ -32,9 +33,12 @@ const shot = process.env.SHOT_OUT || ''
 // Where the fake «save as» dialog says the teacher pointed, for X-1.
 const csvOut = process.env.CSV_OUT || ''
 
-const picks = [join(project, 'examen.yaml'), join(project, 'aula.yaml')]
-let pick = 0
-dialog.showOpenDialog = (async () => ({ canceled: false, filePaths: [picks[pick++]] })) as never
+// The only file the teacher opens now is the exam: the classroom is written
+// from the chosen class before every correction (ADR-0022).
+dialog.showOpenDialog = (async () => ({
+  canceled: false,
+  filePaths: [join(project, 'examen.yaml')]
+})) as never
 
 dialog.showSaveDialog = (async () => ({ canceled: !csvOut, filePath: csvOut })) as never
 
@@ -42,6 +46,7 @@ const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms)
 
 app.whenReady().then(async () => {
   writeSettings(app.getPath('userData'), { enginePath })
+  const classId = writeLabClass(app.getPath('userData'))
   registerIpc()
 
   const win = new BrowserWindow({
@@ -70,31 +75,18 @@ app.whenReady().then(async () => {
     return 'ok'
   })()`)
 
-  // Click «Elegir…» twice: the exam first, then the classroom.
-  await js(`[...document.querySelectorAll('button')].filter(b => b.textContent.includes('Elegir'))[0].click()`)
-  await wait(400)
-  await js(`[...document.querySelectorAll('button')].filter(b => b.textContent.includes('Elegir'))[1].click()`)
-  await wait(800)
+  // The exam in Inicio, the class in Corregir and the password typed: the
+  // same three steps the teacher takes.
+  await openExamAndClass(js, classId, secret)
 
-  // Type the password the way a person does: React only sees a real input event.
-  await js(`(() => {
-    const input = document.querySelector('input[type=password]')
-    if (!input) return 'sin campo de contraseña'
-    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set
-    setter.call(input, ${JSON.stringify(secret)})
-    input.dispatchEvent(new Event('input', { bubbles: true }))
-    return 'ok'
-  })()`).then((r) => console.log('[lab-run] contraseña:', r))
-  await wait(300)
-
-  await js(`[...document.querySelectorAll('button')].find(b => b.textContent.trim() === 'Corregir').click()`)
+  await js(`[...document.querySelectorAll('main button')].find(b => b.textContent.trim() === 'Corregir').click()`)
   console.log('[lab-run] corrigiendo…')
 
   if (cancelMs > 0) {
     await wait(cancelMs)
-    await js(`[...document.querySelectorAll('button')].find(b => b.textContent.trim() === 'Detener').click()`)
+    await js(`[...document.querySelectorAll('main button')].find(b => b.textContent.trim() === 'Detener').click()`)
     await wait(300)
-    await js(`[...document.querySelectorAll('button')].filter(b => b.textContent.trim() === 'Detener').pop().click()`)
+    await js(`[...document.querySelectorAll('main button')].filter(b => b.textContent.trim() === 'Detener').pop().click()`)
     console.log('[lab-run] detener pulsado')
   }
 

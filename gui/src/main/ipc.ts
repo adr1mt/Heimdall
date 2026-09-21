@@ -7,18 +7,19 @@ import { readArtifact } from './artifact'
 import { consolidateChain } from './consolidate'
 import { readExamSession } from './session'
 import { listRuns, varDirOf } from './history'
-import { RunSession, resolveRunTarget } from './run'
-import { describeClass, describeExam } from './describe'
-import { secretRefsOf } from './secrets'
+import { RunSession, projectDirOf } from './run'
+import { describeExam } from './describe'
+import { secretRefsIn } from './secrets'
 import { readSettings, writeSettings } from './store'
 import { readClasses, writeClasses } from './classes'
+import { writeGeneratedAula } from './aula'
+import { aulaYaml } from '../shared/aula'
 import { readGroup, type ClassGroup } from '../shared/classes'
 import type { Description } from '../shared/describe'
 import type { EngineStatus, ExamModeRequest, RunClosed, RunRequest } from '../shared/types'
 
-const FILTERS: Record<'exam' | 'class' | 'engine' | 'result', Electron.FileFilter[]> = {
+const FILTERS: Record<'exam' | 'engine' | 'result', Electron.FileFilter[]> = {
   exam: [{ name: 'Examen', extensions: ['yaml', 'yml'] }],
-  class: [{ name: 'Aula', extensions: ['yaml', 'yml'] }],
   engine: [{ name: 'Motor', extensions: ['*'] }],
   result: [{ name: 'Resultado', extensions: ['json'] }]
 }
@@ -99,8 +100,8 @@ export function endExamMode(): void {
 
 function readRunRequest(value: unknown): RunRequest {
   const raw = (value ?? {}) as Partial<RunRequest>
-  if (typeof raw.examPath !== 'string' || typeof raw.classPath !== 'string') {
-    throw new Error('Falta el examen o el aula.')
+  if (typeof raw.examPath !== 'string' || typeof raw.classId !== 'string') {
+    throw new Error('Falta el examen o la clase.')
   }
   const secrets: Record<string, string> = {}
   for (const [name, secret] of Object.entries(raw.secrets ?? {})) {
@@ -115,7 +116,20 @@ function readRunRequest(value: unknown): RunRequest {
   if (retryFrom && sessionRounds.length > 0) {
     throw new Error('Una vuelta del examen y un reintento son dos cosas distintas y no se piden juntas.')
   }
-  return { examPath: raw.examPath, classPath: raw.classPath, secrets, retryFrom, sessionRounds }
+  return { examPath: raw.examPath, classId: raw.classId, secrets, retryFrom, sessionRounds }
+}
+
+/**
+ * The saved class the correction is about.
+ *
+ * A class that is no longer there stops the correction with a sentence: going
+ * on without it would mean correcting somebody else's list, and a list of
+ * students is not something to guess at (principio 2).
+ */
+function groupOf(classId: unknown): ClassGroup {
+  const group = readClasses(settingsDir()).find((other) => other.id === classId)
+  if (!group) throw new Error('La clase que se iba a corregir ya no está guardada.')
+  return group
 }
 
 export function registerIpc(): void {
@@ -133,8 +147,7 @@ export function registerIpc(): void {
   })
 
   ipcMain.handle(IPC.pickFile, async (_e, kind: unknown): Promise<string | null> => {
-    const key =
-      kind === 'exam' || kind === 'class' || kind === 'engine' || kind === 'result' ? kind : 'exam'
+    const key = kind === 'engine' || kind === 'result' ? kind : 'exam'
     const result = await dialog.showOpenDialog({ properties: ['openFile'], filters: FILTERS[key] })
     return result.canceled ? null : (result.filePaths[0] ?? null)
   })
@@ -147,16 +160,16 @@ export function registerIpc(): void {
     await shell.openExternal(target)
   })
 
-  ipcMain.handle(IPC.secretRefs, (_e, classPath: unknown): string[] =>
-    typeof classPath === 'string' ? secretRefsOf(classPath) : []
+  // The credentials are read off the classroom this class WOULD produce, not
+  // off a file on disk: it is the same text the correction will write, so the
+  // interface never asks for a password the engine will not use.
+  ipcMain.handle(IPC.secretRefs, (_e, classId: unknown): string[] =>
+    secretRefsIn(aulaYaml(groupOf(classId)))
   )
 
   ipcMain.handle(IPC.describe, (_e, paths: unknown): Description => {
-    const raw = (paths ?? {}) as { examPath?: unknown; classPath?: unknown }
-    return {
-      exam: typeof raw.examPath === 'string' ? describeExam(raw.examPath) : null,
-      classroom: typeof raw.classPath === 'string' ? describeClass(raw.classPath) : null
-    }
+    const raw = (paths ?? {}) as { examPath?: unknown }
+    return { exam: typeof raw.examPath === 'string' ? describeExam(raw.examPath) : null }
   })
 
   // The folder of a file the teacher chose, and only a folder: shell.openPath
@@ -191,12 +204,17 @@ export function registerIpc(): void {
     // The renderer's timer already refuses to launch one on top of another;
     // this one does not depend on the renderer being right.
     if (session) throw new Error('Ya hay una corrección en marcha.')
-    const { examPath, classPath, secrets, retryFrom, sessionRounds } = readRunRequest(request)
+    const { examPath, classId, secrets, retryFrom, sessionRounds } = readRunRequest(request)
     // Passes after the first carry no credentials: the teacher typed them
     // once, when the exam started, and they have not left this process.
     if (examMode && Object.keys(secrets).length === 0) Object.assign(secrets, examSecrets)
     const engine = readSettings(settingsDir()).enginePath
-    const target = { ...resolveRunTarget(examPath, classPath), retryFrom, sessionRounds }
+    // The classroom is rewritten from the class before every correction, so a
+    // machine that moved arrives on its own (ADR-0022). The exam is checked
+    // first: nothing is written into a folder that is not a project.
+    const dir = projectDirOf(examPath)
+    const className = writeGeneratedAula(dir, groupOf(classId))
+    const target = { dir, className, retryFrom, sessionRounds }
     const sender = event.sender
 
     session = new RunSession(engine, target, secrets, {

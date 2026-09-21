@@ -21,8 +21,8 @@ export function busy(): boolean {
  * as the mode lasts and never come back to the interface.
  */
 export async function startCorrection(secrets: Record<string, string>): Promise<boolean> {
-  const { examPath, classPath, retry, exam, examRounds } = useApp.getState()
-  if (!examPath || !classPath || busy()) return false
+  const { examPath, classId, retry, exam, examRounds } = useApp.getState()
+  if (!examPath || !classId || busy()) return false
 
   useRun.getState().begin()
   try {
@@ -34,7 +34,7 @@ export async function startCorrection(secrets: Record<string, string>): Promise<
     const sessionRounds = exam.active ? examRounds : []
     await window.heimdall.startRun({
       examPath,
-      classPath,
+      classId,
       secrets,
       retryFrom: sessionRounds.length > 0 ? undefined : retry?.artifactPath,
       sessionRounds

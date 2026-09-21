@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs'
-
 /** The ${MAYUSCULAS} form of a reference (ADR-0009). */
 const REF = /\$\{([A-Z][A-Z0-9_]*)\}/g
 
@@ -15,13 +13,4 @@ export function secretRefsIn(text: string): string[] {
     if (!names.includes(match[1])) names.push(match[1])
   }
   return names
-}
-
-/** The same, read from disk. An unreadable classroom asks for nothing. */
-export function secretRefsOf(classPath: string): string[] {
-  try {
-    return secretRefsIn(readFileSync(classPath, 'utf-8'))
-  } catch {
-    return []
-  }
 }

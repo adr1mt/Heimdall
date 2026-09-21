@@ -11,6 +11,7 @@ import {
   Loader2,
   Monitor,
   Moon,
+  Play,
   Settings as SettingsIcon,
   Sun,
   Users,
@@ -30,11 +31,13 @@ const HelpView = lazy(() => import('./routes/Help'))
 const ResultsView = lazy(() => import('./routes/Results'))
 const HistoryView = lazy(() => import('./routes/History'))
 const ClassesView = lazy(() => import('./routes/Classes'))
+const CorrectView = lazy(() => import('./routes/Correct'))
 
 const ICONS: Record<View, typeof Home> = {
   home: Home,
   classes: Users,
   exams: FolderOpen,
+  correct: Play,
   results: ListChecks,
   analytics: BarChart3,
   history: HistoryIcon,
@@ -126,6 +129,7 @@ function AppBody() {
     home: <HomeView />,
     classes: <ClassesView />,
     exams: <ComingSoon view="exams" />,
+    correct: <CorrectView />,
     results: <ResultsView />,
     analytics: <ComingSoon view="analytics" />,
     history: <HistoryView />,

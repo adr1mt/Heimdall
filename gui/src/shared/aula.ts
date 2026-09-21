@@ -81,6 +81,10 @@ function studentLines(student: ClassStudent, columns: string[]): string[] {
   // The contact is the teacher's own: it travels so the artifact can carry it
   // to Moodle, and it is not a credential.
   if (student.contact) lines.push(`    moodle_id: ${quote(student.contact)}`)
+  // The user is written twice on purpose: the host connects with it, and
+  // `${alumno.usuario}` in an exam reads it off the student. Both are the
+  // same value, the one the teacher wrote down in the class.
+  lines.push(`    usuario: ${quote(student.user)}`)
   lines.push('    hosts:')
   lines.push('      host1:')
   lines.push(`        ip: ${quote(student.host)}`)

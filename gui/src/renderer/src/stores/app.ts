@@ -23,8 +23,6 @@ interface AppState {
   engine: EngineStatus | null
   /** The exam file the teacher picked, if any. */
   examPath: string | null
-  /** The classroom file the teacher picked, if any. */
-  classPath: string | null
   /**
    * The class the teacher is correcting, by its identifier. The students and
    * the name live in the saved classes (ADR-0021); what is remembered here is
@@ -72,7 +70,6 @@ interface AppState {
   setView: (view: View) => void
   setEngine: (engine: EngineStatus) => void
   setExamPath: (path: string | null) => void
-  setClassPath: (path: string | null) => void
   setClassId: (id: string | null) => void
   setNotice: (message: string | null) => void
   setScale: (scale: ScaleId) => void
@@ -153,7 +150,6 @@ export const useApp = create<AppState>((set, get) => ({
   view: 'home',
   engine: null,
   examPath: null,
-  classPath: null,
   classId: savedClassId,
   notice: null,
   scale: savedScale,
@@ -175,7 +171,6 @@ export const useApp = create<AppState>((set, get) => ({
   setView: (view) => set(isReady(view) ? { view } : {}),
   setEngine: (engine) => set({ engine }),
   setExamPath: (examPath) => set({ examPath }),
-  setClassPath: (classPath) => set({ classPath }),
   setClassId: (classId) => {
     if (classId) localStorage.setItem('heimdall-class-id', classId)
     else localStorage.removeItem('heimdall-class-id')

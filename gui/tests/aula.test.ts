@@ -53,6 +53,14 @@ describe('el aula generada', () => {
     expect(yaml).toContain('usuario: "alumno"')
   })
 
+  it('deja el usuario también en el alumno, para «${alumno.usuario}»', () => {
+    // Un examen que compara con el usuario del alumno es de lo más corriente:
+    // si el usuario solo estuviera en el host, ese examen no se podría
+    // corregir desde una clase.
+    const yaml = aulaYaml(group())
+    expect(yaml).toMatch(/^ {4}usuario: "alumno"$/m)
+  })
+
   it('solo escribe el puerto del alumno que no usa el de siempre', () => {
     const yaml = aulaYaml(group())
     expect(yaml).toContain('puerto: 2222')

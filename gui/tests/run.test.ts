@@ -1,24 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { LineSplitter, resolveRunTarget, runArgs, secretsLine } from '../src/main/run'
+import { LineSplitter, projectDirOf, runArgs, secretsLine } from '../src/main/run'
 import { secretRefsIn } from '../src/main/secrets'
 import { parseEvent } from '../src/shared/events'
 
-describe('resolveRunTarget', () => {
-  it('takes the directory of the exam and the name of the classroom', () => {
-    expect(resolveRunTarget('/aula/p1/examen.yaml', '/aula/p1/smx2.yaml')).toEqual({
-      dir: '/aula/p1',
-      className: 'smx2.yaml'
-    })
+describe('projectDirOf', () => {
+  it('takes the directory of the exam', () => {
+    expect(projectDirOf('/aula/p1/examen.yaml')).toBe('/aula/p1')
   })
 
   it('refuses an exam that is not examen.yaml', () => {
-    expect(() => resolveRunTarget('/aula/p1/practica.yaml', '/aula/p1/aula.yaml')).toThrow(
-      /examen\.yaml/
-    )
-  })
-
-  it('refuses a classroom from another folder', () => {
-    expect(() => resolveRunTarget('/aula/p1/examen.yaml', '/otro/aula.yaml')).toThrow(/misma carpeta/)
+    expect(() => projectDirOf('/aula/p1/practica.yaml')).toThrow(/examen\.yaml/)
   })
 })
 

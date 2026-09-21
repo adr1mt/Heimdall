@@ -102,7 +102,7 @@ function readFields(value: unknown): Record<string, string> {
  * called one of these would not be a column of the teacher's: it would
  * silently overwrite the student's identity.
  */
-const RESERVED_COLUMNS = new Set(['id', 'nombre', 'moodle_id', 'excluido', 'hosts'])
+const RESERVED_COLUMNS = new Set(['id', 'nombre', 'moodle_id', 'excluido', 'hosts', 'usuario'])
 
 /** Whether a name can be a column: it travels into the classroom as a key. */
 export function isColumnName(name: string): boolean {

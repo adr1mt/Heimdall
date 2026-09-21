@@ -9,6 +9,7 @@ export const t = {
     home: 'Inicio',
     classes: 'Clases',
     exams: 'Exámenes',
+    correct: 'Corregir',
     results: 'Resultados',
     analytics: 'Analíticas',
     history: 'Histórico',
@@ -34,32 +35,36 @@ export const t = {
     title: 'Inicio',
     exam: 'Examen',
     examHint: 'Qué se comprueba en cada máquina y cuánto pesa cada comprobación.',
-    classroom: 'Clase',
-    classHint: 'Quién es cada alumno y cómo se llega a su máquina.',
-    // La clase es del profesor y dura todo el curso; el fichero de aula es lo
-    // que hoy recibe el motor y vive en los detalles avanzados.
-    classNone: 'Sin clase elegida',
-    classPick: 'Elegir clase…',
-    classChange: 'Cambiar clase',
-    classEmpty: 'Todavía no hay ninguna clase. Se crean en «Clases».',
-    classGone: 'La clase elegida ya no existe.',
-    classFile: 'Fichero de aula',
-    classFileHint: 'Es lo que se envía al motor. Se elige aquí hasta que la clase lo genere.',
-    classFileNone: 'Sin fichero de aula',
     choose: 'Elegir…',
     change: 'Cambiar',
     none: 'Sin elegir',
-    sameFolder: 'El examen tiene que llamarse «examen.yaml» y el aula estar en su misma carpeta.',
+    examFile: 'El examen tiene que llamarse «examen.yaml».',
     // El nombre es lo que el profesor eligió; la ruta es lo que necesita el
     // ordenador y vive en los detalles avanzados.
     unnamed: 'Sin nombre en el fichero',
     examMeta: (checks: number) =>
       checks === 1 ? '1 comprobación' : `${checks} comprobaciones`,
-    classMeta: (students: number) => (students === 1 ? '1 alumno' : `${students} alumnos`),
     advanced: 'Detalles avanzados',
     openFolder: 'Abrir carpeta',
-    goToClasses: 'Ir a Clases',
     folderFailed: 'No se pudo abrir la carpeta',
+    nextStep: 'Con el examen abierto, la corrección se lanza desde «Corregir».',
+    goToCorrect: 'Ir a Corregir'
+  },
+
+  // Corregir: el examen ya abierto, la clase elegida y el botón. Es la
+  // pantalla que se usa con la clase delante.
+  correct: {
+    title: 'Corregir',
+    hint: 'El examen abierto se corrige con la clase que elijas. No hace falta ningún fichero más.',
+    exam: 'Examen',
+    examNone: 'No hay ningún examen abierto.',
+    goHome: 'Abrir un examen',
+    classroom: 'Clase',
+    classNone: 'Sin clase elegida',
+    classPick: 'Elegir clase…',
+    classGone: 'La clase elegida ya no existe.',
+    classEmpty: 'Todavía no hay ninguna clase. Se crean en «Clases».',
+    goToClasses: 'Ir a Clases',
     action: 'Acción'
   },
   classes: {
@@ -113,8 +118,8 @@ export const t = {
   credentials: {
     title: 'Credenciales',
     hint:
-      'El aula solo nombra las contraseñas; los valores los pones aquí y no se guardan en ningún sitio.',
-    none: 'Este aula no pide ninguna contraseña.',
+      'Se nombran las contraseñas, nunca se guardan: el valor lo pones aquí y no se escribe en ningún sitio.',
+    none: 'Esta clase no pide ninguna contraseña.',
     placeholder: 'Contraseña'
   },
   run: {
@@ -129,7 +134,8 @@ export const t = {
     starting: 'Arrancando el motor…',
     progress: (done: number, total: number) => `${done} de ${total} comprobaciones`,
     needEngine: 'Primero hay que indicar dónde está el motor, en Ajustes.',
-    needFiles: 'Elige el examen y el aula.',
+    needExam: 'Abre un examen en Inicio.',
+    needClass: 'Elige la clase que vas a corregir.',
     needSecrets: 'Faltan contraseñas por escribir.',
     retryTitle: 'Reintento preparado',
     retryBody: (checks: number, students: number) =>
@@ -225,7 +231,7 @@ export const t = {
     title: '¿Exportar las notas?',
     yes: 'Guardar el fichero',
     hint:
-      'Se guarda una hoja con el nombre de cada alumno, su identificador de Moodle si el aula lo trae, y su nota. Quien no tenga nota final sale sin nota y con el motivo. No sale nada de lo que escribieron las máquinas.',
+      'Se guarda una hoja con el nombre de cada alumno, su identificador de Moodle si la clase lo trae, y su nota. Quien no tenga nota final sale sin nota y con el motivo. No sale nada de lo que escribieron las máquinas.',
     scale: (label: string) => `Escala: ${label}. Se cambia en Ajustes.`,
     saved: (path: string) => `Notas guardadas en ${path}`,
     cancelled: 'No se ha guardado nada.',
@@ -320,9 +326,9 @@ export const t = {
     errorsSection: 'Cuando algo falla',
     errors:
       'Un problema técnico —máquina apagada, red caída, credenciales que no valen— nunca se convierte en un suspenso: esa comprobación queda sin evaluar y se dice por qué.',
-    filesSection: 'Los dos ficheros',
+    filesSection: 'El examen y la clase',
     files:
-      'El examen dice qué se comprueba. El aula dice a quién se comprueba. Las contraseñas no se escriben en el aula: solo va una referencia al nombre de la variable que las lleva.'
+      'El examen dice qué se comprueba. La clase dice a quién: quién es cada alumno y cómo se llega a su máquina. Las contraseñas no se guardan en ninguno de los dos; se teclean al corregir.'
   },
   projector: {
     on: 'Modo proyector',
@@ -340,11 +346,6 @@ export const t = {
     everyMinutes: (minutes: number) => `Cada ${minutes} min`,
     running: (passes: number, minutes: number) =>
       `${passes === 1 ? '1 vuelta' : `${passes} vueltas`}, cada ${minutes} min.`,
-    correcting: 'Corrigiendo ahora.',
-    nextIn: (seconds: number) =>
-      seconds >= 60
-        ? `Siguiente vuelta en ${Math.ceil(seconds / 60)} min.`
-        : `Siguiente vuelta en ${seconds} s.`,
     // Lo que se mira mientras dura el examen, en cinco datos y sin desplegar
     // nada: en qué vuelta va, cuánto falta para la siguiente, quién sigue
     // dentro, quién ha terminado y por dónde va la vuelta de ahora.

@@ -24,7 +24,12 @@ export interface EngineStatus {
 /** What the renderer asks for when the teacher presses «Corregir». */
 export interface RunRequest {
   examPath: string
-  classPath: string
+  /**
+   * The class being corrected, by its identifier. The classroom the engine
+   * reads is written from it before the run (ADR-0022): the interface never
+   * names a classroom file.
+   */
+  classId: string
   /** Credential name → value. It is never written anywhere (ADR-0009). */
   secrets: Record<string, string>
   /**
@@ -66,16 +71,15 @@ export interface HeimdallApi {
   detectEngine: () => Promise<EngineStatus>
   getEnginePath: () => Promise<string>
   setEnginePath: (path: string) => Promise<EngineStatus>
-  pickFile: (kind: 'exam' | 'class' | 'engine' | 'result') => Promise<string | null>
+  pickFile: (kind: 'exam' | 'engine' | 'result') => Promise<string | null>
   openExternal: (url: string) => Promise<void>
-  /** Credential names the chosen classroom asks for. */
-  secretRefs: (classPath: string) => Promise<string[]>
+  /** Credential names the classroom of this class will ask for. */
+  secretRefs: (classId: string) => Promise<string[]>
   /**
-   * The names the teacher gave the exam and the classroom, for the screen. A
-   * file that cannot be read has no name here and its error, whole, when the
-   * correction starts.
+   * The name the teacher gave the exam, for the screen. A file that cannot be
+   * read has no name here and its error, whole, when the correction starts.
    */
-  describe: (paths: { examPath: string | null; classPath: string | null }) => Promise<Description>
+  describe: (paths: { examPath: string | null }) => Promise<Description>
   /** Opens the folder a chosen file lives in, in the system file manager. */
   openFolder: (path: string) => Promise<void>
   startRun: (request: RunRequest) => Promise<void>

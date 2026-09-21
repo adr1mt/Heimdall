@@ -15,6 +15,7 @@ import { join, resolve } from 'node:path'
 import { readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { guardClose } from '../src/main/close-guard'
 import { registerIpc } from '../src/main/ipc'
+import { openExamAndClass, writeLabClass } from './lab-flow'
 import { writeSettings } from '../src/main/store'
 
 const root = process.cwd()
@@ -31,9 +32,12 @@ function readSecret(path: string | undefined): string {
 }
 const secret = readSecret(process.env.LAB_SECRET_FILE)
 
-const picks = [join(project, 'examen.yaml'), join(project, 'aula.yaml')]
-let pick = 0
-dialog.showOpenDialog = (async () => ({ canceled: false, filePaths: [picks[pick++]] })) as never
+// The only file the teacher opens now is the exam: the classroom is written
+// from the chosen class before every correction (ADR-0022).
+dialog.showOpenDialog = (async () => ({
+  canceled: false,
+  filePaths: [join(project, 'examen.yaml')]
+})) as never
 
 /** What the fake close warning answers, and how many times it was asked. */
 let closeAnswer = 0
@@ -104,6 +108,7 @@ function grep(needle: string, dirs: string[]): boolean {
 
 app.whenReady().then(async () => {
   writeSettings(app.getPath('userData'), { enginePath })
+  const classId = writeLabClass(app.getPath('userData'))
   registerIpc()
 
   const win = new BrowserWindow({
@@ -126,7 +131,7 @@ app.whenReady().then(async () => {
   const screen = (): Promise<string> => js(`document.querySelector('main').innerText`) as Promise<string>
   const click = (text: string): Promise<boolean> =>
     js(`(() => {
-      const b = [...document.querySelectorAll('button')].find(b => b.textContent.trim() === ${JSON.stringify(text)})
+      const b = [...document.querySelectorAll('main button')].find(b => b.textContent.trim() === ${JSON.stringify(text)})
       if (b) b.click()
       return !!b
     })()`) as Promise<boolean>
@@ -138,19 +143,7 @@ app.whenReady().then(async () => {
     return 'ok'
   })()`)
 
-  await js(`[...document.querySelectorAll('button')].filter(b => b.textContent.includes('Elegir'))[0].click()`)
-  await wait(400)
-  await js(`[...document.querySelectorAll('button')].filter(b => b.textContent.includes('Elegir'))[1].click()`)
-  await wait(800)
-  await js(`(() => {
-    const input = document.querySelector('input[type=password]')
-    if (!input) return 'sin campo'
-    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set
-    setter.call(input, ${JSON.stringify(secret)})
-    input.dispatchEvent(new Event('input', { bubbles: true }))
-    return 'ok'
-  })()`)
-  await wait(300)
+  await openExamAndClass(js, classId, secret)
 
   // E-1: the exam starts on its own, without pressing «Corregir».
   await click('Cada 5 min')
@@ -174,10 +167,17 @@ app.whenReady().then(async () => {
   check('E-4', passes === 1, `vueltas lanzadas hasta aquí: ${passes}`)
 
   // E-5: the mode stays on between passes and says when the next one is due.
-  await js(`[...document.querySelectorAll('aside button')].find(b => b.textContent.trim() === 'Inicio').click()`)
+  // It is read in «Corregir», which is where the exam is driven from (T115).
+  await js(`[...document.querySelectorAll('aside button')].find(b => b.textContent.trim() === 'Corregir').click()`)
   await wait(600)
   const home = await screen()
-  check('E-5', /Siguiente vuelta en/.test(home), 'la cuenta atrás de la siguiente vuelta está en pantalla')
+  // The countdown is one of the five readings of the strip since T103:
+  // «Siguiente» over «3 min» or «ahora».
+  check(
+    'E-5',
+    /(\d+ min|\d+ s|ahora)\s*\n?\s*SIGUIENTE/i.test(home),
+    'la cuenta atrás de la siguiente vuelta está en pantalla'
+  )
 
   // E-6: the chain really happens. One whole interval, so it is optional.
   if (chain) {
@@ -213,7 +213,7 @@ app.whenReady().then(async () => {
     // from this by a single number: the application computes no grade.
     const session = JSON.parse(engineSession(rounds.map((r) => r.path)))
 
-    await js(`[...document.querySelectorAll('aside button')].find(b => b.textContent.trim() === 'Inicio').click()`)
+    await js(`[...document.querySelectorAll('aside button')].find(b => b.textContent.trim() === 'Corregir').click()`)
     await wait(2500)
     const panel = await screen()
     if (process.env.DUMP === '1') {
