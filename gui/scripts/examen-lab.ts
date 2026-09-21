@@ -270,8 +270,19 @@ app.whenReady().then(async () => {
   // reason live. The last one belongs to the student whose machine never
   // answered: there the reason names the machine and there is no command to
   // read it from (T066).
-  await js(`(() => {
-    const cells = [...document.querySelectorAll('main button')].filter(b => /^[a-z]+\\d+-/.test(b.textContent.trim()))
+  //
+  // It is opened from «Matriz»: that is the view with one cell per check, and
+  // the one the class is looking at while the exam runs. «Lista» is the
+  // student-by-student reading and has no cell to click (T118).
+  await js(`[...document.querySelectorAll('main button')].find(b => b.textContent.trim() === 'Matriz').click()`)
+  await wait(600)
+  // A cell shows the glyph of its state —that is what reads from the back
+  // row— and carries who and which check in its aria-label. The one that is
+  // wanted is unevaluated: there the reason names the machine and there is no
+  // command to read it from.
+  const opened = await js(`(() => {
+    const cells = [...document.querySelectorAll('main button[aria-label]')]
+      .filter(b => /: Sin evaluar$/.test(b.getAttribute('aria-label')))
     const cell = cells[cells.length - 1]
     if (cell) cell.click()
     return !!cell
@@ -283,6 +294,7 @@ app.whenReady().then(async () => {
     console.log(projected)
     console.log('-------------------------------')
   }
+  check('P-0', opened === true, 'el detalle técnico de una comprobación se abre')
   check('P-1', !/\b\d{1,3}(\.\d{1,3}){3}\b/.test(projected), 'ninguna dirección IP en pantalla')
   check('P-2', projected.includes('•'), 'la máquina aparece tapada')
   const big = await js(`getComputedStyle(document.documentElement).fontSize`)

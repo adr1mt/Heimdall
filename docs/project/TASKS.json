@@ -1865,7 +1865,7 @@
       "title": "Proyector: el detalle tecnico de una comprobacion no se abre en el guion",
       "phase": 6,
       "package": "P4",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Que la comprobacion P-2 vuelva a demostrar que el modo proyector tapa la maquina.",
@@ -1885,7 +1885,7 @@
       "tests": [
         "gui/scripts/examen-lab.ts"
       ],
-      "notes": "Visto el 2026-09-21 al ejecutar examen-lab en T115. El cambio de T115 no toca Resultados ni el modo proyector; E-5 era una comprobacion caduca desde el rediseno de T103 y se actualizo, P-2 queda pendiente de mirar."
+      "notes": "Averiguado el 2026-09-21: nunca fue un fallo de la aplicacion. El guion buscaba la celda en «Lista», que no tiene ninguna, y comparaba el estado en minusculas. Abierta la celda desde «Matriz», el detalle se abre y la maquina sale tapada. Se anade P-0, que comprueba que la celda existe, para que un selector viejo no vuelva a leerse como un fallo del producto."
     },
     {
       "id": "T109",
