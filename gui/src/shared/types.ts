@@ -81,6 +81,13 @@ export interface OpenProject {
   examPath: string
 }
 
+/** What the engine answered about an exam that is not saved yet. */
+export interface ExamCheck {
+  ok: boolean
+  /** What the engine printed, with file and line. Empty when there is none. */
+  message: string
+}
+
 export interface HeimdallApi {
   detectEngine: () => Promise<EngineStatus>
   getEnginePath: () => Promise<string>
@@ -96,6 +103,20 @@ export interface HeimdallApi {
   createProject: (dir: string) => Promise<OpenProject>
   /** Takes a project off the recents. The folder on disk is not touched. */
   removeRecent: (dir: string) => Promise<RecentProject[]>
+  /** The YAML of the open project's exam, as it is on disk. */
+  readExam: (examPath: string) => Promise<string>
+  /** Writes the exam, atomically. Only called once the engine said it is valid. */
+  writeExam: (examPath: string, yaml: string) => Promise<void>
+  /**
+   * Asks the engine whether this exam is valid, without saving it and without
+   * touching a single machine. The class is needed because half the errors of
+   * an exam are about the class it is corrected with.
+   */
+  validateExam: (request: {
+    examPath: string
+    classId: string
+    yaml: string
+  }) => Promise<ExamCheck>
   openExternal: (url: string) => Promise<void>
   /** Credential names the classroom of this class will ask for. */
   secretRefs: (classId: string) => Promise<string[]>

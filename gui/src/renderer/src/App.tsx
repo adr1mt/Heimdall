@@ -32,6 +32,7 @@ const ResultsView = lazy(() => import('./routes/Results'))
 const HistoryView = lazy(() => import('./routes/History'))
 const ClassesView = lazy(() => import('./routes/Classes'))
 const CorrectView = lazy(() => import('./routes/Correct'))
+const EditorView = lazy(() => import('./routes/Editor'))
 
 const ICONS: Record<View, typeof Home> = {
   home: Home,
@@ -131,7 +132,7 @@ function AppBody() {
   const views: Record<View, JSX.Element> = {
     home: <HomeView />,
     classes: <ClassesView />,
-    exams: <ComingSoon view="exams" />,
+    exams: <EditorView />,
     correct: <CorrectView />,
     results: <ResultsView />,
     analytics: <ComingSoon view="analytics" />,

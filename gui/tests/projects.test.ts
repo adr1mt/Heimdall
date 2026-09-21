@@ -132,7 +132,7 @@ describe('la lista de exámenes recientes', () => {
 
 describe('sin ningún examen abierto', () => {
   it('no se puede entrar en lo que es de un examen concreto', () => {
-    for (const view of ['correct', 'results', 'history'] as const) {
+    for (const view of ['exams', 'correct', 'results', 'history'] as const) {
       expect(needsProject(view)).toBe(true)
       expect(canOpen(view, false)).toBe(false)
       expect(canOpen(view, true)).toBe(true)
@@ -146,6 +146,6 @@ describe('sin ningún examen abierto', () => {
   })
 
   it('un examen abierto no resucita una sección que todavía no está', () => {
-    for (const view of ['exams', 'analytics'] as const) expect(canOpen(view, true)).toBe(false)
+    for (const view of ['analytics'] as const) expect(canOpen(view, true)).toBe(false)
   })
 })

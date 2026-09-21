@@ -4,7 +4,7 @@ GO ?= go
 BIN := bin/heimdall
 
 # Test SSH lab. See test/lab.sh.
-.PHONY: check test build lab lab-down lab-status lab-ra2 lab-ra2-down rendimiento gui-check gui-build gui-lab clean
+.PHONY: check test build lab lab-down lab-status lab-ra2 lab-ra2-down rendimiento gui-check gui-build gui-lab gui-editor clean
 
 ## check: fast suite. No network, no disk. Must stay under 10 s.
 check:
@@ -65,6 +65,11 @@ gui-build:
 ## `make lab`.
 gui-lab:
 	cd gui && ./scripts/secretos.sh
+
+## gui-editor: write an exam from the application's editor and correct the lab
+## with it (T109). Needs `make build`, `make gui-build` and `make lab`.
+gui-editor:
+	cd gui && HEIMDALL_ENGINE=$(PWD)/bin/heimdall LAB_SECRET=TEUTON_SECRET_TEST_12345 npm run --silent editor-lab
 
 clean:
 	rm -rf bin/

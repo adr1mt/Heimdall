@@ -1,4 +1,4 @@
-import { statSync, writeFileSync } from 'node:fs'
+import { readFileSync, renameSync, statSync, writeFileSync } from 'node:fs'
 import { basename, dirname } from 'node:path'
 import { app, dialog, ipcMain, powerSaveBlocker, shell, type WebContents } from 'electron'
 import { IPC } from '../shared/ipc'
@@ -13,12 +13,14 @@ import { secretRefsIn } from './secrets'
 import { readSettings, writeSettings } from './store'
 import { readClasses, writeClasses } from './classes'
 import { createProjectAt, forgetProject, openProjectAt, readRecents, rememberProject } from './projects'
+import { validateExam } from './validate'
 import { writeGeneratedAula } from './aula'
 import { aulaYaml } from '../shared/aula'
 import { readGroup, type ClassGroup } from '../shared/classes'
 import type { Description } from '../shared/describe'
 import type {
   EngineStatus,
+  ExamCheck,
   ExamModeRequest,
   OpenProject,
   RecentProject,
@@ -200,6 +202,32 @@ export function registerIpc(): void {
   ipcMain.handle(IPC.removeRecent, (_e, dir: unknown): RecentProject[] => {
     if (typeof dir !== 'string' || !dir) return readRecents(settingsDir())
     return forgetProject(settingsDir(), dir)
+  })
+
+  // The exam of the open project, as text. The editor is the one that reads
+  // it as an exam; here it is a file and nothing more.
+  ipcMain.handle(IPC.readExam, (_e, examPath: unknown): string => {
+    if (typeof examPath !== 'string' || !examPath) throw new Error('No hay ningún examen abierto.')
+    return readFileSync(examPath, 'utf-8')
+  })
+
+  // Written atomically: a power cut in the middle must never leave half an
+  // exam, which would be a class corrected against nothing.
+  ipcMain.handle(IPC.writeExam, (_e, examPath: unknown, yaml: unknown): void => {
+    if (typeof examPath !== 'string' || !examPath) throw new Error('No hay ningún examen abierto.')
+    if (typeof yaml !== 'string') throw new Error('No hay ningún examen que guardar.')
+    const tmp = `${examPath}.tmp`
+    writeFileSync(tmp, yaml, 'utf-8')
+    renameSync(tmp, examPath)
+  })
+
+  // Whether the engine accepts this exam. It resolves the PLAN and stops: no
+  // machine is touched and nothing is written where the teacher can see it.
+  ipcMain.handle(IPC.validateExam, (_e, request: unknown): Promise<ExamCheck> => {
+    const raw = (request ?? {}) as { examPath?: unknown; classId?: unknown; yaml?: unknown }
+    if (typeof raw.yaml !== 'string') throw new Error('No hay ningún examen que comprobar.')
+    const shownAs = typeof raw.examPath === 'string' ? dirname(raw.examPath) : ''
+    return validateExam(readSettings(settingsDir()).enginePath, raw.yaml, groupOf(raw.classId), shownAs)
   })
 
   // http(s) only: shell.openExternal opens any scheme the system knows, and a
