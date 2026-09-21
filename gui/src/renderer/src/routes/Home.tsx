@@ -1,149 +1,225 @@
-import { useEffect, useState } from 'react'
-import { ArrowRight, FileText, FolderOpen } from 'lucide-react'
-import { Button, Card, CardContent, ViewHeader } from '@/components/ui'
+import { useCallback, useEffect, useState } from 'react'
+import { FolderOpen, Plus, X } from 'lucide-react'
+import { Button, ConfirmDialog, SectionTitle, Spinner, ViewHeader } from '@/components/ui'
 import { useApp, noticeFrom } from '@/stores/app'
-import type { Description } from '../../../shared/describe'
+import { useRun } from '@/stores/run'
 import { t } from '@/i18n/es'
+import type { RecentProject } from '../../../shared/types'
 
 /**
- * Inicio: the exam that is open.
+ * Inicio: the list of exams the teacher works with.
  *
- * Correcting lives in «Corregir», with the class: the same exam is corrected
- * with 2SMX C and with 2SMX D, so it belongs to neither. Until T108 turns
- * this into the list of projects, the exam is still opened as a file.
+ * A project is a folder with its exam inside, so opening one is choosing a
+ * folder and nothing else: the exam has a fixed name and the application
+ * finds it. No file is picked by hand and no path is on screen — what the
+ * teacher recognises is the name they gave the exam.
+ *
+ * Correcting is the next step and lives in «Corregir», with the class: the
+ * same exam is corrected with 2SMX C and with 2SMX D and belongs to neither.
  */
 export default function HomeView() {
-  const examPath = useApp((s) => s.examPath)
-  const setExamPath = useApp((s) => s.setExamPath)
+  const setProject = useApp((s) => s.setProject)
   const setNotice = useApp((s) => s.setNotice)
-  const setView = useApp((s) => s.setView)
+  const exam = useApp((s) => s.exam)
+  const phase = useRun((s) => s.phase)
 
-  /** What the chosen exam is called, for the screen. */
-  const [described, setDescribed] = useState<Description>({ exam: null })
+  const [recents, setRecents] = useState<RecentProject[] | null>(null)
+  /** The folder being opened right now, so the row says so and nothing else moves. */
+  const [busy, setBusy] = useState<string | null>(null)
+  /**
+   * What was going to be opened while a correction is running. Opening another
+   * exam stops it, so it is asked first (principio 4: nothing is lost quietly).
+   */
+  const [pending, setPending] = useState<{ dir: string; create: boolean } | null>(null)
 
-  useEffect(() => {
-    if (!examPath) {
-      setDescribed({ exam: null })
+  const correcting = phase === 'starting' || phase === 'running' || exam.active
+
+  const refresh = useCallback(() => {
+    window.heimdall
+      .recentProjects()
+      .then(setRecents)
+      .catch((error) => {
+        setRecents([])
+        setNotice(noticeFrom('No se pudo leer la lista de exámenes', error))
+      })
+  }, [setNotice])
+
+  useEffect(refresh, [refresh])
+
+  /** Opens or creates, once nothing is in the way. */
+  async function go(dir: string, create: boolean): Promise<void> {
+    setBusy(dir)
+    try {
+      if (correcting) await stopCorrection()
+      const project = create
+        ? await window.heimdall.createProject(dir)
+        : await window.heimdall.openProject(dir)
+      // Nothing of the previous exam survives the change: its result is not
+      // this exam's, and the store drops its session and its pending retry.
+      useRun.getState().reset()
+      setNotice(null)
+      setProject(project)
+    } catch (error) {
+      setNotice(noticeFrom(t.home.missing, error))
+    } finally {
+      setBusy(null)
+      refresh()
+    }
+  }
+
+  /** Asks first when a correction is in flight; goes straight through if not. */
+  function guard(dir: string, create: boolean): void {
+    if (correcting) {
+      setPending({ dir, create })
       return
     }
-    let current = true
-    window.heimdall
-      .describe({ examPath })
-      .then((description) => {
-        if (current) setDescribed(description)
-      })
-      // A name is for reading: if it cannot be read the path is still there,
-      // and the file's real error arrives whole when the engine reads it.
-      .catch(() => {
-        if (current) setDescribed({ exam: null })
-      })
-    return () => {
-      current = false
-    }
-  }, [examPath])
+    void go(dir, create)
+  }
 
-  async function pick(): Promise<void> {
+  async function pick(create: boolean): Promise<void> {
     try {
-      const picked = await window.heimdall.pickFile('exam')
-      if (picked) setExamPath(picked)
+      const dir = await window.heimdall.pickDirectory()
+      if (dir) guard(dir, create)
     } catch (error) {
-      setNotice(noticeFrom('No se pudo abrir el fichero', error))
+      setNotice(noticeFrom('No se pudo elegir la carpeta', error))
+    }
+  }
+
+  async function forget(dir: string): Promise<void> {
+    try {
+      setRecents(await window.heimdall.removeRecent(dir))
+    } catch (error) {
+      setNotice(noticeFrom('No se pudo quitar el examen de la lista', error))
     }
   }
 
   return (
     <div className="flex h-full flex-col">
-      <ViewHeader title={t.home.title} />
-      <div className="min-h-0 flex-1 space-y-5 overflow-auto p-6">
-        <PickCard
-          icon={<FileText className="h-4 w-4" />}
-          title={t.home.exam}
-          name={described.exam?.name ?? null}
-          meta={described.exam?.checks == null ? null : t.home.examMeta(described.exam.checks)}
-          path={examPath}
-          onPick={() => void pick()}
-        />
-        <p className="text-xs text-muted-foreground">{t.home.examFile}</p>
-
-        {examPath && (
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">{t.home.nextStep}</p>
-            <Button onClick={() => setView('correct')}>
-              <ArrowRight className="h-4 w-4" />
-              {t.home.goToCorrect}
+      <ViewHeader
+        title={t.home.title}
+        actions={
+          <>
+            <Button variant="outline" size="sm" disabled={busy !== null} onClick={() => void pick(false)}>
+              <FolderOpen className="h-4 w-4" />
+              {t.home.open}
             </Button>
-          </div>
-        )}
+            <Button size="sm" disabled={busy !== null} onClick={() => void pick(true)}>
+              <Plus className="h-4 w-4" />
+              {t.home.create}
+            </Button>
+          </>
+        }
+      />
+
+      <div className="min-h-0 flex-1 overflow-auto p-6">
+        <div className="max-w-3xl space-y-3">
+          <SectionTitle hint={t.home.subtitle}>{t.home.recent}</SectionTitle>
+
+          {recents === null ? (
+            <p className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Spinner /> {t.home.opening}
+            </p>
+          ) : recents.length === 0 ? (
+            <p className="py-10 text-center text-sm text-muted-foreground">{t.home.noRecent}</p>
+          ) : (
+            <ul>
+              {recents.map((recent) => (
+                <RecentRow
+                  key={recent.dir}
+                  recent={recent}
+                  busy={busy === recent.dir}
+                  disabled={busy !== null}
+                  onOpen={() => guard(recent.dir, false)}
+                  onForget={() => void forget(recent.dir)}
+                />
+              ))}
+            </ul>
+          )}
+          {recents !== null && recents.length > 0 && (
+            <p className="text-micro text-muted-foreground">{t.home.removeHint}</p>
+          )}
+        </div>
       </div>
+
+      <ConfirmDialog
+        open={pending !== null}
+        title={t.home.inProgress}
+        confirmLabel={t.home.inProgressConfirm}
+        destructive
+        onCancel={() => setPending(null)}
+        onConfirm={() => {
+          const target = pending
+          setPending(null)
+          if (target) void go(target.dir, target.create)
+        }}
+      >
+        {t.home.inProgressBody}
+      </ConfirmDialog>
     </div>
   )
 }
 
 /**
- * The exam, by its name.
- *
- * The name comes from the file itself —what the teacher called the exam—
- * because that is what they recognise; the path is what the computer needs
- * and it waits inside «detalles avanzados», where it is still one click away
- * when something has to be looked at on disk.
+ * Stops whatever is correcting before another exam is opened. What has been
+ * corrected is kept, because the engine is cancelled and not killed, and exam
+ * mode is turned off in the main process so its credentials are wiped.
  */
-function PickCard({
-  icon,
-  title,
-  name,
-  meta,
-  path,
-  onPick
-}: {
-  icon: React.ReactNode
-  title: string
-  name: string | null
-  meta: string | null
-  path: string | null
-  onPick: () => void
-}) {
-  const setNotice = useApp((s) => s.setNotice)
-
-  async function openFolder(): Promise<void> {
-    if (!path) return
-    try {
-      await window.heimdall.openFolder(path)
-    } catch (error) {
-      setNotice(noticeFrom(t.home.folderFailed, error))
-    }
+async function stopCorrection(): Promise<void> {
+  const app = useApp.getState()
+  if (app.exam.active) {
+    app.stopExam()
+    await window.heimdall.setExamMode({ active: false })
   }
+  await window.heimdall.cancelRun()
+}
 
+/**
+ * One exam in the list, by the name the teacher gave it. The folder it lives
+ * in is not on screen: a path is what the computer needs, and «/home/…/2smx/
+ * examen.yaml» in front of a class says nothing about which exam it is.
+ */
+function RecentRow({
+  recent,
+  busy,
+  disabled,
+  onOpen,
+  onForget
+}: {
+  recent: RecentProject
+  busy: boolean
+  disabled: boolean
+  onOpen: () => void
+  onForget: () => void
+}) {
   return (
-    <Card>
-      <CardContent className="space-y-2 pt-5">
-        <div className="flex items-center gap-2 text-micro uppercase tracking-[0.09em] text-muted-foreground">
-          {icon}
-          {title}
+    <li className="group relative border-b border-border/70">
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={onOpen}
+        className="flex w-full items-center gap-3 rounded-md py-3 pl-2 pr-10 text-left transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:opacity-60"
+      >
+        <FolderOpen className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-sm font-medium">{recent.name}</div>
+          {busy && <div className="text-xs text-muted-foreground">{t.home.opening}</div>}
         </div>
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <div className="min-w-0">
-            <p className="truncate text-name font-semibold">
-              {path ? (name ?? t.home.unnamed) : <span className="text-muted-foreground">{t.home.none}</span>}
-            </p>
-            {path && meta && <p className="text-xs text-muted-foreground">{meta}</p>}
-          </div>
-          <Button variant="outline" size="sm" onClick={onPick}>
-            {path ? t.home.change : t.home.choose}
-          </Button>
-        </div>
-        {path && (
-          <details>
-            <summary className="cursor-pointer text-xs text-muted-foreground">
-              {t.home.advanced}
-            </summary>
-            <p className="mt-1 break-all font-mono text-dense text-muted-foreground">{path}</p>
-            <Button variant="ghost" size="sm" className="mt-1" onClick={() => void openFolder()}>
-              <FolderOpen className="h-4 w-4" />
-              {t.home.openFolder}
-            </Button>
-          </details>
+      </button>
+      <div className="absolute right-1 top-1/2 -translate-y-1/2">
+        {busy ? (
+          <Spinner className="h-4 w-4" />
+        ) : (
+          <button
+            type="button"
+            onClick={onForget}
+            className="rounded-md p-1.5 text-muted-foreground opacity-0 transition-opacity hover:bg-muted focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover:opacity-100"
+            title={t.home.removeRecent}
+            aria-label={`${t.home.removeRecent}: ${recent.name}`}
+          >
+            <X className="h-4 w-4" />
+          </button>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </li>
   )
 }

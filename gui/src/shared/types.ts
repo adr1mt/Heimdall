@@ -67,11 +67,35 @@ export interface RunClosed {
   stderr: string
 }
 
+/** A project in the list of recents: a folder and what its exam is called. */
+export interface RecentProject {
+  dir: string
+  name: string
+}
+
+/** The project that is open. The exam is resolved from the folder. */
+export interface OpenProject {
+  dir: string
+  name: string
+  /** The exam file inside the folder. The interface never shows it. */
+  examPath: string
+}
+
 export interface HeimdallApi {
   detectEngine: () => Promise<EngineStatus>
   getEnginePath: () => Promise<string>
   setEnginePath: (path: string) => Promise<EngineStatus>
   pickFile: (kind: 'exam' | 'engine' | 'result') => Promise<string | null>
+  /** The folder of a project, for «Abrir» and «Nuevo». */
+  pickDirectory: () => Promise<string | null>
+  /** The projects opened before, newest first. They survive the app closing. */
+  recentProjects: () => Promise<RecentProject[]>
+  /** Opens the project of a folder: the exam is found inside it, not chosen. */
+  openProject: (dir: string) => Promise<OpenProject>
+  /** Starts a project in a folder. It never overwrites an exam already there. */
+  createProject: (dir: string) => Promise<OpenProject>
+  /** Takes a project off the recents. The folder on disk is not touched. */
+  removeRecent: (dir: string) => Promise<RecentProject[]>
   openExternal: (url: string) => Promise<void>
   /** Credential names the classroom of this class will ask for. */
   secretRefs: (classId: string) => Promise<string[]>

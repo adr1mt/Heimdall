@@ -18,7 +18,10 @@ export const t = {
     // A section that is not built yet stays in sight, disabled: the menu is
     // the same one in every version and no entry appears out of nowhere.
     soon: (label: string) => `«${label}» todavía no está. Llega en una versión próxima.`,
-    soonBadge: 'pronto'
+    soonBadge: 'pronto',
+    // Una sección que es de un examen concreto no se puede abrir sin examen:
+    // no hay nada que corregir, ni resultados, ni histórico.
+    needProject: (label: string) => `«${label}» es de un examen. Abre uno en Inicio.`
   },
   engine: {
     ready: 'Motor listo',
@@ -31,24 +34,29 @@ export const t = {
     save: 'Guardar y comprobar',
     saved: 'Ruta guardada.'
   },
+  // Inicio es la lista de proyectos: abrir, crear y los de siempre. Un
+  // proyecto es una carpeta con su examen dentro; el profesor no elige
+  // ficheros y no ve rutas.
   home: {
     title: 'Inicio',
-    exam: 'Examen',
-    examHint: 'Qué se comprueba en cada máquina y cuánto pesa cada comprobación.',
-    choose: 'Elegir…',
-    change: 'Cambiar',
-    none: 'Sin elegir',
-    examFile: 'El examen tiene que llamarse «examen.yaml».',
-    // El nombre es lo que el profesor eligió; la ruta es lo que necesita el
-    // ordenador y vive en los detalles avanzados.
+    subtitle: 'Un proyecto es una carpeta con su examen dentro.',
+    recent: 'Tus exámenes',
+    open: 'Abrir…',
+    create: 'Nuevo…',
+    noRecent: 'Todavía no has abierto ningún examen. Abre una carpeta o crea uno nuevo.',
+    removeRecent: 'Quitar de la lista',
+    removeHint: 'Solo se quita de esta lista. La carpeta y sus notas no se tocan.',
+    opening: 'Abriendo…',
+    missing: 'No se pudo abrir',
+    // El nombre es lo que el profesor escribió en el examen. Lo lee Corregir,
+    // que enseña el examen abierto.
     unnamed: 'Sin nombre en el fichero',
     examMeta: (checks: number) =>
       checks === 1 ? '1 comprobación' : `${checks} comprobaciones`,
-    advanced: 'Detalles avanzados',
-    openFolder: 'Abrir carpeta',
-    folderFailed: 'No se pudo abrir la carpeta',
-    nextStep: 'Con el examen abierto, la corrección se lanza desde «Corregir».',
-    goToCorrect: 'Ir a Corregir'
+    inProgress: 'Hay una corrección en marcha',
+    inProgressBody:
+      'Si abres otro examen ahora se detendrá la corrección de la clase actual y el modo examen. Las notas ya guardadas se conservan.',
+    inProgressConfirm: 'Abrir de todas formas'
   },
 
   // Corregir: el examen ya abierto, la clase elegida y el botón. Es la

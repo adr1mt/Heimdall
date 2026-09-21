@@ -12,11 +12,19 @@ import { describeExam } from './describe'
 import { secretRefsIn } from './secrets'
 import { readSettings, writeSettings } from './store'
 import { readClasses, writeClasses } from './classes'
+import { createProjectAt, forgetProject, openProjectAt, readRecents, rememberProject } from './projects'
 import { writeGeneratedAula } from './aula'
 import { aulaYaml } from '../shared/aula'
 import { readGroup, type ClassGroup } from '../shared/classes'
 import type { Description } from '../shared/describe'
-import type { EngineStatus, ExamModeRequest, RunClosed, RunRequest } from '../shared/types'
+import type {
+  EngineStatus,
+  ExamModeRequest,
+  OpenProject,
+  RecentProject,
+  RunClosed,
+  RunRequest
+} from '../shared/types'
 
 const FILTERS: Record<'exam' | 'engine' | 'result', Electron.FileFilter[]> = {
   exam: [{ name: 'Examen', extensions: ['yaml', 'yml'] }],
@@ -163,6 +171,35 @@ export function registerIpc(): void {
     const key = kind === 'engine' || kind === 'result' ? kind : 'exam'
     const result = await dialog.showOpenDialog({ properties: ['openFile'], filters: FILTERS[key] })
     return result.canceled ? null : (result.filePaths[0] ?? null)
+  })
+
+  ipcMain.handle(IPC.pickDirectory, async (): Promise<string | null> => {
+    const result = await dialog.showOpenDialog({ properties: ['openDirectory', 'createDirectory'] })
+    return result.canceled ? null : (result.filePaths[0] ?? null)
+  })
+
+  // The projects the teacher works with. They touch no machine and no grade:
+  // a project is a folder with an exam in it, and this is the list of the
+  // ones opened before (ADR-0021).
+  ipcMain.handle(IPC.recentProjects, (): RecentProject[] => readRecents(settingsDir()))
+
+  ipcMain.handle(IPC.openProject, (_e, dir: unknown): OpenProject => {
+    if (typeof dir !== 'string' || !dir) throw new Error('No hay ninguna carpeta que abrir.')
+    const project = openProjectAt(dir)
+    rememberProject(settingsDir(), project)
+    return project
+  })
+
+  ipcMain.handle(IPC.createProject, (_e, dir: unknown): OpenProject => {
+    if (typeof dir !== 'string' || !dir) throw new Error('No hay ninguna carpeta donde crearlo.')
+    const project = createProjectAt(dir)
+    rememberProject(settingsDir(), project)
+    return project
+  })
+
+  ipcMain.handle(IPC.removeRecent, (_e, dir: unknown): RecentProject[] => {
+    if (typeof dir !== 'string' || !dir) return readRecents(settingsDir())
+    return forgetProject(settingsDir(), dir)
   })
 
   // http(s) only: shell.openExternal opens any scheme the system knows, and a

@@ -6,26 +6,24 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T115 hecho: corregir es elegir la clase y pulsar.** «Corregir» es una
-sección propia: el examen abierto, la clase entre las guardadas, las
-credenciales de esa corrección, el avance y el panel de sesión. Inicio se queda
-solo con el examen. **Ya no se elige ningún fichero de aula**: la petición
-lleva la clase y la aplicación escribe su aula antes de cada corrección
-(ADR-0022). El histórico dice el nombre de la clase, no el fichero generado.
+**T108 hecho: Inicio es la lista de exámenes.** «Abrir», «Nuevo» y los de
+siempre, como en Teutón GUI. Un examen es una carpeta con su `examen.yaml`
+dentro: se abre la carpeta y la aplicación encuentra el examen. **Ya no se
+elige ningún fichero y no hay ninguna ruta en pantalla**: se lee el nombre que
+el profesor le puso al examen.
 
-El aula generada gana `usuario` en el alumno: sin eso, un examen que dice
-`${alumno.usuario}` no se podía corregir desde una clase.
+«Nuevo» deja un examen con una comprobación real, corregible desde el primer
+minuto. Los recientes viven en `projects.json` (ADR-0021) y sobreviven al
+cierre; ilegible se vacía sin ruido, a diferencia de las clases: un atajo
+perdido no es trabajo perdido. Sin examen abierto, Corregir, Resultados e
+Histórico se ven apagados y no se abren. Abrir otro examen con una corrección
+en marcha pregunta antes, la detiene sin matarla y no arrastra nada del
+anterior: ni sesión, ni reintento, ni resultado.
 
-**Revisión visual de Clases** antes de T115, con la aplicación construida. De
-ahí sale **T117**: con muchas columnas propias, al desplazar la tabla se pierde
-de vista de quién es cada fila. No bloquea P2.
-
-**P2**: un examen no pertenece a una clase; el mismo examen se corrige con
-2SMX C y con 2SMX D. T106 (Clases, ADR-0021) y T107 (aula generada, ADR-0022)
-siguen enteros.
+**P2 cerrado salvo T116 y T117.** Queda pulido, no estructura.
 
 **Dirección**: Teutón GUI (`workspace/teuton-gui`) es la referencia canónica de
-interfaz. Fase 6: P1 visual (hecho), P2 clases y proyectos, P3 editor, P4 uso
+interfaz. Fase 6: P1 visual y P2 clases y proyectos hechos; P3 editor, P4 uso
 en clase, P5 protección.
 
 ## Estado actual
@@ -39,24 +37,22 @@ en clase, P5 protección.
   `assert`, `report` atómico, `events`, `engine` y `ssh` (ADR-0011).
 - `test/lab.sh`: `alu1` en `127.1.2.3:2201`, el roto en el 2299. `acceptance.sh`
   (A-1…A-14), `eventos.sh` (E-1…E-10), `sesion.sh` (S-1…S-8).
-- `gui/`: árbol Node independiente; `make gui-check` (219 tests), `gui-build`,
-  `gui-lab`. Vistas vivas: Inicio (el examen abierto), **Corregir** (clase,
+- `gui/`: árbol Node independiente; `make gui-check` (236 tests), `gui-build`,
+  `gui-lab`. Vistas vivas: **Inicio** (lista de exámenes), **Corregir** (clase,
   credenciales, modo examen, avance y sesión), Clases, Resultados (Lista y
   Matriz, exportación, reintento, cadena), Histórico, Ajustes, Ayuda. Modo
-  proyector en la barra lateral. Las clases viven en `classes.json`, en el
-  directorio de datos de usuario (ADR-0021), y de cada clase sale su aula
+  proyector en la barra lateral. En el directorio de datos de usuario:
+  `classes.json` (ADR-0021) y `projects.json`; de cada clase sale su aula
   dentro de la carpeta del examen (ADR-0022).
 
 ## Pruebas ejecutadas
 
-`make gui-check` (219) y `typecheck` verdes. Contra el laboratorio, con la
-aplicación construida y el flujo nuevo: `make gui-lab` entero verde (S-0…S-4,
-H-1, X-1, X-2); el mismo examen corregido con **dos clases distintas**, cada
-una con su artefacto y sus alumnos, sin elegir más fichero que el examen; el
-modo examen E-1…E-5 verde; el histórico enseñando «Laboratorio». **P-2 del
-guion del examen falla** (el detalle técnico de una comprobación no se abre en
-Resultados): apuntado como T118, no lo toca T115. `make check` y `make test` no
-se repitieron esta sesión.
+`make check` y `make gui-check` (236) verdes, `typecheck` verde. Contra el
+laboratorio, con la aplicación construida y el flujo de proyectos:
+`make gui-lab` verde (S-0…S-4, H-1, X-1, X-2) y el modo examen verde (E-1…E-5,
+C-1…C-3, P-1, P-3, S-5). El examen que crea «Nuevo» se ha **corregido de
+verdad**: alumne01 saca 100/100. **P-2 sigue en rojo** (T118, anterior a esta
+sesión). `make test` no se repitió.
 
 ## Problemas conocidos
 
@@ -64,14 +60,13 @@ se repitieron esta sesión.
 - **A-10**: legacy escrito pero marcado `PEND`; se cierra o se retira en T060.
 - Un reintento exige el mismo PLAN. Intervalo mínimo del modo examen, 5 min.
 - El proyector tapa las máquinas, no los nombres del alumnado.
-- Inicio todavía pide el fichero del examen: lo arregla T108 (Inicio =
-  proyectos).
 - P-2 del guion `examen-lab` en rojo; no se ha averiguado desde cuándo (T118).
 - Los datos de alumnado quedan fuera de toda copia de seguridad hasta T113.
 
 ## Siguiente tarea recomendada
 
-Resto del **paquete P2**: **T116** (pegar una clase desde una hoja de cálculo)
-y **T108** (Inicio como lista de proyectos). Después, **T117** (fijar
-identificador y nombre al desplazar la tabla de Clases) y **T118**. Pendiente
-de fase 5 y sin fecha: **T059**.
+Fin del **paquete P2**: **T116** (pegar una clase desde una hoja de cálculo) y
+**T117** (fijar identificador y nombre al desplazar la tabla de Clases).
+Después, el paquete **P3**: **T109**, el editor del examen, que es la última
+pantalla que Teutón GUI tenía y Heimdall no. Pendiente de fase 5 y sin fecha:
+**T059**.

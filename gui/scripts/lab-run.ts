@@ -33,11 +33,17 @@ const shot = process.env.SHOT_OUT || ''
 // Where the fake «save as» dialog says the teacher pointed, for X-1.
 const csvOut = process.env.CSV_OUT || ''
 
-// The only file the teacher opens now is the exam: the classroom is written
-// from the chosen class before every correction (ADR-0022).
-dialog.showOpenDialog = (async () => ({
+// The only thing the teacher opens now is the project's folder: the exam is
+// found inside it and the classroom is written from the chosen class before
+// every correction (ADR-0022, T108).
+// «Abrir» asks for a folder —the project— and the rest of the application
+// still asks for single files; whichever fits travels the way the teacher's
+// would.
+dialog.showOpenDialog = (async (options?: Electron.OpenDialogOptions) => ({
   canceled: false,
-  filePaths: [join(project, 'examen.yaml')]
+  filePaths: [
+    options?.properties?.includes('openDirectory') ? project : join(project, 'examen.yaml')
+  ]
 })) as never
 
 dialog.showSaveDialog = (async () => ({ canceled: !csvOut, filePath: csvOut })) as never

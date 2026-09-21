@@ -52,13 +52,16 @@ type Js = (code: string) => Promise<unknown>
 const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms))
 
 /**
- * Opens the exam in Inicio, goes to Corregir, chooses the class and types the
+ * Opens the project in Inicio, chooses the class in Corregir and types the
  * password, the way a teacher does it: the values go through real events, so
  * React sees exactly what it would see from a keyboard and a mouse.
+ *
+ * Opening the project lands on «Corregir» on its own; the click on the menu
+ * is there so a change of that landing does not silently break the harness.
  */
 export async function openExamAndClass(js: Js, classId: string, secret: string): Promise<void> {
-  await js(`[...document.querySelectorAll('button')].filter(b => b.textContent.includes('Elegir'))[0].click()`)
-  await wait(600)
+  await js(`[...document.querySelectorAll('header button')].find(b => b.textContent.includes('Abrir')).click()`)
+  await wait(900)
   await js(`[...document.querySelectorAll('aside button')].find(b => b.textContent.trim() === 'Corregir').click()`)
   await wait(600)
   await js(`(() => {

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { EngineStatus } from '../../../shared/types'
+import type { EngineStatus, OpenProject } from '../../../shared/types'
 import { DEFAULT_SCALE, type ScaleId } from '@/lib/export'
 import { DEFAULT_PASS_MARK } from '@/lib/summary'
 import {
@@ -11,7 +11,7 @@ import {
   type ExamMode
 } from '@/lib/exam'
 
-import { isReady, type View } from '@/lib/nav'
+import { canOpen, type View } from '@/lib/nav'
 
 export type { View }
 export type Theme = 'dark' | 'light'
@@ -21,8 +21,12 @@ interface AppState {
   view: View
   /** null while the engine has not been looked for yet. */
   engine: EngineStatus | null
-  /** The exam file the teacher picked, if any. */
-  examPath: string | null
+  /**
+   * The project that is open: a folder with an exam in it. The teacher opens
+   * it from Inicio and never chooses a file; everything that is about one
+   * exam —corregir, resultados, histórico— hangs off this.
+   */
+  project: OpenProject | null
   /**
    * The class the teacher is correcting, by its identifier. The students and
    * the name live in the saved classes (ADR-0021); what is remembered here is
@@ -69,7 +73,7 @@ interface AppState {
   toggleTheme: () => void
   setView: (view: View) => void
   setEngine: (engine: EngineStatus) => void
-  setExamPath: (path: string | null) => void
+  setProject: (project: OpenProject | null) => void
   setClassId: (id: string | null) => void
   setNotice: (message: string | null) => void
   setScale: (scale: ScaleId) => void
@@ -149,7 +153,7 @@ export const useApp = create<AppState>((set, get) => ({
   theme: savedTheme,
   view: 'home',
   engine: null,
-  examPath: null,
+  project: null,
   classId: savedClassId,
   notice: null,
   scale: savedScale,
@@ -165,12 +169,23 @@ export const useApp = create<AppState>((set, get) => ({
     set({ theme })
   },
   toggleTheme: () => get().setTheme(get().theme === 'dark' ? 'light' : 'dark'),
-  // A section that is not built yet cannot be opened, whoever asks: the
-  // button is disabled, and this is the second lock so no code path lands the
-  // teacher on an empty screen.
-  setView: (view) => set(isReady(view) ? { view } : {}),
+  // A section that is not built yet, or that needs an exam there is not,
+  // cannot be opened whoever asks: the button is disabled, and this is the
+  // second lock so no code path lands the teacher on an empty screen.
+  setView: (view) => set(canOpen(view, get().project !== null) ? { view } : {}),
   setEngine: (engine) => set({ engine }),
-  setExamPath: (examPath) => set({ examPath }),
+  // Changing project leaves nothing of the previous one behind: its rounds
+  // are another exam's session and its pending retry another exam's, and
+  // reading them together would grade the wrong exam. With an exam open the
+  // next thing is correcting it; with none, Inicio is the only section left.
+  setProject: (project) =>
+    set({
+      project,
+      retry: null,
+      examRounds: [],
+      exam: EXAM_OFF,
+      view: project ? 'correct' : 'home'
+    }),
   setClassId: (classId) => {
     if (classId) localStorage.setItem('heimdall-class-id', classId)
     else localStorage.removeItem('heimdall-class-id')

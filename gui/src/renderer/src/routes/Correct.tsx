@@ -44,7 +44,7 @@ import { t } from '@/i18n/es'
  * classroom the engine reads is written from the class (ADR-0022).
  */
 export default function CorrectView() {
-  const examPath = useApp((s) => s.examPath)
+  const examPath = useApp((s) => s.project?.examPath ?? null)
   const engine = useApp((s) => s.engine)
   const setNotice = useApp((s) => s.setNotice)
   const setView = useApp((s) => s.setView)

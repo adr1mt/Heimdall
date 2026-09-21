@@ -63,6 +63,9 @@ function AppBody() {
   const notice = useApp((s) => s.notice)
   const setNotice = useApp((s) => s.setNotice)
   const setEngine = useApp((s) => s.setEngine)
+  // Without an exam open there is nothing to correct, no results and no
+  // history: those sections are disabled, not hidden (lib/nav).
+  const hasProject = useApp((s) => s.project !== null)
 
   useEffect(() => {
     window.heimdall
@@ -152,7 +155,13 @@ function AppBody() {
 
         <nav className="flex flex-1 flex-col gap-0.5 px-3">
           {NAV_MAIN.map((entry) => (
-            <NavButton key={entry.id} entry={entry} active={view === entry.id} onPick={setView} />
+            <NavButton
+              key={entry.id}
+              entry={entry}
+              active={view === entry.id}
+              hasProject={hasProject}
+              onPick={setView}
+            />
           ))}
         </nav>
 
@@ -160,7 +169,13 @@ function AppBody() {
           {/* Ajustes y Ayuda al pie: no son parte de corregir nada. */}
           <div className="flex flex-col gap-0.5 border-t border-white/10 pt-3">
             {NAV_FOOTER.map((entry) => (
-              <NavButton key={entry.id} entry={entry} active={view === entry.id} onPick={setView} />
+              <NavButton
+                key={entry.id}
+                entry={entry}
+                active={view === entry.id}
+                hasProject={hasProject}
+                onPick={setView}
+              />
             ))}
           </div>
           <EngineBadge />
@@ -214,25 +229,31 @@ function AppBody() {
 function NavButton({
   entry,
   active,
+  hasProject,
   onPick
 }: {
   entry: NavEntry
   active: boolean
+  hasProject: boolean
   onPick: (view: View) => void
 }) {
   const Icon = ICONS[entry.id]
+  const waiting = entry.ready && entry.needsProject === true && !hasProject
+  const open = entry.ready && !waiting
   return (
     <button
-      disabled={!entry.ready}
-      aria-disabled={!entry.ready}
-      title={entry.ready ? undefined : comingSoon(entry.id)}
+      disabled={!open}
+      aria-disabled={!open}
+      title={
+        entry.ready ? (waiting ? t.nav.needProject(entry.label) : undefined) : comingSoon(entry.id)
+      }
       onClick={() => onPick(entry.id)}
       className={cn(
         'group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
         active
           ? 'bg-primary/20 text-white'
           : 'text-sidebar-foreground/70 hover:bg-white/5 hover:text-white',
-        !entry.ready && 'cursor-not-allowed opacity-40 hover:bg-transparent hover:text-sidebar-foreground/70'
+        !open && 'cursor-not-allowed opacity-40 hover:bg-transparent hover:text-sidebar-foreground/70'
       )}
     >
       {active && (

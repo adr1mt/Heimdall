@@ -16,7 +16,7 @@ const MAX_RUNS = 50
  * same screen and the same artifact as the day it was corrected.
  */
 export default function HistoryView() {
-  const examPath = useApp((s) => s.examPath)
+  const examPath = useApp((s) => s.project?.examPath ?? null)
   const setView = useApp((s) => s.setView)
   const setNotice = useApp((s) => s.setNotice)
   const phase = useRun((s) => s.phase)

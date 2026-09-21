@@ -1748,7 +1748,7 @@
       "title": "Inicio: abrir, crear y recientes de proyectos",
       "phase": 6,
       "package": "P2",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T115"
@@ -1890,7 +1890,7 @@
       "title": "Editor visual del examen, con vista YAML",
       "phase": 6,
       "package": "P3",
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T108"
@@ -2009,7 +2009,7 @@
       "title": "Copias de seguridad de las notas",
       "phase": 6,
       "package": "P5",
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P2",
       "depends_on": [
         "T108"
