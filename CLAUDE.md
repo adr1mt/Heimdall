@@ -64,23 +64,24 @@ Prioridad ante contradicciones: **ADR aceptado > `docs/design/` > `docs/research
 La tarea `READY` de mayor prioridad (`P0` > `P1` > `P2`) con todas sus
 `depends_on` en `DONE`. A igualdad, el `id` menor.
 
-**Máximo dos tareas por sesión.** La segunda solo si cumple **todas** estas
-condiciones:
+El alcance de una sesión depende de lo que toque la tarea.
 
-- es pequeña y de bajo riesgo;
-- pertenece a la misma fase que la primera;
-- no introduce ninguna decisión arquitectónica nueva.
+**Trabajo de GUI y producto: un paquete por sesión.** Las tareas de pantalla
+llevan un campo `package` en `TASKS.json` (P1…P5 de la fase 6) y se trabajan
+enteras, de una sentada. Dentro del paquete se hacen los commits que aíslen el
+cambio —uno por tarea cuando ayude, uno por bloque coherente cuando no—, pero
+no se cierra la sesión después de cada microtarea. El repositorio queda en
+estado válido después de cada commit.
 
-**Nunca se encadena una segunda tarea** si cualquiera de las dos toca:
-integridad de la nota, modelo de estados y resultados, SSH, concurrencia,
-cancelación, seguridad o secretos, contrato motor ↔ GUI, o empaquetado y
-release.
+**Áreas críticas: una tarea por sesión, sin encadenar.** Integridad de la nota,
+modelo de estados y resultados, SSH, concurrencia, cancelación, seguridad o
+secretos, persistencia crítica (notas, copias, datos del alumnado) y contrato
+motor ↔ GUI. Ahí sigue siendo un commit por tarea, siempre separado, y no se
+encadena nada más. Si una tarea de paquete entra en una de estas áreas, esa
+tarea sale del paquete y se trabaja sola.
 
-Un commit por tarea, siempre separado. El repositorio queda en estado válido
-después de cada uno.
-
-Si la tarea resulta más grande de lo previsto: divídela en `TASKS.json` antes de
-implementarla, termina una parte coherente y **no encadenes una segunda**.
+Si una tarea resulta más grande de lo previsto: divídela en `TASKS.json` antes
+de implementarla y termina una parte coherente.
 
 ## Terminar una sesión
 

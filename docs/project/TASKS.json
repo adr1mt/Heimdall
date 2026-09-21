@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "updated": "2026-09-21",
   "status_values": [
     "BLOCKED",
@@ -10,10 +10,12 @@
   ],
   "rules": [
     "Se trabaja la tarea READY de mayor prioridad con todas sus depends_on en DONE.",
-    "Una tarea por sesion. Si crece, se divide aqui antes de implementarla.",
+    "Las tareas de GUI y producto se agrupan en paquetes (campo package). Se trabaja un paquete coherente por sesion, con commits separados cuando aislen el cambio.",
+    "Una tarea por sesion, sin encadenar, para todo lo que toque nota, motor, SSH, concurrencia, secretos, persistencia critica o el contrato motor-GUI.",
+    "Si una tarea crece, se divide aqui antes de implementarla.",
     "Al marcar DONE, pasar a READY las tareas cuyas dependencias queden satisfechas.",
     "DROPPED es una tarea retirada: no se trabaja y no se borra. Lleva dropped_reason y la fecha.",
-    "Las tareas de fase 5 en adelante son deliberadamente gruesas: se detallan al acercarse."
+    "Las tareas de fase 7 en adelante son deliberadamente gruesas: se detallan al acercarse."
   ],
   "tasks": [
     {
@@ -1173,7 +1175,7 @@
     {
       "id": "T060",
       "title": "Borrado de la capa legacy en un commit",
-      "phase": 6,
+      "phase": 7,
       "status": "BLOCKED",
       "priority": "P1",
       "depends_on": [
@@ -1200,7 +1202,7 @@
     {
       "id": "T070",
       "title": "Rehacer los examenes del curso en formato nativo",
-      "phase": 7,
+      "phase": 8,
       "status": "BLOCKED",
       "priority": "P1",
       "depends_on": [
@@ -1225,7 +1227,7 @@
       "id": "T071",
       "title": "Editor de examenes en la GUI sobre el formato nativo",
       "phase": 7,
-      "status": "BLOCKED",
+      "status": "DROPPED",
       "priority": "P1",
       "depends_on": [
         "T070"
@@ -1243,34 +1245,39 @@
         "Un examen invalido se senala en la GUI con el mensaje del motor"
       ],
       "tests": [],
-      "notes": "Detallar al llegar."
+      "notes": "Detallar al llegar.",
+      "dropped_reason": "Sustituida por T109 (2026-09-21): el editor entra en la realineacion de producto, con el editor de Teuton GUI como referencia y sin depender de T070."
     },
     {
       "id": "T072",
-      "title": "Empaquetado con el binario embebido para Linux y Windows",
-      "phase": 7,
+      "title": "Empaquetado con el motor embebido para Linux",
+      "phase": 6,
       "status": "BLOCKED",
       "priority": "P1",
       "depends_on": [
-        "T071"
+        "T109"
       ],
-      "goal": "Que el profesor descargue la aplicacion, la ejecute y funcione.",
+      "goal": "Que el profesor descargue un fichero, lo abra y funcione, sin instalar nada.",
       "scope": [
-        "Binario del motor embebido en la aplicacion, por plataforma",
-        "Paquetes de Linux y de Windows",
+        "Binario del motor embebido en la aplicacion",
+        "AppImage (y .deb) de Linux con el motor dentro",
         "La GUI usa el binario embebido y no uno del sistema"
       ],
-      "out_of_scope": [],
+      "out_of_scope": [
+        "Windows y macOS: fuera del alcance (decision del 2026-09-21)"
+      ],
       "acceptance": [
-        "Instalacion y ejecucion sin Ruby, sin gems, sin Go, sin Docker ni Podman y sin servicios externos, en Linux y en Windows"
+        "Instalacion y ejecucion en Linux sin Ruby, sin gems, sin Go, sin Docker ni Podman y sin servicios externos",
+        "Con el motor del sistema ausente, la aplicacion corrige igual"
       ],
       "tests": [],
-      "notes": "Detallar al llegar."
+      "notes": "Antes cubria Linux y Windows. La prioridad es Linux (decision del 2026-09-21).",
+      "package": "P5"
     },
     {
       "id": "T080",
       "title": "Hardening, auditoria de secretos y release",
-      "phase": 8,
+      "phase": 9,
       "status": "BLOCKED",
       "priority": "P1",
       "depends_on": [
@@ -1488,6 +1495,447 @@
         "gui/scripts/examen-lab.ts (P-1, P-2)"
       ],
       "notes": "Encontrada el 2026-09-21 al cerrar T064: con una maquina apagada, el motivo dice «no se ha podido conectar con 127.1.2.3:2299» y eso se proyectaba tal cual. Hasta ahora no se veia porque la vista se rompia antes con un alumno excluido."
+    },
+    {
+      "id": "T100",
+      "title": "Navegacion objetivo de la aplicacion",
+      "phase": 6,
+      "package": "P1",
+      "status": "READY",
+      "priority": "P0",
+      "depends_on": [],
+      "goal": "Que la aplicacion tenga las secciones que el profesor espera, en el orden en que las busca.",
+      "scope": [
+        "Barra lateral: Inicio, Clases, Examenes, Resultados, Analiticas, Historico",
+        "Ajustes y Ayuda abajo, separados del resto",
+        "Las secciones todavia no construidas aparecen deshabilitadas, nunca ocultas"
+      ],
+      "out_of_scope": [
+        "Construir el contenido de Clases, Examenes o Analiticas: eso es T106, T108 y T110"
+      ],
+      "acceptance": [
+        "Las seis entradas estan en la barra lateral en ese orden",
+        "Ajustes y Ayuda quedan al pie",
+        "Una seccion sin construir no se puede pulsar y dice que llega mas adelante"
+      ],
+      "tests": [
+        "gui/tests/nav.test.ts"
+      ],
+      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
+    },
+    {
+      "id": "T101",
+      "title": "Resultados: cabecera de clase y conmutador Lista/Matriz",
+      "phase": 6,
+      "package": "P1",
+      "status": "READY",
+      "priority": "P0",
+      "depends_on": [
+        "T100"
+      ],
+      "goal": "Que al abrir Resultados se vea como va la clase antes que ningun detalle tecnico.",
+      "scope": [
+        "Cabecera con aprobados, nota media y cuantos requieren atencion",
+        "Conmutador Lista / Matriz en la propia seccion, nunca como entrada lateral",
+        "Buscador y filtros en la misma barra, sin bloques por encima"
+      ],
+      "out_of_scope": [
+        "Cambiar ninguna nota ni recalcular nada en la aplicacion"
+      ],
+      "acceptance": [
+        "La cabecera sale de las notas que publica el motor, sin recalcular",
+        "El conmutador cambia de modo sin recargar la correccion",
+        "Un alumno sin nota final no cuenta como suspenso en la cabecera"
+      ],
+      "tests": [
+        "gui/tests/results-header.test.ts"
+      ],
+      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
+    },
+    {
+      "id": "T102",
+      "title": "Resultados Lista: una fila por alumno, la clase entera a la vista",
+      "phase": 6,
+      "package": "P1",
+      "status": "READY",
+      "priority": "P0",
+      "depends_on": [
+        "T101"
+      ],
+      "goal": "Que con 26 alumnos se vea quien va mal sin hacer scroll.",
+      "scope": [
+        "Fila compacta: alumno, nota, superadas sobre el total, estado",
+        "Dos columnas cuando la ventana da de si",
+        "PASS, FAIL, sin evaluar, provisional, nota final, mejor vuelta y FINALIZADO caben en la fila",
+        "El detalle de un alumno se abre al pulsar, no esta desplegado"
+      ],
+      "out_of_scope": [
+        "Quitar informacion: lo que hoy se ve sigue estando, pero dentro del detalle"
+      ],
+      "acceptance": [
+        "Ocho alumnos o mas visibles a la vez en una ventana normal",
+        "La causa tecnica de un alumno se lee sin abrir nada mas que su fila",
+        "Ningun alumno sin nota final aparece con un cero"
+      ],
+      "tests": [
+        "gui/tests/results-list.test.ts"
+      ],
+      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
+    },
+    {
+      "id": "T103",
+      "title": "Resultados Matriz: comprobaciones por alumnado",
+      "phase": 6,
+      "package": "P1",
+      "status": "READY",
+      "priority": "P0",
+      "depends_on": [
+        "T101"
+      ],
+      "goal": "Que de un vistazo se vea que alumno va mal, que comprobacion falla a muchos y quien tiene una averia.",
+      "scope": [
+        "Rejilla: una dimension el alumnado, otra las comprobaciones",
+        "Verde superada, rojo fallada, ambar sin evaluar, con su leyenda",
+        "Fila de nota al pie de cada alumno",
+        "Al pulsar una celda se abre el detalle completo de esa comprobacion"
+      ],
+      "out_of_scope": [
+        "Colorear de rojo lo que es una averia tecnica (principio 3)"
+      ],
+      "acceptance": [
+        "Una comprobacion que falla a toda la clase se ve como una linea entera",
+        "Una maquina que no respondio pinta ambar y nunca rojo",
+        "La celda abre el mismo detalle que hoy da la lista"
+      ],
+      "tests": [
+        "gui/tests/results-matrix.test.ts"
+      ],
+      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
+    },
+    {
+      "id": "T104",
+      "title": "Los avisos tecnicos dejan de ocupar la pantalla",
+      "phase": 6,
+      "package": "P1",
+      "status": "READY",
+      "priority": "P0",
+      "depends_on": [
+        "T101"
+      ],
+      "goal": "Que la huella SSH, el host y los mensajes internos no tapen las notas de la clase.",
+      "scope": [
+        "Una linea plegada por bloque tecnico: «1 aviso tecnico · Ver»",
+        "Al desplegar, el detalle entero: causa, huella, maquina, mensaje",
+        "Mismo patron para lo que quedo sin comprobar y para la cadena de correcciones"
+      ],
+      "out_of_scope": [
+        "Perder informacion: desplegado se sigue leyendo todo"
+      ],
+      "acceptance": [
+        "Con avisos, la primera fila de alumno sigue visible sin hacer scroll",
+        "Desplegado, el aviso conserva todo lo que hoy muestra",
+        "Con el proyector encendido, el desplegado sigue tapando la maquina"
+      ],
+      "tests": [
+        "gui/tests/notices.test.ts",
+        "gui/scripts/examen-lab.ts (P-1)"
+      ],
+      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
+    },
+    {
+      "id": "T105",
+      "title": "Inicio: el examen y la clase, no las rutas",
+      "phase": 6,
+      "package": "P1",
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [
+        "T100"
+      ],
+      "goal": "Que Inicio diga que examen y que clase hay puestos, con el nombre que el profesor les dio.",
+      "scope": [
+        "Examen, Clase, Credenciales y Accion, cada uno con su boton de cambiar",
+        "Durante el examen: vuelta actual, tiempo hasta la siguiente, alumnos activos, finalizados y progreso",
+        "Las rutas y los detalles internos van a informacion avanzada y a «Abrir carpeta»"
+      ],
+      "out_of_scope": [
+        "Tocar el modo examen ni la sesion: la logica de vueltas se queda como esta"
+      ],
+      "acceptance": [
+        "Ninguna ruta de fichero aparece en la pantalla de uso normal",
+        "El examen y la clase se reconocen por su nombre",
+        "Durante el examen los cinco datos de la vuelta se leen sin desplegar nada"
+      ],
+      "tests": [
+        "gui/tests/home.test.ts"
+      ],
+      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
+    },
+    {
+      "id": "T106",
+      "title": "Clases: grupos fijos reutilizables",
+      "phase": 6,
+      "package": "P2",
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T100"
+      ],
+      "goal": "Que el profesor guarde sus grupos una vez y los reutilice en cada examen.",
+      "scope": [
+        "ADR-0021 primero: donde guarda la aplicacion sus datos propios y con que garantias",
+        "Crear, editar, borrar y duplicar una clase",
+        "Por alumno: identificador, nombre, correo o identificador de Moodle, IP fija de examen y usuario SSH"
+      ],
+      "out_of_scope": [
+        "Guardar contrasenas: nunca (ADR-0009)",
+        "Tocar el artefacto ni nada que publique el motor"
+      ],
+      "acceptance": [
+        "Una clase sobrevive al cierre de la aplicacion",
+        "Ninguna contrasena se escribe en disco",
+        "Borrar una clase pide confirmacion y no toca ninguna correccion guardada"
+      ],
+      "tests": [
+        "gui/tests/classes.test.ts"
+      ],
+      "notes": "Escribir ADR-0021 antes de implementar: es persistencia propia de la GUI y no la cubre ningun ADR. Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
+    },
+    {
+      "id": "T107",
+      "title": "Clases: pegar desde una hoja de calculo y generar el aula",
+      "phase": 6,
+      "package": "P2",
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T106"
+      ],
+      "goal": "Que apuntar a 26 alumnos cueste un pegado, y que el aula del examen salga de la clase.",
+      "scope": [
+        "Importar pegando columnas o un CSV, con vista previa antes de guardar",
+        "Generar el aula del examen a partir de la clase elegida",
+        "Un cambio de IP en la clase se refleja al volver a generar"
+      ],
+      "out_of_scope": [
+        "Escribir contrasenas en el aula: solo van referencias"
+      ],
+      "acceptance": [
+        "Un pegado de tres columnas crea la clase entera",
+        "El aula generada pasa la validacion del motor",
+        "Una fila incompleta se senala antes de guardar y no se guarda a medias"
+      ],
+      "tests": [
+        "gui/tests/classes-import.test.ts"
+      ],
+      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
+    },
+    {
+      "id": "T108",
+      "title": "Examenes: un espacio de trabajo propio",
+      "phase": 6,
+      "package": "P2",
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T100"
+      ],
+      "goal": "Que el profesor no gestione carpetas: la aplicacion las crea y las ordena.",
+      "scope": [
+        "Nuevo, abrir, abrir reciente, duplicar, renombrar y eliminar con confirmacion",
+        "La aplicacion crea los ficheros necesarios por detras",
+        "«Abrir carpeta» queda como opcion avanzada"
+      ],
+      "out_of_scope": [
+        "Importar examenes de Teuton (ADR-0016)"
+      ],
+      "acceptance": [
+        "Un examen nuevo se crea y se corrige sin abrir un gestor de ficheros",
+        "Eliminar pide confirmacion y dice que se borra",
+        "Los recientes sobreviven al cierre de la aplicacion"
+      ],
+      "tests": [
+        "gui/tests/workspace.test.ts"
+      ],
+      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
+    },
+    {
+      "id": "T109",
+      "title": "Editor visual del examen, con vista YAML",
+      "phase": 6,
+      "package": "P3",
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T108"
+      ],
+      "goal": "Que el profesor escriba un examen desde un formulario y nunca desde un editor de texto.",
+      "scope": [
+        "Anadir una comprobacion con formulario: id, descripcion, grupo, host, comando, argumentos, asercion, valor esperado, peso y timeout",
+        "Vista avanzada en YAML del mismo examen",
+        "Validacion con el propio motor antes de guardar, con fichero y linea"
+      ],
+      "out_of_scope": [
+        "Dos modelos distintos: visual y YAML son el mismo examen",
+        "Importar examenes antiguos"
+      ],
+      "acceptance": [
+        "Un examen creado desde la aplicacion corre sin tocar un fichero a mano",
+        "Un examen invalido se senala con el mensaje del motor, con fichero y linea",
+        "Lo editado en la vista visual aparece en la vista YAML y al reves"
+      ],
+      "tests": [
+        "gui/tests/editor.test.ts"
+      ],
+      "notes": "Sustituye a T071. Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
+    },
+    {
+      "id": "T110",
+      "title": "Analiticas del grupo",
+      "phase": 6,
+      "package": "P4",
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T102"
+      ],
+      "goal": "Que el profesor sepa a quien atender primero y que comprobacion esta fallando a todos.",
+      "scope": [
+        "Distribucion de notas del grupo",
+        "Alumnado que necesita atencion, con la averia tecnica primero",
+        "Comprobaciones que mas fallan"
+      ],
+      "out_of_scope": [
+        "Recalcular notas en la aplicacion: los numeros salen del motor"
+      ],
+      "acceptance": [
+        "Los numeros coinciden con los de Resultados",
+        "Una maquina caida pesa mas que una nota baja en la lista de atencion",
+        "Un alumno sin nota final no entra en la distribucion como un cero"
+      ],
+      "tests": [
+        "gui/tests/analytics.test.ts"
+      ],
+      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
+    },
+    {
+      "id": "T111",
+      "title": "Modo proyector: vista completa dedicada",
+      "phase": 6,
+      "package": "P4",
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T103"
+      ],
+      "goal": "Que al proyectar se vea la clase en directo y nada mas.",
+      "scope": [
+        "Pantalla completa sin barra lateral ni menus",
+        "Fuera IPs, credenciales, comandos, rutas y detalle tecnico",
+        "Tipografia grande, la matriz o la lista en vivo de protagonista",
+        "Por alumno: nombre, nota, progreso, estado y FINALIZADO"
+      ],
+      "out_of_scope": [
+        "Tapar los nombres del alumnado: el profesor eligio una clase con nombre"
+      ],
+      "acceptance": [
+        "Ninguna direccion de maquina aparece proyectada (garantia de T066)",
+        "La barra lateral y los menus desaparecen al activarlo",
+        "Se sale del modo con una sola accion"
+      ],
+      "tests": [
+        "gui/tests/projector.test.ts",
+        "gui/scripts/examen-lab.ts (P-1, P-2, P-3)"
+      ],
+      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
+    },
+    {
+      "id": "T112",
+      "title": "Exportar a Moodle",
+      "phase": 6,
+      "package": "P4",
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T102"
+      ],
+      "goal": "Que las notas entren en Moodle sin tocar la hoja a mano.",
+      "scope": [
+        "Accion «Exportar a Moodle» con el CSV que Moodle importa tal cual",
+        "Siempre la nota valida que publica el motor"
+      ],
+      "out_of_scope": [
+        "Convertir en cero a quien no tiene nota final",
+        "Calcular ninguna nota en la aplicacion"
+      ],
+      "acceptance": [
+        "El CSV lo importa Moodle sin retoques",
+        "Un alumno sin nota final sale con la celda vacia, nunca con un cero",
+        "La nota exportada es la misma que se ve en pantalla"
+      ],
+      "tests": [
+        "gui/tests/moodle.test.ts"
+      ],
+      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
+    },
+    {
+      "id": "T113",
+      "title": "Copias de seguridad de las notas",
+      "phase": 6,
+      "package": "P5",
+      "status": "BLOCKED",
+      "priority": "P2",
+      "depends_on": [
+        "T108"
+      ],
+      "goal": "Que borrar una carpeta no se lleve por delante el unico resultado valido.",
+      "scope": [
+        "Copia periodica de las notas fuera de la carpeta del examen",
+        "Restaurar una copia desde la aplicacion",
+        "Numero de copias acotado"
+      ],
+      "out_of_scope": [
+        "Copiar la salida de las maquinas: solo viajan las notas"
+      ],
+      "acceptance": [
+        "Borrada la carpeta del examen, las notas se recuperan desde la aplicacion",
+        "Restaurar no baja ninguna nota ya guardada",
+        "Ninguna contrasena viaja en la copia"
+      ],
+      "tests": [
+        "gui/tests/backups.test.ts"
+      ],
+      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
+    },
+    {
+      "id": "T114",
+      "title": "Actualizacion automatica que nunca interrumpe",
+      "phase": 6,
+      "package": "P5",
+      "status": "BLOCKED",
+      "priority": "P2",
+      "depends_on": [
+        "T072"
+      ],
+      "goal": "Que la aplicacion se mantenga al dia sola y jamas en mitad de una correccion.",
+      "scope": [
+        "Comprobar al iniciar y preparar la descarga en segundo plano",
+        "No comprobar siquiera mientras el modo examen esta activo",
+        "Aplicar al cerrar, nunca durante el uso",
+        "Un fallo de red o de permisos se registra y no se pone delante de la clase"
+      ],
+      "out_of_scope": [
+        "Interrumpir una correccion por una actualizacion, en ningun caso"
+      ],
+      "acceptance": [
+        "Con el modo examen activo no hay ni una peticion de red de actualizacion",
+        "La version nueva se instala al cerrar y se avisa antes sin bloquear",
+        "Sin red, la aplicacion arranca igual y sin dialogos"
+      ],
+      "tests": [
+        "gui/tests/updater.test.ts"
+      ],
+      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
     }
   ]
 }

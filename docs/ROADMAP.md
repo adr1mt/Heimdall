@@ -108,7 +108,35 @@ técnica, y se resuelve en el motor (T062, T063, T064).
 **Salida**: un examen completo corregido de principio a fin desde la aplicación,
 contra el laboratorio, sin que exista un solo fichero de Teuton por medio.
 
-## Fase 6 — Retirada de la capa legacy
+## Fase 6 — Realineación de producto con la referencia
+
+Teutón GUI es la **referencia canónica** de interfaz, navegación, densidad
+visual y flujo de trabajo. Heimdall GUI no se inspira en ella: es su evolución
+natural, con el motor de Heimdall debajo y con información que antes no existía
+—`UNEVALUATED` con su causa, nota provisional, mejor vuelta, `FINALIZADO`—.
+Cuando una pantalla ya estaba bien resuelta allí, se conserva su estructura y
+su densidad; solo se cambia una decisión visual con una razón concreta de
+usabilidad. Lo que no se hereda nunca es el contrato: ni Ruby, ni `start.rb`,
+ni `config.yaml`, ni formatos antiguos (ADR-0016).
+
+La fase se trabaja por **paquetes funcionales**, uno por sesión, con commits
+separados dentro del paquete cuando aíslan el cambio:
+
+| Paquete | Contiene | Cierra |
+|---|---|---|
+| **P1 · Realineación visual** | T100–T105 | La clase entera se lee de un vistazo, en Lista o en Matriz, y el aviso técnico deja de ser el protagonista |
+| **P2 · Clases y proyectos** | ADR-0021 + T106–T108 | Los grupos se guardan una vez y los exámenes viven en un espacio propio |
+| **P3 · Editor** | T109 | Un examen se escribe desde un formulario, validado por el motor |
+| **P4 · Uso en clase** | T110–T112 | Analíticas, proyector dedicado y exportación a Moodle |
+| **P5 · Protección y distribución** | T113, T072, T114 | Las notas no se pierden, la aplicación se descarga y se actualiza sola |
+
+Prioridad **Linux**. Windows y macOS quedan fuera del alcance.
+
+**Salida**: un examen de una clase de 26 alumnos se prepara, se corrige y se
+proyecta de principio a fin sin abrir una terminal, sin escribir un YAML a mano
+y sin instalar nada más que la aplicación.
+
+## Fase 7 — Retirada de la capa legacy
 
 `internal/legacy`, `--compat=teuton2` y la fachada `--export=json`/`--cname`/
 `--case` se borran en un commit propio, junto con `06-LEGACY-WRITER.md` y las
@@ -118,17 +146,18 @@ internas y no reciben nada nuevo (ADR-0016).
 **Salida**: `grep -ri teuton` en el código del motor y de la GUI no devuelve
 ninguna dependencia, solo menciones históricas en `docs/research/`.
 
-## Fase 7 — Exámenes del curso y empaquetado
+## Fase 8 — Exámenes del curso en formato nativo
 
-- Los exámenes reales se rehacen en el formato nativo, uno a uno, con su
-  aula. No hay migrador automático (ADR-0016).
-- Editor de exámenes en la GUI sobre el formato nativo.
-- Binario embebido en la aplicación de escritorio, para Linux y Windows.
+- Los exámenes reales del curso se rehacen en el formato nativo, uno a uno,
+  con su aula. No hay migrador automático (ADR-0016).
 
-**Salida**: descargar la aplicación, ejecutarla y que funcione. Sin Ruby, sin
-gems, sin Go, sin Docker ni Podman, sin servicios externos.
+El editor y el empaquetado ya no viven aquí: son los paquetes P3 y P5 de la
+fase 6.
 
-## Fase 8 — Hardening y release
+**Salida**: los exámenes del curso corren en Heimdall, escritos desde la
+aplicación y sin un solo fichero heredado.
+
+## Fase 9 — Hardening y release
 
 - Repaso de los 16 modos de fallo de
   [research/FAILURE-MODES.md](research/FAILURE-MODES.md): cada uno, corregido o
