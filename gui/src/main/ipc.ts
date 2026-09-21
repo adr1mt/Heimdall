@@ -1,5 +1,5 @@
-import { writeFileSync } from 'node:fs'
-import { basename } from 'node:path'
+import { statSync, writeFileSync } from 'node:fs'
+import { basename, dirname } from 'node:path'
 import { app, dialog, ipcMain, powerSaveBlocker, shell, type WebContents } from 'electron'
 import { IPC } from '../shared/ipc'
 import { detectEngine } from './engine'
@@ -8,8 +8,10 @@ import { consolidateChain } from './consolidate'
 import { readExamSession } from './session'
 import { listRuns, varDirOf } from './history'
 import { RunSession, resolveRunTarget } from './run'
+import { describeClass, describeExam } from './describe'
 import { secretRefsOf } from './secrets'
 import { readSettings, writeSettings } from './store'
+import type { Description } from '../shared/describe'
 import type { EngineStatus, ExamModeRequest, RunClosed, RunRequest } from '../shared/types'
 
 const FILTERS: Record<'exam' | 'class' | 'engine' | 'result', Electron.FileFilter[]> = {
@@ -146,6 +148,26 @@ export function registerIpc(): void {
   ipcMain.handle(IPC.secretRefs, (_e, classPath: unknown): string[] =>
     typeof classPath === 'string' ? secretRefsOf(classPath) : []
   )
+
+  ipcMain.handle(IPC.describe, (_e, paths: unknown): Description => {
+    const raw = (paths ?? {}) as { examPath?: unknown; classPath?: unknown }
+    return {
+      exam: typeof raw.examPath === 'string' ? describeExam(raw.examPath) : null,
+      classroom: typeof raw.classPath === 'string' ? describeClass(raw.classPath) : null
+    }
+  })
+
+  // The folder of a file the teacher chose, and only a folder: shell.openPath
+  // on a file executes whatever the desktop associates with it, and a
+  // `.desktop` is a program.
+  ipcMain.handle(IPC.openFolder, async (_e, path: unknown): Promise<void> => {
+    const target = typeof path === 'string' ? dirname(path) : ''
+    if (!target || !statSync(target, { throwIfNoEntry: false })?.isDirectory()) {
+      throw new Error('No hay ninguna carpeta que abrir.')
+    }
+    const problem = await shell.openPath(target)
+    if (problem) throw new Error(problem)
+  })
 
   ipcMain.handle(IPC.setExamMode, (_e, request: unknown): void => {
     const raw = (request ?? {}) as Partial<ExamModeRequest>

@@ -37,8 +37,19 @@ export const t = {
     classroom: 'Aula',
     classHint: 'Quién es cada alumno y cómo se llega a su máquina.',
     choose: 'Elegir…',
+    change: 'Cambiar',
     none: 'Sin elegir',
-    sameFolder: 'El examen tiene que llamarse «examen.yaml» y el aula estar en su misma carpeta.'
+    sameFolder: 'El examen tiene que llamarse «examen.yaml» y el aula estar en su misma carpeta.',
+    // El nombre es lo que el profesor eligió; la ruta es lo que necesita el
+    // ordenador y vive en los detalles avanzados.
+    unnamed: 'Sin nombre en el fichero',
+    examMeta: (checks: number) =>
+      checks === 1 ? '1 comprobación' : `${checks} comprobaciones`,
+    classMeta: (students: number) => (students === 1 ? '1 alumno' : `${students} alumnos`),
+    advanced: 'Detalles avanzados',
+    openFolder: 'Abrir carpeta',
+    folderFailed: 'No se pudo abrir la carpeta',
+    action: 'Acción'
   },
   credentials: {
     title: 'Credenciales',
@@ -274,7 +285,17 @@ export const t = {
     nextIn: (seconds: number) =>
       seconds >= 60
         ? `Siguiente vuelta en ${Math.ceil(seconds / 60)} min.`
-        : `Siguiente vuelta en ${seconds} s.`
+        : `Siguiente vuelta en ${seconds} s.`,
+    // Lo que se mira mientras dura el examen, en cinco datos y sin desplegar
+    // nada: en qué vuelta va, cuánto falta para la siguiente, quién sigue
+    // dentro, quién ha terminado y por dónde va la vuelta de ahora.
+    roundLabel: 'Vuelta',
+    nextLabel: 'Siguiente',
+    activeLabel: 'Activos',
+    finishedLabel: 'Finalizados',
+    progressLabel: 'Progreso',
+    nowCorrecting: 'ahora',
+    ofMinutes: (minutes: number) => `cada ${minutes} min`
   },
   session: {
     title: 'La nota del examen',

@@ -6,6 +6,8 @@ export const IPC = {
   pickFile: 'dialog:pickFile',
   openExternal: 'shell:openExternal',
   secretRefs: 'run:secretRefs',
+  describe: 'files:describe',
+  openFolder: 'shell:openFolder',
   startRun: 'run:start',
   cancelRun: 'run:cancel',
   setExamMode: 'exam:setMode',

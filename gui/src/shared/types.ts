@@ -3,6 +3,7 @@
 
 import type { EngineEvent } from './events'
 import type { RunResult } from './artifact'
+import type { Description } from './describe'
 import type { Consolidation } from './consolidation'
 import type { Session } from './session'
 import type { RunSummary } from './history'
@@ -68,6 +69,14 @@ export interface HeimdallApi {
   openExternal: (url: string) => Promise<void>
   /** Credential names the chosen classroom asks for. */
   secretRefs: (classPath: string) => Promise<string[]>
+  /**
+   * The names the teacher gave the exam and the classroom, for the screen. A
+   * file that cannot be read has no name here and its error, whole, when the
+   * correction starts.
+   */
+  describe: (paths: { examPath: string | null; classPath: string | null }) => Promise<Description>
+  /** Opens the folder a chosen file lives in, in the system file manager. */
+  openFolder: (path: string) => Promise<void>
   startRun: (request: RunRequest) => Promise<void>
   /** Reads the canonical artifact of a finished run. */
   readArtifact: (path: string) => Promise<RunResult>

@@ -1,5 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Download, FileText, Layers, Play, RotateCcw, Square, Timer, Users } from 'lucide-react'
+import {
+  Download,
+  FileText,
+  FolderOpen,
+  Layers,
+  Play,
+  RotateCcw,
+  Square,
+  Timer,
+  Users
+} from 'lucide-react'
 import {
   Badge,
   Button,
@@ -12,6 +22,8 @@ import {
   Meter,
   ProgressBar,
   SectionTitle,
+  Segmented,
+  SegmentedItem,
   ViewHeader
 } from '@/components/ui'
 import { useApp, messageOf, noticeFrom } from '@/stores/app'
@@ -30,6 +42,7 @@ import { scoreView } from '@/lib/results'
 import { scaleOf, sessionCsv, sessionCsvName, sessionExportSummary } from '@/lib/export'
 import { startCorrection } from '@/lib/start-run'
 import type { Session } from '../../../shared/session'
+import type { Description } from '../../../shared/describe'
 import { t } from '@/i18n/es'
 
 export default function HomeView() {
@@ -45,6 +58,30 @@ export default function HomeView() {
 
   const run = useRun()
   const busy = run.phase === 'starting' || run.phase === 'running'
+
+  /** What the two chosen files are called, for the screen. */
+  const [described, setDescribed] = useState<Description>({ exam: null, classroom: null })
+
+  useEffect(() => {
+    if (!examPath && !classPath) {
+      setDescribed({ exam: null, classroom: null })
+      return
+    }
+    let current = true
+    window.heimdall
+      .describe({ examPath, classPath })
+      .then((description) => {
+        if (current) setDescribed(description)
+      })
+      // A name is for reading: if it cannot be read the path is still there,
+      // and the file's real error arrives whole when the engine reads it.
+      .catch(() => {
+        if (current) setDescribed({ exam: null, classroom: null })
+      })
+    return () => {
+      current = false
+    }
+  }, [examPath, classPath])
 
   /** Credential names the classroom asks for, and what the teacher typed. */
   const [refs, setRefs] = useState<string[]>([])
@@ -136,30 +173,38 @@ export default function HomeView() {
   }
 
   const percent = runPercent(run)
+  const examSession = useExamSession()
 
   return (
     <div className="flex h-full flex-col">
       <ViewHeader title={t.home.title} />
       <div className="min-h-0 flex-1 space-y-5 overflow-auto p-6">
         <div className="grid gap-4 md:grid-cols-2">
-          <FileCard
+          <PickCard
             icon={<FileText className="h-4 w-4" />}
             title={t.home.exam}
-            hint={t.home.examHint}
+            name={described.exam?.name ?? null}
+            meta={
+              described.exam?.checks == null ? null : t.home.examMeta(described.exam.checks)
+            }
             path={examPath}
             disabled={busy}
             onPick={() => void pick('exam')}
           />
-          <FileCard
+          <PickCard
             icon={<Users className="h-4 w-4" />}
             title={t.home.classroom}
-            hint={t.home.classHint}
+            name={described.classroom?.name ?? null}
+            meta={
+              described.classroom?.students == null
+                ? null
+                : t.home.classMeta(described.classroom.students)
+            }
             path={classPath}
             disabled={busy}
             onPick={() => void pick('class')}
           />
         </div>
-        <p className="max-w-3xl text-xs text-muted-foreground">{t.home.sameFolder}</p>
 
         {/* A retry is never silent: it says what it will repeat and it can be
             called off without leaving this screen. */}
@@ -201,29 +246,42 @@ export default function HomeView() {
           </Card>
         )}
 
-        <div className="flex items-center gap-3">
-          {busy ? (
-            <Button variant="destructive" disabled={run.cancelling} onClick={() => setConfirmStop(true)}>
-              <Square className="h-4 w-4" />
-              {run.cancelling ? t.run.cancelling : t.run.cancel}
-            </Button>
-          ) : (
-            <Button disabled={!!missing} onClick={() => void start()}>
-              {retry ? <RotateCcw className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-              {retry ? t.run.retryStart : run.phase === 'finished' ? t.run.again : t.run.start}
-            </Button>
-          )}
-          {missing && !busy && <span className="text-xs text-muted-foreground">{missing}</span>}
+        <div>
+          <SectionTitle>{t.home.action}</SectionTitle>
+          <div className="flex flex-wrap items-center gap-3">
+            {busy ? (
+              <Button
+                variant="destructive"
+                disabled={run.cancelling}
+                onClick={() => setConfirmStop(true)}
+              >
+                <Square className="h-4 w-4" />
+                {run.cancelling ? t.run.cancelling : t.run.cancel}
+              </Button>
+            ) : (
+              <Button disabled={!!missing} onClick={() => void start()}>
+                {retry ? <RotateCcw className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                {retry ? t.run.retryStart : run.phase === 'finished' ? t.run.again : t.run.start}
+              </Button>
+            )}
+            <ExamControl
+              exam={exam}
+              disabled={!!missing && !exam.active}
+              onStart={(minutes) => void startExamMode(minutes)}
+              onStop={() => void stopExamMode()}
+            />
+            {missing && !busy && <span className="text-xs text-muted-foreground">{missing}</span>}
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {exam.active ? t.exam.hint : t.home.sameFolder}
+          </p>
         </div>
 
-        <ExamCard
-          exam={exam}
-          disabled={!!missing && !exam.active}
-          onStart={(minutes) => void startExamMode(minutes)}
-          onStop={() => void stopExamMode()}
-        />
+        {exam.active && (
+          <ExamStrip exam={exam} percent={percent} session={examSession.session} />
+        )}
 
-        <SessionPanel />
+        <SessionPanel {...examSession} />
 
         {run.phase !== 'idle' && <RunPanel percent={percent} />}
       </div>
@@ -243,13 +301,11 @@ export default function HomeView() {
 }
 
 /**
- * Exam mode: the class is corrected again and again while the practice lasts.
- *
- * The countdown is shown because the teacher has to know whether what is on
- * the screen is from a minute ago or from twenty, and because it is the only
- * visible sign that the mode is still on between two passes.
+ * Exam mode, as two buttons and an interval. It lives next to «Corregir»
+ * because both are the same decision —correct now, or keep correcting— and
+ * the teacher takes it once, with the class already in the room.
  */
-function ExamCard({
+function ExamControl({
   exam,
   disabled,
   onStart,
@@ -261,58 +317,84 @@ function ExamCard({
   onStop: () => void
 }) {
   const [minutes, setMinutes] = useState<number>(exam.everyMinutes)
+
+  if (exam.active) {
+    return (
+      <Button variant="outline" onClick={onStop}>
+        <Timer className="h-4 w-4" />
+        {t.exam.stop}
+      </Button>
+    )
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <Button variant="outline" disabled={disabled} onClick={() => onStart(minutes)}>
+        <Timer className="h-4 w-4" />
+        {t.exam.start}
+      </Button>
+      <Segmented>
+        {EXAM_INTERVALS.map((value) => (
+          <SegmentedItem key={value} active={value === minutes} onClick={() => setMinutes(value)}>
+            {t.exam.everyMinutes(value)}
+          </SegmentedItem>
+        ))}
+      </Segmented>
+    </div>
+  )
+}
+
+/**
+ * What is going on while the exam lasts, in the five readings that answer it
+ * without opening anything: which round this is, how long until the next one,
+ * how many students are still being corrected, how many have finished and how
+ * far the round in flight has got.
+ *
+ * The countdown is what says the mode is still on between two rounds; the
+ * finished ones are the engine's word (ADR-0020), never counted here.
+ */
+function ExamStrip({
+  exam,
+  percent,
+  session
+}: {
+  exam: ExamMode
+  percent: number | null
+  session: Session | null
+}) {
   const [left, setLeft] = useState<number | null>(null)
 
   useEffect(() => {
-    if (!exam.active) {
-      setLeft(null)
-      return
-    }
     const tick = (): void => setLeft(secondsLeft(exam, Date.now()))
     tick()
     const timer = setInterval(tick, 1000)
     return () => clearInterval(timer)
   }, [exam])
 
+  const tally = session ? sessionTally(session) : null
+  const active = tally ? tally.graded + tally.open - tally.finished : null
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Timer className="h-4 w-4" />
-          {t.exam.title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <p className="text-xs text-muted-foreground">{t.exam.hint}</p>
-        {exam.active ? (
-          <>
-            <p className="text-sm">
-              {t.exam.running(exam.passes, exam.everyMinutes)}{' '}
-              {left === null ? t.exam.correcting : t.exam.nextIn(left)}
-            </p>
-            <Button variant="outline" size="sm" onClick={onStop}>
-              {t.exam.stop}
-            </Button>
-          </>
-        ) : (
-          <div className="flex flex-wrap items-center gap-2">
-            {EXAM_INTERVALS.map((value) => (
-              <Button
-                key={value}
-                variant={value === minutes ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setMinutes(value)}
-              >
-                {t.exam.everyMinutes(value)}
-              </Button>
-            ))}
-            <Button disabled={disabled} onClick={() => onStart(minutes)}>
-              {t.exam.start}
-            </Button>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-5">
+      <Reading value={String(exam.passes)} label={t.exam.roundLabel} hint={t.exam.ofMinutes(exam.everyMinutes)} />
+      <Reading
+        value={left === null ? t.exam.nowCorrecting : left >= 60 ? `${Math.ceil(left / 60)} min` : `${left} s`}
+        label={t.exam.nextLabel}
+      />
+      <Reading value={active === null ? '—' : String(Math.max(active, 0))} label={t.exam.activeLabel} />
+      <Reading value={tally === null ? '—' : String(tally.finished)} label={t.exam.finishedLabel} />
+      <Reading value={percent === null ? '—' : `${percent}%`} label={t.exam.progressLabel} />
+    </div>
+  )
+}
+
+function Reading({ value, label, hint }: { value: string; label: string; hint?: string }) {
+  return (
+    <div className="bg-background px-4 py-3">
+      <div className="text-figure font-bold tabular-nums">{value}</div>
+      <div className="text-micro uppercase tracking-[0.09em] text-muted-foreground">{label}</div>
+      {hint && <div className="text-xs text-muted-foreground">{hint}</div>}
+    </div>
   )
 }
 
@@ -326,7 +408,12 @@ function ExamCard({
  * 12), and while a round is running the previous answer stays on screen
  * instead of a blank.
  */
-function SessionPanel() {
+function useExamSession(): {
+  rounds: string[]
+  session: Session | null
+  problem: string | null
+  loading: boolean
+} {
   const rounds = useApp((s) => s.examRounds)
   const [session, setSession] = useState<Session | null>(null)
   const [problem, setProblem] = useState<string | null>(null)
@@ -353,6 +440,24 @@ function SessionPanel() {
     void read(rounds)
   }, [rounds, read])
 
+  return { rounds, session, problem, loading }
+}
+
+/**
+ * The exam as a whole, student by student. It is read once, by the view, and
+ * shown in two places: the strip up top and this panel.
+ */
+function SessionPanel({
+  rounds,
+  session,
+  problem,
+  loading
+}: {
+  rounds: string[]
+  session: Session | null
+  problem: string | null
+  loading: boolean
+}) {
   if (rounds.length === 0) return null
 
   return (
@@ -565,37 +670,72 @@ function StudentRow({ student, checks }: { student: StudentProgress; checks: num
   )
 }
 
-function FileCard({
+/**
+ * One of the two things a correction needs, by its name.
+ *
+ * The name comes from the file itself —what the teacher called the exam and
+ * the class— because that is what they recognise; the path is what the
+ * computer needs and it waits inside «detalles avanzados», where it is still
+ * one click away when something has to be looked at on disk.
+ */
+function PickCard({
   icon,
   title,
-  hint,
+  name,
+  meta,
   path,
   disabled,
   onPick
 }: {
   icon: React.ReactNode
   title: string
-  hint: string
+  name: string | null
+  meta: string | null
   path: string | null
   disabled: boolean
   onPick: () => void
 }) {
+  const setNotice = useApp((s) => s.setNotice)
+
+  async function openFolder(): Promise<void> {
+    if (!path) return
+    try {
+      await window.heimdall.openFolder(path)
+    } catch (error) {
+      setNotice(noticeFrom(t.home.folderFailed, error))
+    }
+  }
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+      <CardContent className="space-y-2 pt-5">
+        <div className="flex items-center gap-2 text-micro uppercase tracking-[0.09em] text-muted-foreground">
           {icon}
           {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <p className="text-xs text-muted-foreground">{hint}</p>
-        <p className="truncate font-mono text-dense" title={path ?? undefined}>
-          {path ?? <span className="text-muted-foreground">{t.home.none}</span>}
-        </p>
-        <Button variant="outline" size="sm" disabled={disabled} onClick={onPick}>
-          {t.home.choose}
-        </Button>
+        </div>
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <div className="min-w-0">
+            <p className="truncate text-name font-semibold">
+              {path ? (name ?? t.home.unnamed) : <span className="text-muted-foreground">{t.home.none}</span>}
+            </p>
+            {path && meta && <p className="text-xs text-muted-foreground">{meta}</p>}
+          </div>
+          <Button variant="outline" size="sm" disabled={disabled} onClick={onPick}>
+            {path ? t.home.change : t.home.choose}
+          </Button>
+        </div>
+        {path && (
+          <details>
+            <summary className="cursor-pointer text-xs text-muted-foreground">
+              {t.home.advanced}
+            </summary>
+            <p className="mt-1 break-all font-mono text-dense text-muted-foreground">{path}</p>
+            <Button variant="ghost" size="sm" className="mt-1" onClick={() => void openFolder()}>
+              <FolderOpen className="h-4 w-4" />
+              {t.home.openFolder}
+            </Button>
+          </details>
+        )}
       </CardContent>
     </Card>
   )
