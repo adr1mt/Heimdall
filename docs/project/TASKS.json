@@ -1833,6 +1833,32 @@
       "notes": "Referencia: workspace/teuton-gui, solo lectura: su pantalla de Clases ya tiene este pegado."
     },
     {
+      "id": "T117",
+      "title": "Clases: identificador y nombre fijos al desplazar la tabla",
+      "phase": 6,
+      "package": "P2",
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [
+        "T107"
+      ],
+      "goal": "Que con muchas columnas propias se sepa siempre a que alumno se le esta escribiendo.",
+      "scope": [
+        "Identificador y Nombre y apellidos fijos a la izquierda durante el desplazamiento horizontal",
+        "El resto de columnas se desplaza con normalidad"
+      ],
+      "out_of_scope": [
+        "Fijar ninguna columna mas",
+        "Rediseniar la tabla de Clases"
+      ],
+      "acceptance": [
+        "Con nueve columnas propias y la tabla desplazada al final, identificador y nombre siguen visibles",
+        "Con pocas columnas la tabla se ve igual que antes"
+      ],
+      "tests": [],
+      "notes": "Observado en la revision visual de Clases del 2026-09-21: al desplazar hasta p8 se editan numeros sin saber de quien son. No bloquea P2: va despues de T115 y T116."
+    },
+    {
       "id": "T109",
       "title": "Editor visual del examen, con vista YAML",
       "phase": 6,
