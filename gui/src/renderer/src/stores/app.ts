@@ -10,7 +10,9 @@ import {
   type ExamMode
 } from '@/lib/exam'
 
-export type View = 'home' | 'results' | 'history' | 'settings' | 'help'
+import { isReady, type View } from '@/lib/nav'
+
+export type { View }
 export type Theme = 'dark' | 'light'
 
 interface AppState {
@@ -131,7 +133,10 @@ export const useApp = create<AppState>((set, get) => ({
     set({ theme })
   },
   toggleTheme: () => get().setTheme(get().theme === 'dark' ? 'light' : 'dark'),
-  setView: (view) => set({ view }),
+  // A section that is not built yet cannot be opened, whoever asks: the
+  // button is disabled, and this is the second lock so no code path lands the
+  // teacher on an empty screen.
+  setView: (view) => set(isReady(view) ? { view } : {}),
   setEngine: (engine) => set({ engine }),
   setExamPath: (examPath) => set({ examPath }),
   setClassPath: (classPath) => set({ classPath }),

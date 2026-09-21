@@ -7,10 +7,17 @@ export const t = {
   },
   nav: {
     home: 'Inicio',
+    classes: 'Clases',
+    exams: 'Exámenes',
     results: 'Resultados',
+    analytics: 'Analíticas',
     history: 'Histórico',
     settings: 'Ajustes',
-    help: 'Ayuda'
+    help: 'Ayuda',
+    // A section that is not built yet stays in sight, disabled: the menu is
+    // the same one in every version and no entry appears out of nowhere.
+    soon: (label: string) => `«${label}» todavía no está. Llega en una versión próxima.`,
+    soonBadge: 'pronto'
   },
   engine: {
     ready: 'Motor listo',

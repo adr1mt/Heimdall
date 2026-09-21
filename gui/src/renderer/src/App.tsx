@@ -1,7 +1,9 @@
 import { Component, lazy, Suspense, useEffect, type ErrorInfo, type ReactNode } from 'react'
 import {
   AlertTriangle,
+  BarChart3,
   CheckCircle2,
+  FolderOpen,
   HelpCircle,
   History as HistoryIcon,
   Home,
@@ -11,8 +13,10 @@ import {
   Moon,
   Settings as SettingsIcon,
   Sun,
+  Users,
   X
 } from 'lucide-react'
+import { NAV_FOOTER, NAV_MAIN, comingSoon, type NavEntry } from './lib/nav'
 import { useApp, noticeFrom, type View } from './stores/app'
 import { useRun } from './stores/run'
 import { cn } from './lib/utils'
@@ -26,13 +30,16 @@ const HelpView = lazy(() => import('./routes/Help'))
 const ResultsView = lazy(() => import('./routes/Results'))
 const HistoryView = lazy(() => import('./routes/History'))
 
-const NAV: { id: View; label: string; icon: typeof Home }[] = [
-  { id: 'home', label: t.nav.home, icon: Home },
-  { id: 'results', label: t.nav.results, icon: ListChecks },
-  { id: 'history', label: t.nav.history, icon: HistoryIcon },
-  { id: 'settings', label: t.nav.settings, icon: SettingsIcon },
-  { id: 'help', label: t.nav.help, icon: HelpCircle }
-]
+const ICONS: Record<View, typeof Home> = {
+  home: Home,
+  classes: Users,
+  exams: FolderOpen,
+  results: ListChecks,
+  analytics: BarChart3,
+  history: HistoryIcon,
+  settings: SettingsIcon,
+  help: HelpCircle
+}
 
 /**
  * The error boundary wraps the WHOLE application, not just the view: a failure
@@ -116,7 +123,10 @@ function AppBody() {
 
   const views: Record<View, JSX.Element> = {
     home: <HomeView />,
+    classes: <ComingSoon view="classes" />,
+    exams: <ComingSoon view="exams" />,
     results: <ResultsView />,
+    analytics: <ComingSoon view="analytics" />,
     history: <HistoryView />,
     settings: <SettingsView />,
     help: <HelpView />
@@ -136,30 +146,18 @@ function AppBody() {
         </div>
 
         <nav className="flex flex-1 flex-col gap-0.5 px-3">
-          {NAV.map((item) => {
-            const active = view === item.id
-            return (
-              <button
-                key={item.id}
-                onClick={() => setView(item.id)}
-                className={cn(
-                  'group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                  active
-                    ? 'bg-primary/20 text-white'
-                    : 'text-sidebar-foreground/70 hover:bg-white/5 hover:text-white'
-                )}
-              >
-                {active && (
-                  <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-primary" />
-                )}
-                <item.icon className="h-[18px] w-[18px]" />
-                {item.label}
-              </button>
-            )
-          })}
+          {NAV_MAIN.map((entry) => (
+            <NavButton key={entry.id} entry={entry} active={view === entry.id} onPick={setView} />
+          ))}
         </nav>
 
         <div className="space-y-3 px-4 pb-4">
+          {/* Ajustes y Ayuda al pie: no son parte de corregir nada. */}
+          <div className="flex flex-col gap-0.5 border-t border-white/10 pt-3">
+            {NAV_FOOTER.map((entry) => (
+              <NavButton key={entry.id} entry={entry} active={view === entry.id} onPick={setView} />
+            ))}
+          </div>
           <EngineBadge />
           <ProjectorToggle />
           <button
@@ -204,6 +202,53 @@ function AppBody() {
           </ViewErrorBoundary>
         </div>
       </main>
+    </div>
+  )
+}
+
+function NavButton({
+  entry,
+  active,
+  onPick
+}: {
+  entry: NavEntry
+  active: boolean
+  onPick: (view: View) => void
+}) {
+  const Icon = ICONS[entry.id]
+  return (
+    <button
+      disabled={!entry.ready}
+      aria-disabled={!entry.ready}
+      title={entry.ready ? undefined : comingSoon(entry.id)}
+      onClick={() => onPick(entry.id)}
+      className={cn(
+        'group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+        active
+          ? 'bg-primary/20 text-white'
+          : 'text-sidebar-foreground/70 hover:bg-white/5 hover:text-white',
+        !entry.ready && 'cursor-not-allowed opacity-40 hover:bg-transparent hover:text-sidebar-foreground/70'
+      )}
+    >
+      {active && (
+        <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-primary" />
+      )}
+      <Icon className="h-[18px] w-[18px]" />
+      {entry.label}
+      {!entry.ready && (
+        <span className="ml-auto text-glyph uppercase tracking-[0.09em] text-sidebar-foreground/40">
+          {t.nav.soonBadge}
+        </span>
+      )}
+    </button>
+  )
+}
+
+/** A section that is still to be built, if anything ever routes to it. */
+function ComingSoon({ view }: { view: View }) {
+  return (
+    <div className="flex h-full items-center justify-center p-8">
+      <p className="text-sm text-muted-foreground">{comingSoon(view)}</p>
     </div>
   )
 }
