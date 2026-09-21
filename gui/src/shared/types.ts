@@ -7,6 +7,7 @@ import type { Description } from './describe'
 import type { Consolidation } from './consolidation'
 import type { Session } from './session'
 import type { RunSummary } from './history'
+import type { BackupEntry, RestoreReport } from './backup'
 import type { ClassGroup } from './classes'
 
 /** Result of locating the engine and asking it for its version. */
@@ -143,6 +144,16 @@ export interface HeimdallApi {
   session: (roundPaths: string[]) => Promise<Session>
   /** The past runs of the project the exam belongs to, newest first. */
   listRuns: (examPath: string) => Promise<RunSummary[]>
+  /**
+   * The safety copies of this exam's grades, kept outside its folder. They
+   * hold the grade of every student and none of the machines' output.
+   */
+  listBackups: (examPath: string) => Promise<BackupEntry[]>
+  /**
+   * Puts the copies back into the exam's folder. A correction already there
+   * is left untouched, so restoring never lowers a grade already saved.
+   */
+  restoreBackups: (examPath: string) => Promise<RestoreReport>
   /**
    * Writes the grades the renderer already built where the teacher says.
    * Returns the path, or null if they cancelled the dialog.

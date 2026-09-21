@@ -127,6 +127,43 @@ app.whenReady().then(async () => {
     console.log('---------------------')
   }
 
+  // B-1 and B-2 of T113: the safety copy is made by itself when the
+  // correction ends, and deleting the exam's folder does not take the grades
+  // with it. The folder is deleted from here —the teacher would do it from
+  // the file manager— and everything after it goes through the real buttons.
+  if (process.env.CHECK_BACKUPS) {
+    const copies = (await js(
+      `window.heimdall.listBackups(${JSON.stringify(join(project, 'examen.yaml'))}).then(b => b.length)`
+    )) as number
+    console.log('[lab-run] copias:', copies)
+
+    rmSync(join(project, 'var'), { recursive: true, force: true })
+    await js(`[...document.querySelectorAll('aside button')].find(b => b.textContent.trim() === 'Histórico').click()`)
+    await wait(600)
+    await js(`[...document.querySelectorAll('main button')].find(b => b.textContent.trim() === 'Actualizar').click()`)
+    await wait(600)
+    const restored = await js(`(() => {
+      const button = [...document.querySelectorAll('main button')]
+        .find(b => b.textContent.includes('Restaurar las notas'))
+      if (button) button.click()
+      return !!button
+    })()`)
+    await wait(1000)
+    const reopened = await js(`(() => {
+      const row = [...document.querySelectorAll('main button')].find(b => b.textContent.trim() === 'Abrir')
+      if (row) row.click()
+      return !!row
+    })()`)
+    await wait(800)
+    const recovered = (await js(`document.querySelector('main').innerText`)) as string
+    console.log('[lab-run] restaurar:', restored && reopened ? 'ok' : `boton=${restored} abrir=${reopened}`)
+    console.log('----- recuperado -----')
+    console.log(recovered)
+    console.log('----------------------')
+    await js(`[...document.querySelectorAll('aside button')].find(b => b.textContent.trim() === 'Resultados').click()`)
+    await wait(600)
+  }
+
   // X-1 of T056: take the grades out through the real button and the real
   // save dialog. What lands on disk is what the teacher would get.
   if (csvOut) {

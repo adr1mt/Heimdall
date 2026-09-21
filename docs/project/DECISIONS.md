@@ -613,3 +613,23 @@ Dos decisiones menores:
    nadie lo dijera. Se rechaza al teclearla.
 7. **El puerto se escribe solo cuando no es el de siempre.** Escribir 22 en
    cada fila escondería qué alumnos son realmente la excepción.
+
+## T113 · Las copias de seguridad de las notas
+
+1. **La copia lleva las notas, no las pruebas.** Guarda la nota de cada alumno
+   y el estado y el peso de cada comprobación; deja fuera la salida de las
+   máquinas y lo que se comparó. Dos razones: la salida de un alumno es dato no
+   confiable y no tiene por qué estar en una copia que nadie va a auditar, y lo
+   que se pierde al borrar una carpeta son las notas, no la evidencia. La copia
+   restaurada lo dice en el propio fichero y en la pantalla.
+2. **Las copias viven en la carpeta de datos de la aplicación**, nunca dentro
+   de la del examen. Una copia dentro de la carpeta que se borra no es copia.
+3. **Restaurar solo puede añadir.** Una corrección que ya está en la carpeta no
+   se sobrescribe jamás: el artefacto del motor tiene la evidencia entera y la
+   copia solo las notas, así que pisarlo bajaría lo que el profesor ya tiene.
+   El botón no puede, ni por error, bajar una nota guardada.
+4. **La copia se hace sola al terminar cada corrección** y se repara sola: una
+   corrección cuya copia se borró vuelve a copiarse en la siguiente. No hay
+   botón de «copiar» porque no hay nada que decidir.
+5. **Un fallo al copiar no rompe la corrección que acaba de terminar.** La
+   copia es una red de seguridad, no un paso de la evaluación.

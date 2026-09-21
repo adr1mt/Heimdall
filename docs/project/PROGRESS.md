@@ -6,16 +6,18 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T072: la aplicación se instala con el motor dentro.** Un commit.
+**T113: las notas tienen copia de seguridad.** Un commit.
 
-- `make gui-dist` deja en `gui/dist` un AppImage y un `.deb` con el motor
-  dentro. Quien lo instala no instala nada más: ni Go, ni Ruby, ni contenedores.
-- Sin nada elegido en Ajustes, la aplicación usa el motor que lleva dentro. Una
-  ruta elegida a mano sigue mandando sobre él; un `heimdall` a secas guardado
-  por una instalación antigua ya no ata a la aplicación al motor del sistema.
-- `make gui-paquete` comprueba el paquete construido, no el árbol de
-  desarrollo: P-1 lleva el motor, P-2 con el entorno vacío corrige igual que el
-  compilado del repositorio, P-3 arranca sin ningún `heimdall` en el `PATH`.
+- Al terminar cada corrección, Heimdall guarda las notas **fuera de la carpeta
+  del examen**, en su propia carpeta de datos. Si el profesor borra la carpeta
+  del examen, las notas siguen ahí.
+- La copia lleva la nota de cada alumno y el resultado de cada comprobación.
+  No lleva la salida de las máquinas ni ninguna contraseña.
+- En Histórico hay un apartado nuevo: se ven las copias, cuáles siguen en la
+  carpeta y cuáles solo quedan en copia, y un botón las devuelve.
+- Restaurar **solo puede añadir**: una corrección que ya está en la carpeta se
+  queda intacta, con su detalle entero. Nunca baja una nota ya guardada.
+- Se guardan las 50 correcciones más recientes de cada examen.
 
 ## Estado actual
 
@@ -28,7 +30,7 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
   `assert`, `report` atómico, `events`, `engine` y `ssh` (ADR-0011).
 - `test/lab.sh`: `alu1` en `127.1.2.3:2201`, el roto en el 2299. `acceptance.sh`,
   `eventos.sh`, `sesion.sh`.
-- `gui/`: árbol Node independiente; `make gui-check` (283 tests), `gui-build`,
+- `gui/`: árbol Node independiente; `make gui-check` (306 tests), `gui-build`,
   `gui-lab`, **`gui-editor`**. **Las nueve secciones están construidas**:
   Inicio, Clases, Exámenes, Corregir, Resultados, Analíticas, Histórico,
   Ajustes y Ayuda. Modo proyector en la barra lateral. En el directorio de
@@ -37,10 +39,10 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Pruebas ejecutadas
 
-`make check` y `make gui-check` (290) verdes, `typecheck` verde. Contra el
+`make check` y `make gui-check` (306) verdes, `typecheck` verde. Contra el
 laboratorio, con la aplicación construida: `make gui-lab` (S-0…S-4, H-1, X-1,
-X-2), `make gui-editor` (D-1…D-7) y el modo examen **entero verde** por primera
-vez (E-1…E-5, P-0…P-3, C-1…C-3, S-5). Un examen escrito desde el formulario
+X-2, **B-1…B-3**), `make gui-editor` (D-1…D-7) y el modo examen entero
+(E-1…E-5, P-0…P-3, C-1…C-3, S-5). Un examen escrito desde el formulario
 corrige el laboratorio: alumne01, 100/100. Del paquete real, `make gui-paquete`
 (P-1…P-3) verde. `make test` no se repitió.
 
@@ -50,7 +52,8 @@ corrige el laboratorio: alumne01, 100/100. Del paquete real, `make gui-paquete`
 - **A-10**: legacy escrito pero marcado `PEND`; se cierra o se retira en T060.
 - Un reintento exige el mismo PLAN. Intervalo mínimo del modo examen, 5 min.
 - El proyector tapa las máquinas, no los nombres del alumnado.
-- Los datos de alumnado quedan fuera de toda copia de seguridad hasta T113.
+- La copia guarda las notas, no las pruebas: una corrección recuperada de una
+  copia no enseña la salida de las máquinas, y lo dice en la propia pantalla.
 - El paquete se construye para Linux x64. Windows y macOS quedan fuera
   (decisión del 2026-09-21).
 - El editor reescribe el YAML con su propio formato: mismo examen, otra
@@ -58,8 +61,6 @@ corrige el laboratorio: alumne01, 100/100. Del paquete real, `make gui-paquete`
 
 ## Siguiente tarea recomendada
 
-**T113**, copias de seguridad de las notas: es área crítica (persistencia de
-notas), una tarea por sesión y sin encadenar. Después **T114**, actualización
-automática, que T072 ha desbloqueado.
+**T114**, actualización automática, desbloqueada por T072.
 
 Sin fecha: T059, T060, T070, T080, T111, T112, T023.

@@ -11,7 +11,7 @@ import { MAX_ARTIFACT, tooBigMessage } from './artifact'
  * `.partial.json` and are not runs that finished, so they stay out of the
  * list.
  */
-const RUN_FILE = /^run-[A-Za-z0-9_-]+\.json$/
+export const RUN_FILE = /^run-[A-Za-z0-9_-]+\.json$/
 
 /**
  * How many runs the history goes back. A classroom directory accumulates one

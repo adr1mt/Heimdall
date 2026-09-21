@@ -23,6 +23,8 @@ export const IPC = {
   consolidate: 'run:consolidate',
   session: 'run:session',
   listRuns: 'history:list',
+  listBackups: 'backups:list',
+  restoreBackups: 'backups:restore',
   saveCsv: 'export:saveCsv',
   listClasses: 'classes:list',
   saveClasses: 'classes:save',

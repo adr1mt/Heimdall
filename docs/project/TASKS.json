@@ -2015,7 +2015,7 @@
       "title": "Copias de seguridad de las notas",
       "phase": 6,
       "package": "P5",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [
         "T108"
@@ -2035,7 +2035,8 @@
         "Ninguna contrasena viaja en la copia"
       ],
       "tests": [
-        "gui/tests/backups.test.ts"
+        "gui/tests/backups.test.ts",
+        "gui/scripts/secretos.sh (B-1, B-2, B-3)"
       ],
       "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
     },

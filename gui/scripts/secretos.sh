@@ -43,6 +43,7 @@ PROJECT="$WORK" \
 HEIMDALL_ENGINE="$REPO/bin/heimdall" \
 LAB_SECRET_FILE="$WORK/clave" \
 CSV_OUT="$CSV" \
+CHECK_BACKUPS=1 \
   npm run --silent lab-run -- --user-data-dir="$USERDATA" >"$WORK/salida.txt" 2>&1 &
 app=$!
 
@@ -98,6 +99,26 @@ if [ -s "$CSV" ] && grep -qFf "$PATTERN" "$CSV"; then
   fail "X-2" "contraseña en el fichero de notas"
 else
   ok "X-2" "ninguna contraseña en el fichero de notas"
+fi
+
+# T113: la copia se hace sola y borrar la carpeta del examen no se lleva las
+# notas. La carpeta se borra dentro del arnés y se restaura desde la pantalla.
+grep -q "^\[lab-run\] copias: [1-9]" "$WORK/salida.txt" \
+  && ok "B-1" "al terminar la corrección hay copia de las notas fuera del examen" \
+  || fail "B-1" "no se ha hecho ninguna copia de seguridad"
+
+if grep -q "^\[lab-run\] restaurar: ok$" "$WORK/salida.txt" \
+   && sed -n '/----- recuperado -----/,/----------------------/p' "$WORK/salida.txt" \
+      | grep -q "de peso total"; then
+  ok "B-2" "borrada la carpeta del examen, las notas se recuperan desde la aplicación"
+else
+  fail "B-2" "las notas no se recuperan tras borrar la carpeta del examen"
+fi
+
+if grep -rqFf "$PATTERN" "$USERDATA/copias" 2>/dev/null; then
+  fail "B-3" "contraseña en las copias de seguridad"
+else
+  ok "B-3" "ninguna contraseña viaja en la copia"
 fi
 
 [ -z "$failed" ] || { echo; echo "Hay fallos."; exit 1; }

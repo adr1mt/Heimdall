@@ -432,6 +432,27 @@ export const t = {
     capped: (max: number) =>
       `Se muestran las ${max} correcciones más recientes. Las anteriores siguen en la carpeta y se pueden abrir a mano.`
   },
+  // Las copias de seguridad de las notas. Viven fuera de la carpeta del
+  // examen, así que borrar esa carpeta no se lleva las notas por delante.
+  backups: {
+    title: 'Copias de seguridad',
+    hint:
+      'Después de cada corrección, Heimdall guarda las notas fuera de la carpeta del examen. La copia lleva la nota de cada alumno; no lleva la salida de las máquinas ni ninguna contraseña.',
+    empty: 'Todavía no hay ninguna copia. Se hace sola al terminar la primera corrección.',
+    loading: 'Buscando copias…',
+    restore: 'Restaurar las notas',
+    restoring: 'Restaurando…',
+    onDisk: 'Ya está en la carpeta',
+    missing: 'Solo queda la copia',
+    counts: (students: number) => `${students} alumnos`,
+    // Restaurar solo puede añadir correcciones: la que ya está en la carpeta
+    // se queda como está, con su detalle entero.
+    done: (restored: number, kept: number) =>
+      restored === 0
+        ? `No hacía falta restaurar nada: las ${kept} correcciones ya estaban en la carpeta.`
+        : `Se han recuperado ${restored} correcciones. ${kept === 0 ? 'Ninguna nota guardada se ha tocado.' : `Las otras ${kept} ya estaban y no se han tocado.`}`,
+    capped: (max: number) => `Se guardan las ${max} correcciones más recientes.`
+  },
   settings: {
     title: 'Ajustes',
     engineSection: 'Motor de corrección',

@@ -7,6 +7,7 @@ import { readArtifact } from './artifact'
 import { consolidateChain } from './consolidate'
 import { readExamSession } from './session'
 import { listRuns, varDirOf } from './history'
+import { backupRuns, listBackups, restoreBackups } from './backup'
 import { RunSession, projectDirOf } from './run'
 import { describeExam } from './describe'
 import { secretRefsIn } from './secrets'
@@ -299,6 +300,10 @@ export function registerIpc(): void {
       onEvent: (engineEvent) => send(sender, IPC.runEvent, engineEvent),
       onClose: (exitCode, stderr) => {
         session = null
+        // The grades leave the exam's folder the moment they exist. It never
+        // throws and it never blocks: a copy that fails must not turn a
+        // finished correction into an error (T113).
+        backupRuns(settingsDir(), examPath)
         const closed: RunClosed = { exitCode, stderr }
         send(sender, IPC.runClosed, closed)
       }
@@ -336,6 +341,21 @@ export function registerIpc(): void {
   ipcMain.handle(IPC.listRuns, (_e, examPath: unknown) => {
     if (typeof examPath !== 'string' || !examPath) return []
     return listRuns(varDirOf(examPath), savedClasses())
+  })
+
+  // The safety copies. Listing them reads only the app's own data directory.
+  ipcMain.handle(IPC.listBackups, (_e, examPath: unknown) => {
+    if (typeof examPath !== 'string' || !examPath) return []
+    return listBackups(settingsDir(), examPath)
+  })
+
+  // Restoring only ever adds corrections back: a result already in the
+  // exam's folder is never overwritten, so no grade already saved goes down.
+  ipcMain.handle(IPC.restoreBackups, (_e, examPath: unknown) => {
+    if (typeof examPath !== 'string' || !examPath) {
+      throw new Error('No hay ningún examen abierto que restaurar.')
+    }
+    return restoreBackups(settingsDir(), examPath)
   })
 
   // Writing the grades out. The renderer built the text and chose the scale;

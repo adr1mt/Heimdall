@@ -1,14 +1,18 @@
 import { useCallback, useEffect, useState } from 'react'
-import { AlertTriangle, FolderOpen, RefreshCw, RotateCcw } from 'lucide-react'
+import { AlertTriangle, FolderOpen, RefreshCw, RotateCcw, ShieldCheck } from 'lucide-react'
 import { Badge, Button, Spinner, ViewHeader } from '@/components/ui'
 import { useApp, noticeFrom } from '@/stores/app'
 import { useRun } from '@/stores/run'
 import { dateText } from '@/lib/results'
 import { t } from '@/i18n/es'
 import type { RunSummary } from '../../../shared/history'
+import type { BackupEntry } from '../../../shared/backup'
 
 /** As many rows as the main process is willing to summarise (history.ts). */
 const MAX_RUNS = 50
+
+/** As many copies as the main process keeps of one exam (backup.ts). */
+const MAX_BACKUPS = 50
 
 /**
  * The corrections already on disk. Nothing here evaluates anything: it lists
@@ -24,10 +28,13 @@ export default function HistoryView() {
 
   const [runs, setRuns] = useState<RunSummary[] | null>(null)
   const [opening, setOpening] = useState<string | null>(null)
+  const [backups, setBackups] = useState<BackupEntry[] | null>(null)
+  const [restoring, setRestoring] = useState(false)
 
   const load = useCallback(() => {
     if (!examPath) {
       setRuns([])
+      setBackups([])
       return
     }
     setRuns(null)
@@ -37,6 +44,14 @@ export default function HistoryView() {
       .catch((error) => {
         setRuns([])
         setNotice(noticeFrom('No se pudo leer el histórico', error))
+      })
+    setBackups(null)
+    window.heimdall
+      .listBackups(examPath)
+      .then(setBackups)
+      .catch((error) => {
+        setBackups([])
+        setNotice(noticeFrom('No se pudieron leer las copias de seguridad', error))
       })
   }, [examPath, setNotice])
 
@@ -52,6 +67,25 @@ export default function HistoryView() {
       setNotice(noticeFrom('No se pudo abrir el resultado', error))
     } finally {
       setOpening(null)
+    }
+  }
+
+  /**
+   * Puts the copies back. It never overwrites a correction already in the
+   * folder, so pressing it twice —or pressing it by mistake— cannot lower a
+   * grade that is already saved.
+   */
+  async function restore(): Promise<void> {
+    if (!examPath) return
+    setRestoring(true)
+    try {
+      const report = await window.heimdall.restoreBackups(examPath)
+      setNotice(t.backups.done(report.restored, report.kept))
+      load()
+    } catch (error) {
+      setNotice(noticeFrom('No se pudieron restaurar las notas', error))
+    } finally {
+      setRestoring(false)
     }
   }
 
@@ -109,7 +143,84 @@ export default function HistoryView() {
             )}
           </div>
         )}
+
+        {examPath && (
+          <Backups
+            backups={backups}
+            restoring={restoring}
+            disabled={busy}
+            onRestore={() => void restore()}
+          />
+        )}
       </div>
+    </div>
+  )
+}
+
+/**
+ * The safety copies of this exam. They live in the application's own folder,
+ * so deleting the exam's folder does not take the grades with it. What a copy
+ * holds is the grade of every student, never the output of their machines.
+ */
+function Backups({
+  backups,
+  restoring,
+  disabled,
+  onRestore
+}: {
+  backups: BackupEntry[] | null
+  restoring: boolean
+  disabled: boolean
+  onRestore: () => void
+}) {
+  const recoverable = backups?.filter((backup) => !backup.onDisk).length ?? 0
+  return (
+    <div className="space-y-3 rounded-md border border-border p-4">
+      <div className="flex items-center gap-2">
+        <ShieldCheck className="h-4 w-4 text-muted-foreground" />
+        <h2 className="text-sm font-medium">{t.backups.title}</h2>
+      </div>
+      <p className="max-w-3xl text-xs text-muted-foreground">{t.backups.hint}</p>
+
+      {backups === null ? (
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Spinner /> {t.backups.loading}
+        </p>
+      ) : backups.length === 0 ? (
+        <p className="text-sm text-muted-foreground">{t.backups.empty}</p>
+      ) : (
+        <>
+          <div className="space-y-1">
+            {backups.map((backup) => (
+              <div
+                key={backup.path}
+                className="flex flex-wrap items-center justify-between gap-2 text-xs"
+              >
+                <span className="text-muted-foreground">
+                  {dateText(backup.at)} · {t.backups.counts(backup.students)}
+                </span>
+                <Badge variant={backup.onDisk ? 'success' : 'warning'}>
+                  {backup.onDisk ? t.backups.onDisk : t.backups.missing}
+                </Badge>
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={disabled || restoring || recoverable === 0}
+              onClick={onRestore}
+            >
+              {restoring ? <Spinner /> : null}
+              {restoring ? t.backups.restoring : t.backups.restore}
+            </Button>
+            <span className="text-micro text-muted-foreground">
+              {t.backups.capped(MAX_BACKUPS)}
+            </span>
+          </div>
+        </>
+      )}
     </div>
   )
 }
