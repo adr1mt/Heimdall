@@ -22,7 +22,7 @@ Ficticias, públicas y solo válidas dentro del contenedor:
 
 | usuario | contraseña |
 |---|---|
-| `alumno` | `TEUTON_SECRET_TEST_12345` |
+| `alumno` | `HEIMDALL_SECRET_TEST_12345` |
 
 Nunca se usan credenciales reales en desarrollo ni en tests.
 

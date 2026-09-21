@@ -1176,7 +1176,7 @@
       "id": "T060",
       "title": "Borrado de la capa legacy en un commit",
       "phase": 7,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T059"
@@ -1282,7 +1282,7 @@
       "id": "T080",
       "title": "Hardening, auditoria de secretos y release",
       "phase": 9,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T060",

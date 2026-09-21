@@ -15,7 +15,7 @@ BIN="$ROOT/bin/heimdall"
 STUDENTS=100
 
 # Lab password: fictitious, public, only valid inside the container.
-SECRET="TEUTON_SECRET_TEST_12345"
+SECRET="HEIMDALL_SECRET_TEST_12345"
 SECRETS_LINE="$(printf '{"schema":1,"secrets":{"AULA_PASSWORD":"%s"}}\n' "$SECRET")"
 
 WORK="$(mktemp -d)"

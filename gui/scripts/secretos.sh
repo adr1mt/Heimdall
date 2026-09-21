@@ -12,7 +12,7 @@ set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 REPO="$(cd "$ROOT/.." && pwd)"
-SECRET="TEUTON_SECRET_TEST_12345"
+SECRET="HEIMDALL_SECRET_TEST_12345"
 
 # npm runs from the GUI tree whatever directory the script was called from.
 cd "$ROOT"

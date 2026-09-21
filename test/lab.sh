@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 # Test SSH lab: one container, one command. Used by the integration suite.
 #
-# 127.1.2.3 on purpose, never 127.0.0.x: Teuton routes any address containing
-# "127.0.0." to local execution (F-01) and A-11 checks that we do not.
+# 127.1.2.3 on purpose, never 127.0.0.x: the old engine routed any address
+# containing "127.0.0." to local execution (F-01) and A-11 checks that we do
+# not.
 #
 # Test credentials are fictitious and public on purpose (see docs/design).
 set -euo pipefail
 
-IMAGE=teutonlab-ssh
+IMAGE=heimdall-lab-ssh
 NAME=alu1
 HOST=127.1.2.3
 PORT=2201
-CONTAINERFILE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/docs/research/evidence"
+CONTAINERFILE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 die() { echo "lab: $*" >&2; exit 1; }
 

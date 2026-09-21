@@ -6,12 +6,10 @@ import (
 	"fmt"
 	"io"
 	"os/signal"
-	"path/filepath"
 	"syscall"
 
 	"heimdall/internal/engine"
 	"heimdall/internal/events"
-	"heimdall/internal/legacy"
 	"heimdall/internal/model"
 	"heimdall/internal/plan"
 	"heimdall/internal/report"
@@ -29,11 +27,8 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 	varDir := fs.String("var", "var", "directorio donde se escribe el artefacto")
 	concurrency := fs.Int("concurrency", 0, "alumnos en paralelo; 0 usa el del examen")
 	hostConcurrency := fs.Int("host-concurrency", 0, "conexiones que se abren a la vez contra una misma máquina; 0 usa el del examen")
-	compat := fs.String("compat", "", "escribe además los ficheros del formato antiguo: teuton2")
 	eventStream := fs.String("events", "", "emite el contrato nativo por stdout mientras corre: ndjson")
-	export := fs.String("export", "", "fachada para la GUI actual: json")
 	cname := fs.String("cname", "", "nombre del fichero de aula, sin la extensión; por defecto aula.yaml")
-	cases := fs.String("case", "", "posiciones de los alumnos del aula que se evalúan, p. ej. 1,3")
 	retryFrom := fs.String("retry", "", "repite solo las comprobaciones que quedaron sin evaluar en el artefacto indicado")
 	var sessionRounds roundList
 	fs.Var(&sessionRounds, "session", "vuelta anterior de esta sesión de examen; se repite una vez por vuelta, de la más antigua a la más reciente, y deja fuera a quien ya terminó")
@@ -48,62 +43,17 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 		fmt.Fprintf(stderr, "heimdall run: --events=%s no existe; el contrato nativo es ndjson\n", *eventStream)
 		return exitInvalidConfig
 	}
-	if *eventStream != "" && *export != "" {
-		fmt.Fprintln(stderr, "heimdall run: --events y --export escriben los dos en stdout; usa solo uno")
-		return exitInvalidConfig
-	}
-	if *compat != "" && *compat != "teuton2" {
-		fmt.Fprintf(stderr, "heimdall run: --compat=%s no existe; el único formato antiguo soportado es teuton2\n", *compat)
-		return exitInvalidConfig
-	}
-	// --export=json is how the GUI asks for a run: it wants the old files and
-	// the live progress. Any other format would end with the GUI reading a
-	// directory that nobody wrote, so it is an error here and not a surprise
-	// there (C9).
-	if *export != "" {
-		if *export != "json" {
-			fmt.Fprintf(stderr, "heimdall run: --export=%s no existe; este motor solo exporta json\n", *export)
-			return exitInvalidConfig
-		}
-		*compat = "teuton2"
-	}
-
-	// A repeat run is a run of this engine on this contract. The frozen
-	// facade is not taught anything new (principio 13), and a positional
-	// selection on top of a selection by result would leave the teacher
-	// guessing which one won.
-	if *retryFrom != "" {
-		switch {
-		case *compat != "" || *export != "":
-			fmt.Fprintln(stderr, "heimdall run: --retry no se combina con --compat ni con --export")
-			return exitInvalidConfig
-		case *cases != "":
-			fmt.Fprintln(stderr, "heimdall run: --retry ya elige a quién repite; no se combina con --case")
-			return exitInvalidConfig
-		}
-	}
-
 	// A round of a session and a repeat run are two different rules over two
 	// different questions, and the boundary between them is not crossed
-	// (ADR-0020). The frozen facade is not taught either of them (principio 13).
-	if len(sessionRounds) > 0 {
-		switch {
-		case *retryFrom != "":
-			fmt.Fprintln(stderr, "heimdall run: --session y --retry son dos cosas distintas: una vuelta de la sesión corrige la clase entera y --retry repite lo que quedó sin evaluar")
-			return exitInvalidConfig
-		case *compat != "" || *export != "":
-			fmt.Fprintln(stderr, "heimdall run: --session no se combina con --compat ni con --export")
-			return exitInvalidConfig
-		}
+	// (ADR-0020).
+	if len(sessionRounds) > 0 && *retryFrom != "" {
+		fmt.Fprintln(stderr, "heimdall run: --session y --retry son dos cosas distintas: una vuelta de la sesión corrige la clase entera y --retry repite lo que quedó sin evaluar")
+		return exitInvalidConfig
 	}
 
 	p, err := plan.LoadNamed(fs.Arg(0), *cname)
 	if err != nil {
 		fmt.Fprintf(stderr, "heimdall run: la configuración no es válida\n\n%s\n", err)
-		return exitInvalidConfig
-	}
-	if err := selectCases(p, *cases); err != nil {
-		fmt.Fprintf(stderr, "heimdall run: %s\n", err)
 		return exitInvalidConfig
 	}
 
@@ -166,11 +116,6 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	var live *progress
-	if *export == "json" {
-		live = newProgress(stdout)
-	}
-
 	// The native stream owns stdout while it is on: a line of prose in the
 	// middle of it would break the only channel the GUI has.
 	var stream *events.Emitter
@@ -189,9 +134,6 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 		Progress:        progressTo(stream),
 		Retry:           retry,
 		OnStudentDone: func(run *model.RunResult) error {
-			if live != nil {
-				live.students(run)
-			}
 			if err := writer.WritePartial(run); err != nil {
 				partialErr = err
 				return err
@@ -199,11 +141,6 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 			return nil
 		},
 	})
-
-	if live != nil {
-		live.students(result)
-		live.finish()
-	}
 
 	path, err := writer.WriteFinal(result)
 	if err != nil {
@@ -217,16 +154,7 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 		fmt.Fprintf(stderr, "heimdall run: aviso: no se pudo guardar algún parcial: %s\n", partialErr)
 	}
 
-	if *compat == "teuton2" {
-		if err := writeLegacy(*varDir, fs.Arg(0), result, values(secrets)); err != nil {
-			fmt.Fprintf(stderr, "heimdall run: aviso: %s\n", err)
-		}
-	}
-
 	code := engine.ExitCode(result)
-	if *export == "json" {
-		code = legacyExitCode(code)
-	}
 
 	if stream != nil {
 		stream.RunEnd(runEndOf(result, path, code))
@@ -308,27 +236,6 @@ func runEndOf(run *model.RunResult, artifact string, code int) events.RunEnd {
 		Counts:   events.CountsOf(run),
 		Warnings: run.Warnings,
 	}
-}
-
-// writeLegacy writes the files the current GUI reads, on top of the canonical
-// artifact, which is always written. The test name is the name of the project
-// directory, which is where the GUI looks when the project has no tt_testname
-// (C5). A failure here is a warning, never a different exit code: the run and
-// its grades already happened.
-func writeLegacy(varDir, projectDir string, run *model.RunResult, secrets []string) error {
-	clean, err := report.Redact(run, secrets)
-	if err != nil {
-		return fmt.Errorf("no se pudieron escribir los ficheros del formato antiguo: %w", err)
-	}
-	abs, err := filepath.Abs(projectDir)
-	if err != nil {
-		return fmt.Errorf("no se pudo resolver %s: %w", projectDir, err)
-	}
-	w, err := legacy.New(varDir, filepath.Base(abs))
-	if err != nil {
-		return err
-	}
-	return w.Write(clean)
 }
 
 // printSummary tells the teacher what happened in the words of the classroom:

@@ -79,7 +79,7 @@ gui-lab:
 ## gui-editor: write an exam from the application's editor and correct the lab
 ## with it (T109). Needs `make build`, `make gui-build` and `make lab`.
 gui-editor:
-	cd gui && HEIMDALL_ENGINE=$(PWD)/bin/heimdall LAB_SECRET=TEUTON_SECRET_TEST_12345 npm run --silent editor-lab
+	cd gui && HEIMDALL_ENGINE=$(PWD)/bin/heimdall LAB_SECRET=HEIMDALL_SECRET_TEST_12345 npm run --silent editor-lab
 
 clean:
 	rm -rf bin/

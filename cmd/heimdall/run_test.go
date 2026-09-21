@@ -182,52 +182,9 @@ func assertEmptyDir(t *testing.T, dir string) {
 	}
 }
 
-// The questionnaire project answers itself: no machine is contacted, so the
-// legacy files can be checked without the lab.
+// The questionnaire project answers itself: no machine is contacted, so a run
+// can be checked without the lab.
 const quizProject = "../../testdata/cuestionario"
-
-// With --compat=teuton2 the current GUI finds the three files it reads, in
-// var/<nombre del proyecto>/.
-func TestRunWritesTheLegacyFilesOnlyWithCompat(t *testing.T) {
-	out := t.TempDir()
-	var stdout, stderr bytes.Buffer
-	if got := run([]string{"run", "--var=" + out, "--compat=teuton2", quizProject}, &stdout, &stderr); got != 0 {
-		t.Fatalf("exit = %d (%s)", got, stderr.String())
-	}
-	dir := filepath.Join(out, "cuestionario")
-	for _, name := range []string{"resume.json", "case-01.json", "moodle.csv"} {
-		if _, err := os.Stat(filepath.Join(dir, name)); err != nil {
-			t.Errorf("falta %s: %s", name, err)
-		}
-	}
-
-	plain := t.TempDir()
-	stdout.Reset()
-	stderr.Reset()
-	if got := run([]string{"run", "--var=" + plain, quizProject}, &stdout, &stderr); got != 0 {
-		t.Fatalf("exit = %d (%s)", got, stderr.String())
-	}
-	if _, err := os.Stat(filepath.Join(plain, "cuestionario")); !os.IsNotExist(err) {
-		t.Errorf("sin --compat no se escribe nada del formato antiguo (%v)", err)
-	}
-	if entries, err := os.ReadDir(plain); err != nil || len(entries) == 0 {
-		t.Errorf("el artefacto canónico se escribe siempre: %v %v", entries, err)
-	}
-}
-
-// A format this engine does not know is an explicit error, never a silent run
-// without the files the teacher asked for (C9).
-func TestRunRejectsAnUnknownCompatFormat(t *testing.T) {
-	out := t.TempDir()
-	var stdout, stderr bytes.Buffer
-	if got := run([]string{"run", "--var=" + out, "--compat=teuton3", quizProject}, &stdout, &stderr); got != exitInvalidConfig {
-		t.Fatalf("exit = %d, se esperaba %d", got, exitInvalidConfig)
-	}
-	if !strings.Contains(stderr.String(), "teuton2") {
-		t.Errorf("stderr = %q: debe decir cuál es el formato soportado", stderr.String())
-	}
-	assertEmptyDir(t, out)
-}
 
 // The native stream has one format. Any other spelling is a mistake that must
 // stop here and not end with the GUI waiting for a line that never comes.
@@ -239,21 +196,6 @@ func TestRunRejectsAnUnknownEventFormat(t *testing.T) {
 	}
 	if !strings.Contains(stderr.String(), "ndjson") {
 		t.Errorf("stderr = %q: debe decir cuál es el formato", stderr.String())
-	}
-	assertEmptyDir(t, out)
-}
-
-// The native stream and the frozen facade both write to stdout: asking for
-// both would corrupt the only channel the GUI has.
-func TestRunRejectsTheNativeStreamTogetherWithTheLegacyFacade(t *testing.T) {
-	out := t.TempDir()
-	var stdout, stderr bytes.Buffer
-	got := run([]string{"run", "--events=ndjson", "--export=json", "--var=" + out, protoProject}, &stdout, &stderr)
-	if got != exitInvalidConfig {
-		t.Fatalf("exit = %d, se esperaba %d", got, exitInvalidConfig)
-	}
-	if stdout.Len() != 0 {
-		t.Errorf("stdout = %q: no debe escribirse nada", stdout.String())
 	}
 	assertEmptyDir(t, out)
 }

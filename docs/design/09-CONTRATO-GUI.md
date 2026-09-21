@@ -35,8 +35,6 @@ printf '%s' "$SECRETS_JSON" | heimdall run --secrets=stdin --events=ndjson --var
   bandera, `stdout` lleva el resumen en prosa para el profesor.
 - Con `--events=ndjson`, `stdout` es **solo** del flujo. El resumen en prosa no
   se imprime y los avisos del proceso van a `stderr`.
-- `--events` y `--export` son incompatibles: los dos escriben en `stdout`.
-  Pedir ambos es error de configuración (exit 2).
 - Los secretos viajan por `stdin` en una línea JSON. Nunca por `argv`
   (ADR-0009). El sobre es `{"schema":1,"secrets":{…}}` y se manda **siempre**,
   también cuando el aula no pide ninguna contraseña: entonces `secrets` va
@@ -47,10 +45,10 @@ printf '%s' "$SECRETS_JSON" | heimdall run --secrets=stdin --events=ndjson --var
   fichero: la GUI nombra el artefacto y nada más, nunca una lista de alumnos ni
   de comprobaciones. Si el `plan_hash` no coincide con el PLAN recién resuelto,
   es error de configuración (exit 2) y no se toca ninguna máquina.
-  `--retry` no se combina con `--compat`, `--export` ni `--case`.
 - `--session=<vuelta>`, repetible, deja fuera de esta vuelta a quien la sesión
-  ya dio por terminado (§8). No se combina con `--retry` ni con la fachada
-  congelada.
+  ya dio por terminado (§8). No se combina con `--retry`.
+- `--cname=<fichero>` nombra el aula dentro de la carpeta del examen, porque
+  cada clase tiene la suya (ADR-0022). Sin la bandera es `aula.yaml`.
 
 Códigos de salida, sin cambios: `0` todo evaluado · `2` configuración inválida
 · `3` ejecución parcial · `4` cancelada · `1` ni se pudo escribir.

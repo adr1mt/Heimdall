@@ -153,20 +153,6 @@ func TestReadArtifactRefusesAnUnknownSchema(t *testing.T) {
 	}
 }
 
-// --retry is a run of this engine on this contract. It is not taught to the
-// frozen facade, and it does not share the wheel with --case.
-func TestRunRejectsRetryMixedWithTheFrozenFacadeOrWithCase(t *testing.T) {
-	for _, extra := range []string{"--export=json", "--compat=teuton2", "--case=1"} {
-		out := t.TempDir()
-		var stdout, stderr bytes.Buffer
-		got := run([]string{"run", "--retry=var/run-R1.json", extra, "--var=" + out, protoProject}, &stdout, &stderr)
-		if got != exitInvalidConfig {
-			t.Errorf("%s: exit = %d, se esperaba %d", extra, got, exitInvalidConfig)
-		}
-		assertEmptyDir(t, out)
-	}
-}
-
 // A previous artifact that is not there ends the run before any machine is
 // touched, with exit 2 and an untouched var/.
 func TestRunRejectsARetryWhosePreviousRunIsMissing(t *testing.T) {

@@ -138,10 +138,10 @@ y sin instalar nada más que la aplicación.
 
 ## Fase 7 — Retirada de la capa legacy
 
-`internal/legacy`, `--compat=teuton2` y la fachada `--export=json`/`--cname`/
-`--case` se borran en un commit propio, junto con `06-LEGACY-WRITER.md` y las
-referencias que queden. Hasta ese momento están congeladas: sirven para pruebas
-internas y no reciben nada nuevo (ADR-0016).
+Hecha. `internal/legacy`, `--compat=teuton2` y la fachada `--export=json` y
+`--case` se borraron en un commit, junto con `06-LEGACY-WRITER.md` y las
+referencias que quedaban (ADR-0016). `--cname` se queda: no era fachada, es
+cómo la aplicación nombra el aula de cada clase (ADR-0022).
 
 **Salida**: `grep -ri teuton` en el código del motor y de la GUI no devuelve
 ninguna dependencia, solo menciones históricas en `docs/research/`.

@@ -13,7 +13,7 @@ import (
 
 // The lab credentials are fictitious and only valid inside the container
 // (test/README.md). No real credential is ever used in a test.
-const labPassword = "TEUTON_SECRET_TEST_12345"
+const labPassword = "HEIMDALL_SECRET_TEST_12345"
 
 // TestPrototypeAgainstTheLab runs the prototype exam against the real
 // container. alumne01 is the machine that is up; alumne02 points at a closed

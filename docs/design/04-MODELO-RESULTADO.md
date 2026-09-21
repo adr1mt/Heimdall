@@ -1,7 +1,7 @@
 # Modelo canónico de resultados
 
 Único formato de verdad del motor: **`run-<id>.json`**. Todo lo demás (NDJSON,
-GUI, Moodle, HTML, el escritor legacy) **deriva** de él. Nada escribe hacia
+GUI, Moodle, HTML) **deriva** de él. Nada escribe hacia
 atrás.
 
 Los nombres de campo van en **inglés**: es un contrato de máquina, se mapea 1:1

@@ -21,7 +21,7 @@ const (
 	labPort     = 2201
 	closedPort  = 2299
 	labUser     = "alumno"
-	labPassword = "TEUTON_SECRET_TEST_12345"
+	labPassword = "HEIMDALL_SECRET_TEST_12345"
 )
 
 func labConfig(t *testing.T) Config {

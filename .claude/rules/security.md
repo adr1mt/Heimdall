@@ -33,7 +33,8 @@ Cero coincidencias, con el proceso vivo.
 - Comandos como vector de argumentos. Sin shell, siempre.
 - Un valor sustituido entra **tal cual** como argumento: espacios, comillas y
   `;` incluidos. Nunca se reinterpreta.
-- El CSV legacy lleva prefijo defensivo contra fórmulas (F-14).
+- Todo CSV que exporte la aplicación lleva prefijo defensivo contra fórmulas
+  (F-14).
 
 ## Salida de los alumnos
 

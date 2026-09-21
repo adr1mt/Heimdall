@@ -51,9 +51,6 @@ func checkCmd(args []string, stdout, stderr io.Writer) int {
 	fmt.Fprintf(stdout, "Concurrencia:   %d alumnos a la vez, %d conexiones por máquina\n",
 		p.Summary.Concurrency, p.Summary.HostConcurrency)
 	fmt.Fprintf(stdout, "Hash del plan:  %s\n", p.Hash)
-	// The table the current GUI reads to size its progress bar (C2).
-	fmt.Fprintln(stdout)
-	printDSLStats(stdout, p)
 	return exitOK
 }
 

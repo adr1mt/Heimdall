@@ -22,13 +22,11 @@ que describe el sistema; esto describe **qué no se puede hacer**.
    `total_weight` son los mismos para todos los alumnos. Nada de lo que ocurra
    en una máquina puede alterarlos.
 
-5. **`internal/legacy` está congelada** (ADR-0016). Solo la lee
-   `--compat=teuton2`, solo escribe hacia fuera y nunca influye en la nota. No
-   se le añade **nada**: ni un campo, ni una bandera, ni una corrección que no
-   sea una regresión del motor. Sirve para pruebas internas hasta que se borre
-   entera en T060. Ningún diseño nuevo la tiene en cuenta.
+5. **No hay capa de compatibilidad.** `internal/legacy`, `--compat` y la
+   fachada del motor viejo se borraron en T060 (ADR-0016). No se reintroducen:
+   ni un fichero, ni una bandera, ni un formato de salida de Teuton.
 
-6. **El artefacto canónico se escribe siempre**, con o sin `--compat`, incluso
+6. **El artefacto canónico se escribe siempre**, incluso
    con cancelación o con todos los alumnos rotos. Única excepción: PLAN inválido.
 
 7. **No hay shell.** Los comandos son vectores de argumentos. No se construyen
@@ -54,7 +52,6 @@ internal/engine/ worker pool, presupuesto por alumno, cancelación
 internal/assert/ aserciones
 internal/report/ escritura atómica del artefacto
 internal/events/ contrato nativo NDJSON hacia la GUI
-internal/legacy/ LegacyTeutonWriter (congelado, se borra en T060)
 testdata/        exámenes e inventarios de prueba
 test/            scripts de aceptación e integración
 gui/             Heimdall GUI (Electron, TypeScript)
@@ -65,7 +62,7 @@ No se crean paquetes nuevos de primer nivel sin justificarlo en la tarea.
 `gui/` es un árbol Node independiente del módulo Go: `make check` no depende de
 él y su suite se ejecuta aparte. La GUI habla con el motor **solo** por el
 contrato nativo —argumentos, secretos por stdin, eventos NDJSON y artefacto
-canónico—; nunca lee `internal/legacy` ni ningún fichero de Teuton.
+canónico—; nunca lee un fichero de Teuton.
 
 ## Cambiar una decisión
 

@@ -10,7 +10,6 @@ profundamente a la arquitectura, **antes** de escribir una línea de Go.
 | [03-ESTADOS-Y-NOTA.md](03-ESTADOS-Y-NOTA.md) | Taxonomía de estados y causas; política de notas incompletas |
 | [04-MODELO-RESULTADO.md](04-MODELO-RESULTADO.md) | `RunResult` completo y ejemplo realista del JSON |
 | [05-SECRETOS-TIMEOUTS-REINTENTOS.md](05-SECRETOS-TIMEOUTS-REINTENTOS.md) | Secretos, límites de stdout/stderr, timeouts y reintentos |
-| [06-LEGACY-WRITER.md](06-LEGACY-WRITER.md) | `LegacyTeutonWriter`: **congelado** (ADR-0016), se borra en T060 |
 | [07-PROTOTIPO.md](07-PROTOTIPO.md) | Especificación exacta del primer prototipo y 14 criterios de aceptación |
 | [08-DECISIONES-ABIERTAS.md](08-DECISIONES-ABIERTAS.md) | Lo que sigue abierto |
 | [09-CONTRATO-GUI.md](09-CONTRATO-GUI.md) | Contrato nativo motor ↔ GUI: eventos NDJSON y códigos de salida |

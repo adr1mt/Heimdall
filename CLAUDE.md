@@ -49,8 +49,8 @@ Prioridad ante contradicciones: **ADR aceptado > `docs/design/` > `docs/research
 11. Tests y evidencia antes de dar una tarea por terminada.
 12. El modelo canónico es la fuente de verdad; lo demás deriva de él.
 13. Heimdall tiene identidad propia. Ninguna limitación de Teuton ni de su GUI
-    condiciona el diseño. `internal/legacy` y la fachada `--compat`/`--export`
-    están **congeladas** para pruebas internas y se borran en T060.
+    condiciona el diseño. La capa de compatibilidad se borró entera en T060:
+    no queda ni código ni banderas del motor viejo.
 
 ## Empezar una sesión
 

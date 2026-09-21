@@ -18,7 +18,7 @@ BADKEY="$ROOT/testdata/clave-desconocida"
 
 # The lab password (test/README.md). Fictitious, public and only valid inside
 # the container. A-7 demands zero occurrences of it anywhere.
-SECRET="TEUTON_SECRET_TEST_12345"
+SECRET="HEIMDALL_SECRET_TEST_12345"
 SECRETS_LINE="$(printf '{"schema":1,"secrets":{"AULA_PASSWORD":"%s"}}\n' "$SECRET")"
 
 WORK="$(mktemp -d)"
@@ -183,8 +183,8 @@ else
     "$(jq '[.students[] | select(.status != "")] | length >= 1' "$PART")" 'true'
 fi
 
-# --- A-10 legacy artifacts: pending, belongs to T040 ----------------------
-skip A-10 "artefactos legacy (resume.json, case-NN.json): los escribe T040, fuera de la fase 1"
+# --- A-10 legacy artifacts: withdrawn with the compatibility layer (T060) --
+skip A-10 "artefactos del formato viejo: retirados con la capa de compatibilidad (T060)"
 
 # --- A-12 the grade does not depend on the locale -------------------------
 VAR12="$WORK/var12"
@@ -228,4 +228,4 @@ if [ -n "$failed" ]; then
   echo "acceptance: fallan criterios:$failed"
   exit 1
 fi
-echo "acceptance: los 13 criterios de la fase 1 en verde (A-10 pendiente de T040)"
+echo "acceptance: los 13 criterios de la fase 1 en verde (A-10 retirado en T060)"

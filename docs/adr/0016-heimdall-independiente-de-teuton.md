@@ -38,7 +38,9 @@ formatos, ni de proyectos.
    de prueba interna, sin una funcionalidad nueva ni una dependencia más. El
    diseño nativo no la tiene en cuenta para nada. Se borra entera, en un commit
    propio, en cuanto la GUI nativa corra sobre el artefacto canónico con sus
-   pruebas de integración en verde.
+   pruebas de integración en verde. Ejecutado en T060, con una excepción:
+   `--cname` no se borró porque para entonces ya no era fachada, sino cómo la
+   GUI nombra el aula de cada clase (ADR-0022).
 5. **Ninguna limitación de Teuton GUI condiciona el diseño.** El modelo real
    —`PASS`, `FAIL`, `UNEVALUATED`, causa técnica, resultados parciales,
    provisionales, avisos, progreso por comprobación— es lo que la GUI muestra.

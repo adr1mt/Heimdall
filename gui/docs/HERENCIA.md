@@ -29,10 +29,8 @@ Las once entradas están **retiradas**. Ninguna tiene código en `gui/src`:
 | `looksLikeTeuton` | Conservada, reescrita | Sigue siendo buena idea comprobar que el binario elegido es el correcto. Hoy es `parseEngineVersion`, que solo acepta un programa que se identifique como Heimdall. |
 | Registro de «mejor nota» + copias horarias | Conservadas, con otro sentido | Dejaron de ser un salvavidas contra ejecuciones que se pierden. Se conservan por valor pedagógico: la mejor ronda completa de una sesión de examen la decide el motor (ADR-0020), y la copia de notas vive fuera de la carpeta del examen (T113). |
 
-Queda una referencia a Teuton en `tests/engine.test.ts`: una línea de versión
-de ejemplo con el prefijo de la fachada congelada. Se borra con ella en T060.
-Las cadenas `TEUTON_SECRET_TEST_*` de `scripts/` son solo nombres de variable
-de una prueba de fuga de secretos; se renombran en T060.
+No queda ninguna referencia a Teuton en el código ni en los guiones: la capa de
+compatibilidad y sus últimos restos de nombre se borraron en T060.
 
 ## §4 — Lógica de aula
 

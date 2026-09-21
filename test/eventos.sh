@@ -15,7 +15,7 @@ PROTO="$ROOT/testdata/proto"
 
 # The lab password (test/README.md). Fictitious, public and only valid inside
 # the container. E-8 demands zero occurrences of it in the stream.
-SECRET="TEUTON_SECRET_TEST_12345"
+SECRET="HEIMDALL_SECRET_TEST_12345"
 SECRETS_LINE="$(printf '{"schema":1,"secrets":{"AULA_PASSWORD":"%s"}}\n' "$SECRET")"
 
 WORK="$(mktemp -d)"

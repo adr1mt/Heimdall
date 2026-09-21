@@ -633,3 +633,17 @@ Dos decisiones menores:
    botón de «copiar» porque no hay nada que decidir.
 5. **Un fallo al copiar no rompe la corrección que acaba de terminar.** La
    copia es una red de seguridad, no un paso de la evaluación.
+
+## T060 · La retirada de la capa de compatibilidad
+
+1. **Se borra entera**, como decía ADR-0016: `internal/legacy`, `--compat`,
+   `--export=json`, `--case`, la línea de versión con nombre de Teuton, la
+   tabla `DSL Stats` de `check` y `06-LEGACY-WRITER.md`. Un commit.
+2. **`--cname` se queda.** ADR-0016 la listaba como parte de la fachada, pero
+   dejó de serlo: desde ADR-0022 cada clase tiene su aula dentro de la carpeta
+   del examen y la aplicación nombra ese fichero en cada ejecución. Es contrato
+   nativo vivo y así queda escrito en `09-CONTRATO-GUI.md`.
+3. **A-10 se retira, no se cierra.** Pedía los ficheros del formato viejo; sin
+   ese formato el criterio no tiene objeto.
+4. **`HEIMDALL_SECRET_TEST_12345`**: el secreto del laboratorio llevaba nombre
+   de Teuton. Solo era un nombre, pero no queda ninguno.

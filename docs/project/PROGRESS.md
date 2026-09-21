@@ -6,24 +6,24 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T059: inventario de lo heredado de la GUI vieja.** Un commit, solo
-documentación.
+**T060: fuera la capa del motor viejo.** Un commit.
 
-- `gui/docs/HERENCIA.md` da veredicto a cada utilidad de Teuton GUI: las once
-  que existían para tapar defectos del motor viejo están **retiradas** y ya no
-  quedaba código suyo en la aplicación; la lógica de aula está **conservada**,
-  con dónde vive hoy.
-- Dos supervivientes con otro sentido: comprobar que el binario es el correcto,
-  y la mejor nota más las copias, hoy valor pedagógico y no un salvavidas.
-- T060 pasa a `READY`: borrar la capa antigua entera, con los dos restos de
-  nombre que quedan en un test y en un guion de pruebas.
+- Heimdall ya no sabe escribir los ficheros del programa antiguo ni se hace
+  pasar por él. Se fue el paquete entero, las banderas que lo encendían y la
+  línea de versión con su nombre.
+- Se queda `--cname`: dejó de ser andamio el día que cada clase tuvo su propia
+  aula dentro de la carpeta del examen. Ahora está escrito como contrato vivo.
+- El laboratorio de pruebas tiene su propia receta de contenedor, con su propia
+  contraseña de mentira. Ya no depende de material del sistema viejo.
+- El criterio A-10 queda retirado: pedía ficheros de un formato que ya no
+  existe.
 
 ## Estado actual
 
 - **Go 1.27.1** en `/mnt/datos/Applications/Claude/toolchains/go`; en shell no
   interactiva hay que exportar el `PATH` a mano. `go.mod`: `module heimdall`.
 - `cmd/heimdall`: `check`, `run`, `consolidate`, `session`, `version`, con
-  `--secrets`, `--events=ndjson`, `--retry`, `--session`. Exit: 0 · 2 config ·
+  `--secrets`, `--events=ndjson`, `--retry`, `--session`, `--cname`. Exit: 0 · 2 config ·
   3 parcial · 4 cancelado · 1 sin escribir.
 - Motor completo y probado: `model` puro, `plan` con sus nueve validaciones,
   `assert`, `report` atómico, `events`, `engine` y `ssh` (ADR-0011).
@@ -48,7 +48,6 @@ corrige el laboratorio: alumne01, 100/100. Del paquete real, `make gui-paquete`
 ## Problemas conocidos
 
 - Laboratorio en **`127.1.2.3`**, nunca `127.0.0.x` (F-01, A-11).
-- **A-10**: legacy escrito pero marcado `PEND`; se cierra o se retira en T060.
 - Un reintento exige el mismo PLAN. Intervalo mínimo del modo examen, 5 min.
 - El proyector tapa las máquinas, no los nombres del alumnado.
 - La copia guarda las notas, no las pruebas: una corrección recuperada de una

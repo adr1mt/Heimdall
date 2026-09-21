@@ -38,22 +38,21 @@ OK     A-6   se conservan 64 kB como máximo
 OK     A-6   se contabiliza todo lo que produjo el comando
 OK     A-6   la memoria del motor se queda en 13 MB (< 100 MB)
 OK     A-9   el parcial de un run matado trae al menos un alumno terminado
-PEND   A-10  artefactos legacy (resume.json, case-NN.json): los escribe T040, fuera de la fase 1
+PEND   A-10  artefactos del formato viejo: retirados con la capa de compatibilidad (T060)
 OK     A-12  el mismo examen bajo es_ES.UTF-8 y bajo LC_ALL=C da notas idénticas
 OK     A-13  una clave desconocida sale con exit 2
 OK     A-13  el error dice el fichero y la línea
 OK     A-13  una clave desconocida no crea nada en var/
 OK     A-13  una clave desconocida no abre ninguna conexión al contenedor
 
-acceptance: los 13 criterios de la fase 1 en verde (A-10 pendiente de T040)
+acceptance: los 13 criterios de la fase 1 en verde (A-10 retirado en T060)
 ```
 
-## A-10, el único pendiente
+## A-10, retirado
 
-A-10 pide los artefactos `resume.json` y `case-NN.json` del formato viejo, que
-los escribe `internal/legacy`. Ese paquete es de la fase 3 (T040) y la fase 1 lo
-declara explícitamente fuera de alcance, así que el criterio queda marcado
-`PEND` en el script en vez de verde. No es uno de los cinco que protegen la
+A-10 pedía los artefactos `resume.json` y `case-NN.json` del formato viejo. Esa
+capa se borró entera en T060 (ADR-0016), así que el criterio ya no tiene objeto
+y queda retirado, no pendiente. Nunca fue uno de los cinco que protegen la
 integridad de la nota (A-1, A-2, A-3, A-8, A-14): esos cinco están en verde.
 
 El script vuelve a dar A-10 en verde en cuanto T040 exista; hasta entonces

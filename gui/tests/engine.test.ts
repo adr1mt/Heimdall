@@ -13,11 +13,7 @@ function fakeEngine(name: string, body: string): string {
 }
 
 describe('parseEngineVersion', () => {
-  it('reads the version out of the line the engine prints today', () => {
-    expect(parseEngineVersion('teuton version 2.10.6 (heimdall 0.1.0-dev)\n')).toBe('0.1.0-dev')
-  })
-
-  it('reads it out of a line with no frozen prefix left', () => {
+  it('reads the version out of the line the engine prints', () => {
     expect(parseEngineVersion('heimdall 1.0.0\n')).toBe('1.0.0')
   })
 

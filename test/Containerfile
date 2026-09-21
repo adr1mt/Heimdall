@@ -1,0 +1,9 @@
+FROM docker.io/library/debian:12-slim
+RUN apt-get update && apt-get install -y --no-install-recommends openssh-server procps && \
+    rm -rf /var/lib/apt/lists/* && mkdir -p /run/sshd && \
+    useradd -m -s /bin/bash alumno && echo 'alumno:HEIMDALL_SECRET_TEST_12345' | chpasswd && \
+    sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -i 's/^#*PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config && \
+    ssh-keygen -A && rm -f /etc/ssh/ssh_host_ed25519_key* /etc/ssh/ssh_host_ecdsa_key*
+EXPOSE 22
+CMD ["/usr/sbin/sshd","-D","-e"]

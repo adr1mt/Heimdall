@@ -32,10 +32,8 @@ export function defaultEnginePath(): string {
 /**
  * The engine version inside the line `heimdall version` prints.
  *
- * That line currently carries a prefix from the frozen facade the old GUI
- * needed; it goes away in T060. Matching `heimdall <version>` works with the
- * line of today and with whatever is left afterwards, and it does not accept
- * as an engine a program that does not identify itself as Heimdall.
+ * Matching `heimdall <version>` does not accept as an engine a program that
+ * does not identify itself as Heimdall.
  */
 const VERSION_LINE = /\bheimdall\s+v?([0-9][\w.+-]*)/i
 

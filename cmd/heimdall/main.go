@@ -25,7 +25,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 
 	switch args[0] {
 	case "version":
-		printVersion(stdout)
+		fmt.Fprintf(stdout, "heimdall %s\n", version)
 		return exitOK
 	case "run":
 		return runCmd(args[1:], stdout, stderr)

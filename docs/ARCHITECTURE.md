@@ -55,7 +55,6 @@ aula.yaml  ──┴─► plan.Load ──(inválido)──► exit 2 · ficher
                     │
                     ▼
               report.WriteAtomic(var/run-<ulid>.json)
-                    └─(congelado, ADR-0016)─► legacy.Write(...) solo con --compat=teuton2
 ```
 
 La fase PLAN es anterior a cualquier conexión y no puede alterarse después.
@@ -71,7 +70,6 @@ La fase PLAN es anterior a cualquier conexión y no puede alterarse después.
 | `internal/engine` | Worker pool, presupuesto por alumno, aislamiento, cancelación | Decidir notas |
 | `internal/assert` | `contiene`, `igual_a`, `no_contiene`, `exit_code`, `cerca_de` | Saber de notas |
 | `internal/report` | Escritura atómica, artefacto parcial, redacción de secretos | Calcular nada |
-| `internal/legacy` | **Congelado (ADR-0016)**: ficheros y fachada de Teuton para pruebas internas, hasta que se borre en T060 | Recibir nada nuevo, influir en la nota |
 | `internal/events` | Contrato nativo: eventos NDJSON por `stdout` (ADR-0017) | Llevar salida de las máquinas, ser fuente de verdad |
 | `gui/` | Heimdall GUI: Electron sobre el contrato nativo | Calcular notas, hablar con SSH |
 
@@ -94,8 +92,8 @@ alumnado no viaja por él en absoluto (ADR-0017).
 
 El motor no sabe que existe una GUI: publica eventos y un artefacto. La GUI no
 sabe de SSH ni de notas: presenta lo que el modelo canónico dice. No hay
-compatibilidad con Teuton en ningún punto; `internal/legacy` está congelado y
-solo sirve para pruebas internas hasta que se borre.
+compatibilidad con Teuton en ningún punto: la capa de compatibilidad se borró
+entera en T060.
 
 La GUI vive en `gui/`, en este repositorio, para que contrato y consumidor
 viajen siempre en la misma versión. Toma de `teuton-gui` la base técnica y
@@ -151,8 +149,7 @@ Cada uno es comprobable y tiene su test:
 6. `unevaluated > 0` implica `final_score == null` y `status == INCOMPLETE`.
 7. El fallo de un alumno no altera ningún resultado de otro alumno.
 8. Toda comprobación termina: por resultado, por timeout o por cancelación.
-9. Ningún secreto aparece en el artefacto, los logs, `argv` ni los ficheros
-   legacy.
+9. Ningún secreto aparece en el artefacto, los logs ni `argv`.
 10. El resultado no depende de la configuración regional del equipo del
     profesor.
 
