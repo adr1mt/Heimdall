@@ -1501,7 +1501,7 @@
       "title": "Navegacion objetivo de la aplicacion",
       "phase": 6,
       "package": "P1",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [],
       "goal": "Que la aplicacion tenga las secciones que el profesor espera, en el orden en que las busca.",
@@ -1528,7 +1528,7 @@
       "title": "Resultados: cabecera de clase y conmutador Lista/Matriz",
       "phase": 6,
       "package": "P1",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "T100"
@@ -1548,7 +1548,7 @@
         "Un alumno sin nota final no cuenta como suspenso en la cabecera"
       ],
       "tests": [
-        "gui/tests/results-header.test.ts"
+        "gui/tests/summary.test.ts"
       ],
       "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
     },
@@ -1557,7 +1557,7 @@
       "title": "Resultados Lista: una fila por alumno, la clase entera a la vista",
       "phase": 6,
       "package": "P1",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "T101"
@@ -1578,7 +1578,7 @@
         "Ningun alumno sin nota final aparece con un cero"
       ],
       "tests": [
-        "gui/tests/results-list.test.ts"
+        "gui/tests/summary.test.ts"
       ],
       "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
     },
@@ -1587,7 +1587,7 @@
       "title": "Resultados Matriz: comprobaciones por alumnado",
       "phase": 6,
       "package": "P1",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "T101"
@@ -1608,7 +1608,7 @@
         "La celda abre el mismo detalle que hoy da la lista"
       ],
       "tests": [
-        "gui/tests/results-matrix.test.ts"
+        "gui/tests/summary.test.ts"
       ],
       "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
     },
@@ -1617,7 +1617,7 @@
       "title": "Los avisos tecnicos dejan de ocupar la pantalla",
       "phase": 6,
       "package": "P1",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "T101"
@@ -1647,7 +1647,7 @@
       "title": "Inicio: el examen y la clase, no las rutas",
       "phase": 6,
       "package": "P1",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T100"
@@ -1666,17 +1666,15 @@
         "El examen y la clase se reconocen por su nombre",
         "Durante el examen los cinco datos de la vuelta se leen sin desplegar nada"
       ],
-      "tests": [
-        "gui/tests/home.test.ts"
-      ],
-      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
+      "tests": [],
+      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato. El nombre del examen y del aula se leen de los dos YAML solo para la pantalla; la validacion sigue siendo del motor."
     },
     {
       "id": "T106",
       "title": "Clases: grupos fijos reutilizables",
       "phase": 6,
       "package": "P2",
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T100"
@@ -1735,7 +1733,7 @@
       "title": "Examenes: un espacio de trabajo propio",
       "phase": 6,
       "package": "P2",
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T100"
@@ -1936,6 +1934,30 @@
         "gui/tests/updater.test.ts"
       ],
       "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
+    },
+    {
+      "id": "T067",
+      "title": "Un aula sin contrasenas tambien se puede corregir desde la aplicacion",
+      "phase": 5,
+      "status": "READY",
+      "priority": "P0",
+      "depends_on": [],
+      "goal": "Que un examen cuyo aula no pide ninguna contrasena se corrija desde la GUI, como se corrige desde la linea de comandos.",
+      "scope": [
+        "La GUI manda los secretos por stdin siempre, y el motor rechaza un mapa vacio: decidir de que lado se arregla y hacerlo en un sitio",
+        "Cubrirlo con una prueba: aula sin password_ref, correccion completa"
+      ],
+      "out_of_scope": [
+        "Cambiar la politica de secretos (ADR-0009): nada de contrasenas en argv ni en el entorno",
+        "Tocar la GUI mas alla de lo que exija este caso"
+      ],
+      "acceptance": [
+        "Un examen con un aula sin ninguna referencia de contrasena se corrige entero desde la aplicacion",
+        "Un aula que si pide contrasenas se sigue corrigiendo igual que hoy",
+        "Ningun secreto aparece en argv, ni en el artefacto, ni en los logs"
+      ],
+      "tests": [],
+      "notes": "Encontrado el 2026-09-21 probando el modo examen de T105 contra el cuestionario (testdata/cuestionario, sin hosts): «heimdall run: los secretos de stdin no traen ninguna clave en \"secrets\"», exit 2. Afecta igual a Corregir. Toca secretos y el contrato motor-GUI: una tarea por sesion, sin encadenar."
     }
   ]
 }
