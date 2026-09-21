@@ -6,25 +6,30 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T108 hecho: Inicio es la lista de exámenes.** «Abrir», «Nuevo» y los de
-siempre, como en Teutón GUI. Un examen es una carpeta con su `examen.yaml`
-dentro: se abre la carpeta y la aplicación encuentra el examen. **Ya no se
-elige ningún fichero y no hay ninguna ruta en pantalla**: se lee el nombre que
-el profesor le puso al examen.
+**Paridad con Teutón GUI terminada.** Cinco tareas, cinco commits.
 
-«Nuevo» deja un examen con una comprobación real, corregible desde el primer
-minuto. Los recientes viven en `projects.json` (ADR-0021) y sobreviven al
-cierre; ilegible se vacía sin ruido, a diferencia de las clases: un atajo
-perdido no es trabajo perdido. Sin examen abierto, Corregir, Resultados e
-Histórico se ven apagados y no se abren. Abrir otro examen con una corrección
-en marcha pregunta antes, la detiene sin matarla y no arrastra nada del
-anterior: ni sesión, ni reintento, ni resultado.
+- **T108**: Inicio es la lista de exámenes. Un examen es una carpeta con su
+  `examen.yaml` dentro; se abre la carpeta y la aplicación lo encuentra. No se
+  elige ningún fichero y no hay ninguna ruta en pantalla. Los recientes viven
+  en `projects.json` y sobreviven al cierre. Sin examen abierto, las secciones
+  que son de un examen se ven apagadas y no se abren.
+- **T116**: pegar una clase desde una hoja de cálculo, con vista previa. Una
+  fila incompleta se enseña en rojo y no entra. Una contraseña pegada no se lee
+  nunca y se dice qué columna se ha dejado fuera.
+- **T117**: identificador y nombre fijos al desplazar la tabla de Clases.
+- **T109**: editor del examen. Un solo modelo: formulario y vista YAML son el
+  mismo examen, en los dos sentidos. Quien dice si vale es el motor
+  (`heimdall check` en carpeta aparte, sin tocar máquinas) y su mensaje
+  —fichero y línea— es lo que sale en pantalla; no se escribe hasta que lo
+  acepta. Todo valor esperado va entrecomillado: `igual_a: yes` sin comillas es
+  un booleano.
+- **T110**: Analíticas, sobre el mismo artefacto que Resultados. Quien no tiene
+  nota no entra en la distribución como un cero, y una máquina caída va antes
+  que cualquier nota baja.
+- **T118**: era del guion, no del producto: buscaba la celda en «Lista», que no
+  tiene ninguna. Nuevo P-0 para que no se repita la confusión.
 
-**P2 cerrado salvo T116 y T117.** Queda pulido, no estructura.
-
-**Dirección**: Teutón GUI (`workspace/teuton-gui`) es la referencia canónica de
-interfaz. Fase 6: P1 visual y P2 clases y proyectos hechos; P3 editor, P4 uso
-en clase, P5 protección.
+De Teutón GUI ya no queda nada por copiar. Fase 6: P1…P4 hechos; queda P5.
 
 ## Estado actual
 
@@ -35,24 +40,22 @@ en clase, P5 protección.
   3 parcial · 4 cancelado · 1 sin escribir.
 - Motor completo y probado: `model` puro, `plan` con sus nueve validaciones,
   `assert`, `report` atómico, `events`, `engine` y `ssh` (ADR-0011).
-- `test/lab.sh`: `alu1` en `127.1.2.3:2201`, el roto en el 2299. `acceptance.sh`
-  (A-1…A-14), `eventos.sh` (E-1…E-10), `sesion.sh` (S-1…S-8).
-- `gui/`: árbol Node independiente; `make gui-check` (236 tests), `gui-build`,
-  `gui-lab`. Vistas vivas: **Inicio** (lista de exámenes), **Corregir** (clase,
-  credenciales, modo examen, avance y sesión), Clases, Resultados (Lista y
-  Matriz, exportación, reintento, cadena), Histórico, Ajustes, Ayuda. Modo
-  proyector en la barra lateral. En el directorio de datos de usuario:
-  `classes.json` (ADR-0021) y `projects.json`; de cada clase sale su aula
-  dentro de la carpeta del examen (ADR-0022).
+- `test/lab.sh`: `alu1` en `127.1.2.3:2201`, el roto en el 2299. `acceptance.sh`,
+  `eventos.sh`, `sesion.sh`.
+- `gui/`: árbol Node independiente; `make gui-check` (283 tests), `gui-build`,
+  `gui-lab`, **`gui-editor`**. **Las nueve secciones están construidas**:
+  Inicio, Clases, Exámenes, Corregir, Resultados, Analíticas, Histórico,
+  Ajustes y Ayuda. Modo proyector en la barra lateral. En el directorio de
+  datos de usuario: `classes.json` (ADR-0021) y `projects.json`; de cada clase
+  sale su aula dentro de la carpeta del examen (ADR-0022).
 
 ## Pruebas ejecutadas
 
-`make check` y `make gui-check` (236) verdes, `typecheck` verde. Contra el
-laboratorio, con la aplicación construida y el flujo de proyectos:
-`make gui-lab` verde (S-0…S-4, H-1, X-1, X-2) y el modo examen verde (E-1…E-5,
-C-1…C-3, P-1, P-3, S-5). El examen que crea «Nuevo» se ha **corregido de
-verdad**: alumne01 saca 100/100. **P-2 sigue en rojo** (T118, anterior a esta
-sesión). `make test` no se repitió.
+`make check` y `make gui-check` (283) verdes, `typecheck` verde. Contra el
+laboratorio, con la aplicación construida: `make gui-lab` (S-0…S-4, H-1, X-1,
+X-2), `make gui-editor` (D-1…D-7) y el modo examen **entero verde** por primera
+vez (E-1…E-5, P-0…P-3, C-1…C-3, S-5). Un examen escrito desde el formulario
+corrige el laboratorio: alumne01, 100/100. `make test` no se repitió.
 
 ## Problemas conocidos
 
@@ -60,13 +63,12 @@ sesión). `make test` no se repitió.
 - **A-10**: legacy escrito pero marcado `PEND`; se cierra o se retira en T060.
 - Un reintento exige el mismo PLAN. Intervalo mínimo del modo examen, 5 min.
 - El proyector tapa las máquinas, no los nombres del alumnado.
-- P-2 del guion `examen-lab` en rojo; no se ha averiguado desde cuándo (T118).
 - Los datos de alumnado quedan fuera de toda copia de seguridad hasta T113.
+- El editor reescribe el YAML con su propio formato: mismo examen, otra
+  disposición. Los comentarios del fichero no sobreviven a un guardado.
 
 ## Siguiente tarea recomendada
 
-Fin del **paquete P2**: **T116** (pegar una clase desde una hoja de cálculo) y
-**T117** (fijar identificador y nombre al desplazar la tabla de Clases).
-Después, el paquete **P3**: **T109**, el editor del examen, que es la última
-pantalla que Teutón GUI tenía y Heimdall no. Pendiente de fase 5 y sin fecha:
-**T059**.
+**T072**, el instalador para Linux con el motor dentro: es lo único que falta
+para usar la aplicación sin compilar nada. Después **P5**: T113 y T114.
+Sin fecha: T059, T060, T070, T080, T111, T112, T023.

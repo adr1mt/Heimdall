@@ -573,7 +573,7 @@
       "id": "T023",
       "title": "Autenticacion por clave SSH",
       "phase": 2,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P2",
       "depends_on": [
         "T021"
@@ -1203,7 +1203,7 @@
       "id": "T070",
       "title": "Rehacer los examenes del curso en formato nativo",
       "phase": 8,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T053"
@@ -1252,7 +1252,7 @@
       "id": "T072",
       "title": "Empaquetado con el motor embebido para Linux",
       "phase": 6,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T109"
@@ -1951,7 +1951,7 @@
       "title": "Modo proyector: vista completa dedicada",
       "phase": 6,
       "package": "P4",
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T103"
@@ -1982,7 +1982,7 @@
       "title": "Exportar a Moodle",
       "phase": 6,
       "package": "P4",
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T102"
