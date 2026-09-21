@@ -1149,7 +1149,7 @@
       "id": "T059",
       "title": "Inventario de lo heredado: conservado o retirado con su motivo",
       "phase": 5,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T054",
@@ -1176,7 +1176,7 @@
       "id": "T060",
       "title": "Borrado de la capa legacy en un commit",
       "phase": 7,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T059"

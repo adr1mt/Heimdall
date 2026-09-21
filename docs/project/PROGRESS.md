@@ -6,18 +6,17 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T113: las notas tienen copia de seguridad.** Un commit.
+**T059: inventario de lo heredado de la GUI vieja.** Un commit, solo
+documentación.
 
-- Al terminar cada corrección, Heimdall guarda las notas **fuera de la carpeta
-  del examen**, en su propia carpeta de datos. Si el profesor borra la carpeta
-  del examen, las notas siguen ahí.
-- La copia lleva la nota de cada alumno y el resultado de cada comprobación.
-  No lleva la salida de las máquinas ni ninguna contraseña.
-- En Histórico hay un apartado nuevo: se ven las copias, cuáles siguen en la
-  carpeta y cuáles solo quedan en copia, y un botón las devuelve.
-- Restaurar **solo puede añadir**: una corrección que ya está en la carpeta se
-  queda intacta, con su detalle entero. Nunca baja una nota ya guardada.
-- Se guardan las 50 correcciones más recientes de cada examen.
+- `gui/docs/HERENCIA.md` da veredicto a cada utilidad de Teuton GUI: las once
+  que existían para tapar defectos del motor viejo están **retiradas** y ya no
+  quedaba código suyo en la aplicación; la lógica de aula está **conservada**,
+  con dónde vive hoy.
+- Dos supervivientes con otro sentido: comprobar que el binario es el correcto,
+  y la mejor nota más las copias, hoy valor pedagógico y no un salvavidas.
+- T060 pasa a `READY`: borrar la capa antigua entera, con los dos restos de
+  nombre que quedan en un test y en un guion de pruebas.
 
 ## Estado actual
 
