@@ -1674,7 +1674,7 @@
       "title": "Clases: grupos fijos reutilizables",
       "phase": 6,
       "package": "P2",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T100"
@@ -1710,7 +1710,7 @@
       "title": "Clases: pegar desde una hoja de calculo y generar el aula",
       "phase": 6,
       "package": "P2",
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T106"

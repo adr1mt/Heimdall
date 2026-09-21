@@ -25,6 +25,12 @@ interface AppState {
   examPath: string | null
   /** The classroom file the teacher picked, if any. */
   classPath: string | null
+  /**
+   * The class the teacher is correcting, by its identifier. The students and
+   * the name live in the saved classes (ADR-0021); what is remembered here is
+   * only which one was chosen last.
+   */
+  classId: string | null
   /** One operational notice on screen, or null. */
   notice: string | null
   /**
@@ -67,6 +73,7 @@ interface AppState {
   setEngine: (engine: EngineStatus) => void
   setExamPath: (path: string | null) => void
   setClassPath: (path: string | null) => void
+  setClassId: (id: string | null) => void
   setNotice: (message: string | null) => void
   setScale: (scale: ScaleId) => void
   setPassMark: (mark: number) => void
@@ -96,6 +103,7 @@ const savedTheme: Theme = localStorage.getItem('heimdall-theme') === 'light' ? '
 const savedScale: ScaleId =
   localStorage.getItem('heimdall-scale') === 'hundred' ? 'hundred' : DEFAULT_SCALE
 const savedProjector = localStorage.getItem('heimdall-projector') === '1'
+const savedClassId = localStorage.getItem('heimdall-class-id')
 const savedPassMark = readPassMark(localStorage.getItem('heimdall-pass-mark'))
 
 /**
@@ -146,6 +154,7 @@ export const useApp = create<AppState>((set, get) => ({
   engine: null,
   examPath: null,
   classPath: null,
+  classId: savedClassId,
   notice: null,
   scale: savedScale,
   passMark: savedPassMark,
@@ -167,6 +176,11 @@ export const useApp = create<AppState>((set, get) => ({
   setEngine: (engine) => set({ engine }),
   setExamPath: (examPath) => set({ examPath }),
   setClassPath: (classPath) => set({ classPath }),
+  setClassId: (classId) => {
+    if (classId) localStorage.setItem('heimdall-class-id', classId)
+    else localStorage.removeItem('heimdall-class-id')
+    set({ classId })
+  },
   setNotice: (notice) => set({ notice }),
   setScale: (scale) => {
     localStorage.setItem('heimdall-scale', scale)

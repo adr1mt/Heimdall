@@ -29,6 +29,7 @@ const SettingsView = lazy(() => import('./routes/Settings'))
 const HelpView = lazy(() => import('./routes/Help'))
 const ResultsView = lazy(() => import('./routes/Results'))
 const HistoryView = lazy(() => import('./routes/History'))
+const ClassesView = lazy(() => import('./routes/Classes'))
 
 const ICONS: Record<View, typeof Home> = {
   home: Home,
@@ -123,7 +124,7 @@ function AppBody() {
 
   const views: Record<View, JSX.Element> = {
     home: <HomeView />,
-    classes: <ComingSoon view="classes" />,
+    classes: <ClassesView />,
     exams: <ComingSoon view="exams" />,
     results: <ResultsView />,
     analytics: <ComingSoon view="analytics" />,

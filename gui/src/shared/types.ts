@@ -7,6 +7,7 @@ import type { Description } from './describe'
 import type { Consolidation } from './consolidation'
 import type { Session } from './session'
 import type { RunSummary } from './history'
+import type { ClassGroup } from './classes'
 
 /** Result of locating the engine and asking it for its version. */
 export interface EngineStatus {
@@ -98,6 +99,14 @@ export interface HeimdallApi {
    * Returns the path, or null if they cancelled the dialog.
    */
   saveCsv: (name: string, text: string) => Promise<string | null>
+  /**
+   * The teacher's classes, as they were last saved. It throws when the file
+   * cannot be read: an empty list would look like «you have no classes»
+   * (ADR-0021 §5).
+   */
+  listClasses: () => Promise<ClassGroup[]>
+  /** Saves the whole list of classes. It never writes a password (ADR-0009). */
+  saveClasses: (classes: ClassGroup[]) => Promise<void>
   /**
    * Turns exam mode on or off in the main process: it keeps the computer
    * awake, makes closing the window ask first, and holds the credentials of

@@ -11,6 +11,8 @@ import { RunSession, resolveRunTarget } from './run'
 import { describeClass, describeExam } from './describe'
 import { secretRefsOf } from './secrets'
 import { readSettings, writeSettings } from './store'
+import { readClasses, writeClasses } from './classes'
+import { readGroup, type ClassGroup } from '../shared/classes'
 import type { Description } from '../shared/describe'
 import type { EngineStatus, ExamModeRequest, RunClosed, RunRequest } from '../shared/types'
 
@@ -252,6 +254,19 @@ export function registerIpc(): void {
     if (result.canceled || !result.filePath) return null
     writeFileSync(result.filePath, text, 'utf-8')
     return result.filePath
+  })
+
+  // The teacher's own classes. They touch no machine and no grade: this is
+  // the address book of the course (ADR-0021).
+  ipcMain.handle(IPC.listClasses, (): ClassGroup[] => readClasses(settingsDir()))
+
+  // Whatever the renderer sends is read back through the model before it is
+  // written, so a field that is not part of a class —a password above all—
+  // never reaches the disk (ADR-0009, ADR-0021 §4).
+  ipcMain.handle(IPC.saveClasses, (_e, classes: unknown): void => {
+    if (!Array.isArray(classes)) throw new Error('No hay ninguna lista de clases que guardar.')
+    const groups = classes.map(readGroup).filter((group): group is ClassGroup => group !== null)
+    writeClasses(settingsDir(), groups)
   })
 
   ipcMain.handle(IPC.cancelRun, (): void => {

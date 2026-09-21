@@ -18,14 +18,14 @@ describe('navegación', () => {
   })
 
   it('no ofrece como abrible una sección que todavía no está', () => {
-    for (const id of ['classes', 'exams', 'analytics'] as const) expect(isReady(id)).toBe(false)
-    for (const id of ['home', 'results', 'history', 'settings', 'help'] as const) {
+    for (const id of ['exams', 'analytics'] as const) expect(isReady(id)).toBe(false)
+    for (const id of ['home', 'classes', 'results', 'history', 'settings', 'help'] as const) {
       expect(isReady(id)).toBe(true)
     }
   })
 
   it('dice por su nombre qué sección llega más adelante', () => {
-    expect(comingSoon('classes')).toContain('Clases')
+    expect(comingSoon('exams')).toContain('Exámenes')
   })
 
   it('no repite ninguna entrada entre el cuerpo y el pie', () => {

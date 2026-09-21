@@ -16,6 +16,8 @@ export const IPC = {
   session: 'run:session',
   listRuns: 'history:list',
   saveCsv: 'export:saveCsv',
+  listClasses: 'classes:list',
+  saveClasses: 'classes:save',
   // Pushed from the main process while a run is alive.
   runEvent: 'run:event',
   runClosed: 'run:closed'

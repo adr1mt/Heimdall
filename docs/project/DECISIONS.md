@@ -565,3 +565,28 @@ Dos decisiones menores:
    real, «de qué vuelta sale la nota» es mentira.
 7. **Empate: gana la primera vuelta que llegó**, que es cuando el alumno llegó
    ahí.
+
+## T106 · Las clases del profesor
+
+1. **ADR-0021**: la aplicación guarda sus datos propios en el directorio de
+   datos de usuario, un fichero JSON por tipo de dato y escritura atómica.
+   Nada de lo que guarde entra en el camino de la nota: el motor sigue
+   recibiendo examen, aula y secretos por stdin.
+2. **Un fichero de datos ilegible no se sustituye por una lista vacía.** Es la
+   diferencia deliberada con `settings.json`: volver a elegir la ruta del motor
+   cuesta diez segundos, volver a apuntar veintiséis alumnos no. Se avisa, el
+   fichero no se toca y la escritura queda bloqueada hasta arreglarlo.
+3. **La garantía de «ninguna contraseña» es estructural, no un filtro.** Lo que
+   se escribe se serializa campo a campo desde el modelo, así que un campo que
+   no es de una clase no llega al disco aunque alguien lo mande por IPC o lo
+   escriba a mano en el fichero.
+4. **Una clase no lleva la ruta de su aula.** El aula depende del examen y sale
+   de la clase en T107; meterle una ruta ahora habría sido andamio. Hasta
+   entonces el fichero de aula sigue eligiéndose, ya dentro de los detalles
+   avanzados.
+5. **El identificador del alumno es obligatorio y único; el contacto no.** Sin
+   identificador el examen no tiene cómo llamar al alumno; el correo o el
+   identificador de Moodle es para el profesor y puede faltar.
+6. **La clase se valida antes de guardar, no al corregir.** Un identificador
+   repetido o un alumno sin máquina se dice al teclearlo: descubrirlo con la
+   clase ya sentada delante de los ordenadores cuesta el examen.

@@ -15,9 +15,8 @@ import {
   Button,
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
   ConfirmDialog,
+  Foldaway,
   Input,
   Meter,
   ProgressBar,
@@ -27,6 +26,8 @@ import {
   ViewHeader
 } from '@/components/ui'
 import { useApp, messageOf, noticeFrom } from '@/stores/app'
+import { useClasses, groupById } from '@/stores/classes'
+import { groupLine, type ClassGroup } from '../../../shared/classes'
 import { useRun } from '@/stores/run'
 import { runPercent, type StudentProgress } from '@/lib/run-state'
 import { EXAM_INTERVALS, secondsLeft, type ExamMode } from '@/lib/exam'
@@ -42,7 +43,7 @@ import { scoreView } from '@/lib/results'
 import { scaleOf, sessionCsv, sessionCsvName, sessionExportSummary } from '@/lib/export'
 import { startCorrection } from '@/lib/start-run'
 import type { Session } from '../../../shared/session'
-import type { Description } from '../../../shared/describe'
+import type { ClassDescription, Description } from '../../../shared/describe'
 import { t } from '@/i18n/es'
 
 export default function HomeView() {
@@ -52,12 +53,24 @@ export default function HomeView() {
   const setExamPath = useApp((s) => s.setExamPath)
   const setClassPath = useApp((s) => s.setClassPath)
   const setNotice = useApp((s) => s.setNotice)
+  const classId = useApp((s) => s.classId)
+  const setClassId = useApp((s) => s.setClassId)
   const retry = useApp((s) => s.retry)
   const setRetry = useApp((s) => s.setRetry)
   const exam = useApp((s) => s.exam)
 
   const run = useRun()
   const busy = run.phase === 'starting' || run.phase === 'running'
+
+  // The saved classes, so Inicio can say which class is chosen by its name
+  // and not by the file underneath it.
+  const groups = useClasses((s) => s.groups)
+  const classesLoaded = useClasses((s) => s.loaded)
+  const loadClasses = useClasses((s) => s.load)
+  useEffect(() => {
+    if (!classesLoaded) void loadClasses()
+  }, [classesLoaded, loadClasses])
+  const group = groupById(groups, classId)
 
   /** What the two chosen files are called, for the screen. */
   const [described, setDescribed] = useState<Description>({ exam: null, classroom: null })
@@ -191,18 +204,18 @@ export default function HomeView() {
             disabled={busy}
             onPick={() => void pick('exam')}
           />
-          <PickCard
-            icon={<Users className="h-4 w-4" />}
-            title={t.home.classroom}
-            name={described.classroom?.name ?? null}
-            meta={
-              described.classroom?.students == null
-                ? null
-                : t.home.classMeta(described.classroom.students)
-            }
-            path={classPath}
+          <ClassCard
+            group={group}
+            groups={groups}
+            missingClass={classId !== null && group === null}
+            classPath={classPath}
+            classroom={described.classroom}
+            refs={refs}
+            secrets={secrets}
             disabled={busy}
-            onPick={() => void pick('class')}
+            onChoose={setClassId}
+            onPickFile={() => void pick('class')}
+            onSecret={(name, value) => setSecrets((prev) => ({ ...prev, [name]: value }))}
           />
         </div>
 
@@ -218,32 +231,6 @@ export default function HomeView() {
               {t.run.retryCancel}
             </Button>
           </div>
-        )}
-
-        {classPath && (
-          <Card>
-            <CardHeader>
-              <CardTitle>{t.credentials.title}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-xs text-muted-foreground">
-                {refs.length > 0 ? t.credentials.hint : t.credentials.none}
-              </p>
-              {refs.map((name) => (
-                <label key={name} className="flex items-center gap-3">
-                  <span className="w-56 shrink-0 truncate font-mono text-dense">{name}</span>
-                  <Input
-                    type="password"
-                    autoComplete="off"
-                    disabled={busy}
-                    placeholder={t.credentials.placeholder}
-                    value={secrets[name] ?? ''}
-                    onChange={(e) => setSecrets((prev) => ({ ...prev, [name]: e.target.value }))}
-                  />
-                </label>
-              ))}
-            </CardContent>
-          </Card>
         )}
 
         <div>
@@ -667,6 +654,158 @@ function StudentRow({ student, checks }: { student: StudentProgress; checks: num
         </>
       )}
     </div>
+  )
+}
+
+/**
+ * The class being corrected, by its name.
+ *
+ * What the teacher recognises is «2SMX A · 15 alumnos», not a path: the class
+ * is theirs and lasts the whole course, and they wrote it down once in
+ * «Clases». The classroom file is what the engine still receives, so it stays
+ * one click away inside «detalles avanzados», together with the credentials it
+ * asks for.
+ *
+ * Those details open on their own when something is missing there: burying a
+ * reason why «Corregir» is greyed out would be worse than showing a path.
+ */
+function ClassCard({
+  group,
+  groups,
+  missingClass,
+  classPath,
+  classroom,
+  refs,
+  secrets,
+  disabled,
+  onChoose,
+  onPickFile,
+  onSecret
+}: {
+  group: ClassGroup | null
+  groups: ClassGroup[]
+  /** A class was chosen and is no longer there. */
+  missingClass: boolean
+  classPath: string | null
+  classroom: ClassDescription | null
+  refs: string[]
+  secrets: Record<string, string>
+  disabled: boolean
+  onChoose: (id: string | null) => void
+  onPickFile: () => void
+  onSecret: (name: string, value: string) => void
+}) {
+  const setNotice = useApp((s) => s.setNotice)
+  const setView = useApp((s) => s.setView)
+  const pending = !classPath || refs.some((name) => !secrets[name])
+
+  async function openFolder(): Promise<void> {
+    if (!classPath) return
+    try {
+      await window.heimdall.openFolder(classPath)
+    } catch (error) {
+      setNotice(noticeFrom(t.home.folderFailed, error))
+    }
+  }
+
+  return (
+    <Card>
+      <CardContent className="space-y-3 pt-5">
+        <div className="flex items-center gap-2 text-micro uppercase tracking-[0.09em] text-muted-foreground">
+          <Users className="h-4 w-4" />
+          {t.home.classroom}
+        </div>
+
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <p className="min-w-0 truncate text-name font-semibold">
+            {group ? (
+              groupLine(group)
+            ) : (
+              <span className="text-muted-foreground">
+                {missingClass ? t.home.classGone : t.home.classNone}
+              </span>
+            )}
+          </p>
+          {groups.length === 0 ? (
+            <Button variant="outline" size="sm" onClick={() => setView('classes')}>
+              {t.home.goToClasses}
+            </Button>
+          ) : (
+            <select
+              aria-label={t.home.classPick}
+              disabled={disabled}
+              value={group?.id ?? ''}
+              onChange={(e) => onChoose(e.target.value || null)}
+              className="h-9 rounded-md border border-input bg-background px-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+            >
+              <option value="">{t.home.classNone}</option>
+              {groups.map((other) => (
+                <option key={other.id} value={other.id}>
+                  {other.name}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        <Foldaway summary={t.home.advanced} defaultOpen={pending}>
+          <div className="space-y-2">
+            <p className="text-micro uppercase tracking-[0.09em] text-muted-foreground">
+              {t.home.classFile}
+            </p>
+            {classPath ? (
+              <>
+                <p className="text-sm">
+                  {classroom?.name ?? t.home.unnamed}
+                  {classroom?.students != null && (
+                    <span className="text-muted-foreground"> · {t.home.classMeta(classroom.students)}</span>
+                  )}
+                </p>
+                <p className="break-all font-mono text-dense text-muted-foreground">{classPath}</p>
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">{t.home.classFileNone}</p>
+            )}
+            <p className="text-xs text-muted-foreground">{t.home.classFileHint}</p>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" disabled={disabled} onClick={onPickFile}>
+                {classPath ? t.home.change : t.home.choose}
+              </Button>
+              {classPath && (
+                <Button variant="ghost" size="sm" onClick={() => void openFolder()}>
+                  <FolderOpen className="h-4 w-4" />
+                  {t.home.openFolder}
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {classPath && (
+            <div className="space-y-2 border-t border-border pt-3">
+              <p className="text-micro uppercase tracking-[0.09em] text-muted-foreground">
+                {t.credentials.title}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {refs.length > 0 ? t.credentials.hint : t.credentials.none}
+              </p>
+              {refs.map((name) => (
+                <label key={name} className="flex items-center gap-3">
+                  <span className="w-56 shrink-0 truncate font-mono text-dense">{name}</span>
+                  <Input
+                    type="password"
+                    autoComplete="off"
+                    disabled={disabled}
+                    placeholder={t.credentials.placeholder}
+                    value={secrets[name] ?? ''}
+                    onChange={(e) => onSecret(name, e.target.value)}
+                  />
+                </label>
+              ))}
+            </div>
+          )}
+        </Foldaway>
+      </CardContent>
+    </Card>
   )
 }
 

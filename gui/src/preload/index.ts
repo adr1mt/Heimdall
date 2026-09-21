@@ -33,6 +33,8 @@ const api: HeimdallApi = {
   session: (roundPaths) => ipcRenderer.invoke(IPC.session, roundPaths),
   listRuns: (examPath) => ipcRenderer.invoke(IPC.listRuns, examPath),
   saveCsv: (name, text) => ipcRenderer.invoke(IPC.saveCsv, name, text),
+  listClasses: () => ipcRenderer.invoke(IPC.listClasses),
+  saveClasses: (classes) => ipcRenderer.invoke(IPC.saveClasses, classes),
   onRunEvent: (listener) => subscribe<EngineEvent>(IPC.runEvent, listener),
   onRunClosed: (listener) => subscribe<RunClosed>(IPC.runClosed, listener)
 }
