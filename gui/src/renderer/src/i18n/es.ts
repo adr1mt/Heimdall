@@ -144,6 +144,33 @@ export const t = {
       cerca_de: 'Cerca de una línea, aparece'
     }
   },
+  // Analíticas: a quién atender primero y qué está fallando al grupo entero.
+  // No calcula ninguna nota: cuenta sobre las que publicó el motor.
+  analytics: {
+    title: 'Analíticas',
+    hint: 'De la corrección que tienes abierta en Resultados. Ninguna nota se recalcula aquí.',
+    none: 'Todavía no hay ninguna corrección abierta.',
+    noneHint: 'Corrige una clase, o abre una corrección del histórico.',
+    distribution: 'Cómo va el grupo',
+    band: (from: number, to: number) => `${from}–${to === 101 ? 100 : to - 1}`,
+    ungraded: (students: number) =>
+      students === 1 ? '1 alumno sin nota' : `${students} alumnos sin nota`,
+    ungradedHint: 'Su máquina no respondió a todo. No cuentan como un cero.',
+    attention: 'A quién atender primero',
+    attentionNone: 'Nadie necesita que vayas: todos aprueban y ninguna máquina ha fallado.',
+    broken: 'Problema técnico',
+    failing: 'Va por debajo',
+    unevaluated: (checks: number) =>
+      checks === 1 ? '1 comprobación sin hacer' : `${checks} comprobaciones sin hacer`,
+    noScore: 'Sin nota',
+    failingChecks: 'Qué se le está atragantando al grupo',
+    failingNone: 'Ninguna comprobación se le ha atragantado al grupo.',
+    failedBy: (failed: number, evaluated: number) => `La fallan ${failed} de ${evaluated}`,
+    couldNot: (students: number) =>
+      students === 1
+        ? 'No se pudo comprobar en 1 alumno'
+        : `No se pudo comprobar en ${students} alumnos`
+  },
   classes: {
     title: 'Clases',
     hint: 'Los grupos del curso. Se apuntan una vez y se reutilizan en cada examen.',

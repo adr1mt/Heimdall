@@ -33,6 +33,7 @@ const HistoryView = lazy(() => import('./routes/History'))
 const ClassesView = lazy(() => import('./routes/Classes'))
 const CorrectView = lazy(() => import('./routes/Correct'))
 const EditorView = lazy(() => import('./routes/Editor'))
+const AnalyticsView = lazy(() => import('./routes/Analytics'))
 
 const ICONS: Record<View, typeof Home> = {
   home: Home,
@@ -135,7 +136,7 @@ function AppBody() {
     exams: <EditorView />,
     correct: <CorrectView />,
     results: <ResultsView />,
-    analytics: <ComingSoon view="analytics" />,
+    analytics: <AnalyticsView />,
     history: <HistoryView />,
     settings: <SettingsView />,
     help: <HelpView />

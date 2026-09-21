@@ -18,14 +18,13 @@ describe('navegación', () => {
     expect(NAV_FOOTER.map((entry) => entry.id)).toEqual(['settings', 'help'])
   })
 
-  it('no ofrece como abrible una sección que todavía no está', () => {
-    for (const id of ['analytics'] as const) expect(isReady(id)).toBe(false)
-    for (const id of ['home', 'classes', 'exams', 'correct', 'results', 'history', 'settings', 'help'] as const) {
+  it('las siete secciones y el pie están construidas', () => {
+    for (const id of ['home', 'classes', 'exams', 'correct', 'results', 'analytics', 'history', 'settings', 'help'] as const) {
       expect(isReady(id)).toBe(true)
     }
   })
 
-  it('dice por su nombre qué sección llega más adelante', () => {
+  it('sigue sabiendo nombrar una sección que todavía no estuviera', () => {
     expect(comingSoon('analytics')).toContain('Analíticas')
   })
 

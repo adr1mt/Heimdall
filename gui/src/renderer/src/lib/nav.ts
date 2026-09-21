@@ -41,7 +41,7 @@ export const NAV_MAIN: NavEntry[] = [
   { id: 'exams', label: t.nav.exams, ready: true, needsProject: true },
   { id: 'correct', label: t.nav.correct, ready: true, needsProject: true },
   { id: 'results', label: t.nav.results, ready: true, needsProject: true },
-  { id: 'analytics', label: t.nav.analytics, ready: false },
+  { id: 'analytics', label: t.nav.analytics, ready: true, needsProject: true },
   { id: 'history', label: t.nav.history, ready: true, needsProject: true }
 ]
 

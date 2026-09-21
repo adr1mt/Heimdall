@@ -1922,7 +1922,7 @@
       "title": "Analiticas del grupo",
       "phase": 6,
       "package": "P4",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T102"
