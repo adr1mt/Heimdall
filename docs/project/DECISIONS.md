@@ -590,3 +590,26 @@ Dos decisiones menores:
 6. **La clase se valida antes de guardar, no al corregir.** Un identificador
    repetido o un alumno sin máquina se dice al teclearlo: descubrirlo con la
    clase ya sentada delante de los ordenadores cuesta el examen.
+
+## T107 · El aula generada
+
+1. **ADR-0022**: el aula que escribe la aplicación es un artefacto derivado de
+   la clase, no un documento del profesor. Fuente de verdad, la clase.
+2. **Un examen no pertenece a una clase.** El motor recibe la carpeta y el
+   nombre del fichero de aula por separado, así que varias aulas conviven en
+   la carpeta de un examen y cada corrección usa la suya. La restricción del
+   motor era «misma carpeta», nunca «una clase».
+3. **Dos cerrojos contra pisar un aula ajena**: el nombre reservado
+   (`aula-heimdall-<id de la clase>.yaml`) y la marca dentro del fichero. Ante
+   la duda no se escribe y se dice por qué.
+4. **El nombre del fichero cuelga del identificador de la clase, no del
+   nombre.** Renombrar «2SMX C» no deja una copia huérfana detrás.
+5. **La clase gana columnas propias**, como las tenía Teutón GUI. No es un
+   extra: tres de los exámenes de prueba piden datos por alumno que no son la
+   máquina (`subdominio`, `p1`…`p10`), y sin columnas una clase no podía
+   corregirlos. Viajan al aula como campos libres del alumno.
+6. **Una columna no puede llamarse como una clave del aula** (`id`, `nombre`,
+   `moodle_id`, `excluido`, `hosts`): pisaría la identidad del alumno sin que
+   nadie lo dijera. Se rechaza al teclearla.
+7. **El puerto se escribe solo cuando no es el de siempre.** Escribir 22 en
+   cada fila escondería qué alumnos son realmente la excepción.

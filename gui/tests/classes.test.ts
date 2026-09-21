@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { classesFile, readClasses, writeClasses } from '../src/main/classes'
 import {
+  columnProblem,
   duplicateOf,
   groupLine,
   problemWith,
@@ -19,8 +20,17 @@ function group(over: Partial<ClassGroup> = {}): ClassGroup {
   return {
     id: 'g1',
     name: '2SMX A',
+    columns: [],
     students: [
-      { id: 'alu1', name: 'Alumna Uno', contact: 'alu1@ficticio', host: '127.1.2.3', user: 'alumno' }
+      {
+        id: 'alu1',
+        name: 'Alumna Uno',
+        contact: 'alu1@ficticio',
+        host: '127.1.2.3',
+        port: '',
+        user: 'alumno',
+        fields: {}
+      }
     ],
     ...over
   }
@@ -106,6 +116,52 @@ describe('leer una clase', () => {
   })
 })
 
+describe('las columnas propias del profesor', () => {
+  it('se guardan y se recuperan con lo que tiene cada alumno', () => {
+    const dir = emptyDir()
+    const g = group({ columns: ['subdominio'] })
+    g.students[0].fields = { subdominio: 'uno.example' }
+    writeClasses(dir, [g])
+    expect(readClasses(dir)[0].students[0].fields).toEqual({ subdominio: 'uno.example' })
+  })
+
+  // Una columna con uno de estos nombres pisaría la identidad del alumno en
+  // el aula sin que nadie lo dijera.
+  it('no pueden llamarse como una clave que ya usa el aula', () => {
+    for (const name of ['id', 'nombre', 'moodle_id', 'excluido', 'hosts']) {
+      expect(columnProblem(name, [])).not.toBeNull()
+    }
+  })
+
+  it('una columna reservada no sobrevive a la lectura', () => {
+    const read = readGroup({ ...group(), columns: ['nombre', 'subdominio'] })
+    expect(read?.columns).toEqual(['subdominio'])
+  })
+
+  it('un campo reservado no sobrevive a la lectura', () => {
+    const read = readGroup({
+      ...group(),
+      students: [{ ...group().students[0], fields: { nombre: 'pisado', subdominio: 'ok' } }]
+    })
+    expect(read?.students[0].fields).toEqual({ subdominio: 'ok' })
+  })
+
+  it('rechaza un nombre que no vale como clave', () => {
+    expect(columnProblem('Sub Dominio', [])).toMatch(/min[úu]sculas/i)
+    expect(columnProblem('2p', [])).not.toBeNull()
+    expect(columnProblem('', [])).toMatch(/nombre/i)
+  })
+
+  it('no deja repetir una columna', () => {
+    expect(columnProblem('subdominio', ['subdominio'])).toMatch(/ya está/i)
+  })
+
+  it('acepta un nombre normal', () => {
+    expect(columnProblem('subdominio', [])).toBeNull()
+    expect(columnProblem('p10', [])).toBeNull()
+  })
+})
+
 describe('antes de guardar una clase', () => {
   it('acepta una clase completa', () => {
     expect(problemWith(group(), [])).toBeNull()
@@ -155,9 +211,12 @@ describe('duplicar una clase', () => {
 
   it('los alumnos son copias: tocar la copia no toca el original', () => {
     const original = group()
+    original.students[0].fields = { subdominio: 'uno.example' }
     const copy = duplicateOf(original, [original], 'g2')
     copy.students[0].name = 'Otro nombre'
+    copy.students[0].fields.subdominio = 'otro.example'
     expect(original.students[0].name).toBe('Alumna Uno')
+    expect(original.students[0].fields.subdominio).toBe('uno.example')
   })
 })
 

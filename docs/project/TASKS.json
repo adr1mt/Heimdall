@@ -1703,65 +1703,134 @@
       "tests": [
         "gui/tests/classes.test.ts"
       ],
-      "notes": "Escribir ADR-0021 antes de implementar: es persistencia propia de la GUI y no la cubre ningun ADR. Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato. Hasta que exista la entidad Clase, Inicio mantiene «Aula»: hoy esa tarjeta representa el fichero de aula, no una clase logica, y renombrarla antes de P2 mezclaria los dos conceptos."
+      "notes": "Hecha el 2026-09-21 con ADR-0021. El modelo de la clase (identificador, nombre, contacto, maquina, usuario) resulto correcto y se conserva entero. Lo que se cae con la redefinicion de P2 es el selector de clase que quedo en Inicio y su tarjeta de detalles avanzados: la clase se elige en Corregir, no en Inicio. El puerto lo anade T107, que es quien lo necesita."
     },
     {
       "id": "T107",
-      "title": "Clases: pegar desde una hoja de calculo y generar el aula",
+      "title": "El aula generada a partir de la clase",
+      "phase": 6,
+      "package": "P2",
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T106"
+      ],
+      "goal": "Que el mismo examen se pueda corregir con cualquier clase, sin que el profesor vea un fichero de aula.",
+      "scope": [
+        "ADR-0022 primero: el aula generada es un artefacto derivado de la clase",
+        "Convertir una clase en el aula que el motor lee, con el examen abierto",
+        "Nombre reservado y determinista, derivado del identificador de la clase",
+        "La clase gana el puerto: una columna opcional, vacia es 22",
+        "Regenerar antes de cada correccion: un cambio en la clase llega solo",
+        "El aula solo nombra la contrasena; el valor se teclea al corregir",
+        "Columnas propias de la clase: lo que el examen pide y no es la maquina"
+      ],
+      "out_of_scope": [
+        "Escribir ninguna contrasena en el aula ni en ningun sitio (ADR-0009)",
+        "Tocar el contrato con el motor: el aula generada es una entrada mas, con el formato de siempre",
+        "Pisar, leer o migrar un aula escrita a mano",
+        "Pantalla: la eleccion de clase es T115"
+      ],
+      "acceptance": [
+        "El mismo proyecto se corrige con dos clases distintas y cada una deja su resultado",
+        "Un aula escrita a mano en la carpeta del proyecto sigue intacta despues de generar",
+        "Cambiar una IP en la clase cambia el aula sin que el profesor haga nada",
+        "El aula generada pasa la validacion del motor",
+        "Ninguna contrasena aparece en el aula generada"
+      ],
+      "tests": [
+        "gui/tests/aula.test.ts"
+      ],
+      "notes": "Area critica: escribe datos de alumnado y produce una entrada del motor. Tarea sola, commit propio. El motor recibe la carpeta y el nombre del fichero de aula por separado (--cname), asi que varias aulas conviven en una carpeta sin tocar nada."
+    },
+    {
+      "id": "T108",
+      "title": "Inicio: abrir, crear y recientes de proyectos",
+      "phase": 6,
+      "package": "P2",
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T115"
+      ],
+      "goal": "Que Inicio sea la lista de proyectos, como en Teuton GUI, y no dos selectores de fichero.",
+      "scope": [
+        "Abrir carpeta, Nuevo y los proyectos recientes, con quitar de la lista",
+        "Abrir un proyecto resuelve el examen de la carpeta; no se eligen ficheros",
+        "Lo que necesita un proyecto abierto queda desactivado hasta que lo haya",
+        "Los recientes sobreviven al cierre de la aplicacion (ADR-0021)"
+      ],
+      "out_of_scope": [
+        "Duplicar, renombrar y eliminar proyectos: con el proyecto desacoplado de la clase no hacen falta",
+        "Importar examenes de Teuton (ADR-0016)",
+        "Editar el examen: eso es P3"
+      ],
+      "acceptance": [
+        "Un examen nuevo se crea y se corrige sin abrir un gestor de ficheros",
+        "Los recientes sobreviven al cierre de la aplicacion",
+        "Sin proyecto abierto, ninguna seccion que lo necesite se puede abrir",
+        "Ninguna ruta de fichero aparece en el uso normal"
+      ],
+      "tests": [
+        "gui/tests/projects.test.ts"
+      ],
+      "notes": "Referencia: workspace/teuton-gui, solo lectura. Su Inicio es exactamente esto: Abrir, Nuevo y recientes."
+    },
+    {
+      "id": "T115",
+      "title": "Corregir: proyecto abierto mas clase elegida",
       "phase": 6,
       "package": "P2",
       "status": "READY",
       "priority": "P1",
       "depends_on": [
-        "T106"
+        "T107"
       ],
-      "goal": "Que apuntar a 26 alumnos cueste un pegado, y que el aula del examen salga de la clase.",
+      "goal": "Que corregir sea elegir la clase y pulsar, con el proyecto ya abierto.",
       "scope": [
-        "Importar pegando columnas o un CSV, con vista previa antes de guardar",
-        "Generar el aula del examen a partir de la clase elegida",
-        "Un cambio de IP en la clase se refleja al volver a generar"
+        "Seccion propia «Corregir», como el «Ejecutar» de Teuton GUI",
+        "Selector de clase entre las clases guardadas",
+        "Credenciales, Corregir, Empezar el examen, avance y panel de sesion se mudan aqui desde Inicio",
+        "Se retira de Inicio el selector de clase y la tarjeta de detalles avanzados de T106"
       ],
       "out_of_scope": [
-        "Escribir contrasenas en el aula: solo van referencias"
+        "Tocar el modo examen, la sesion ni el reintento: se mudan tal cual",
+        "Guardar ninguna contrasena"
       ],
       "acceptance": [
-        "Un pegado de tres columnas crea la clase entera",
-        "El aula generada pasa la validacion del motor",
+        "Con un proyecto abierto, elegir clase y corregir no pide ningun fichero",
+        "Cambiar de clase y volver a corregir produce el resultado de la clase nueva",
+        "El modo examen sigue funcionando igual que antes de la mudanza"
+      ],
+      "tests": [],
+      "notes": "Referencia: workspace/teuton-gui, solo lectura. Un profesor que sabe usar Teuton GUI tiene que reconocer esta pantalla sin aprender nada."
+    },
+    {
+      "id": "T116",
+      "title": "Clases: pegar desde una hoja de calculo",
+      "phase": 6,
+      "package": "P2",
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [
+        "T107"
+      ],
+      "goal": "Que apuntar a 26 alumnos cueste un pegado.",
+      "scope": [
+        "Pegar columnas o un CSV, con vista previa antes de guardar",
+        "Una fila incompleta se senala y no se guarda a medias"
+      ],
+      "out_of_scope": [
+        "Contrasenas: no se pegan ni se guardan"
+      ],
+      "acceptance": [
+        "Un pegado de varias columnas crea la clase entera",
         "Una fila incompleta se senala antes de guardar y no se guarda a medias"
       ],
       "tests": [
         "gui/tests/classes-import.test.ts"
       ],
-      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
-    },
-    {
-      "id": "T108",
-      "title": "Examenes: un espacio de trabajo propio",
-      "phase": 6,
-      "package": "P2",
-      "status": "READY",
-      "priority": "P1",
-      "depends_on": [
-        "T100"
-      ],
-      "goal": "Que el profesor no gestione carpetas: la aplicacion las crea y las ordena.",
-      "scope": [
-        "Nuevo, abrir, abrir reciente, duplicar, renombrar y eliminar con confirmacion",
-        "La aplicacion crea los ficheros necesarios por detras",
-        "«Abrir carpeta» queda como opcion avanzada"
-      ],
-      "out_of_scope": [
-        "Importar examenes de Teuton (ADR-0016)"
-      ],
-      "acceptance": [
-        "Un examen nuevo se crea y se corrige sin abrir un gestor de ficheros",
-        "Eliminar pide confirmacion y dice que se borra",
-        "Los recientes sobreviven al cierre de la aplicacion"
-      ],
-      "tests": [
-        "gui/tests/workspace.test.ts"
-      ],
-      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
+      "notes": "Referencia: workspace/teuton-gui, solo lectura: su pantalla de Clases ya tiene este pegado."
     },
     {
       "id": "T109",

@@ -15,8 +15,19 @@ export interface ClassStudent {
   contact: string
   /** Fixed exam address of the machine. */
   host: string
+  /** SSH port, when it is not the usual one. Empty means 22. */
+  port: string
   /** User the correction connects with. */
   user: string
+  /**
+   * The teacher's own columns for this student: `subdominio`, `p1`…
+   *
+   * An exam can ask for data that is not the machine —each student's own
+   * subdomain, the ports they were assigned— and it reaches the check through
+   * substitution. Which columns exist is the class's business (`columns`);
+   * this holds what each student has in them.
+   */
+  fields: Record<string, string>
 }
 
 export interface ClassGroup {
@@ -24,12 +35,20 @@ export interface ClassGroup {
   id: string
   /** The logical name, e.g. «2SMX A». */
   name: string
+  /**
+   * The teacher's own columns, in the order they are shown.
+   *
+   * They are declared on the class and not deduced from the students: a
+   * column everybody has left empty still has to be on screen, or nobody can
+   * fill it in.
+   */
+  columns: string[]
   students: ClassStudent[]
 }
 
 /** An empty row, for the screen. */
 export function emptyStudent(): ClassStudent {
-  return { id: '', name: '', contact: '', host: '', user: '' }
+  return { id: '', name: '', contact: '', host: '', port: '', user: '', fields: {} }
 }
 
 /**
@@ -46,7 +65,9 @@ export function readStudent(value: unknown): ClassStudent | null {
     name: text(raw.name),
     contact: text(raw.contact),
     host: text(raw.host),
-    user: text(raw.user)
+    port: text(raw.port),
+    user: text(raw.user),
+    fields: readFields(raw.fields)
   }
   // A row with no identifier is not a student: the exam would have nothing to
   // call it by.
@@ -61,7 +82,43 @@ export function readGroup(value: unknown): ClassGroup | null {
   const students = Array.isArray(raw.students)
     ? raw.students.map(readStudent).filter((s): s is ClassStudent => s !== null)
     : []
-  return { id, name, students }
+  const columns = Array.isArray(raw.columns)
+    ? raw.columns.map(text).filter((column) => isColumnName(column))
+    : []
+  return { id, name, columns, students }
+}
+
+/** Only string values: a column holds what goes into a command, not a tree. */
+function readFields(value: unknown): Record<string, string> {
+  const fields: Record<string, string> = {}
+  for (const [name, raw] of Object.entries((value ?? {}) as Record<string, unknown>)) {
+    if (isColumnName(name) && typeof raw === 'string') fields[name] = raw.trim()
+  }
+  return fields
+}
+
+/**
+ * The keys a student already has in the classroom the engine reads. A column
+ * called one of these would not be a column of the teacher's: it would
+ * silently overwrite the student's identity.
+ */
+const RESERVED_COLUMNS = new Set(['id', 'nombre', 'moodle_id', 'excluido', 'hosts'])
+
+/** Whether a name can be a column: it travels into the classroom as a key. */
+export function isColumnName(name: string): boolean {
+  return /^[a-z][a-z0-9_]*$/.test(name) && !RESERVED_COLUMNS.has(name)
+}
+
+/** Why this column name cannot be used, or null. */
+export function columnProblem(name: string, columns: string[]): string | null {
+  const clean = name.trim()
+  if (!clean) return 'La columna necesita un nombre.'
+  if (RESERVED_COLUMNS.has(clean)) return `«${clean}» es un nombre que ya usa el aula.`
+  if (!isColumnName(clean)) {
+    return 'Solo minúsculas, números y guion bajo, empezando por una letra. Por ejemplo «subdominio».'
+  }
+  if (columns.includes(clean)) return `La columna «${clean}» ya está.`
+  return null
 }
 
 function text(value: unknown): string {
@@ -111,5 +168,10 @@ export function duplicateOf(group: ClassGroup, others: ClassGroup[], id: string)
   const taken = new Set(others.map((other) => other.name.trim().toLowerCase()))
   let name = `${group.name} (copia)`
   for (let n = 2; taken.has(name.toLowerCase()); n += 1) name = `${group.name} (copia ${n})`
-  return { id, name, students: group.students.map((student) => ({ ...student })) }
+  return {
+    id,
+    name,
+    columns: [...group.columns],
+    students: group.students.map((student) => ({ ...student, fields: { ...student.fields } }))
+  }
 }

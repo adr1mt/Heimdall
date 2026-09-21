@@ -6,24 +6,25 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T106**: el profesor apunta sus grupos una vez y los reutiliza. «Clases» es
-pantalla nueva: crear, editar, duplicar y eliminar un grupo, y por alumno el
-identificador, el nombre, el correo o Moodle, la máquina y el usuario. La clase
-sobrevive al cierre. Inicio dice «2SMX A · 15 alumnos» en vez de nombrar un
-fichero; el fichero de aula y las contraseñas bajan a detalles avanzados, que
-se abren solos cuando falta algo. Ninguna contraseña llega al disco, y es
-estructural: se serializa campo a campo desde el modelo.
+**P2 redefinido.** Un examen no pertenece a una clase: el mismo «Examen DHCP»
+se corrige con 2SMX C y con 2SMX D. El flujo será abrir proyecto → Corregir →
+elegir clase → corregir. Teutón GUI es la referencia funcional directa y no se
+inventa modelo nuevo.
 
-**ADR-0021** fija dónde viven los datos propios de la aplicación. Un fichero de
-clases ilegible no se sustituye por una lista vacía: se avisa y no se guarda
-nada encima, al revés que con los ajustes.
+**T107 hecho**: la aplicación escribe el aula a partir de la clase elegida, y
+el profesor no ve ningún fichero. Nombre reservado por clase, así que un aula
+escrita a mano nunca se pisa, y se rehace en cada corrección, así que un cambio
+de IP llega solo (ADR-0022). La clase gana el puerto y **columnas propias**
+—`subdominio`, `p1`…`p10`—, que es lo que ya tenía Teutón GUI y lo que hace que
+cualquier clase sirva para cualquier examen.
 
-**T106 salió del paquete P2** por la regla de áreas críticas: guarda datos de
-alumnado en disco. T107 y T108 siguen siendo paquete.
+**T106** (ADR-0021): pantalla de Clases con crear, editar, duplicar y eliminar,
+guardadas fuera del repositorio y sin contraseñas. Se conserva entera; solo cae
+el selector de clase que quedó en Inicio, que se muda a Corregir en T115.
 
-**Dirección fijada**: Teutón GUI (`workspace/teuton-gui`) es la referencia
-canónica de interfaz. Fase 6 en cinco paquetes: P1 visual (hecho, T100–T105),
-P2 clases y proyectos, P3 editor, P4 uso en clase, P5 protección.
+**Dirección**: Teutón GUI (`workspace/teuton-gui`) es la referencia canónica de
+interfaz. Fase 6: P1 visual (hecho, T100–T105), P2 clases y proyectos, P3
+editor, P4 uso en clase, P5 protección.
 
 ## Estado actual
 
@@ -40,28 +41,32 @@ P2 clases y proyectos, P3 editor, P4 uso en clase, P5 protección.
   `gui-lab`. Vistas vivas: Inicio (modo examen y panel de sesión), Resultados
   (Lista y Matriz, exportación, reintento, cadena), Histórico, Ajustes, Ayuda.
   Modo proyector en la barra lateral. Clases (T106) guarda los grupos en
-  `classes.json`, en el directorio de datos de usuario (ADR-0021).
+  `classes.json`, en el directorio de datos de usuario (ADR-0021), y de cada
+  clase sale su aula dentro de la carpeta del examen (T107, ADR-0022).
 
 ## Pruebas ejecutadas
 
-`make check` verde. `make gui-check` (190) y `typecheck` verdes. Las clases,
-probadas con la aplicación construida y un directorio de datos de usar y tirar:
-una clase de 15 alumnos guardada y releída, el editor, el borrado con
-confirmación y el estado vacío. Una contraseña colada por IPC **no** llega al
-`classes.json` real. Los scripts de aceptación y `make test` no se repitieron
-esta sesión; quedaron verdes antes.
+`make check` verde. `make gui-check` (213) y `typecheck` verdes. El aula
+generada, probada contra el motor real: `check` en verde con el examen de RA2 y
+con el cuestionario (que pide `p1`…`p10`), y **el examen del prototipo
+corregido de verdad con dos clases distintas sobre el laboratorio**, cada una
+con su artefacto y sus alumnos. Cero apariciones de la contraseña en toda la
+carpeta del examen. El aula escrita a mano, intacta después de generar. La
+pantalla de Clases con columnas propias, mirada con la aplicación construida.
+Los scripts de aceptación y `make test` no se repitieron esta sesión.
 
 ## Problemas conocidos
 
 - Laboratorio en **`127.1.2.3`**, nunca `127.0.0.x` (F-01, A-11).
 - **A-10**: los ficheros legacy se escriben, pero la aceptación lo marca `PEND`;
   se cierra o se retira en T060.
-- El histórico se apoya en la carpeta del examen elegido.
 - Un reintento exige el mismo PLAN.
 - Intervalo mínimo del modo examen, 5 minutos.
 - El proyector tapa las máquinas, no los nombres del alumnado.
-- Clase y fichero de aula se eligen por separado hasta T107, que generará el
-  aula desde la clase.
+- Inicio todavía pide dos ficheros: lo arreglan T115 (Corregir con selector de
+  clase) y T108 (Inicio = proyectos).
+- El histórico enseña el nombre del fichero de aula, que ahora es generado y
+  feo. Tiene que decir el nombre de la clase: se arregla en T115.
 - Los datos de alumnado quedan fuera de toda copia de seguridad hasta T113.
 
 ## Siguiente tarea recomendada

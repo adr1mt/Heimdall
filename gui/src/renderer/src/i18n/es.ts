@@ -92,8 +92,20 @@ export const t = {
       name: 'Nombre y apellidos',
       contact: 'Correo o Moodle',
       host: 'Máquina',
+      port: 'Puerto',
       user: 'Usuario'
     },
+    portHint: 'Vacío es el puerto de siempre, el 22.',
+    // Columnas propias: lo que el examen pide y no es la máquina.
+    addColumn: 'Añadir columna',
+    columnName: 'Nombre de la columna',
+    columnPlaceholder: 'subdominio',
+    columnHint:
+      'Para lo que el examen pida de cada alumno y no sea su máquina: un subdominio, un puerto asignado. En el examen se escribe ${alumno.NOMBRE}.',
+    removeColumn: (name: string) => `Quitar la columna «${name}»`,
+    removeColumnTitle: (name: string) => `¿Quitar la columna «${name}»?`,
+    removeColumnBody: 'Se borra lo que cada alumno tuviera en ella.',
+    columnAdd: 'Añadir',
     loadFailed: 'No se pudieron leer las clases',
     saveFailed: 'No se pudo guardar la clase',
     blocked: 'Mientras el fichero de clases no se pueda leer, no se guarda nada.'

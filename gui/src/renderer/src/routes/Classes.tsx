@@ -12,6 +12,7 @@ import {
 import { useApp, noticeFrom } from '@/stores/app'
 import { useClasses } from '@/stores/classes'
 import {
+  columnProblem,
   duplicateOf,
   emptyStudent,
   problemWith,
@@ -52,7 +53,7 @@ export default function ClassesView() {
   }
 
   function startNew(): void {
-    setDraft({ id: crypto.randomUUID(), name: '', students: [emptyStudent()] })
+    setDraft({ id: crypto.randomUUID(), name: '', columns: [], students: [emptyStudent()] })
   }
 
   async function duplicate(group: ClassGroup): Promise<void> {
@@ -189,6 +190,8 @@ function ClassEditor({
   onSave: (group: ClassGroup) => void
 }) {
   const problem = problemWith(draft, others)
+  const [addingColumn, setAddingColumn] = useState(false)
+  const [removingColumn, setRemovingColumn] = useState<string | null>(null)
 
   function setStudent(index: number, patch: Partial<ClassStudent>): void {
     onChange({
@@ -213,78 +216,171 @@ function ClassEditor({
         <SectionTitle
           hint={t.classes.noPasswords}
           actions={
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onChange({ ...draft, students: [...draft.students, emptyStudent()] })}
-            >
-              <Plus className="h-4 w-4" />
-              {t.classes.addStudent}
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setAddingColumn(true)}>
+                <Plus className="h-4 w-4" />
+                {t.classes.addColumn}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onChange({ ...draft, students: [...draft.students, emptyStudent()] })}
+              >
+                <Plus className="h-4 w-4" />
+                {t.classes.addStudent}
+              </Button>
+            </div>
           }
         >
           {t.classes.students}
         </SectionTitle>
 
-        <div className="space-y-2">
-          <div className="hidden gap-2 px-1 text-micro uppercase tracking-[0.09em] text-muted-foreground lg:grid lg:grid-cols-[8rem_1fr_1fr_10rem_8rem_2rem]">
-            <span>{t.classes.col.id}</span>
-            <span>{t.classes.col.name}</span>
-            <span>{t.classes.col.contact}</span>
-            <span>{t.classes.col.host}</span>
-            <span>{t.classes.col.user}</span>
-            <span />
-          </div>
-          {draft.students.map((student, index) => (
-            <div
-              key={index}
-              className="grid gap-2 rounded-md border border-border p-2 lg:grid-cols-[8rem_1fr_1fr_10rem_8rem_2rem] lg:border-0 lg:p-1"
-            >
-              <Input
-                aria-label={t.classes.col.id}
-                placeholder={t.classes.col.id}
-                value={student.id}
-                onChange={(e) => setStudent(index, { id: e.target.value })}
-              />
-              <Input
-                aria-label={t.classes.col.name}
-                placeholder={t.classes.col.name}
-                value={student.name}
-                onChange={(e) => setStudent(index, { name: e.target.value })}
-              />
-              <Input
-                aria-label={t.classes.col.contact}
-                placeholder={t.classes.col.contact}
-                value={student.contact}
-                onChange={(e) => setStudent(index, { contact: e.target.value })}
-              />
-              <Input
-                aria-label={t.classes.col.host}
-                placeholder={t.classes.col.host}
-                value={student.host}
-                onChange={(e) => setStudent(index, { host: e.target.value })}
-              />
-              <Input
-                aria-label={t.classes.col.user}
-                placeholder={t.classes.col.user}
-                value={student.user}
-                onChange={(e) => setStudent(index, { user: e.target.value })}
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                aria-label={t.classes.removeStudent}
-                title={t.classes.removeStudent}
-                onClick={() =>
-                  onChange({ ...draft, students: draft.students.filter((_, i) => i !== index) })
-                }
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
+        {/* Una columna propia se declara en la clase, no se deduce de los
+            alumnos: una que todos tengan vacía tiene que seguir en pantalla o
+            nadie puede rellenarla. */}
+        {addingColumn && (
+          <ColumnAdder
+            columns={draft.columns}
+            onCancel={() => setAddingColumn(false)}
+            onAdd={(name) => {
+              onChange({ ...draft, columns: [...draft.columns, name] })
+              setAddingColumn(false)
+            }}
+          />
+        )}
+
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-max border-separate border-spacing-x-2 border-spacing-y-1">
+            <thead>
+              <tr className="text-left text-micro uppercase tracking-[0.09em] text-muted-foreground">
+                <th className="font-normal">{t.classes.col.id}</th>
+                <th className="font-normal">{t.classes.col.name}</th>
+                <th className="font-normal">{t.classes.col.contact}</th>
+                <th className="font-normal">{t.classes.col.host}</th>
+                <th className="font-normal" title={t.classes.portHint}>
+                  {t.classes.col.port}
+                </th>
+                <th className="font-normal">{t.classes.col.user}</th>
+                {draft.columns.map((column) => (
+                  <th key={column} className="font-normal">
+                    <span className="flex items-center gap-1">
+                      <span className="font-mono normal-case tracking-normal">{column}</span>
+                      <button
+                        type="button"
+                        aria-label={t.classes.removeColumn(column)}
+                        title={t.classes.removeColumn(column)}
+                        onClick={() => setRemovingColumn(column)}
+                        className="rounded p-0.5 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </span>
+                  </th>
+                ))}
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {draft.students.map((student, index) => (
+                <tr key={index}>
+                  <td className="w-28">
+                    <Input
+                      aria-label={t.classes.col.id}
+                      value={student.id}
+                      onChange={(e) => setStudent(index, { id: e.target.value })}
+                    />
+                  </td>
+                  <td className="w-44">
+                    <Input
+                      aria-label={t.classes.col.name}
+                      value={student.name}
+                      onChange={(e) => setStudent(index, { name: e.target.value })}
+                    />
+                  </td>
+                  <td className="w-40">
+                    <Input
+                      aria-label={t.classes.col.contact}
+                      value={student.contact}
+                      onChange={(e) => setStudent(index, { contact: e.target.value })}
+                    />
+                  </td>
+                  <td className="w-32">
+                    <Input
+                      aria-label={t.classes.col.host}
+                      value={student.host}
+                      onChange={(e) => setStudent(index, { host: e.target.value })}
+                    />
+                  </td>
+                  <td className="w-20">
+                    <Input
+                      aria-label={t.classes.col.port}
+                      placeholder="22"
+                      value={student.port}
+                      onChange={(e) => setStudent(index, { port: e.target.value })}
+                    />
+                  </td>
+                  <td className="w-28">
+                    <Input
+                      aria-label={t.classes.col.user}
+                      value={student.user}
+                      onChange={(e) => setStudent(index, { user: e.target.value })}
+                    />
+                  </td>
+                  {draft.columns.map((column) => (
+                    <td key={column} className="w-36">
+                      <Input
+                        aria-label={column}
+                        value={student.fields[column] ?? ''}
+                        onChange={(e) =>
+                          setStudent(index, {
+                            fields: { ...student.fields, [column]: e.target.value }
+                          })
+                        }
+                      />
+                    </td>
+                  ))}
+                  <td>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      aria-label={t.classes.removeStudent}
+                      title={t.classes.removeStudent}
+                      onClick={() =>
+                        onChange({ ...draft, students: draft.students.filter((_, i) => i !== index) })
+                      }
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={removingColumn !== null}
+        title={removingColumn ? t.classes.removeColumnTitle(removingColumn) : ''}
+        confirmLabel={t.classes.remove}
+        destructive
+        onConfirm={() => {
+          if (!removingColumn) return
+          onChange({
+            ...draft,
+            columns: draft.columns.filter((column) => column !== removingColumn),
+            students: draft.students.map((student) => {
+              const fields = { ...student.fields }
+              delete fields[removingColumn]
+              return { ...student, fields }
+            })
+          })
+          setRemovingColumn(null)
+        }}
+        onCancel={() => setRemovingColumn(null)}
+      >
+        {t.classes.removeColumnBody}
+      </ConfirmDialog>
 
       <div className="flex shrink-0 flex-wrap items-center gap-3 border-t border-border p-4">
         <Button disabled={problem !== null} onClick={() => onSave(draft)}>
@@ -295,6 +391,53 @@ function ClassEditor({
         </Button>
         {problem && <span className="text-xs text-warning-strong">{problem}</span>}
       </div>
+    </div>
+  )
+}
+
+/**
+ * Una columna propia, por su nombre.
+ *
+ * El nombre viaja al aula como clave del alumno y de ahí lo alcanza
+ * `${alumno.NOMBRE}` en el examen, así que se comprueba al teclearlo: un
+ * nombre que no vale como clave rompería el examen a mitad de corrección.
+ */
+function ColumnAdder({
+  columns,
+  onAdd,
+  onCancel
+}: {
+  columns: string[]
+  onAdd: (name: string) => void
+  onCancel: () => void
+}) {
+  const [name, setName] = useState('')
+  const problem = name.trim() === '' ? null : columnProblem(name, columns)
+
+  return (
+    <div className="space-y-2 rounded-md border border-border p-3">
+      <p className="text-xs text-muted-foreground">{t.classes.columnHint}</p>
+      <div className="flex flex-wrap items-center gap-2">
+        <Input
+          autoFocus
+          aria-label={t.classes.columnName}
+          placeholder={t.classes.columnPlaceholder}
+          value={name}
+          className="max-w-xs"
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') onCancel()
+            if (e.key === 'Enter' && !problem && name.trim()) onAdd(name.trim())
+          }}
+        />
+        <Button size="sm" disabled={!name.trim() || problem !== null} onClick={() => onAdd(name.trim())}>
+          {t.classes.columnAdd}
+        </Button>
+        <Button variant="ghost" size="sm" onClick={onCancel}>
+          {t.classes.cancel}
+        </Button>
+      </div>
+      {problem && <p className="text-xs text-warning-strong">{problem}</p>}
     </div>
   )
 }

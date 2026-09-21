@@ -54,12 +54,15 @@ export function writeClasses(dir: string, classes: ClassGroup[]): void {
     classes: classes.map((group) => ({
       id: group.id,
       name: group.name,
+      columns: group.columns,
       students: group.students.map((student) => ({
         id: student.id,
         name: student.name,
         contact: student.contact,
         host: student.host,
-        user: student.user
+        port: student.port,
+        user: student.user,
+        fields: student.fields
       }))
     }))
   }
