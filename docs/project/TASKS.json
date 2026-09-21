@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated": "2026-09-20",
+  "updated": "2026-09-21",
   "status_values": [
     "BLOCKED",
     "READY",
@@ -1398,7 +1398,7 @@
       "id": "T064",
       "title": "La aplicacion encadena el examen sobre la sesion, no sobre vueltas sueltas",
       "phase": 5,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T058",
@@ -1426,7 +1426,7 @@
         "gui/tests/session.test.ts: la pantalla se construye con lo que publica el motor y no suma nada",
         "gui/scripts/examen-lab.ts: una sesion real de dos vueltas contra el laboratorio, con la mejor nota conservada y el finalizado fuera de la segunda"
       ],
-      "notes": "Mitad de pantalla de la logica de sesion. No modifica T058 ni se mezcla con T059."
+      "notes": "Mitad de pantalla de la logica de sesion. No modifica T058 ni se mezcla con T059. Hecha el 2026-09-21: la sesion se lee del motor con `heimdall session` y las vueltas siguientes viajan con --session. Comprobada contra el laboratorio (S-1 a S-4 de gui/scripts/examen-lab.ts)."
     },
     {
       "id": "T065",
@@ -1459,6 +1459,35 @@
         "Revision manual del README contra PROGRESS.md, ROADMAP.md y el Makefile"
       ],
       "notes": "Pedida por Adria el 2026-09-20. Solo documentacion, commit propio."
+    },
+    {
+      "id": "T066",
+      "title": "El proyector tapa tambien la maquina que aparece en el motivo tecnico",
+      "phase": 5,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [
+        "T064"
+      ],
+      "goal": "Que con la clase mirando la pantalla no se lea la direccion de la maquina de nadie.",
+      "scope": [
+        "Tapar la maquina en el `detail` de una comprobacion, como ya se tapa en el comando, en la salida y en los avisos",
+        "Revisar si queda algun otro texto de Resultados sin tapar"
+      ],
+      "out_of_scope": [
+        "Cambiar lo que escribe el motor: el motivo tecnico se queda como esta en el artefacto",
+        "Tocar la sesion de examen ni nada de T064"
+      ],
+      "acceptance": [
+        "P-1 de gui/scripts/examen-lab.ts en verde: ninguna direccion IP en la pantalla proyectada",
+        "P-2 en verde con un proyecto cuyas comprobaciones no llegaron a ejecutarse",
+        "Fuera del proyector el motivo tecnico se sigue viendo entero"
+      ],
+      "tests": [
+        "gui/tests/projector.test.ts",
+        "gui/scripts/examen-lab.ts (P-1, P-2)"
+      ],
+      "notes": "Encontrada el 2026-09-21 al cerrar T064: con una maquina apagada, el motivo dice «no se ha podido conectar con 127.1.2.3:2299» y eso se proyectaba tal cual. Hasta ahora no se veia porque la vista se rompia antes con un alumno excluido."
     }
   ]
 }

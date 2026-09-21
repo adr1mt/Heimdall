@@ -1,5 +1,6 @@
-// Acceptance harness for T058: exam mode, projector mode and the confirmation
-// when the window is closed, driven through the real application — the real
+// Acceptance harness for T058 and T064: exam mode as a session, projector mode
+// and the confirmation when the window is closed, driven through the real
+// application — the real
 // preload, the real IPC, the real views and the real close guard. Not part of
 // the application.
 //
@@ -11,7 +12,7 @@
 import { app, BrowserWindow, dialog } from 'electron'
 import { execFileSync } from 'node:child_process'
 import { join, resolve } from 'node:path'
-import { readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { guardClose } from '../src/main/close-guard'
 import { registerIpc } from '../src/main/ipc'
 import { writeSettings } from '../src/main/store'
@@ -55,6 +56,22 @@ let failed = false
 function check(id: string, ok: boolean, detail: string): void {
   if (!ok) failed = true
   console.log(`${ok ? 'OK    ' : 'FALLO '} ${id.padEnd(5)} ${detail}`)
+}
+
+/**
+ * What the engine says an exam session is worth, straight from the binary.
+ * Exit 3 —somebody still without a closed grade— prints the session all the
+ * same, and it is the ordinary case in the lab: alumne02's machine is not
+ * there.
+ */
+function engineSession(rounds: string[]): string {
+  try {
+    return execFileSync(enginePath, ['session', ...rounds], { encoding: 'utf-8' })
+  } catch (error) {
+    const failed = error as { status?: number; stdout?: string; stderr?: string }
+    if (failed.status === 3 && failed.stdout) return failed.stdout
+    throw new Error(`heimdall session falló (${failed.status}): ${failed.stderr ?? ''}`)
+  }
 }
 
 /** How many engines are alive right now. The criterion is: never two. */
@@ -178,6 +195,66 @@ app.whenReady().then(async () => {
     for (let i = 0; i < 240 && enginesAlive() > 0; i++) await wait(250)
   }
 
+  // The session, which is what the exam is really worth (T064). It needs two
+  // rounds, so it rides along with the chain.
+  if (chain) {
+    // The rounds on disk, oldest first: the same list the application sends
+    // to the engine.
+    const varDir = join(project, 'var')
+    const rounds = readdirSync(varDir)
+      .filter((name) => /^run-.*\.json$/.test(name))
+      .map((name) => join(varDir, name))
+      .map((path) => ({ path, run: JSON.parse(readFileSync(path, 'utf-8')) }))
+      .sort((a, b) => String(a.run.finished_at).localeCompare(String(b.run.finished_at)))
+
+    check('S-1', rounds.length >= 2, `vueltas guardadas: ${rounds.length}`)
+
+    // What the engine says the session is worth. The screen may not differ
+    // from this by a single number: the application computes no grade.
+    const session = JSON.parse(engineSession(rounds.map((r) => r.path)))
+
+    await js(`[...document.querySelectorAll('aside button')].find(b => b.textContent.trim() === 'Inicio').click()`)
+    await wait(2500)
+    const panel = await screen()
+    if (process.env.DUMP === '1') {
+      console.log('----- panel de la sesión -----')
+      console.log(panel)
+      console.log('------------------------------')
+    }
+
+    const best = session.students.filter((s: { from_round: number }) => s.from_round > 0)
+    const shown = best.every(
+      (s: { name: string; from_round: number; score: { final_score: number } }) =>
+        panel.includes(s.name) &&
+        panel.includes(`Sale de la vuelta ${s.from_round}`) &&
+        panel.includes(String(s.score.final_score))
+    )
+    check('S-2', best.length > 0 && shown, `alumnos con nota de sesión en pantalla: ${best.length}`)
+
+    // Nobody without a whole round gets a number on the screen.
+    const ungraded = session.students.filter((s: { from_round: number }) => s.from_round === 0)
+    const honest = ungraded.every((s: { reason: string }) => panel.includes(s.reason))
+    check('S-3', honest, `alumnos sin nota, con su motivo en pantalla: ${ungraded.length}`)
+
+    // A student the session finished is left out of the next round, and the
+    // round says why instead of giving them a zero.
+    const finished = session.students.filter((s: { status: string }) => s.status === 'FINISHED')
+    if (finished.length > 0) {
+      const last = rounds[rounds.length - 1].run
+      const left = finished.every((f: { student_id: string }) => {
+        const inRound = last.students.find(
+          (s: { student_id: string }) => s.student_id === f.student_id
+        )
+        return inRound && inRound.status === 'EXCLUDED' && /ya tenía el examen entero bien/.test(
+          JSON.stringify(inRound)
+        )
+      })
+      check('S-4', left, `terminados dejados fuera de la última vuelta: ${finished.length}`)
+    } else {
+      console.log(`PEND  S-4    ningún alumno terminó el examen entero en el laboratorio`)
+    }
+  }
+
   // P-1: on the projector, no machine address anywhere on the screen.
   await js(`[...document.querySelectorAll('aside button')].find(b => b.textContent.trim() === 'Resultados').click()`)
   await wait(600)
@@ -185,7 +262,7 @@ app.whenReady().then(async () => {
   await wait(400)
   // Open a check, which is where the command and the output live.
   await js(`(() => {
-    const cell = [...document.querySelectorAll('main button')].find(b => /^p\\d+-/.test(b.textContent.trim()))
+    const cell = [...document.querySelectorAll('main button')].find(b => /^[a-z]+\\d+-/.test(b.textContent.trim()))
     if (cell) cell.click()
     return !!cell
   })()`)

@@ -28,6 +28,7 @@ const api: HeimdallApi = {
   setExamMode: (request) => ipcRenderer.invoke(IPC.setExamMode, request),
   readArtifact: (path) => ipcRenderer.invoke(IPC.readArtifact, path),
   consolidate: (path) => ipcRenderer.invoke(IPC.consolidate, path),
+  session: (roundPaths) => ipcRenderer.invoke(IPC.session, roundPaths),
   listRuns: (examPath) => ipcRenderer.invoke(IPC.listRuns, examPath),
   saveCsv: (name, text) => ipcRenderer.invoke(IPC.saveCsv, name, text),
   onRunEvent: (listener) => subscribe<EngineEvent>(IPC.runEvent, listener),

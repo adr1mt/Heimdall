@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { FileText, Play, RotateCcw, Square, Timer, Users } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { Download, FileText, Layers, Play, RotateCcw, Square, Timer, Users } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -14,11 +14,22 @@ import {
   SectionTitle,
   ViewHeader
 } from '@/components/ui'
-import { useApp, noticeFrom } from '@/stores/app'
+import { useApp, messageOf, noticeFrom } from '@/stores/app'
 import { useRun } from '@/stores/run'
 import { runPercent, type StudentProgress } from '@/lib/run-state'
 import { EXAM_INTERVALS, secondsLeft, type ExamMode } from '@/lib/exam'
+import {
+  SESSION_STATUS_TEXT,
+  fromRoundText,
+  nextRoundText,
+  roundLines,
+  sessionTally,
+  sessionText
+} from '@/lib/session'
+import { scoreView } from '@/lib/results'
+import { scaleOf, sessionCsv, sessionCsvName, sessionExportSummary } from '@/lib/export'
 import { startCorrection } from '@/lib/start-run'
+import type { Session } from '../../../shared/session'
 import { t } from '@/i18n/es'
 
 export default function HomeView() {
@@ -212,6 +223,8 @@ export default function HomeView() {
           onStop={() => void stopExamMode()}
         />
 
+        <SessionPanel />
+
         {run.phase !== 'idle' && <RunPanel percent={percent} />}
       </div>
 
@@ -300,6 +313,171 @@ function ExamCard({
         )}
       </CardContent>
     </Card>
+  )
+}
+
+/**
+ * The exam as a whole: what each student's grade is worth right now, which
+ * round it comes from and who has already finished.
+ *
+ * It is read after every round, from the engine, with the rounds of this exam
+ * and nothing else. Not a single number on this panel was worked out here: the
+ * best round, the state and the grade are the engine's (ADR-0020, principio
+ * 12), and while a round is running the previous answer stays on screen
+ * instead of a blank.
+ */
+function SessionPanel() {
+  const rounds = useApp((s) => s.examRounds)
+  const [session, setSession] = useState<Session | null>(null)
+  const [problem, setProblem] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const read = useCallback(async (paths: string[]): Promise<void> => {
+    if (paths.length === 0) {
+      setSession(null)
+      setProblem(null)
+      return
+    }
+    setLoading(true)
+    try {
+      setSession(await window.heimdall.session(paths))
+      setProblem(null)
+    } catch (error) {
+      setProblem(t.session.refused(messageOf(error)))
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    void read(rounds)
+  }, [rounds, read])
+
+  if (rounds.length === 0) return null
+
+  return (
+    <div className="space-y-3 rounded-md border border-border p-4">
+      <div className="flex items-center gap-2 text-sm font-medium">
+        <Layers className="h-4 w-4" />
+        {t.session.title}
+      </div>
+      <p className="max-w-3xl text-xs text-muted-foreground">{t.session.hint}</p>
+
+      {loading && <p className="text-xs text-muted-foreground">{t.session.loading}</p>}
+
+      {problem && (
+        <p role="alert" className="rounded-md bg-destructive/10 p-3 text-sm text-destructive-strong">
+          {problem}
+        </p>
+      )}
+
+      {session && !problem && (
+        <>
+          <div className="space-y-0.5">
+            <p className="text-xs text-muted-foreground">{sessionText(session)}</p>
+            <p className="text-xs text-muted-foreground">
+              {t.session.tally(
+                sessionTally(session).graded,
+                sessionTally(session).finished,
+                sessionTally(session).open
+              )}
+            </p>
+          </div>
+
+          <SessionExportButton session={session} />
+
+          <div className="space-y-2">
+            {session.students.map((student) => {
+              const score = scoreView(student.score)
+              const next = nextRoundText(student)
+              return (
+                <div key={student.student_id} className="space-y-1 rounded-md border border-border p-3">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">{student.name}</span>
+                      <Badge
+                        variant={
+                          student.status === 'FINISHED'
+                            ? 'success'
+                            : student.status === 'EXCLUDED'
+                              ? 'outline'
+                              : undefined
+                        }
+                      >
+                        {SESSION_STATUS_TEXT[student.status]}
+                      </Badge>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      {student.from_round === 0 ? (
+                        <span className="text-sm text-muted-foreground">{t.results.noGrade}</span>
+                      ) : (
+                        <span className="text-lg font-semibold tabular-nums">{score.value}</span>
+                      )}
+                      <span className="text-micro text-muted-foreground">
+                        {fromRoundText(student)}
+                      </span>
+                    </div>
+                  </div>
+                  {next && <p className="text-xs text-muted-foreground">{next}</p>}
+                  <details>
+                    <summary className="cursor-pointer text-xs text-muted-foreground">
+                      {t.session.rounds}
+                    </summary>
+                    <div className="mt-1 space-y-0.5">
+                      {roundLines(student).map((line, index) => (
+                        <p key={index} className="text-micro text-muted-foreground">
+                          {line}
+                        </p>
+                      ))}
+                    </div>
+                  </details>
+                </div>
+              )
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+/** The session's grades, out of the application, with the engine's numbers. */
+function SessionExportButton({ session }: { session: Session }) {
+  const scaleId = useApp((s) => s.scale)
+  const setNotice = useApp((s) => s.setNotice)
+  const [confirm, setConfirm] = useState(false)
+  const scale = scaleOf(scaleId)
+
+  async function save(): Promise<void> {
+    setConfirm(false)
+    try {
+      const path = await window.heimdall.saveCsv(sessionCsvName(session), sessionCsv(session, scale))
+      setNotice(path ? t.export.saved(path) : t.export.cancelled)
+    } catch (error) {
+      setNotice(noticeFrom(t.export.failed, error))
+    }
+  }
+
+  return (
+    <div>
+      <Button variant="outline" size="sm" onClick={() => setConfirm(true)}>
+        <Download className="h-4 w-4" />
+        {t.session.export}
+      </Button>
+      <ConfirmDialog
+        open={confirm}
+        title={t.session.exportTitle}
+        confirmLabel={t.export.yes}
+        onConfirm={() => void save()}
+        onCancel={() => setConfirm(false)}
+      >
+        <span className="space-y-2 block">
+          <span className="block">{sessionExportSummary(session, scale)}</span>
+          <span className="block">{t.session.exportHint}</span>
+          <span className="block text-xs text-muted-foreground">{t.export.scale(scale.label)}</span>
+        </span>
+      </ConfirmDialog>
+    </div>
   )
 }
 

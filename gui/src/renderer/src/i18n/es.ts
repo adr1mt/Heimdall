@@ -230,6 +230,22 @@ export const t = {
         ? `Siguiente vuelta en ${Math.ceil(seconds / 60)} min.`
         : `Siguiente vuelta en ${seconds} s.`
   },
+  session: {
+    title: 'La nota del examen',
+    hint:
+      'Cada alumno se queda con su mejor vuelta entera. Una vuelta que no llegó a evaluarlo del todo no le baja la nota, y quien ya lo tiene todo bien deja de ser corregido. La nota la cierra el motor leyendo las vueltas; aquí solo se enseña.',
+    loading: 'Leyendo las vueltas del examen…',
+    reload: 'Volver a leer las vueltas',
+    refused: (why: string) =>
+      `Estas vueltas no se pueden leer como una sesión, así que no se enseña ninguna nota: ${why}`,
+    tally: (graded: number, finished: number, open: number) =>
+      `${graded} alumnos con nota · ${finished} han terminado · ${open} todavía sin nota`,
+    rounds: 'Lo que dijo cada vuelta',
+    export: 'Exportar las notas del examen…',
+    exportTitle: '¿Exportar las notas del examen?',
+    exportHint:
+      'Se guarda la nota con la que se queda cada alumno y de qué vuelta sale. Quien no tenga ninguna vuelta entera sale sin nota y con el motivo.'
+  },
   theme: {
     toLight: 'Tema claro',
     toDark: 'Tema oscuro'

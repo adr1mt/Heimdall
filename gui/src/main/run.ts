@@ -27,6 +27,12 @@ export interface RunTarget {
   className: string
   /** Previous artifact to repeat, for --retry. Absent in a normal run. */
   retryFrom?: string
+  /**
+   * Artifacts of the earlier rounds of this exam session, oldest first, for
+   * --session. The engine reads them and leaves out whoever already finished
+   * (ADR-0020); this process only passes the names along.
+   */
+  sessionRounds?: string[]
 }
 
 /**
@@ -61,6 +67,10 @@ export function runArgs(target: RunTarget): string[] {
   // The engine picks what gets repeated, out of the artifact it is given: the
   // interface never sends a list of checks (ADR-0018).
   if (target.retryFrom) args.push(`--retry=${target.retryFrom}`)
+  // One flag per round, oldest first. The order is the order they ran and it
+  // is not sorted here: getting it wrong would make «de qué vuelta sale» a
+  // lie (ADR-0020 §5).
+  for (const round of target.sessionRounds ?? []) args.push(`--session=${round}`)
   args.push(target.dir)
   return args
 }

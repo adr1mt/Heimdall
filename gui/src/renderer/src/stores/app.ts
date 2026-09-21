@@ -43,6 +43,14 @@ interface AppState {
   projector: boolean
   /** Exam mode: the class is corrected again and again while it is on. */
   exam: ExamMode
+  /**
+   * The artifacts of the rounds of the exam going on, oldest first.
+   *
+   * They are the session, and the only thing the interface keeps of it: the
+   * grade that counts, which round it comes from and who has finished are
+   * asked of the engine with this list (ADR-0020, principio 12).
+   */
+  examRounds: string[]
 
   setTheme: (theme: Theme) => void
   toggleTheme: () => void
@@ -60,6 +68,8 @@ interface AppState {
   examPassStarted: () => void
   /** The engine is gone: schedule the next pass, if the mode is still on. */
   examPassFinished: () => void
+  /** A round of the exam left its artifact; it joins the session. */
+  examRoundFinished: (artifactPath: string) => void
 }
 
 /** What the teacher asked to repeat, as the interface carries it around. */
@@ -113,6 +123,7 @@ export const useApp = create<AppState>((set, get) => ({
   retry: null,
   projector: savedProjector,
   exam: EXAM_OFF,
+  examRounds: [],
 
   setTheme: (theme) => {
     localStorage.setItem('heimdall-theme', theme)
@@ -138,10 +149,18 @@ export const useApp = create<AppState>((set, get) => ({
     set({ projector })
   },
 
-  startExam: (everyMinutes) => set({ exam: examStarted(everyMinutes, Date.now()) }),
+  // A new exam is a new session: the rounds of the previous one are not
+  // part of it and reading them together would grade the wrong exam.
+  startExam: (everyMinutes) => set({ exam: examStarted(everyMinutes, Date.now()), examRounds: [] }),
   stopExam: () => set({ exam: examStopped(get().exam) }),
   examPassStarted: () => set({ exam: passStarted(get().exam) }),
-  examPassFinished: () => set({ exam: passFinished(get().exam, Date.now()) })
+  examPassFinished: () => set({ exam: passFinished(get().exam, Date.now()) }),
+  examRoundFinished: (artifactPath) =>
+    set((state) =>
+      state.examRounds.includes(artifactPath)
+        ? state
+        : { examRounds: [...state.examRounds, artifactPath] }
+    )
 }))
 
 /**

@@ -5,6 +5,7 @@ import { IPC } from '../shared/ipc'
 import { detectEngine } from './engine'
 import { readArtifact } from './artifact'
 import { consolidateChain } from './consolidate'
+import { readExamSession } from './session'
 import { listRuns, varDirOf } from './history'
 import { RunSession, resolveRunTarget } from './run'
 import { secretRefsOf } from './secrets'
@@ -102,7 +103,15 @@ function readRunRequest(value: unknown): RunRequest {
     if (typeof secret === 'string') secrets[name] = secret
   }
   const retryFrom = typeof raw.retryFrom === 'string' && raw.retryFrom ? raw.retryFrom : undefined
-  return { examPath: raw.examPath, classPath: raw.classPath, secrets, retryFrom }
+  const sessionRounds = Array.isArray(raw.sessionRounds)
+    ? raw.sessionRounds.filter((round): round is string => typeof round === 'string' && !!round)
+    : []
+  // A round of a session corrects the whole class; --retry repeats what was
+  // left unevaluated. The engine refuses both at once, and so does this.
+  if (retryFrom && sessionRounds.length > 0) {
+    throw new Error('Una vuelta del examen y un reintento son dos cosas distintas y no se piden juntas.')
+  }
+  return { examPath: raw.examPath, classPath: raw.classPath, secrets, retryFrom, sessionRounds }
 }
 
 export function registerIpc(): void {
@@ -158,12 +167,12 @@ export function registerIpc(): void {
     // The renderer's timer already refuses to launch one on top of another;
     // this one does not depend on the renderer being right.
     if (session) throw new Error('Ya hay una corrección en marcha.')
-    const { examPath, classPath, secrets, retryFrom } = readRunRequest(request)
+    const { examPath, classPath, secrets, retryFrom, sessionRounds } = readRunRequest(request)
     // Passes after the first carry no credentials: the teacher typed them
     // once, when the exam started, and they have not left this process.
     if (examMode && Object.keys(secrets).length === 0) Object.assign(secrets, examSecrets)
     const engine = readSettings(settingsDir()).enginePath
-    const target = { ...resolveRunTarget(examPath, classPath), retryFrom }
+    const target = { ...resolveRunTarget(examPath, classPath), retryFrom, sessionRounds }
     const sender = event.sender
 
     session = new RunSession(engine, target, secrets, {
@@ -190,6 +199,16 @@ export function registerIpc(): void {
   ipcMain.handle(IPC.consolidate, (_e, path: unknown) => {
     if (typeof path !== 'string' || !path) throw new Error('No hay ninguna cadena que consolidar.')
     return consolidateChain(readSettings(settingsDir()).enginePath, path)
+  })
+
+  // Reading a session touches no machine either: `heimdall session` opens the
+  // rounds already on disk and says what each student's exam is worth.
+  ipcMain.handle(IPC.session, (_e, roundPaths: unknown) => {
+    const rounds = Array.isArray(roundPaths)
+      ? roundPaths.filter((round): round is string => typeof round === 'string' && !!round)
+      : []
+    if (rounds.length === 0) throw new Error('No hay ninguna vuelta que leer como sesión.')
+    return readExamSession(readSettings(settingsDir()).enginePath, rounds)
   })
 
   // Reading the history touches no machine and computes no grade: it only

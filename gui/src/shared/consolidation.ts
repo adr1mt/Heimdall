@@ -86,5 +86,9 @@ export function parseConsolidation(text: string): Consolidation {
   if (!Array.isArray(chain.students) || !Array.isArray(chain.runs) || !chain.plan) {
     throw new Error('La consolidación está incompleta.')
   }
+  // Same as an artifact: a student the inventory left out carries no checks.
+  for (const student of chain.students) {
+    if (!Array.isArray(student.checks)) student.checks = []
+  }
   return chain as Consolidation
 }

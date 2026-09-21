@@ -70,6 +70,9 @@ function AppBody() {
     const offEvent = window.heimdall.onRunEvent((event) => {
       useRun.getState().event(event)
       if (event.event !== 'run.end' || !event.artifact) return
+      // The round joins the session before anything else: what it is worth is
+      // asked of the engine with the whole list (ADR-0020).
+      if (useApp.getState().exam.active) useApp.getState().examRoundFinished(event.artifact)
       window.heimdall
         .readArtifact(event.artifact)
         .then((artifact) => {

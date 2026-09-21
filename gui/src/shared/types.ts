@@ -4,6 +4,7 @@
 import type { EngineEvent } from './events'
 import type { RunResult } from './artifact'
 import type { Consolidation } from './consolidation'
+import type { Session } from './session'
 import type { RunSummary } from './history'
 
 /** Result of locating the engine and asking it for its version. */
@@ -30,6 +31,12 @@ export interface RunRequest {
    * (ADR-0018).
    */
   retryFrom?: string
+  /**
+   * Artifacts of the earlier rounds of this exam session, oldest first. The
+   * engine reads them to leave out whoever already finished; the interface
+   * only names the files and never decides who is done (ADR-0020).
+   */
+  sessionRounds?: string[]
 }
 
 /** What the renderer asks for when exam mode is switched. */
@@ -69,6 +76,12 @@ export interface HeimdallApi {
    * whole. It is read-only, and the grade in it is the engine's (ADR-0019).
    */
   consolidate: (path: string) => Promise<Consolidation>
+  /**
+   * Asks the engine what the rounds of an exam session are worth: the best
+   * whole round of each student, which round it was and who has finished. It
+   * is read-only and the grades in it are the engine's (ADR-0020).
+   */
+  session: (roundPaths: string[]) => Promise<Session>
   /** The past runs of the project the exam belongs to, newest first. */
   listRuns: (examPath: string) => Promise<RunSummary[]>
   /**

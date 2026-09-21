@@ -11,6 +11,7 @@ export const IPC = {
   setExamMode: 'exam:setMode',
   readArtifact: 'run:artifact',
   consolidate: 'run:consolidate',
+  session: 'run:session',
   listRuns: 'history:list',
   saveCsv: 'export:saveCsv',
   // Pushed from the main process while a run is alive.

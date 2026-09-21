@@ -1,7 +1,9 @@
 import type { RunResult, StudentResult } from '../../../shared/artifact'
 import type { AcademicStatus, Score, StudentStatus } from '../../../shared/events'
 import type { Consolidation } from '../../../shared/consolidation'
+import type { Session } from '../../../shared/session'
 import { dateText } from './results'
+import { SESSION_STATUS_TEXT } from './session'
 
 /**
  * Taking the grades out of the application, in the only two forms that are
@@ -103,18 +105,30 @@ export function gradeRow(student: Gradable, scale: Scale): GradeRow {
     unevaluated: checks.filter((c) => c.status === 'UNEVALUATED').length
   }
 
-  const score = student.score
-  if (score.status === 'COMPLETE' && score.final_score !== null) {
-    row.grade = toScale(score.final_score, scale)
-    return row
-  }
-  row.note =
-    score.status === 'INCOMPLETE'
-      ? `sin nota: falta por comprobar ${score.unevaluated} de ${score.total} de peso`
-      : score.status === 'EXCLUDED'
-        ? 'sin nota: excluido del examen'
-        : 'sin nota: no se pudo evaluar nada de este alumno'
+  const { grade, note } = gradeOf(student.score, scale)
+  row.grade = grade
+  row.note = note
   return row
+}
+
+/**
+ * The grade of one student, or the reason there is none. A single correction,
+ * a chain and an exam session all write it with these same words, so none of
+ * them can put a number where the others would put a reason.
+ */
+export function gradeOf(score: Score, scale: Scale): { grade: string; note: string } {
+  if (score.status === 'COMPLETE' && score.final_score !== null) {
+    return { grade: toScale(score.final_score, scale), note: '' }
+  }
+  return {
+    grade: '',
+    note:
+      score.status === 'INCOMPLETE'
+        ? `sin nota: falta por comprobar ${score.unevaluated} de ${score.total} de peso`
+        : score.status === 'EXCLUDED'
+          ? 'sin nota: excluido del examen'
+          : 'sin nota: no se pudo evaluar nada de este alumno'
+  }
 }
 
 const STATE_TEXT: Record<StudentStatus, string> = {
@@ -214,6 +228,89 @@ export function chainExportSummary(chain: Consolidation, scale: Scale): string {
   const rows = chainGradeRows(chain, scale)
   const graded = rows.filter((row) => row.grade !== '').length
   return `${rows.length} alumnos · ${graded} con nota final en escala ${scale.label} · ${rows.length - graded} sin nota · ${chain.runs.length} correcciones leídas juntas`
+}
+
+/** One line of a session's export: the same, plus which round the grade is from. */
+export interface SessionGradeRow {
+  name: string
+  studentId: string
+  moodleId: string
+  state: string
+  grade: string
+  note: string
+  /** The round the grade comes from, or '' when there is none. */
+  round: string
+}
+
+/**
+ * What a session exports, student by student.
+ *
+ * The grade is the engine's, of the round the engine picked, and a student
+ * without a single whole round exports no number at all: the reason travels
+ * instead, in the engine's own words when it wrote one (ADR-0020).
+ */
+export function sessionGradeRows(session: Session, scale: Scale): SessionGradeRow[] {
+  return session.students.map((student) => {
+    const { grade, note } = gradeOf(student.score, scale)
+    return {
+      name: student.name,
+      studentId: student.student_id,
+      moodleId: student.moodle_id ?? '',
+      state: SESSION_STATUS_TEXT[student.status],
+      grade,
+      note: grade ? '' : (student.reason ?? note),
+      round: student.from_round > 0 ? String(student.from_round) : ''
+    }
+  })
+}
+
+const SESSION_HEADER = [
+  'alumno',
+  'identificador',
+  'moodle',
+  'estado',
+  'nota',
+  'escala',
+  'vuelta',
+  'observaciones'
+]
+
+/**
+ * The grades of an exam session as a CSV. It carries no check counts: a
+ * session says which round counts, and the checks of that round live in its
+ * own correction, where they can be read with their evidence.
+ */
+export function sessionCsv(session: Session, scale: Scale): string {
+  const lines = [SESSION_HEADER.join(';')]
+  for (const row of sessionGradeRows(session, scale)) {
+    lines.push(
+      [
+        row.name,
+        row.studentId,
+        row.moodleId,
+        row.state,
+        row.grade,
+        row.grade ? String(scale.max) : '',
+        row.round,
+        row.note
+      ]
+        .map(field)
+        .join(';')
+    )
+  }
+  return `\ufeff${lines.join('\r\n')}\r\n`
+}
+
+/** The session's file name, said so it cannot be taken for one round's. */
+export function sessionCsvName(session: Session): string {
+  return `notas-sesion-${stamp(session.rounds[session.rounds.length - 1]?.finished_at ?? '')}.csv`
+}
+
+/** What the teacher is told a session's export contains, before saving it. */
+export function sessionExportSummary(session: Session, scale: Scale): string {
+  const rows = sessionGradeRows(session, scale)
+  const graded = rows.filter((row) => row.grade !== '').length
+  return `${rows.length} alumnos · ${graded} con nota final en escala ${scale.label} · ${rows.length - graded} sin nota · ${session.rounds.length} vueltas del examen`
 }
 
 /** What the file is called by default, so two exports never overwrite each other. */

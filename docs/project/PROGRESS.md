@@ -2,28 +2,27 @@
 
 Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
-**Actualizado**: 2026-09-20 · **Fase**: 5 — Heimdall GUI sobre el contrato nativo
+**Actualizado**: 2026-09-21 · **Fase**: 5 — Heimdall GUI sobre el contrato nativo
 
 ## Última sesión
 
-**T063 hecha**: el motor ya publica la sesión de examen y la vuelta siguiente
-deja fuera a quien ha terminado.
+**T064 hecha**: durante el examen la pantalla ya enseña lo que vale cada
+alumno, no la última vuelta suelta.
 
-Dos cosas nuevas. Una, se puede pedir la sesión entera de una práctica: de cada
-alumno dice la nota que vale, de qué vuelta sale, si ya ha terminado y qué dijo
-cada vuelta. No escribe nada: se lee y ya está.
+En Inicio, mientras dura el examen, hay un panel con la clase: la nota con la
+que se queda cada uno, de qué vuelta sale, quién ha terminado —y que ya no se
+le corrige— y, desplegable, lo que dijo cada vuelta. Quien no tiene ninguna
+vuelta entera sale sin nota y con el motivo, nunca con un cero. Se exporta
+desde ahí, con una columna que dice de qué vuelta sale cada nota.
 
-Dos, quien ya tiene el examen entero bien deja de ser molestado. La vuelta
-siguiente no abre ni una conexión contra su máquina —comprobado contra el
-laboratorio, mirando el registro de la máquina— y en el resultado de esa vuelta
-sale con el motivo escrito: «en la vuelta 1 ya lo tenía todo bien». Nunca un
-cero ni un «sin evaluar». Su nota sigue siendo la de aquella vuelta. Los demás
-reciben exactamente las mismas comprobaciones y los mismos pesos de siempre.
+Ninguna de esas notas se calcula en la aplicación: se le piden al motor con las
+vueltas de este examen, y viajan con la vuelta siguiente para que deje fuera a
+los terminados.
 
-Una sesión que no sea de este examen para la corrección antes de tocar ninguna
-máquina y dice cuál no encaja.
-
-Falta que se vea en pantalla: eso es T064.
+Por el camino, dos fallos de verdad. Uno arreglado: una vuelta que dejaba fuera
+a un alumno terminado rompía la pantalla de Resultados. Otro abierto, **T066**:
+el motivo técnico de una máquina apagada enseña su dirección sin tapar en el
+proyector. Se ve ahora porque antes la pantalla se rompía antes de llegar ahí.
 
 ## Estado actual
 
@@ -36,49 +35,52 @@ Falta que se vea en pantalla: eso es T064.
   `--compat=teuton2` y `--export=json`. Exit: 0 ok · 2 config · 3 parcial ·
   4 cancelado · 1 sin escribir.
 - `internal/model` (puro): `Classify`, `ComputeScore`, `StudentStatusOf`,
-  `Consolidate` (ADR-0019) y `BuildSession` (ADR-0020: mejor vuelta completa;
-  `ACTIVE`/`FINISHED` derivados, `FINISHED` solo con el peso entero; una vuelta
-  que deja al alumno fuera no le quita la nota que ya tenía). El rastro de los
-  intentos anteriores no entra en ninguna nota. `plan`: los dos YAML y nueve validaciones. `assert`: cinco
-  aserciones. `report`: escritura atómica y redacción. `events`: NDJSON.
+  `Consolidate` (ADR-0019) y `BuildSession` (ADR-0020: mejor vuelta completa,
+  `FINISHED` solo con el peso entero, y una vuelta que deja al alumno fuera no
+  le quita la nota que ya tenía). `plan`: los dos YAML y nueve validaciones.
+  `assert`: cinco aserciones. `report`: escritura atómica y redacción.
+  `events`: NDJSON.
 - `internal/engine`: pool de 16, 4 aperturas por máquina, presupuesto por
-  alumno, parcial tras cada alumno, selección de reintento y `ExcludeFinished`
-  (deja fuera a los terminados sin tocar el denominador). `internal/ssh`: 2
-  reintentos, identidades en memoria (ADR-0011), 64 kB por flujo, corte a 8 MB.
-- `test/lab.sh`: `alu1` en `127.1.2.3:2201`, el roto en el 2299;
-  `acceptance.sh` recorre A-1 a A-14, `eventos.sh` E-1 a E-10 y `sesion.sh`
-  S-1 a S-8 sobre `testdata/sesion`.
-- `gui/`: árbol Node independiente; `make gui-check` (125 tests), `gui-build` y
+  alumno, parcial tras cada alumno, reintento y `ExcludeFinished` (deja fuera a
+  los terminados sin tocar el denominador). `internal/ssh`: 2 reintentos,
+  identidades en memoria (ADR-0011), 64 kB por flujo, corte a 8 MB.
+- `test/lab.sh`: `alu1` en `127.1.2.3:2201`, el roto en el 2299. `acceptance.sh`
+  (A-1 a A-14), `eventos.sh` (E-1 a E-10) y `sesion.sh` (S-1 a S-8).
+- `gui/`: árbol Node independiente; `make gui-check` (143 tests), `gui-build` y
   `gui-lab`. Vistas: Inicio, Resultados, Histórico, Ajustes, Ayuda. Inicio
-  lleva el **modo examen** (vueltas encadenadas, una cada vez) y la barra
-  lateral el **modo proyector**. Resultados enseña lo no comprobado, manda el
-  reintento a Inicio, **exporta a CSV** y **enseña la cadena consolidada**
-  llamando a `heimdall consolidate`. El histórico lee `var/run-*.json` del
-  examen. `workspace/teuton-gui` es referencia de solo lectura.
+  lleva el **modo examen** (vueltas encadenadas, una cada vez) y **el panel de
+  la sesión**, que llama a `heimdall session` con las vueltas de este examen y
+  manda la lista con la vuelta siguiente. La barra lateral, el **modo
+  proyector**. Resultados enseña lo no comprobado, manda el reintento a Inicio,
+  **exporta a CSV** y **enseña la cadena consolidada** con `heimdall
+  consolidate`. El histórico lee `var/run-*.json` del examen.
+  `workspace/teuton-gui` es referencia de solo lectura.
 
 ## Pruebas ejecutadas
 
-`make check` verde. `acceptance.sh`, `eventos.sh` y el nuevo `sesion.sh`
-(S-1 a S-8) verdes contra el laboratorio. `make gui-check`, `make gui-lab` y
-`make test` no se repitieron esta sesión; quedaron verdes antes.
+`make check` verde. `make gui-check` verde (143 pruebas). `make gui-build`
+verde. `gui/scripts/examen-lab.ts` contra el laboratorio con dos vueltas
+reales: E-1 a E-7, S-1 a S-5 y C-1 a C-3 en verde; **P-1 y P-2 en rojo**, que
+es el fallo del proyector anotado en T066. `acceptance.sh`, `eventos.sh`,
+`sesion.sh` y `make test` no se repitieron esta sesión; quedaron verdes antes.
 
 ## Problemas conocidos
 
 - Laboratorio en **`127.1.2.3`**, nunca `127.0.0.x` (F-01, A-11).
 - **A-10**: los ficheros legacy se escriben, pero el script de aceptación lo
   marca `PEND`. Con la capa congelada, se cierra o se retira en T060.
-- El histórico se apoya en la carpeta del examen elegido; sin examen elegido no
-  hay lista, y para eso está «Abrir otro resultado…».
-- Un reintento exige el mismo PLAN: si lo que estaba mal era el `aula.yaml`,
-  esa clase se corrige entera otra vez.
-- El modo examen de la aplicación sigue enseñando la última vuelta, no la
-  mejor, y no le pasa la sesión al motor: eso llega en T064. Intervalo mínimo,
-  5 minutos.
-- El proyector tapa las máquinas, no los nombres del alumnado.
+- El histórico se apoya en la carpeta del examen elegido; para lo demás está
+  «Abrir otro resultado…».
+- Un reintento exige el mismo PLAN: si lo que fallaba era el `aula.yaml`, esa
+  clase se corrige entera otra vez.
+- Intervalo mínimo del modo examen, 5 minutos.
+- El proyector tapa las máquinas, no los nombres del alumnado, y **no tapa la
+  dirección que aparece en el motivo técnico** (T066).
+- El panel de la sesión se borra al empezar un examen nuevo: las vueltas del
+  examen anterior no son de esta sesión.
 
 ## Siguiente tarea recomendada
 
-**T064** (`READY`, P1): que la aplicación encadene el examen sobre la sesión —la
-mejor vuelta, quién ha terminado— en vez de sobre la última vuelta suelta. A la
-par, **T059** sigue `READY` y cierra la fase 5 con el inventario de lo
-heredado.
+**T066** (`READY`, P1): tapar la máquina también en el motivo técnico, que es lo
+único que hoy se proyecta sin tapar. Después, **T059** cierra la fase 5 con el
+inventario de lo heredado.

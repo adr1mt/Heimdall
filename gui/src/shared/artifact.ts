@@ -158,5 +158,12 @@ export function parseArtifact(text: string): RunResult {
   if (!Array.isArray(run.students) || !run.plan) {
     throw new Error('El fichero de resultados está incompleto.')
   }
+  // A student nobody evaluated carries no checks, and that is written as
+  // nothing at all. It is read as «ninguna comprobación», which is what it
+  // means: an excluded student is the ordinary case since a round of an exam
+  // session leaves out whoever already finished (T063).
+  for (const student of run.students) {
+    if (!Array.isArray(student.checks)) student.checks = []
+  }
   return run as RunResult
 }
