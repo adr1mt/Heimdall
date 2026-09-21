@@ -1683,21 +1683,27 @@
       "scope": [
         "ADR-0021 primero: donde guarda la aplicacion sus datos propios y con que garantias",
         "Crear, editar, borrar y duplicar una clase",
-        "Por alumno: identificador, nombre, correo o identificador de Moodle, IP fija de examen y usuario SSH"
+        "Por alumno: identificador, nombre, correo o identificador de Moodle, IP fija de examen y usuario SSH",
+        "Inicio pasa de hablar de «Aula» a hablar de «Clase»: el nombre logico y cuantos alumnos, por ejemplo «2SMX A · 15 alumnos»",
+        "Fichero, ruta, configuracion y credenciales del aula bajan a detalles avanzados",
+        "Lo que elige el profesor es Clase + Examen, nunca ficheros"
       ],
       "out_of_scope": [
         "Guardar contrasenas: nunca (ADR-0009)",
-        "Tocar el artefacto ni nada que publique el motor"
+        "Tocar el artefacto ni nada que publique el motor",
+        "Cambiar el contrato con el motor salvo que este caso lo exija: por debajo sigue el modelo de aula actual",
+        "Mezclar este cambio con T067"
       ],
       "acceptance": [
         "Una clase sobrevive al cierre de la aplicacion",
         "Ninguna contrasena se escribe en disco",
-        "Borrar una clase pide confirmacion y no toca ninguna correccion guardada"
+        "Borrar una clase pide confirmacion y no toca ninguna correccion guardada",
+        "Un profesor abre Heimdall y entiende que clase y que examen hay elegidos sin saber como se guardan los ficheros por dentro"
       ],
       "tests": [
         "gui/tests/classes.test.ts"
       ],
-      "notes": "Escribir ADR-0021 antes de implementar: es persistencia propia de la GUI y no la cubre ningun ADR. Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato."
+      "notes": "Escribir ADR-0021 antes de implementar: es persistencia propia de la GUI y no la cubre ningun ADR. Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato. Hasta que exista la entidad Clase, Inicio mantiene «Aula»: hoy esa tarjeta representa el fichero de aula, no una clase logica, y renombrarla antes de P2 mezclaria los dos conceptos."
     },
     {
       "id": "T107",

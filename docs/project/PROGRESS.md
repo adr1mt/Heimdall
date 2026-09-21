@@ -7,11 +7,9 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 ## Última sesión
 
 **Dirección fijada**: Teutón GUI (`workspace/teuton-gui`) es la referencia
-canónica de interfaz, navegación y densidad. La fase 6 la realinea en cinco
-paquetes: P1 visual, P2 clases y proyectos, P3 editor, P4 uso en clase, P5
-protección y distribución. Las pantallas se trabajan por paquete, uno por
-sesión; nota, motor, SSH, secretos, persistencia crítica y contrato siguen
-siendo una tarea por sesión.
+canónica de interfaz. La fase 6 la realinea en cinco paquetes: P1 visual, P2
+clases y proyectos, P3 editor, P4 uso en clase, P5 protección. Un paquete por
+sesión; nota, motor, SSH, secretos, persistencia y contrato, una tarea.
 
 **P1 hecho** (T100–T105): la barra lateral lleva Inicio, Clases, Exámenes,
 Resultados, Analíticas e Histórico, con lo aún no construido desactivado.
@@ -59,6 +57,8 @@ repitieron esta sesión; quedaron verdes antes.
 - Un reintento exige el mismo PLAN.
 - Intervalo mínimo del modo examen, 5 minutos.
 - El proyector tapa las máquinas, no los nombres del alumnado.
+- Inicio dice «Aula» a propósito: es el fichero, no una clase. Pasa a
+  «Clase» en P2 (T106), no antes.
 
 ## Siguiente tarea recomendada
 
