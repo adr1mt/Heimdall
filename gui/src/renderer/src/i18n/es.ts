@@ -547,7 +547,15 @@ export const t = {
     finishedLabel: 'Finalizados',
     progressLabel: 'Progreso',
     nowCorrecting: 'ahora',
-    ofMinutes: (minutes: number) => `cada ${minutes} min`
+    ofMinutes: (minutes: number) => `cada ${minutes} min`,
+    // La regla del modo examen, escrita donde se ve sin desplegar nada: con
+    // qué nota se queda cada alumno, de dónde sale y cada cuánto se repite.
+    ruleTitle: 'Mientras dure el examen',
+    ruleBest: 'Cada alumno se queda con su mejor vuelta entera. Una vuelta peor no le baja la nota.',
+    ruleRound: 'Debajo, junto a cada nota, se dice de qué vuelta sale.',
+    ruleEvery: (minutes: number) => `Se vuelve a corregir cada ${minutes} min hasta que termines el examen.`,
+    pendingTitle: 'Alumnos a evaluar',
+    pendingHint: 'Todavía no hay ninguna vuelta terminada, así que aún no tienen nota.'
   },
   session: {
     title: 'La nota del examen',

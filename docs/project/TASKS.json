@@ -2201,7 +2201,7 @@
       "id": "T123",
       "title": "Corregir: el modo examen a la vista",
       "phase": 6,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "Que el modo examen se vea como se veia en teuton-gui, sin abrir nada.",

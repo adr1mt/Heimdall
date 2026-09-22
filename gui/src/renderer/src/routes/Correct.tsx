@@ -296,7 +296,11 @@ export default function CorrectView() {
         </div>
 
         {exam.active && (
-          <ExamStrip exam={exam} percent={percent} session={examSession.session} />
+          <>
+            <ExamStrip exam={exam} percent={percent} session={examSession.session} />
+            <ExamRules minutes={exam.everyMinutes} />
+            {!examSession.session && group && <PendingStudents group={group} />}
+          </>
         )}
 
         <SessionPanel {...examSession} />
@@ -551,6 +555,51 @@ function ExamStrip({
       <Reading value={active === null ? '—' : String(Math.max(active, 0))} label={t.exam.activeLabel} />
       <Reading value={tally === null ? '—' : String(tally.finished)} label={t.exam.finishedLabel} />
       <Reading value={percent === null ? '—' : `${percent}%`} label={t.exam.progressLabel} />
+    </div>
+  )
+}
+
+/**
+ * The rule of exam mode, in words, next to the readings.
+ *
+ * The numbers up top say where the exam is; this says what will be done with
+ * them, which is what the teacher is asked in the room: which round counts and
+ * that a bad one cannot take a grade away.
+ */
+function ExamRules({ minutes }: { minutes: number }) {
+  return (
+    <div className="space-y-1 rounded-md border border-border p-4">
+      <div className="flex items-center gap-2 text-sm font-medium">
+        <Timer className="h-4 w-4" />
+        {t.exam.ruleTitle}
+      </div>
+      <p className="max-w-3xl text-xs text-muted-foreground">{t.exam.ruleBest}</p>
+      <p className="max-w-3xl text-xs text-muted-foreground">{t.exam.ruleRound}</p>
+      <p className="max-w-3xl text-xs text-muted-foreground">{t.exam.ruleEvery(minutes)}</p>
+    </div>
+  )
+}
+
+/**
+ * Who is going to be corrected, while no round has finished yet. It is the
+ * class as it is, not a grade: the engine has not said anything about these
+ * students, so nothing is shown next to them.
+ */
+function PendingStudents({ group }: { group: ClassGroup }) {
+  return (
+    <div className="space-y-2 rounded-md border border-border p-4">
+      <div className="flex items-center gap-2 text-sm font-medium">
+        <Users className="h-4 w-4" />
+        {t.exam.pendingTitle}
+      </div>
+      <p className="max-w-3xl text-xs text-muted-foreground">{t.exam.pendingHint}</p>
+      <div className="flex flex-wrap gap-2">
+        {group.students.map((student) => (
+          <span key={student.id} className="rounded-md border border-border px-2 py-1 text-xs">
+            {student.name}
+          </span>
+        ))}
+      </div>
     </div>
   )
 }
