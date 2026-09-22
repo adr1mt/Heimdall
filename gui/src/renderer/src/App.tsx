@@ -25,6 +25,7 @@ import { cn } from './lib/utils'
 import { shouldStartPass } from './lib/exam'
 import { startCorrection } from './lib/start-run'
 import { t } from './i18n/es'
+import logo from './assets/logo.png'
 
 const HomeView = lazy(() => import('./routes/Home'))
 const SettingsView = lazy(() => import('./routes/Settings'))
@@ -170,13 +171,8 @@ function AppBody() {
       {!projector && (
       <aside className="flex w-60 flex-col bg-sidebar text-sidebar-foreground">
         <div className="flex items-center gap-2.5 px-5 pb-4 pt-5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <span className="text-base font-bold">H</span>
-          </div>
-          <div className="leading-tight">
-            <div className="text-sm font-semibold tracking-tight">{t.app.name}</div>
-            <div className="text-micro text-sidebar-foreground/50">{t.app.tagline}</div>
-          </div>
+          <img src={logo} alt="" className="h-8 w-8 object-contain" />
+          <div className="text-sm font-semibold tracking-tight">{t.app.name}</div>
         </div>
 
         <nav className="flex flex-1 flex-col gap-0.5 px-3">

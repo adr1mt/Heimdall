@@ -2,8 +2,7 @@
 // Spanish in the classroom; interface text is not scattered across the views.
 export const t = {
   app: {
-    name: 'Heimdall',
-    tagline: 'Evaluación de prácticas por SSH'
+    name: 'Heimdall'
   },
   nav: {
     home: 'Inicio',
