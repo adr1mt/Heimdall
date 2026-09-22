@@ -53,10 +53,14 @@ Si lo que quieres es usarlo, la guía es [docs/GUIA.md](docs/GUIA.md).
 
 - El motor evalúa y califica por SSH contra máquinas reales, en exámenes de
   verdad.
-- La aplicación propia, **Heimdall GUI**, vive en [`gui/`](gui/) y está en
-  desarrollo avanzado: Inicio, Resultados, Histórico, Ajustes y Ayuda, con
-  **modo examen** —vueltas encadenadas mientras dura la sesión— y **modo
+- La aplicación propia, **Heimdall GUI**, vive en [`gui/`](gui/) y está
+  completa: Inicio, Clases, El examen, Corregir, Resultados, Analíticas,
+  Histórico, Ajustes y Ayuda, con **modo examen** —vueltas encadenadas
+  mientras dura la práctica, cada alumno con su mejor vuelta entera— y **modo
   proyector** para enseñar el progreso en pantalla grande.
+- La contraseña del aula se escribe una vez, se guarda cifrada y está auditada
+  de punta a punta: no aparece en `ps`, ni en los informes, ni en las
+  exportaciones ([los 16 modos de fallo](docs/MODOS-DE-FALLO-HEIMDALL.md)).
 - La aplicación se empaqueta en `.deb` y AppImage con el motor dentro, y
   funciona en un equipo sin nada instalado. Todavía **no hay una descarga
   publicada**: se construye con `make gui-dist`.
@@ -151,9 +155,14 @@ La aplicación es un árbol Node aparte, con su propio ciclo:
 
 ```bash
 make gui-check      # suite de la GUI
-make gui-build      # empaqueta la aplicación
+make gui-build      # compila la aplicación
+make gui-dist       # .deb y AppImage con el motor dentro, en gui/dist
 make gui-lab        # la arranca contra el laboratorio
 ```
+
+El número de versión es uno solo para todo el producto: vive en `VERSION`, el
+motor se sella con él al compilar y `make version` comprueba que el motor y la
+aplicación dicen lo mismo.
 
 Corregir desde la terminal:
 
@@ -180,6 +189,10 @@ necesita un [ADR](docs/adr/).
 | Contrato entre el motor y la aplicación | [docs/design/09-CONTRATO-GUI.md](docs/design/09-CONTRATO-GUI.md) |
 | Estado actual del trabajo | [docs/project/PROGRESS.md](docs/project/PROGRESS.md) |
 | Investigación previa y mediciones | [docs/research/](docs/research/) |
+
+## Licencia
+
+MPL-2.0.
 
 ## Contexto
 
