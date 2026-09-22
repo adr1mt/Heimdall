@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { FolderOpen, Plus, X } from 'lucide-react'
+import { FolderOpen, FolderSymlink, Plus, X } from 'lucide-react'
 import { Button, ConfirmDialog, SectionTitle, Spinner, ViewHeader } from '@/components/ui'
 import { useApp, noticeFrom } from '@/stores/app'
 import { useRun } from '@/stores/run'
@@ -85,6 +85,19 @@ export default function HomeView() {
     }
   }
 
+  /**
+   * Opens the project's folder in the system's file manager. The folder is
+   * where the exam and its corrections live, and looking for it by hand from
+   * the name written inside the exam is not looking for anything (T120).
+   */
+  async function reveal(dir: string): Promise<void> {
+    try {
+      await window.heimdall.openFolder(dir)
+    } catch (error) {
+      setNotice(noticeFrom(t.home.folderFailed, error))
+    }
+  }
+
   async function forget(dir: string): Promise<void> {
     try {
       setRecents(await window.heimdall.removeRecent(dir))
@@ -130,6 +143,7 @@ export default function HomeView() {
                   busy={busy === recent.dir}
                   disabled={busy !== null}
                   onOpen={() => guard(recent.dir, false)}
+                  onReveal={() => void reveal(recent.dir)}
                   onForget={() => void forget(recent.dir)}
                 />
               ))}
@@ -183,12 +197,14 @@ function RecentRow({
   busy,
   disabled,
   onOpen,
+  onReveal,
   onForget
 }: {
   recent: RecentProject
   busy: boolean
   disabled: boolean
   onOpen: () => void
+  onReveal: () => void
   onForget: () => void
 }) {
   return (
@@ -197,7 +213,7 @@ function RecentRow({
         type="button"
         disabled={disabled}
         onClick={onOpen}
-        className="flex w-full items-center gap-3 rounded-md py-3 pl-2 pr-10 text-left transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:opacity-60"
+        className="flex w-full items-center gap-3 rounded-md py-3 pl-2 pr-20 text-left transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:opacity-60"
       >
         <FolderOpen className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
         <div className="min-w-0 flex-1">
@@ -205,21 +221,36 @@ function RecentRow({
           {busy && <div className="text-xs text-muted-foreground">{t.home.opening}</div>}
         </div>
       </button>
-      <div className="absolute right-1 top-1/2 -translate-y-1/2">
+      <div className="absolute right-1 top-1/2 flex -translate-y-1/2 items-center gap-1">
         {busy ? (
           <Spinner className="h-4 w-4" />
         ) : (
-          <button
-            type="button"
-            onClick={onForget}
-            className="rounded-md p-1.5 text-muted-foreground opacity-0 transition-opacity hover:bg-muted focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover:opacity-100"
-            title={t.home.removeRecent}
-            aria-label={`${t.home.removeRecent}: ${recent.name}`}
-          >
-            <X className="h-4 w-4" />
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={onReveal}
+              className={ROW_ACTION}
+              title={t.home.openFolder}
+              aria-label={`${t.home.openFolder}: ${recent.name}`}
+            >
+              <FolderSymlink className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={onForget}
+              className={ROW_ACTION}
+              title={t.home.removeRecent}
+              aria-label={`${t.home.removeRecent}: ${recent.name}`}
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </>
         )}
       </div>
     </li>
   )
 }
+
+/** Los botones de una fila: aparecen al pasar por encima y al enfocarlos. */
+const ROW_ACTION =
+  'rounded-md p-1.5 text-muted-foreground opacity-0 transition-opacity hover:bg-muted focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover:opacity-100'

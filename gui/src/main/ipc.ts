@@ -1,4 +1,4 @@
-import { readFileSync, renameSync, statSync, writeFileSync } from 'node:fs'
+import { readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { basename, dirname } from 'node:path'
 import { app, dialog, ipcMain, powerSaveBlocker, shell, type WebContents } from 'electron'
 import { IPC } from '../shared/ipc'
@@ -13,7 +13,14 @@ import { describeExam } from './describe'
 import { secretRefsIn } from './secrets'
 import { readSettings, writeSettings } from './store'
 import { readClasses, writeClasses } from './classes'
-import { createProjectAt, forgetProject, openProjectAt, readRecents, rememberProject } from './projects'
+import {
+  createProjectAt,
+  folderOf,
+  forgetProject,
+  openProjectAt,
+  readRecents,
+  rememberProject
+} from './projects'
 import { validateExam } from './validate'
 import { writeGeneratedAula } from './aula'
 import { aulaYaml } from '../shared/aula'
@@ -255,10 +262,8 @@ export function registerIpc(): void {
   // on a file executes whatever the desktop associates with it, and a
   // `.desktop` is a program.
   ipcMain.handle(IPC.openFolder, async (_e, path: unknown): Promise<void> => {
-    const target = typeof path === 'string' ? dirname(path) : ''
-    if (!target || !statSync(target, { throwIfNoEntry: false })?.isDirectory()) {
-      throw new Error('No hay ninguna carpeta que abrir.')
-    }
+    const target = typeof path === 'string' ? folderOf(path) : null
+    if (!target) throw new Error('No hay ninguna carpeta que abrir.')
     const problem = await shell.openPath(target)
     if (problem) throw new Error(problem)
   })

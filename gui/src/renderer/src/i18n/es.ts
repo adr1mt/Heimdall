@@ -45,6 +45,8 @@ export const t = {
     create: 'Nuevo…',
     noRecent: 'Todavía no has abierto ningún examen. Abre una carpeta o crea uno nuevo.',
     removeRecent: 'Quitar de la lista',
+    openFolder: 'Abrir la carpeta del examen',
+    folderFailed: 'No se pudo abrir la carpeta del examen',
     removeHint: 'Solo se quita de esta lista. La carpeta y sus notas no se tocan.',
     opening: 'Abriendo…',
     missing: 'No se pudo abrir',

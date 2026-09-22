@@ -5,6 +5,7 @@ import { join } from 'node:path'
 import {
   EXAM_FILE,
   createProjectAt,
+  folderOf,
   forgetProject,
   openProjectAt,
   projectsFile,
@@ -149,5 +150,26 @@ describe('sin ningún examen abierto', () => {
     for (const view of ['exams', 'correct', 'results', 'analytics', 'history'] as const) {
       expect(canOpen(view, true)).toBe(true)
     }
+  })
+})
+
+// Desde Inicio se pide abrir la carpeta del examen, y lo que se tiene ahí es
+// la carpeta del proyecto. El canal la abre tal cual; con el fichero del
+// examen abre esa misma carpeta y nunca la de más arriba (T120).
+describe('abrir la carpeta del examen', () => {
+  it('abre la carpeta del proyecto cuando se pide con la carpeta', () => {
+    const dir = projectDir()
+    expect(folderOf(dir)).toBe(dir)
+  })
+
+  it('abre la carpeta del examen cuando se pide con el fichero', () => {
+    const dir = projectDir()
+    expect(folderOf(join(dir, EXAM_FILE))).toBe(dir)
+  })
+
+  it('no abre nada cuando no hay carpeta que abrir', () => {
+    expect(folderOf('')).toBeNull()
+    expect(folderOf('   ')).toBeNull()
+    expect(folderOf(join('/no', 'existe', 'de', 'ninguna', 'manera'))).toBeNull()
   })
 })

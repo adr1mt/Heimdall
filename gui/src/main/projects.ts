@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
 import { describeExam } from './describe'
 import type { OpenProject, RecentProject } from '../shared/types'
@@ -136,4 +136,21 @@ export function createProjectAt(dir: string): OpenProject {
   const name = basename(root)
   writeFileSync(examPath, starterExam(name), 'utf-8')
   return { dir: root, name, examPath }
+}
+
+/**
+ * The folder a path stands for: the folder itself, or the one its file lives
+ * in. The teacher asks for «la carpeta del examen» from a row that knows the
+ * project's folder, and the same channel is asked with the exam file from
+ * other screens; both mean the same place.
+ *
+ * Returns null when there is nothing to open, so the caller says so instead
+ * of opening the file manager somewhere else.
+ */
+export function folderOf(path: string): string | null {
+  if (typeof path !== 'string' || !path.trim()) return null
+  const stat = statSync(path, { throwIfNoEntry: false })
+  if (stat?.isDirectory()) return resolve(path)
+  const parent = dirname(resolve(path))
+  return statSync(parent, { throwIfNoEntry: false })?.isDirectory() ? parent : null
 }
