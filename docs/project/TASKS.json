@@ -1335,7 +1335,7 @@
       "id": "T082",
       "title": "Auditoria de secretos de extremo a extremo, motor y GUI",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T081"
@@ -1353,15 +1353,16 @@
         "Cero coincidencias en todos los puntos comprobados, con el proceso vivo"
       ],
       "tests": [
-        "test/secrets.sh"
+        "test/secrets.sh",
+        "gui/tests/secretos.test.ts"
       ],
-      "notes": "Segunda parte de T080. Toca secretos: tarea sola, sin encadenar."
+      "notes": "Segunda parte de T080. Ejecutada el 22-09-2026 con el laboratorio levantado: cero coincidencias. Resultado en docs/MODOS-DE-FALLO-HEIMDALL.md."
     },
     {
       "id": "T083",
       "title": "Documentacion de usuario y versionado para la publicacion",
       "phase": 9,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T081",

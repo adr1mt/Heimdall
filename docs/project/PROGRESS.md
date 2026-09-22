@@ -6,19 +6,20 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T081 · Los 16 modos de fallo, revisados.** Antes T080, dividida.
+**T081 y T082 · Los fallos revisados y la contraseña auditada.**
 
-- T080 era demasiado grande y una de sus condiciones exige aula real: se
-  parte en T081 (esta), T082 (secretos), T083 (documentación y versión) y
-  T084 (examen real). T080 queda retirada.
-- `docs/MODOS-DE-FALLO-HEIMDALL.md`: una entrada por fallo, con su evidencia.
-  15 de 16 resueltos o sin sentido aquí. **Solo queda F-12**: corregir con
-  clave SSH en vez de contraseña, que ya era la tarea T023.
-- Comprobado en vivo: un examen con una palabra mal escrita se para antes de
-  tocar ninguna máquina y dice fichero y línea; sin fichero de aula no se
-  inventa ningún alumno.
-- `make check` (163 tests) y la suite de la GUI (352) verdes. Los tests que
-  piden el laboratorio podman no se ejecutaron.
+- T080 era demasiado grande: partida en T081 (revisión), T082 (secretos),
+  T083 (documentación y versión) y T084 (examen real de aula).
+- `docs/MODOS-DE-FALLO-HEIMDALL.md`: los 16 fallos del sistema viejo, uno a
+  uno, con su evidencia. **Solo queda abierto F-12**, corregir con clave SSH
+  en vez de contraseña, que ya era T023.
+- Auditoría de la contraseña con el laboratorio levantado y un valor
+  envenenado: **cero coincidencias** en `argv` del proceso vivo, terminal,
+  `var/`, eventos, reintento, vuelta de sesión, aula generada, exportaciones
+  y copias de seguridad.
+- `test/secrets.sh` ahora cubre también eventos, reintento y sesión; la
+  aplicación estrena `gui/tests/secretos.test.ts` (5 pruebas).
+- Verde: motor 163 tests, `test/secrets.sh` entero, aplicación 357 tests.
 
 ## Problemas conocidos
 
@@ -35,5 +36,5 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Siguiente tarea recomendada
 
-**T082** (auditoría de secretos, tarea sola) o **T070** (exámenes del curso en
-formato nativo). T023 sigue siendo P2, pero es el único modo de fallo abierto.
+**T083** (guía de instalación y primer examen, y número de versión) o **T070**
+(exámenes del curso en formato nativo). T084, el examen real, la ejecuta Adrià.

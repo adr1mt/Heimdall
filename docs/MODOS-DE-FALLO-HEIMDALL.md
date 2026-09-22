@@ -194,11 +194,51 @@ Tests: `TestPartialArtifactAfterEachStudent`,
 
 ---
 
+## Auditoría de secretos, de punta a punta (T082)
+
+Ejecutada el 22-09-2026 con el laboratorio levantado y una contraseña
+envenenada, `HEIMDALL_SECRET_TEST_12345`. Cero coincidencias en todos los
+puntos comprobados.
+
+Lado del motor, `test/secrets.sh`, todo verde:
+
+- `argv` del proceso **vivo** (`/proc/<pid>/cmdline`);
+- salida del terminal, `stdout` y `stderr`;
+- todo lo escrito bajo `var/`, incluido `latest.json`;
+- el flujo de eventos NDJSON que lee la aplicación;
+- los artefactos de un reintento y de una vuelta de sesión de examen;
+- stdin cerrado, stdin sin datos y referencia sin variable: exit 2, sin
+  artefacto y sin contraseña vacía.
+
+Lado de la aplicación, `gui/tests/secretos.test.ts`:
+
+- el aula que genera lleva `password_ref: "${AULA_PASSWORD}"`, nunca el valor;
+- una clase editada a mano con una contraseña dentro la pierde al leerla;
+- los argumentos del motor no la llevan: sale por stdin y solo por ahí;
+- las exportaciones (hoja de notas, CSV de Moodle, resumen) llevan notas, no
+  la salida de las máquinas, ni aunque esa salida la contuviera;
+- lo guardado en disco está cifrado y no es legible (`gui/tests/vault.test.ts`,
+  ADR-0023), y las copias de seguridad guardan notas, no evidencias
+  (`gui/tests/backups.test.ts`).
+
+Dos observaciones, ninguna es un fallo:
+
+1. **El artefacto no nombra la referencia.** La regla de seguridad dice que en
+   el artefacto aparece la referencia y nunca el valor; lo que hay es menos:
+   ni una cosa ni la otra. El artefacto registra el usuario y la dirección de
+   cada máquina, que no son credenciales.
+2. **Una columna del profesor es texto libre.** Las columnas propias de una
+   clase viajan tal cual al aula generada. Quien escriba ahí a mano su
+   contraseña la escribe en un fichero legible. No hay forma de distinguirlo
+   de un dato del examen, y el sitio para la contraseña es la casilla de
+   «Corregir», que sí la guarda cifrada.
+
+---
+
 ## Lo que queda
 
 | Qué | Dónde |
 |---|---|
 | Autenticación por clave SSH (F-12) | T023 |
-| Auditoría de secretos sobre proceso vivo | T082 |
 | Documentación de usuario y versión | T083 |
 | Un examen real de aula corregido entero | T084 |

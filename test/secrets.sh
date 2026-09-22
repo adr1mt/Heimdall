@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Acceptance test for T011: the prototype runs end to end from the command line
-# and the password never becomes visible.
+# End-to-end audit of the classroom password on the engine side (T011, T082).
 #
 # It checks what the security rules demand and a Go test cannot: that the
-# secret is absent from argv of the live process, from the terminal output and
-# from everything under var/.
+# secret is absent from argv of the live process, from the terminal output,
+# from everything under var/ and from the event stream, the retry and the
+# session round. The interface side of the same audit is
+# gui/tests/secretos.test.ts.
 #
 # Needs the lab up (`make lab`). Credentials are fictitious (test/README.md).
 set -uo pipefail
@@ -97,5 +98,32 @@ if grep -qE "goroutine |\.go:[0-9]+" "$OUT/stdout" "$OUT/stderr" "$OUT"/stderr-*
   fail "hay traza de pila en la salida"
 fi
 ok "ninguna traza de pila en la salida"
+
+# --- 6. the event stream and the artifacts of a retry and a session ---------
+# The interface reads the run live over NDJSON and then repeats it: three more
+# documents the secret could ride on (ADR-0017, ADR-0018, ADR-0020).
+printf '{"schema":1,"secrets":{"AULA_PASSWORD":"%s"}}\n' "$SECRET" \
+  | "$BIN" run --secrets=stdin --events=ndjson --var="$OUT/ev" "$PROJECT" \
+    >"$OUT/eventos.ndjson" 2>"$OUT/stderr-ev"
+first="$(ls "$OUT"/ev/run-*.json | grep -v partial | head -1)"
+[ -n "$first" ] || fail "el run con eventos no escribió artefacto"
+[ "$(wc -l <"$OUT/eventos.ndjson")" -gt 0 ] || fail "no se emitió ningún evento"
+
+printf '{"schema":1,"secrets":{"AULA_PASSWORD":"%s"}}\n' "$SECRET" \
+  | "$BIN" run --secrets=stdin --retry="$first" --var="$OUT/re" "$PROJECT" \
+    >"$OUT/stdout-re" 2>"$OUT/stderr-re"
+second="$(ls "$OUT"/re/run-*.json | grep -v partial | head -1)"
+[ -n "$second" ] || fail "el reintento no escribió artefacto"
+
+printf '{"schema":1,"secrets":{"AULA_PASSWORD":"%s"}}\n' "$SECRET" \
+  | "$BIN" run --secrets=stdin --session="$first" --session="$second" \
+    --var="$OUT/se" "$PROJECT" >"$OUT/stdout-se" 2>"$OUT/stderr-se"
+[ -n "$(ls "$OUT"/se/run-*.json 2>/dev/null)" ] || fail "la vuelta de sesión no escribió artefacto"
+
+if grep -rq "$SECRET" "$OUT/ev" "$OUT/re" "$OUT/se" "$OUT/eventos.ndjson" \
+  "$OUT/stdout-re" "$OUT/stderr-re" "$OUT/stdout-se" "$OUT/stderr-se" "$OUT/stderr-ev"; then
+  fail "el secreto aparece en los eventos o en los artefactos del reintento o de la sesión"
+fi
+ok "cero coincidencias en los eventos y en los artefactos de reintento y sesión"
 
 echo "test/secrets.sh: todo verde"
