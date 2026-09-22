@@ -154,7 +154,7 @@ export default function EditorView() {
   return (
     <div className="flex h-full flex-col">
       <ViewHeader
-        title={t.editor.title}
+        title={t.editor.titleOf(exam.examen.trim() || project?.name || '')}
         meta={
           <Badge variant="secondary">{t.editor.summary(checkCount(exam), totalWeight(exam))}</Badge>
         }
@@ -171,6 +171,9 @@ export default function EditorView() {
           <YamlView exam={exam} onChange={change} />
         ) : (
           <>
+            {/* Que la pantalla se llame «Exámenes» y enseñe uno solo no se
+                entiende: aquí se dice cuál es y que es el que se corrige
+                (T122). */}
             <p className="max-w-3xl text-sm text-muted-foreground">{t.editor.hint}</p>
 
             <div className="grid max-w-3xl gap-3 md:grid-cols-2">

@@ -15,3 +15,20 @@ describe('renglón de los bloques técnicos', () => {
     expect(t.pending.folded(2)).toBe('2 alumnos con algo sin comprobar')
   })
 })
+
+// «Exámenes» y un solo examen dentro no se entiende: la pantalla es la del
+// examen abierto y lo dice por su nombre, en el título y en la barra lateral
+// (T122).
+describe('la pantalla del examen dice cuál es', () => {
+  it('nombra el examen abierto en el título', () => {
+    expect(t.editor.titleOf('Cuestionario de redes')).toBe('El examen: Cuestionario de redes')
+  })
+
+  it('sigue diciendo de qué pantalla se trata cuando el examen no tiene nombre', () => {
+    expect(t.editor.titleOf('')).toBe('El examen')
+  })
+
+  it('no habla de una lista de exámenes en la barra lateral', () => {
+    expect(t.nav.exams).toBe('El examen')
+  })
+})

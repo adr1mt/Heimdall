@@ -8,7 +8,7 @@ export const t = {
   nav: {
     home: 'Inicio',
     classes: 'Clases',
-    exams: 'Exámenes',
+    exams: 'El examen',
     correct: 'Corregir',
     results: 'Resultados',
     analytics: 'Analíticas',
@@ -81,8 +81,10 @@ export const t = {
   // en un editor de texto; la vista YAML es el mismo examen, para quien lo
   // prefiera. Quien decide si el examen vale es el motor.
   editor: {
-    title: 'Exámenes',
-    hint: 'Lo que se comprueba en cada máquina y cuánto pesa cada comprobación.',
+    title: 'El examen',
+    // Es el examen abierto, no una lista de exámenes: se dice cuál (T122).
+    titleOf: (name: string) => (name ? `El examen: ${name}` : 'El examen'),
+    hint: 'Es el examen que tienes abierto, el que se corrige en «Corregir». Aquí se escribe lo que se comprueba en cada máquina y cuánto pesa cada comprobación.',
     examName: 'Nombre del examen',
     hosts: 'Máquinas del examen',
     hostsHint: 'Los nombres que usa el examen: host1, host2. La dirección de cada alumno sale de la clase.',
