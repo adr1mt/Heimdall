@@ -3,8 +3,13 @@
 GO ?= go
 BIN := bin/heimdall
 
+# One version for the whole product: the engine is stamped with it at build
+# time and the application reads it from its package.json. test/version.sh
+# checks the two have not drifted apart.
+VERSION := $(shell cat VERSION)
+
 # Test SSH lab. See test/lab.sh.
-.PHONY: check test build lab lab-down lab-status lab-ra2 lab-ra2-down rendimiento gui-check gui-build gui-dist gui-paquete gui-lab gui-editor clean
+.PHONY: check test build version lab lab-down lab-status lab-ra2 lab-ra2-down rendimiento gui-check gui-build gui-dist gui-paquete gui-lab gui-editor clean
 
 ## check: fast suite. No network, no disk. Must stay under 10 s.
 check:
@@ -15,6 +20,7 @@ check:
 ## Needs `make lab` and `make lab-ra2`.
 test: check build
 	$(GO) test -tags=integration ./...
+	test/version.sh
 	test/secrets.sh
 	test/acceptance.sh
 	test/eventos.sh
@@ -27,9 +33,13 @@ test: check build
 rendimiento: build
 	test/rendimiento.sh
 
-## build: single binary in bin/heimdall.
+## build: single binary in bin/heimdall, stamped with VERSION.
 build:
-	$(GO) build -o $(BIN) ./cmd/heimdall
+	$(GO) build -ldflags "-X main.version=$(VERSION)" -o $(BIN) ./cmd/heimdall
+
+## version: what engine and application say they are.
+version: build
+	test/version.sh
 
 ## lab: bring up the podman SSH lab used by the integration tests.
 lab:

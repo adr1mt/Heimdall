@@ -6,20 +6,21 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T081 y T082 · Los fallos revisados y la contraseña auditada.**
+**T081, T082 y T083 · Revisión, auditoría y versión 0.9.0.** Antes T080.
 
-- T080 era demasiado grande: partida en T081 (revisión), T082 (secretos),
-  T083 (documentación y versión) y T084 (examen real de aula).
+- T080, demasiado grande, partida en T081 (revisión de fallos), T082
+  (secretos), T083 (documentación y versión) y T084 (examen real de aula).
 - `docs/MODOS-DE-FALLO-HEIMDALL.md`: los 16 fallos del sistema viejo, uno a
-  uno, con su evidencia. **Solo queda abierto F-12**, corregir con clave SSH
-  en vez de contraseña, que ya era T023.
-- Auditoría de la contraseña con el laboratorio levantado y un valor
-  envenenado: **cero coincidencias** en `argv` del proceso vivo, terminal,
-  `var/`, eventos, reintento, vuelta de sesión, aula generada, exportaciones
-  y copias de seguridad.
-- `test/secrets.sh` ahora cubre también eventos, reintento y sesión; la
-  aplicación estrena `gui/tests/secretos.test.ts` (5 pruebas).
-- Verde: motor 163 tests, `test/secrets.sh` entero, aplicación 357 tests.
+  uno. **Solo queda abierto F-12**, corregir con clave SSH, que ya era T023.
+- Auditoría de la contraseña con el laboratorio levantado: cero coincidencias
+  en `argv` del proceso vivo, terminal, `var/`, eventos, reintento, vuelta de
+  sesión, aula generada, exportaciones y copias.
+- **Versión 0.9.0**, un solo número en `VERSION`: el motor se sella al
+  compilar, la aplicación lo lleva en su paquete y `test/version.sh` vigila
+  que no se separen. Paquete 0.9.0 construido y `make gui-paquete` verde.
+- `docs/GUIA.md` (guía del profesor) y `docs/NOTAS-DE-VERSION.md`.
+- Verde: motor 163 tests, aplicación 357, `test/secrets.sh`, `test/version.sh`
+  y `make gui-paquete`.
 
 ## Problemas conocidos
 
@@ -36,5 +37,6 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Siguiente tarea recomendada
 
-**T083** (guía de instalación y primer examen, y número de versión) o **T070**
-(exámenes del curso en formato nativo). T084, el examen real, la ejecuta Adrià.
+**T070** (exámenes del curso en formato nativo), que es lo que desbloquea
+**T084**: el examen real de aula, la prueba que falta para la 1.0.0 y que
+ejecuta Adrià.

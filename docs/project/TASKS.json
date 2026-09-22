@@ -1362,7 +1362,7 @@
       "id": "T083",
       "title": "Documentacion de usuario y versionado para la publicacion",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T081",
@@ -1380,8 +1380,10 @@
       "acceptance": [
         "Un profesor que no conoce el proyecto llega de la instalacion a una nota siguiendo solo la guia"
       ],
-      "tests": [],
-      "notes": "Tercera parte de T080."
+      "tests": [
+        "test/version.sh"
+      ],
+      "notes": "Tercera parte de T080. Version 0.9.0: un solo numero en VERSION, sellado en el motor al compilar y comprobado por test/version.sh. Guia en docs/GUIA.md y notas en docs/NOTAS-DE-VERSION.md. La 1.0.0 sale cuando pase T084."
     },
     {
       "id": "T084",

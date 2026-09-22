@@ -9,8 +9,10 @@ import (
 	"os"
 )
 
-// version is the engine version. The product name is provisional (D-7).
-const version = "0.1.0-dev"
+// version is the engine version. `make build` stamps it from the VERSION file
+// at the root, the single place the number is written; a build by hand says
+// "dev" and that is the point: only a packaged engine claims a version.
+var version = "dev"
 
 func main() {
 	os.Exit(run(os.Args[1:], os.Stdout, os.Stderr))

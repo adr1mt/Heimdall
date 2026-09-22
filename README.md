@@ -11,7 +11,7 @@
 
 <p align="center">
   <img alt="Go 1.26+" src="https://img.shields.io/badge/Go-1.26%2B-00ADD8?logo=go&logoColor=white">
-  <img alt="Estado: fase 5 de 8" src="https://img.shields.io/badge/estado-fase%205%20de%208-orange">
+  <img alt="Versión 0.9.0" src="https://img.shields.io/badge/versi%C3%B3n-0.9.0-blue">
   <img alt="Dos dependencias" src="https://img.shields.io/badge/dependencias-2-brightgreen">
 </p>
 
@@ -46,7 +46,10 @@ evaluador nunca se confunden: una máquina apagada no es un trabajo mal hecho.
 
 ## Estado del proyecto
 
-En desarrollo, **fase 5 de 8** del [roadmap](docs/ROADMAP.md).
+**Versión 0.9.0**, lista para el aula y pendiente de la prueba que falta: un
+examen real corregido de principio a fin. Esa es la 1.0.0.
+
+Si lo que quieres es usarlo, la guía es [docs/GUIA.md](docs/GUIA.md).
 
 - El motor evalúa y califica por SSH contra máquinas reales, en exámenes de
   verdad.
@@ -54,9 +57,9 @@ En desarrollo, **fase 5 de 8** del [roadmap](docs/ROADMAP.md).
   desarrollo avanzado: Inicio, Resultados, Histórico, Ajustes y Ayuda, con
   **modo examen** —vueltas encadenadas mientras dura la sesión— y **modo
   proyector** para enseñar el progreso en pantalla grande.
-- Todavía **no hay release para usuario final ni empaquetado definitivo**: se
-  compila desde el repositorio. El binario embebido en la aplicación llega en
-  la fase 7.
+- La aplicación se empaqueta en `.deb` y AppImage con el motor dentro, y
+  funciona en un equipo sin nada instalado. Todavía **no hay una descarga
+  publicada**: se construye con `make gui-dist`.
 
 El estado detallado, sesión a sesión, está en
 [docs/project/PROGRESS.md](docs/project/PROGRESS.md).
@@ -167,6 +170,8 @@ necesita un [ADR](docs/adr/).
 
 | Necesitas… | Lee |
 |---|---|
+| Usarlo para corregir | [docs/GUIA.md](docs/GUIA.md) |
+| Qué trae cada versión | [docs/NOTAS-DE-VERSION.md](docs/NOTAS-DE-VERSION.md) |
 | Cómo está montado | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | Por qué está montado así | [docs/adr/](docs/adr/) |
 | Hacia dónde va | [docs/ROADMAP.md](docs/ROADMAP.md) |
