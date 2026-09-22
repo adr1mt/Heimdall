@@ -64,7 +64,10 @@ corrige el laboratorio: alumne01, 100/100. `make gui-paquete` (P-1…P-3) verde.
 
 ## Siguiente tarea recomendada
 
-**T123** (la contraseña en cristiano y el modo examen a la vista): toca
-secretos, así que va sola y no se encadena con nada.
+**T126** (la contraseña del aula se escribe una vez y se recuerda cifrada):
+en Teutón vivía en `config.yaml` y de ahí acababa en `resume.json`; aquí se
+guarda cifrada y no sale en ningún informe. En el aula real es la misma todo
+el curso. Toca secretos: va sola, sin encadenar. Después, **T123** (el modo
+examen a la vista), que ya no lleva contraseña.
 
 Sin fecha: T059, T070, T080, T023.

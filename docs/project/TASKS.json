@@ -2199,14 +2199,13 @@
     },
     {
       "id": "T123",
-      "title": "Corregir: la contrasena en cristiano y el modo examen a la vista",
+      "title": "Corregir: el modo examen a la vista",
       "phase": 6,
       "status": "READY",
-      "priority": "P0",
+      "priority": "P1",
       "depends_on": [],
-      "goal": "Que corregir se entienda sin saber como se llama una variable, y que el modo examen se vea como se veia en teuton-gui.",
+      "goal": "Que el modo examen se vea como se veia en teuton-gui, sin abrir nada.",
       "scope": [
-        "Pedir «la contrasena de las maquinas», no «AULA_PASSWORD»",
         "Recuperar la tarjeta del modo examen: se guarda la mejor nota, de que vuelta sale y el intervalo",
         "Los alumnos a evaluar, listados debajo"
       ],
@@ -2215,13 +2214,11 @@
         "Cambiar la sesion de examen (ADR-0020)"
       ],
       "acceptance": [
-        "En ningun sitio de Corregir aparece el nombre de una referencia del inventario",
         "Con el modo examen encendido se ve, sin abrir nada, que se guarda la mejor nota y de que vuelta sale"
       ],
-      "tests": [
-        "gui/tests: el texto que pide la contrasena no nombra ninguna referencia"
-      ],
-      "notes": "Adria, 22-09-2026. Toca secretos: tarea sola, sin encadenar."
+      "tests": [],
+      "notes": "Adria, 22-09-2026. La contrasena salio de aqui a T126.",
+      "package": "P6"
     },
     {
       "id": "T124",
@@ -2275,6 +2272,39 @@
         "gui/tests: la pantalla no monta las secciones retiradas"
       ],
       "notes": "Adria, 22-09-2026: «quiero la distribucion de notas y la tasa de exito, y ya esta»."
+    },
+    {
+      "id": "T126",
+      "title": "La contrasena del aula se escribe una vez y se recuerda cifrada",
+      "phase": 6,
+      "status": "READY",
+      "priority": "P0",
+      "depends_on": [],
+      "goal": "Que el profesor no vuelva a teclear la contrasena de las maquinas: una vez, y el resto del curso el modo examen arranca solo.",
+      "scope": [
+        "Almacen cifrado con safeStorage en el directorio de datos, fuera de settings.json",
+        "Se guarda al escribirla, sin preguntar y sin casilla que marcar",
+        "Al abrir «Corregir» la casilla sale rellena y no hay nada que tocar",
+        "«Olvidar la contrasena guardada» en Ajustes, con confirmacion",
+        "El texto pide «la contrasena de las maquinas del aula», no una referencia (absorbe la primera mitad de T123)"
+      ],
+      "out_of_scope": [
+        "Una contrasena distinta por alumno o por maquina: en el aula real es la misma todo el curso",
+        "Cambiar ADR-0009: no entra en aula.yaml, ni en argv, ni en el artefacto, ni en ningun informe",
+        "Guardar nada cuando el sistema no ofrezca cifrado: entonces se sigue tecleando"
+      ],
+      "acceptance": [
+        "Escrita una vez, cerrar y abrir la aplicacion y corregir sin teclear nada",
+        "El fichero guardado no contiene la contrasena en claro",
+        "grep del valor en var/, en los informes y en /proc/<pid>/cmdline: cero coincidencias",
+        "«Olvidar» deja la casilla vacia y el fichero borrado"
+      ],
+      "tests": [
+        "gui/tests: lo guardado no es el valor en claro y se recupera igual",
+        "gui/tests: sin cifrado disponible no se guarda nada y se sigue pidiendo",
+        "gui/tests: el texto que pide la contrasena no nombra ninguna referencia"
+      ],
+      "notes": "Adria, 22-09-2026: en Teuton la contrasena vivia en config.yaml y de ahi acababa en resume.json. Aqui se guarda cifrada y nunca sale en un informe. El aula real: usuario/usuario en todas las maquinas, la misma todo el curso. Toca secretos: tarea sola, sin encadenar."
     }
   ]
 }
