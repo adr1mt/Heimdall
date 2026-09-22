@@ -122,6 +122,19 @@ export interface HeimdallApi {
   /** Credential names the classroom of this class will ask for. */
   secretRefs: (classId: string) => Promise<string[]>
   /**
+   * The classroom password remembered on this machine, or an empty string.
+   * It is kept encrypted and it never reaches the classroom, argv, the
+   * artifact or a report (ADR-0023).
+   */
+  rememberedPassword: () => Promise<string>
+  /**
+   * Remembers the classroom password. Answers whether it was kept: on a
+   * system without encryption nothing is written and it goes on being typed.
+   */
+  rememberPassword: (password: string) => Promise<boolean>
+  /** Forgets it, file included. */
+  forgetPassword: () => Promise<void>
+  /**
    * The name the teacher gave the exam, for the screen. A file that cannot be
    * read has no name here and its error, whole, when the correction starts.
    */

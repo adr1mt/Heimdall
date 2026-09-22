@@ -6,21 +6,21 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**Paquete P6 (T120, T121, T122, T124, T125): lo que salió de comparar
-Heimdall con teuton-gui.** Cinco tareas de pantalla, cinco commits.
+**T126 · La contraseña del aula se escribe una vez.** Toca secretos: tarea
+sola, un commit.
 
-- **Inicio**: cada examen de la lista tiene un botón que abre su carpeta en el
-  gestor de archivos. El canal `shell:openFolder` ya existía sin usarse.
-- **Clases** se ve sin editar: lista a la izquierda, la clase entera a la
-  derecha, sin un solo campo editable. «Editar» ya no es el camino para mirar.
-- **«Exámenes»** pasa a **«El examen»** y el título dice cuál, por su nombre.
-- **Resultados** explica «bien», «mal» y «sin evaluar» con una frase cada una
-  encima de los filtros, y los tres números de cabecera dicen sobre qué se
-  cuentan. La matriz no se tocó.
-- **Analíticas** se queda en tres: los cuatro objetivos más fallados, la
-  distribución de notas y la tasa de éxito por grupo, que es nueva. «A quién
-  atender primero» se quitó entera, código incluido; «Cómo va el grupo» era el
-  título de la distribución y se renombró.
+- Se guarda **cifrada** con `safeStorage` en un fichero propio del directorio
+  de datos, al escribirla, sin preguntar y sin casilla que marcar. Al abrir
+  «Corregir» la casilla sale rellena.
+- **Una sola casilla**: la pantalla pide «la contraseña de las máquinas» y el
+  valor se aplica a todas las credenciales del aula generada. Los nombres en
+  mayúsculas salieron de la pantalla (era la primera mitad de T123).
+- **Ajustes** dice si hay una guardada y lleva «Olvidar la contraseña
+  guardada», con confirmación. Sin cifrado disponible no se guarda nada y se
+  sigue tecleando: no hay respaldo en claro.
+- **ADR-0023** sustituye el punto 4 de ADR-0021. ADR-0009 no cambia: la
+  contraseña no entra en el aula, ni en `argv`, ni en el artefacto, ni en
+  ningún informe.
 
 ## Estado actual
 
@@ -42,12 +42,14 @@ Heimdall con teuton-gui.** Cinco tareas de pantalla, cinco commits.
 
 ## Pruebas ejecutadas
 
-`make check` y `make gui-check` (343) verdes, `typecheck` verde. Contra el
+`make check` y `make gui-check` (352) verdes, `typecheck` verde. Contra el
 laboratorio, con la aplicación construida: `make gui-lab` (S-0…S-4, H-1, X-1,
 X-2, **B-1…B-3**), `make gui-editor` (D-1…D-7) y el modo examen entero
 (E-1…E-5, P-0…P-5, C-1…C-3, S-5). Un examen escrito desde el formulario
 corrige el laboratorio: alumne01, 100/100. `make gui-paquete` (P-1…P-3) verde.
-`make test` no se repitió; la actualización se prueba sin red.
+`make test` no se repitió; la actualización se prueba sin red. El almacén
+cifrado, contra el `safeStorage` real de esta máquina: se guarda, el fichero
+no contiene el valor, se recupera igual y «olvidar» lo borra.
 
 ## Problemas conocidos
 
@@ -64,10 +66,8 @@ corrige el laboratorio: alumne01, 100/100. `make gui-paquete` (P-1…P-3) verde.
 
 ## Siguiente tarea recomendada
 
-**T126** (la contraseña del aula se escribe una vez y se recuerda cifrada):
-en Teutón vivía en `config.yaml` y de ahí acababa en `resume.json`; aquí se
-guarda cifrada y no sale en ningún informe. En el aula real es la misma todo
-el curso. Toca secretos: va sola, sin encadenar. Después, **T123** (el modo
-examen a la vista), que ya no lleva contraseña.
+**T123** (el modo examen a la vista): recuperar la tarjeta que dice que se
+guarda la mejor nota, de qué vuelta sale y el intervalo, con los alumnos
+listados debajo. Ya no lleva contraseña: se la quedó T126.
 
 Sin fecha: T059, T070, T080, T023.

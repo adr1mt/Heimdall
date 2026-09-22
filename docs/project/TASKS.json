@@ -2210,7 +2210,7 @@
         "Los alumnos a evaluar, listados debajo"
       ],
       "out_of_scope": [
-        "Cambiar la politica de secretos (ADR-0009): la contrasena se sigue tecleando y no se guarda",
+        "Volver a tocar la contrasena: la resolvio T126 (ADR-0023)",
         "Cambiar la sesion de examen (ADR-0020)"
       ],
       "acceptance": [
@@ -2277,7 +2277,7 @@
       "id": "T126",
       "title": "La contrasena del aula se escribe una vez y se recuerda cifrada",
       "phase": 6,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [],
       "goal": "Que el profesor no vuelva a teclear la contrasena de las maquinas: una vez, y el resto del curso el modo examen arranca solo.",

@@ -668,3 +668,21 @@ Dos decisiones menores:
    respuesta rota, la aplicación arranca igual y no aparece ningún diálogo
    delante de la clase. El aviso de que hay versión nueva tampoco sale en el
    proyector.
+
+## T126 · La contraseña del aula se recuerda cifrada
+
+1. **Se guarda una, no una por máquina ni por alumno.** En el aula real todas
+   las máquinas comparten cuenta y la misma todo el curso. Guardar un mapa de
+   credenciales sería una generalización sin caso de uso.
+2. **Una sola casilla en la pantalla.** Pedía un valor por cada referencia en
+   mayúsculas del aula, que es jerga del fichero y no algo que el profesor
+   tenga que ver. Ahora pide «la contraseña de las máquinas del aula».
+3. **Sin cifrado disponible no se guarda nada.** Antes que un fichero en claro
+   con la contraseña del aula, se sigue tecleando en cada examen.
+4. **El almacén no importa electron.** Recibe el cifrador como parámetro, así
+   que lo que este módulo existe para garantizar —que no se escribe nada
+   legible— se prueba sin sesión de escritorio. Se comprobó además contra el
+   `safeStorage` real de la máquina.
+5. **ADR-0023 sustituye el punto 4 de ADR-0021**, que prohibía escribir
+   cualquier contraseña. La prohibición sigue en pie para `settings.json` y
+   `classes.json`.

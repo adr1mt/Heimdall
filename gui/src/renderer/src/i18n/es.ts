@@ -256,10 +256,11 @@ export const t = {
     blocked: 'Mientras el fichero de clases no se pueda leer, no se guarda nada.'
   },
   credentials: {
-    title: 'Credenciales',
+    title: 'Contraseña del aula',
     hint:
-      'Se nombran las contraseñas, nunca se guardan: el valor lo pones aquí y no se escribe en ningún sitio.',
+      'La contraseña de las máquinas del aula. Se guarda cifrada en este ordenador, así que solo hay que escribirla una vez. No aparece en la clase, ni en las notas, ni en ningún informe.',
     none: 'Esta clase no pide ninguna contraseña.',
+    label: 'Contraseña de las máquinas',
     placeholder: 'Contraseña'
   },
   run: {
@@ -494,6 +495,16 @@ export const t = {
     passHint:
       'Desde qué puntuación, sobre las 100 que publica el motor, se cuenta a un alumno como aprobado. Es también donde cae el aprobado en la escala: lo que marques aquí es el 5. Ninguna nota del motor cambia.',
     passLabel: 'Aprobado a partir de',
+    passwordSection: 'Contraseña del aula',
+    passwordHint:
+      'La contraseña de las máquinas del alumnado se guarda cifrada en este ordenador para no tener que escribirla en cada examen. No se escribe en la clase, ni en las notas, ni en ningún informe.',
+    passwordSaved: 'Hay una contraseña guardada.',
+    passwordNone: 'No hay ninguna contraseña guardada. Se escribe al corregir.',
+    passwordForget: 'Olvidar la contraseña guardada',
+    passwordConfirmTitle: '¿Olvidar la contraseña guardada?',
+    passwordConfirmBody:
+      'La casilla de Corregir quedará vacía y habrá que escribir la contraseña la próxima vez.',
+    passwordConfirmYes: 'Olvidarla',
     aboutSection: 'Acerca de',
     about:
       'Heimdall corrige prácticas de sistemas y redes conectándose por SSH a las máquinas del alumnado.',
@@ -509,7 +520,7 @@ export const t = {
       'Un problema técnico —máquina apagada, red caída, credenciales que no valen— nunca se convierte en un suspenso: esa comprobación queda sin evaluar y se dice por qué.',
     filesSection: 'El examen y la clase',
     files:
-      'El examen dice qué se comprueba. La clase dice a quién: quién es cada alumno y cómo se llega a su máquina. Las contraseñas no se guardan en ninguno de los dos; se teclean al corregir.'
+      'El examen dice qué se comprueba. La clase dice a quién: quién es cada alumno y cómo se llega a su máquina. La contraseña de las máquinas no se guarda en ninguno de los dos: se escribe una vez y queda cifrada en este ordenador.'
   },
   projector: {
     on: 'Modo proyector',

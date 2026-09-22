@@ -39,7 +39,7 @@ stdin— y la nota seguirá saliendo del artefacto canónico. Si algún día un
 dato guardado aquí quisiera influir en la nota, primero hay que cambiar el
 contrato, no este fichero.
 
-**4. Aquí no se escribe ninguna contraseña, nunca** (ADR-0009). Una clase
+**4. Aquí no se escribe ninguna contraseña, nunca** (ADR-0009). El punto 4 queda sustituido por ADR-0023 en cuanto a la contraseña del aula, que se recuerda cifrada en un fichero propio; `settings.json` y `classes.json` siguen sin contener ninguna. Una clase
 guarda a quién se conecta y con qué usuario; el valor de la credencial se
 teclea en cada examen y muere con el proceso. El lector descarta cualquier
 campo que no esté en el modelo, así que un fichero manipulado a mano no

@@ -97,28 +97,26 @@ export default function CorrectView() {
   }, [examPath])
 
   /**
-   * Credential names this class's classroom asks for, and what the teacher
-   * typed. They are asked of the main process, which reads them off the very
-   * text the correction will write, and the values never leave this screen
-   * except towards the engine (ADR-0009).
+   * Credential names this class's classroom asks for. They are asked of the
+   * main process, which reads them off the very text the correction will
+   * write, so the screen never asks for a password the engine will not use.
+   * The value goes to the engine and to the encrypted store, nowhere else
+   * (ADR-0009, ADR-0023).
    */
   const [refs, setRefs] = useState<string[]>([])
-  const [secrets, setSecrets] = useState<Record<string, string>>({})
+  const [password, setPassword] = useState('')
   const [confirmStop, setConfirmStop] = useState(false)
 
   useEffect(() => {
     if (!group) {
       setRefs([])
-      setSecrets({})
       return
     }
     let current = true
     window.heimdall
       .secretRefs(group.id)
       .then((names) => {
-        if (!current) return
-        setRefs(names)
-        setSecrets({})
+        if (current) setRefs(names)
       })
       .catch((error) => setNotice(noticeFrom('No se pudo leer la clase', error)))
     return () => {
@@ -126,21 +124,60 @@ export default function CorrectView() {
     }
   }, [group, setNotice])
 
+  // The password of the classroom machines, typed once and remembered
+  // encrypted (ADR-0023). It arrives filled in, so an exam starts without
+  // touching anything.
+  useEffect(() => {
+    let current = true
+    window.heimdall
+      .rememberedPassword()
+      .then((saved) => {
+        if (current && saved) setPassword(saved)
+      })
+      .catch(() => {
+        // Nothing remembered is the same as nothing saved: it is typed.
+      })
+    return () => {
+      current = false
+    }
+  }, [])
+
+  /**
+   * The envelope the engine reads: the same value for every credential the
+   * generated classroom asks for. In the real classroom the machines share
+   * one account all year (ADR-0023).
+   */
+  function envelope(): Record<string, string> {
+    return Object.fromEntries(refs.map((name) => [name, password]))
+  }
+
+  /**
+   * Keeps the password for the next time. It is saved on its own, with no
+   * question and no box to tick; a system without encryption keeps nothing
+   * and then the field is cleared, because it will be typed again.
+   */
+  async function remember(): Promise<void> {
+    try {
+      if (!(await window.heimdall.rememberPassword(password))) setPassword('')
+    } catch {
+      setPassword('')
+    }
+  }
+
   const missing = !engine?.found
     ? t.run.needEngine
     : !examPath
       ? t.run.needExam
       : !group
         ? t.run.needClass
-        : refs.some((name) => !secrets[name])
+        : refs.length > 0 && !password
           ? t.run.needSecrets
           : null
 
   async function start(): Promise<void> {
     if (missing) return
-    await startCorrection(secrets)
-    // The values leave the interface as soon as the engine has them.
-    setSecrets({})
+    await startCorrection(envelope())
+    await remember()
   }
 
   /**
@@ -152,12 +189,12 @@ export default function CorrectView() {
   async function startExamMode(minutes: number): Promise<void> {
     if (missing) return
     try {
-      await window.heimdall.setExamMode({ active: true, secrets })
+      await window.heimdall.setExamMode({ active: true, secrets: envelope() })
     } catch (error) {
       setNotice(noticeFrom('No se pudo activar el modo examen', error))
       return
     }
-    setSecrets({})
+    await remember()
     setRetry(null)
     useApp.getState().startExam(minutes)
   }
@@ -206,7 +243,14 @@ export default function CorrectView() {
           />
         </div>
 
-        {group && <Credentials refs={refs} secrets={secrets} disabled={busy} onSecret={(name, value) => setSecrets((prev) => ({ ...prev, [name]: value }))} />}
+        {group && (
+          <Credentials
+            asked={refs.length > 0}
+            password={password}
+            disabled={busy}
+            onPassword={setPassword}
+          />
+        )}
 
         {/* A retry is never silent: it says what it will repeat and it can be
             called off without leaving this screen. */}
@@ -381,20 +425,21 @@ function ClassCard({
 }
 
 /**
- * The credentials of this run. They are typed here, they travel to the engine
- * through stdin and they are written nowhere: not in the class, not in the
- * classroom, not in the artifact (ADR-0009).
+ * The password of the classroom machines. It is typed once —one account, the
+ * same on every machine, the whole year— and it travels to the engine through
+ * stdin: not into the class, not into the classroom, not into the artifact
+ * (ADR-0009, ADR-0023).
  */
 function Credentials({
-  refs,
-  secrets,
+  asked,
+  password,
   disabled,
-  onSecret
+  onPassword
 }: {
-  refs: string[]
-  secrets: Record<string, string>
+  asked: boolean
+  password: string
   disabled: boolean
-  onSecret: (name: string, value: string) => void
+  onPassword: (value: string) => void
 }) {
   return (
     <div className="space-y-2 rounded-md border border-border p-4">
@@ -402,21 +447,22 @@ function Credentials({
         {t.credentials.title}
       </p>
       <p className="text-xs text-muted-foreground">
-        {refs.length > 0 ? t.credentials.hint : t.credentials.none}
+        {asked ? t.credentials.hint : t.credentials.none}
       </p>
-      {refs.map((name) => (
-        <label key={name} className="flex items-center gap-3">
-          <span className="w-56 shrink-0 truncate font-mono text-dense">{name}</span>
+      {asked && (
+        <label className="flex items-center gap-3">
+          <span className="w-56 shrink-0 text-sm">{t.credentials.label}</span>
           <Input
             type="password"
             autoComplete="off"
             disabled={disabled}
+            aria-label={t.credentials.label}
             placeholder={t.credentials.placeholder}
-            value={secrets[name] ?? ''}
-            onChange={(e) => onSecret(name, e.target.value)}
+            value={password}
+            onChange={(e) => onPassword(e.target.value)}
           />
         </label>
-      ))}
+      )}
     </div>
   )
 }
