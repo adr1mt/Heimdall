@@ -338,12 +338,21 @@ export const t = {
     // Cabecera de clase: los tres números que se leen antes que nada.
     kpiPassed: 'Aprobados',
     kpiPassedHint: (graded: number, students: number) =>
-      `${graded} de ${students} alumnos con nota final`,
+      graded === students
+        ? `De los ${students} alumnos de la clase`
+        : `De los ${graded} que tienen nota; ${students - graded} se quedaron sin ella`,
     kpiAverage: 'Nota media',
     kpiAverageHint: (pass: string, max: number) => `Aprobado a partir de ${pass} sobre ${max}`,
     kpiAttention: 'Requieren atención',
-    kpiAttentionHint: 'Avería técnica primero, después quien va por debajo',
+    kpiAttentionHint: 'Primero una máquina que falló, después quien no llega al aprobado',
     kpiNoGrades: 'Todavía sin ninguna nota final',
+    // Las tres palabras que se repiten por toda la pantalla, dichas una vez
+    // en una frase: una etiqueta sola no explica nada (T124).
+    statesTitle: 'Qué quieren decir «bien», «mal» y «sin evaluar»',
+    statePass: 'Bien: el alumno superó la comprobación.',
+    stateFail: 'Mal: se comprobó y el alumno no la superó.',
+    stateUnevaluated:
+      'Sin evaluar: no se pudo comprobar —la máquina no respondió, el comando no terminó a tiempo—. No es un fallo del alumno y no cuenta como un cero.',
     modeList: 'Lista',
     modeMatrix: 'Matriz',
     // Lista densa: una fila por alumno.

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { t } from '@/i18n/es'
 import { DEFAULT_PASS_MARK, classSummary, needsAttention, shortName } from '@/lib/summary'
 import { buildMatrix } from '@/lib/matrix'
 import type { CheckResult, RunResult, StudentResult } from '../src/shared/artifact'
@@ -128,5 +129,34 @@ describe('matriz', () => {
       { student: rows[1].student, checks: [check('c1', 'PASS'), check('c2', 'FAIL')] }
     ])
     expect(matrix.rows.map((r) => r.checkId)).toEqual(['c1', 'c2'])
+  })
+})
+
+// Los tres números de cabecera y las tres palabras del resumen: ninguna
+// etiqueta se queda sin su frase (T124).
+describe('la cabecera se lee sin preguntar', () => {
+  it('dice sobre cuántos alumnos se cuentan los aprobados', () => {
+    expect(t.results.kpiPassedHint(18, 18)).toBe('De los 18 alumnos de la clase')
+  })
+
+  it('dice cuántos se quedaron sin nota en vez de callarlo', () => {
+    expect(t.results.kpiPassedHint(16, 18)).toBe(
+      'De los 16 que tienen nota; 2 se quedaron sin ella'
+    )
+  })
+
+  it('explica «bien», «mal» y «sin evaluar» con una frase cada una', () => {
+    for (const phrase of [
+      t.results.statePass,
+      t.results.stateFail,
+      t.results.stateUnevaluated
+    ]) {
+      expect(phrase.length).toBeGreaterThan(t.results.filterAll.length)
+      expect(phrase.endsWith('.')).toBe(true)
+    }
+  })
+
+  it('deja claro que «sin evaluar» no es un fallo del alumno', () => {
+    expect(t.results.stateUnevaluated).toContain('No es un fallo del alumno')
   })
 })

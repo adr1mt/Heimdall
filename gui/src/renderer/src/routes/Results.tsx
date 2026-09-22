@@ -174,11 +174,14 @@ export default function ResultsView() {
 
       <div className="min-h-0 flex-1 space-y-4 overflow-auto p-6">
         {summary && (
-          <KpiStrip
-            summary={summary}
-            attentionOnly={attentionOnly}
-            onAttention={() => setAttentionOnly((on) => !on)}
-          />
+          <>
+            <KpiStrip
+              summary={summary}
+              attentionOnly={attentionOnly}
+              onAttention={() => setAttentionOnly((on) => !on)}
+            />
+            <States />
+          </>
         )}
 
         <div className="flex flex-wrap items-center gap-2">
@@ -188,6 +191,7 @@ export default function ResultsView() {
                 key={status}
                 active={filters.status === status}
                 onClick={() => setFilters({ ...filters, status })}
+                title={status === 'ALL' ? t.results.filterAll : STATE_TEXT[status]}
               >
                 {status === 'ALL' ? t.results.filterAll : STATUS_TEXT[status]}
               </SegmentedItem>
@@ -331,6 +335,31 @@ function KpiStrip({
       </button>
     </div>
   )
+}
+
+/**
+ * «Bien», «mal» y «sin evaluar», dichas con palabras y una sola vez.
+ *
+ * Las tres etiquetas están por toda la pantalla —en los filtros, en la lista,
+ * en la matriz— y la tercera es la que hay que explicar: quien la lee como un
+ * fallo del alumno saca la conclusión contraria a la correcta (principio 3).
+ */
+function States() {
+  return (
+    <div className="space-y-1 rounded-md border border-border bg-secondary/30 px-4 py-3 text-xs text-muted-foreground">
+      <p className="font-medium text-foreground">{t.results.statesTitle}</p>
+      <p>{t.results.statePass}</p>
+      <p>{t.results.stateFail}</p>
+      <p>{t.results.stateUnevaluated}</p>
+    </div>
+  )
+}
+
+/** La frase de cada estado, para el filtro que lleva su etiqueta. */
+const STATE_TEXT: Record<AcademicStatus, string> = {
+  PASS: t.results.statePass,
+  FAIL: t.results.stateFail,
+  UNEVALUATED: t.results.stateUnevaluated
 }
 
 function Reading({ value, label, hint }: { value: string; label: string; hint: string }) {
