@@ -1976,10 +1976,9 @@
         "Se sale del modo con una sola accion"
       ],
       "tests": [
-        "gui/tests/board.test.ts",
         "gui/scripts/examen-lab.ts (P-0…P-5)"
       ],
-      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato. Resuelto reemplazando la aplicacion entera mientras el proyector esta encendido: el tablero se construye con nombre, progreso, estado y nota, y una maquina no es ninguna de esas cuatro cosas, asi que no hay nada que tapar. Se sale con Esc o con el boton. El escenario P del laboratorio se reescribio para lo que ahora se proyecta."
+      "notes": "Referencia: workspace/teuton-gui, solo lectura. Se copia la filosofia visual y de uso, nunca su contrato. Resuelto sobre las pantallas que ya habia: el proyector quita la barra lateral, agranda la letra y tapa las direcciones, y lo que se ve es la matriz. Un primer intento del 2026-09-22 la sustituyo por un tablero de fichas por alumno; Adria lo rechazo el mismo dia y se deshizo. La matriz es la protagonista."
     },
     {
       "id": "T112",
@@ -2099,33 +2098,6 @@
         "gui/tests/run.test.ts: el sobre de un aula sin contrasenas"
       ],
       "notes": "Encontrado el 2026-09-21 probando el modo examen de T105 contra el cuestionario (testdata/cuestionario, sin hosts): «heimdall run: los secretos de stdin no traen ninguna clave en \"secrets\"», exit 2. Afecta igual a Corregir. Toca secretos y el contrato motor-GUI: una tarea por sesion, sin encadenar."
-    },
-    {
-      "id": "T119",
-      "title": "Retirar el tapado de maquinas ahora que el proyector es una vista aparte",
-      "phase": 6,
-      "package": "P4",
-      "status": "READY",
-      "priority": "P2",
-      "depends_on": [
-        "T111"
-      ],
-      "goal": "Que no quede en el arbol un mecanismo de seguridad al que ya no llega ningun camino.",
-      "scope": [
-        "lib/projector.ts y su uso en Results.tsx: con el proyector como vista completa, Resultados nunca se pinta con el modo encendido",
-        "Decidir entre borrarlo con sus tests o darle un camino real, y dejarlo escrito"
-      ],
-      "out_of_scope": [
-        "Debilitar la garantia de T066 sin sustituirla por otra al menos igual de fuerte"
-      ],
-      "acceptance": [
-        "No queda codigo de tapado inalcanzable, o queda documentado por que sigue",
-        "Ninguna direccion de maquina puede proyectarse por ningun camino"
-      ],
-      "tests": [
-        "gui/tests/projector.test.ts"
-      ],
-      "notes": "Detectado el 2026-09-22 al hacer T111. No se toco entonces: quitar un mecanismo de seguridad de paso, dentro de una tarea de pantalla, es justo lo que no se hace."
     }
   ]
 }

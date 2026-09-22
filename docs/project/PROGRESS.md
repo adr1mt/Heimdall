@@ -8,15 +8,15 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 **Paquete P4: proyector dedicado (T111) y exportación a Moodle (T112).**
 
-- El proyector es una vista aparte que ocupa toda la ventana: sin barra lateral
-  ni menús, y en la pared solo nombre, nota, avance, estado y FINALIZADO. No hay
-  nada que tapar porque no entra nada que tapar. Se sale con Esc o con el botón.
+- El proyector quita la barra lateral, agranda la letra y tapa las direcciones.
+  Lo que se proyecta es la pantalla en la que estés, con su matriz de OKs. Se
+  sale con Esc o con el botón. Un primer intento lo cambió por un tablero de
+  fichas; Adrià lo rechazó y se deshizo: la matriz es la protagonista.
 - «Exportar a Moodle» en los tres sitios donde ya salían notas: corrección,
   cadena y sesión de examen. Fichero aparte de tres columnas —alumno, correo y
   nota— que Moodle importa tal cual; empareja por correo (Adrià, 22-09-2026).
   Sin nota final, celda vacía y nunca un cero; sin correo no se puede ir, y la
   aplicación lo dice antes de guardar.
-- Queda T119: el tapado de direcciones ya no tiene camino desde la interfaz.
 
 ## Estado actual
 
@@ -29,7 +29,7 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
   `assert`, `report` atómico, `events`, `engine` y `ssh` (ADR-0011).
 - `test/lab.sh`: `alu1` en `127.1.2.3:2201`, el roto en el 2299. `acceptance.sh`,
   `eventos.sh`, `sesion.sh`.
-- `gui/`: árbol Node independiente; `make gui-check` (324 tests), `gui-build`,
+- `gui/`: árbol Node independiente; `make gui-check` (316 tests), `gui-build`,
   `gui-lab`, **`gui-editor`**. **Las nueve secciones están construidas**:
   Inicio, Clases, Exámenes, Corregir, Resultados, Analíticas, Histórico,
   Ajustes y Ayuda. Proyector: vista completa aparte. En el directorio de
@@ -38,7 +38,7 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Pruebas ejecutadas
 
-`make check` y `make gui-check` (324) verdes, `typecheck` verde. Contra el
+`make check` y `make gui-check` (316) verdes, `typecheck` verde. Contra el
 laboratorio, con la aplicación construida: `make gui-lab` (S-0…S-4, H-1, X-1,
 X-2, **B-1…B-3**), `make gui-editor` (D-1…D-7) y el modo examen entero
 (E-1…E-5, P-0…P-5, C-1…C-3, S-5). Un examen escrito desde el formulario
@@ -61,4 +61,4 @@ corrige el laboratorio: alumne01, 100/100. Del paquete real, `make gui-paquete`
 
 **T114**, actualización automática (paquete P5). Después, T080.
 
-Sin fecha: T059, T070, T080, T119, T023.
+Sin fecha: T059, T070, T080, T023.

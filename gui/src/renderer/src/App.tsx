@@ -34,7 +34,6 @@ const ClassesView = lazy(() => import('./routes/Classes'))
 const CorrectView = lazy(() => import('./routes/Correct'))
 const EditorView = lazy(() => import('./routes/Editor'))
 const AnalyticsView = lazy(() => import('./routes/Analytics'))
-const ProjectorView = lazy(() => import('./routes/Projector'))
 
 const ICONS: Record<View, typeof Home> = {
   home: Home,
@@ -132,17 +131,17 @@ function AppBody() {
     return () => clearInterval(timer)
   }, [])
 
-  // Projector mode replaces the whole application, sidebar and menus
-  // included: what is on the wall is the class and nothing else (T111). It is
-  // returned AFTER the hooks above on purpose —the event stream and the exam
-  // timer live in them, and projecting must not interrupt a correction.
-  if (projector) {
-    return (
-      <Suspense fallback={<div className="h-full w-full bg-background" />}>
-        <ProjectorView />
-      </Suspense>
-    )
-  }
+  // One action out of the projector, and the one a hand reaches for with the
+  // class already looking at the screen. It is the same action as the button.
+  useEffect(() => {
+    function onKey(event: KeyboardEvent): void {
+      if (event.key === 'Escape' && useApp.getState().projector) {
+        useApp.getState().toggleProjector()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   const views: Record<View, JSX.Element> = {
     home: <HomeView />,
@@ -158,6 +157,9 @@ function AppBody() {
 
   return (
     <div className="flex h-full w-full overflow-hidden">
+      {/* Al proyectar desaparece entera: la barra es del profesor, no de la
+          clase, y en la pared solo roba sitio a lo que se está mirando. */}
+      {!projector && (
       <aside className="flex w-60 flex-col bg-sidebar text-sidebar-foreground">
         <div className="flex items-center gap-2.5 px-5 pb-4 pt-5">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
@@ -205,8 +207,11 @@ function AppBody() {
           </button>
         </div>
       </aside>
+      )}
 
       <main className="flex flex-1 flex-col overflow-hidden bg-background">
+        {/* Sin barra lateral hay que poder salir igual, y con una sola acción. */}
+        {projector && <ProjectorExit />}
         {notice && (
           <div
             role="alert"
@@ -318,6 +323,25 @@ function ProjectorToggle() {
       <Monitor className="h-4 w-4 shrink-0" />
       {projector ? t.projector.off : t.projector.on}
     </button>
+  )
+}
+
+/**
+ * The way out of the projector when the sidebar is gone. Small and in the
+ * corner: it is for the teacher, and the wall is for the class.
+ */
+function ProjectorExit() {
+  const toggleProjector = useApp((s) => s.toggleProjector)
+  return (
+    <div className="flex shrink-0 justify-end px-4 pt-3">
+      <button
+        onClick={toggleProjector}
+        className="flex items-center gap-2 rounded-md px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <Monitor className="h-4 w-4" />
+        {t.projector.off}
+      </button>
+    </div>
   )
 }
 

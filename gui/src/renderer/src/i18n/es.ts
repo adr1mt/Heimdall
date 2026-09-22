@@ -494,22 +494,9 @@ export const t = {
   projector: {
     on: 'Modo proyector',
     off: 'Salir del proyector',
-    hintOn: 'La clase en directo, a pantalla completa. Pulsa Esc para salir.',
-    hintOff: 'Proyecta la clase en directo: solo nombre, nota, progreso y estado.',
-    masked: 'máquina tapada',
-    title: 'Clase en directo',
-    leave: 'Salir del proyector',
-    idle: 'Todavía no hay ninguna corrección en marcha.',
-    empty: 'Cuando empiece la corrección, la clase aparecerá aquí.',
-    progress: (finished: number, students: number): string =>
-      `${finished} de ${students} han terminado`,
-    checks: (done: number, total: number): string => `${done} de ${total} comprobaciones`,
-    state: {
-      waiting: 'Esperando',
-      running: 'Corrigiendo',
-      finished: 'FINALIZADO',
-      excluded: 'Excluido'
-    }
+    hintOn: 'Las direcciones de las máquinas están tapadas. Pulsa Esc para salir.',
+    hintOff: 'Quita la barra lateral, agranda la letra y tapa las direcciones.',
+    masked: 'máquina tapada'
   },
   exam: {
     title: 'Modo examen',
