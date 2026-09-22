@@ -2,21 +2,23 @@
 
 Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
-**Actualizado**: 2026-09-22 · **Fase**: 6 — Realineación de producto
+**Actualizado**: 2026-09-22 · **Fase**: 9 — Endurecimiento y publicación
 
 ## Última sesión
 
-**T123 · El modo examen a la vista.** Paquete P6, GUI.
+**T081 · Los 16 modos de fallo, revisados.** Antes T080, dividida.
 
-- Con el modo examen encendido, la pantalla «Corregir» dice con palabras, sin
-  desplegar nada, que cada alumno se queda con su **mejor vuelta entera**, que
-  debajo se indica **de qué vuelta sale** su nota y **cada cuántos minutos** se
-  vuelve a corregir.
-- Mientras no haya ninguna vuelta terminada se ven **los alumnos de la clase**
-  listados, sin nota y diciendo por qué todavía no la tienen.
-- La franja de cinco datos (vuelta, siguiente, activos, finalizados, progreso)
-  se queda como estaba. Ningún número nuevo se calcula aquí.
-- `npm run typecheck` y `npm test` (352 tests) verdes. No se lanzó la app.
+- T080 era demasiado grande y una de sus condiciones exige aula real: se
+  parte en T081 (esta), T082 (secretos), T083 (documentación y versión) y
+  T084 (examen real). T080 queda retirada.
+- `docs/MODOS-DE-FALLO-HEIMDALL.md`: una entrada por fallo, con su evidencia.
+  15 de 16 resueltos o sin sentido aquí. **Solo queda F-12**: corregir con
+  clave SSH en vez de contraseña, que ya era la tarea T023.
+- Comprobado en vivo: un examen con una palabra mal escrita se para antes de
+  tocar ninguna máquina y dice fichero y línea; sin fichero de aula no se
+  inventa ningún alumno.
+- `make check` (163 tests) y la suite de la GUI (352) verdes. Los tests que
+  piden el laboratorio podman no se ejecutaron.
 
 ## Problemas conocidos
 
@@ -33,4 +35,5 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Siguiente tarea recomendada
 
-**T070** o **T080** (P1, sin paquete). T023 queda como P2.
+**T082** (auditoría de secretos, tarea sola) o **T070** (exámenes del curso en
+formato nativo). T023 sigue siendo P2, pero es el único modo de fallo abierto.

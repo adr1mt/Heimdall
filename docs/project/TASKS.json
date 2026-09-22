@@ -1282,7 +1282,7 @@
       "id": "T080",
       "title": "Hardening, auditoria de secretos y release",
       "phase": 9,
-      "status": "READY",
+      "status": "DROPPED",
       "priority": "P1",
       "depends_on": [
         "T060",
@@ -1300,7 +1300,111 @@
         "un examen real de aula corregido con Heimdall, motor y GUI"
       ],
       "tests": [],
-      "notes": "La comparacion nota a nota con Teuton se retira: ya no hay dos motores que comparar (ADR-0016). Detallar al llegar."
+      "notes": "La comparacion nota a nota con Teuton se retira: ya no hay dos motores que comparar (ADR-0016). Detallar al llegar. Dividida el 22-09-2026 en T081 (revision de los 16 modos de fallo), T082 (auditoria de secretos de extremo a extremo), T083 (documentacion de usuario y versionado) y T084 (examen real de aula). No se implementa como tarea unica."
+    },
+    {
+      "id": "T081",
+      "title": "Revision de los 16 modos de fallo de Teuton sobre Heimdall",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T060",
+        "T072"
+      ],
+      "goal": "Dejar por escrito, con evidencia, que hace Heimdall con cada uno de los 16 fallos documentados: corregido, no aplicable o aceptado con su motivo.",
+      "scope": [
+        "Un documento en docs/ con una fila por modo de fallo y su evidencia",
+        "Evidencia = test ejecutable, ADR o regla; nada 'a ojo'",
+        "Los que queden abiertos se anotan como tarea nueva en TASKS.json"
+      ],
+      "out_of_scope": [
+        "Implementar lo que falte: eso sale como tarea propia",
+        "Reauditar Teuton: docs/research es historico"
+      ],
+      "acceptance": [
+        "Cada F-01..F-16 tiene estado y evidencia nombrada",
+        "Los tests citados existen y pasan"
+      ],
+      "tests": [
+        "make check verde con los tests citados"
+      ],
+      "notes": "Primera parte de T080. Resultado en docs/MODOS-DE-FALLO-HEIMDALL.md (22-09-2026). Solo F-12 queda abierto, y es T023."
+    },
+    {
+      "id": "T082",
+      "title": "Auditoria de secretos de extremo a extremo, motor y GUI",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [
+        "T081"
+      ],
+      "goal": "Comprobar sobre un proceso vivo que la contrasena del aula no aparece en ningun sitio observable.",
+      "scope": [
+        "grep del valor en var/, informes, logs, eventos NDJSON y /proc/<pid>/cmdline con el proceso vivo",
+        "Recorrido GUI: casilla, almacen cifrado, stdin del motor, artefacto y exportaciones",
+        "Resultado anotado en el documento de T081"
+      ],
+      "out_of_scope": [
+        "Cambiar ADR-0009"
+      ],
+      "acceptance": [
+        "Cero coincidencias en todos los puntos comprobados, con el proceso vivo"
+      ],
+      "tests": [
+        "test/secrets.sh"
+      ],
+      "notes": "Segunda parte de T080. Toca secretos: tarea sola, sin encadenar."
+    },
+    {
+      "id": "T083",
+      "title": "Documentacion de usuario y versionado para la publicacion",
+      "phase": 9,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T081",
+        "T082"
+      ],
+      "goal": "Que otro profesor pueda instalar Heimdall y corregir un examen sin preguntar nada.",
+      "scope": [
+        "Guia de instalacion y primer examen",
+        "Version y notas de la version",
+        "README al dia"
+      ],
+      "out_of_scope": [
+        "Windows y macOS: el paquete es Linux x64"
+      ],
+      "acceptance": [
+        "Un profesor que no conoce el proyecto llega de la instalacion a una nota siguiendo solo la guia"
+      ],
+      "tests": [],
+      "notes": "Tercera parte de T080."
+    },
+    {
+      "id": "T084",
+      "title": "Corregir un examen real de aula con Heimdall",
+      "phase": 9,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T070",
+        "T083"
+      ],
+      "goal": "La prueba final: un examen del curso corregido de principio a fin con motor y GUI.",
+      "scope": [
+        "Ejecucion real con las maquinas del aula",
+        "Lo que falle se anota como tarea"
+      ],
+      "out_of_scope": [
+        "Comparar nota a nota con Teuton: ya no hay dos motores (ADR-0016)"
+      ],
+      "acceptance": [
+        "Un examen real corregido, con sus notas, sin intervencion manual"
+      ],
+      "tests": [],
+      "notes": "Cuarta parte de T080. La ejecuta Adria: necesita aula y alumnado reales."
     },
     {
       "id": "T061",

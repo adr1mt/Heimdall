@@ -1,5 +1,7 @@
 # Modos de fallo de Teuton
 
+> Qué hace Heimdall con cada uno de estos fallos: [docs/MODOS-DE-FALLO-HEIMDALL.md](../MODOS-DE-FALLO-HEIMDALL.md).
+
 Ordenados por daño a la nota. **[PRUEBA]** = reproducido; **[CÓDIGO]** =
 inferido leyendo el código.
 

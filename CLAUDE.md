@@ -30,6 +30,7 @@ descanso.
 | Especificaciones de detalle | [docs/design/](docs/design/) |
 | Contrato motor ↔ GUI | [docs/design/09-CONTRATO-GUI.md](docs/design/09-CONTRATO-GUI.md) |
 | Evidencia del sistema viejo | [docs/research/](docs/research/) |
+| Los 16 modos de fallo, revisados | [docs/MODOS-DE-FALLO-HEIMDALL.md](docs/MODOS-DE-FALLO-HEIMDALL.md) |
 
 Prioridad ante contradicciones: **ADR aceptado > `docs/design/` > `docs/research/`**.
 `docs/research/` es histórico: no se reaudita Teuton salvo que una tarea lo pida.
