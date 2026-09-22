@@ -178,4 +178,6 @@ export interface HeimdallApi {
   /** Subscribes to the stream. Returns the unsubscribe function. */
   onRunEvent: (listener: (event: EngineEvent) => void) => () => void
   onRunClosed: (listener: (closed: RunClosed) => void) => () => void
+  /** A new version is on disk; it installs itself when the teacher closes. */
+  onUpdateReady: (listener: (version: string) => void) => () => void
 }

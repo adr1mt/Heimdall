@@ -2044,7 +2044,7 @@
       "title": "Actualizacion automatica que nunca interrumpe",
       "phase": 6,
       "package": "P5",
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [
         "T072"

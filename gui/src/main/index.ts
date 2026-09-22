@@ -2,6 +2,7 @@ import { app, BrowserWindow, session, shell } from 'electron'
 import { join } from 'node:path'
 import { allowQuit, guardClose } from './close-guard'
 import { registerIpc } from './ipc'
+import { applyPendingUpdate, startUpdates } from './update-service'
 
 // Avoids the compositor/GPU hangs that are common on Linux (the usual cause
 // of "the window is not responding"). The app is light and needs no HW
@@ -73,6 +74,7 @@ function createWindow(): void {
   win.on('ready-to-show', () => win.show())
 
   guardClose(win)
+  startUpdates(win)
 
   // Open external links in the system browser, safe schemes only.
   const isSafeExternal = (url: string): boolean => /^(https?|mailto):/i.test(url)
@@ -98,6 +100,10 @@ function createWindow(): void {
 }
 
 app.on('before-quit', allowQuit)
+
+// The only moment at which replacing the program cannot interrupt anything:
+// the windows are gone and nothing is being corrected.
+app.on('will-quit', applyPendingUpdate)
 
 // A single instance: the state of a run lives in this process's memory, and
 // two windows would overwrite each other's reports. The second one exits

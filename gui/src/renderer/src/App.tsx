@@ -3,6 +3,7 @@ import {
   AlertTriangle,
   BarChart3,
   CheckCircle2,
+  Download,
   FolderOpen,
   HelpCircle,
   History as HistoryIcon,
@@ -69,6 +70,13 @@ function AppBody() {
   // history: those sections are disabled, not hidden (lib/nav).
   const hasProject = useApp((s) => s.project !== null)
   const projector = useApp((s) => s.projector)
+  const update = useApp((s) => s.update)
+  const setUpdate = useApp((s) => s.setUpdate)
+
+  // A version waiting to be installed is news, not an interruption: it lands
+  // on a line that can be dismissed and nothing else happens until the
+  // teacher closes the application.
+  useEffect(() => window.heimdall.onUpdateReady(setUpdate), [setUpdate])
 
   useEffect(() => {
     window.heimdall
@@ -212,6 +220,23 @@ function AppBody() {
       <main className="flex flex-1 flex-col overflow-hidden bg-background">
         {/* Sin barra lateral hay que poder salir igual, y con una sola acción. */}
         {projector && <ProjectorExit />}
+        {update && !projector && (
+          <div
+            role="status"
+            className="flex shrink-0 items-start gap-2 border-b border-border bg-muted px-4 py-2 text-sm text-muted-foreground"
+          >
+            <Download className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+            <span className="min-w-0 flex-1">{t.update.ready(update)}</span>
+            <button
+              type="button"
+              onClick={() => setUpdate(null)}
+              className="rounded p-0.5 hover:bg-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label={t.update.dismiss}
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
         {notice && (
           <div
             role="alert"

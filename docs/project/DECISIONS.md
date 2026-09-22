@@ -647,3 +647,24 @@ Dos decisiones menores:
    ese formato el criterio no tiene objeto.
 4. **`HEIMDALL_SECRET_TEST_12345`**: el secreto del laboratorio llevaba nombre
    de Teuton. Solo era un nombre, pero no queda ninguno.
+
+## T114 · La actualización automática
+
+1. **Sin `electron-updater`.** La política entera —cuándo se puede preguntar,
+   qué se acepta como versión, cuándo se instala— cabe en un módulo propio que
+   no importa electron y que los tests ejecutan sin red. Una dependencia que
+   trae su propio calendario de comprobaciones y sus propios diálogos habría
+   sido más código, no menos, y ninguno de ellos bajo control.
+2. **Solo el AppImage se actualiza solo.** El `.deb` es de apt y el aula no
+   tiene que elegir entre dos mecanismos. Sin AppImage no se pide nada a la
+   red: la comprobación ni siquiera empieza.
+3. **La red se pregunta una vez, un minuto después de abrir.** Ese minuto es
+   el más ocupado de la hora y la comprobación va detrás; además da tiempo a
+   encender el modo examen, que la cancela antes de la primera petición.
+4. **Solo versiones `1.2.3` y solo del repositorio del proyecto.** Una versión
+   de pruebas no se instala sola en una máquina de aula, y una descarga que
+   apunte fuera de las releases de Heimdall no es una actualización.
+5. **Un fallo es una línea de registro.** Sin red, sin permisos o con la
+   respuesta rota, la aplicación arranca igual y no aparece ningún diálogo
+   delante de la clase. El aviso de que hay versión nueva tampoco sale en el
+   proyector.

@@ -538,6 +538,11 @@ export const t = {
     toLight: 'Tema claro',
     toDark: 'Tema oscuro'
   },
+  update: {
+    ready: (version: string): string =>
+      `Heimdall ${version} está descargada. Se instalará sola al cerrar la aplicación.`,
+    dismiss: 'Cerrar aviso'
+  },
   errors: {
     viewTitle: 'Esta vista no se pudo mostrar',
     appTitle: 'La aplicación no se pudo mostrar',

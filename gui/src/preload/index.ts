@@ -46,7 +46,8 @@ const api: HeimdallApi = {
   listClasses: () => ipcRenderer.invoke(IPC.listClasses),
   saveClasses: (classes) => ipcRenderer.invoke(IPC.saveClasses, classes),
   onRunEvent: (listener) => subscribe<EngineEvent>(IPC.runEvent, listener),
-  onRunClosed: (listener) => subscribe<RunClosed>(IPC.runClosed, listener)
+  onRunClosed: (listener) => subscribe<RunClosed>(IPC.runClosed, listener),
+  onUpdateReady: (listener) => subscribe<string>(IPC.updateReady, listener)
 }
 
 contextBridge.exposeInMainWorld('heimdall', api)

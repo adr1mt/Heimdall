@@ -30,5 +30,7 @@ export const IPC = {
   saveClasses: 'classes:save',
   // Pushed from the main process while a run is alive.
   runEvent: 'run:event',
-  runClosed: 'run:closed'
+  runClosed: 'run:closed',
+  // A new version is downloaded and waiting for the application to close.
+  updateReady: 'update:ready'
 } as const

@@ -36,6 +36,12 @@ interface AppState {
   /** One operational notice on screen, or null. */
   notice: string | null
   /**
+   * The version that is downloaded and waiting for the application to close,
+   * or null. It is news, not a problem: it changes nothing and it is never
+   * shown on the projector.
+   */
+  update: string | null
+  /**
    * The scale the teacher marks in. It only affects what is exported: the
    * artifact keeps the engine's 0-100 whatever this says.
    */
@@ -76,6 +82,7 @@ interface AppState {
   setProject: (project: OpenProject | null) => void
   setClassId: (id: string | null) => void
   setNotice: (message: string | null) => void
+  setUpdate: (version: string | null) => void
   setScale: (scale: ScaleId) => void
   setPassMark: (mark: number) => void
   setRetry: (retry: RetryRequest | null) => void
@@ -156,6 +163,7 @@ export const useApp = create<AppState>((set, get) => ({
   project: null,
   classId: savedClassId,
   notice: null,
+  update: null,
   scale: savedScale,
   passMark: savedPassMark,
   retry: null,
@@ -192,6 +200,7 @@ export const useApp = create<AppState>((set, get) => ({
     set({ classId })
   },
   setNotice: (notice) => set({ notice }),
+  setUpdate: (update) => set({ update }),
   setScale: (scale) => {
     localStorage.setItem('heimdall-scale', scale)
     set({ scale })
