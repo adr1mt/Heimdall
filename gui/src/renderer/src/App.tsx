@@ -34,6 +34,7 @@ const ClassesView = lazy(() => import('./routes/Classes'))
 const CorrectView = lazy(() => import('./routes/Correct'))
 const EditorView = lazy(() => import('./routes/Editor'))
 const AnalyticsView = lazy(() => import('./routes/Analytics'))
+const ProjectorView = lazy(() => import('./routes/Projector'))
 
 const ICONS: Record<View, typeof Home> = {
   home: Home,
@@ -68,6 +69,7 @@ function AppBody() {
   // Without an exam open there is nothing to correct, no results and no
   // history: those sections are disabled, not hidden (lib/nav).
   const hasProject = useApp((s) => s.project !== null)
+  const projector = useApp((s) => s.projector)
 
   useEffect(() => {
     window.heimdall
@@ -129,6 +131,18 @@ function AppBody() {
     }, 1000)
     return () => clearInterval(timer)
   }, [])
+
+  // Projector mode replaces the whole application, sidebar and menus
+  // included: what is on the wall is the class and nothing else (T111). It is
+  // returned AFTER the hooks above on purpose —the event stream and the exam
+  // timer live in them, and projecting must not interrupt a correction.
+  if (projector) {
+    return (
+      <Suspense fallback={<div className="h-full w-full bg-background" />}>
+        <ProjectorView />
+      </Suspense>
+    )
+  }
 
   const views: Record<View, JSX.Element> = {
     home: <HomeView />,

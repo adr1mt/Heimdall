@@ -261,44 +261,37 @@ app.whenReady().then(async () => {
     }
   }
 
-  // P-1: on the projector, no machine address anywhere on the screen.
+  // P: the projector. It replaces the whole application (T111), so what is
+  // checked is not that machine data got covered but that none of it is on
+  // the wall in the first place: the board is built from the name, the
+  // progress, the state and the grade, and a machine is not one of them.
   await js(`[...document.querySelectorAll('aside button')].find(b => b.textContent.trim() === 'Resultados').click()`)
   await wait(600)
   await js(`[...document.querySelectorAll('aside button')].find(b => b.textContent.trim() === 'Modo proyector').click()`)
-  await wait(400)
-  // Open a check, which is where the command, the output and the technical
-  // reason live. The last one belongs to the student whose machine never
-  // answered: there the reason names the machine and there is no command to
-  // read it from (T066).
-  //
-  // It is opened from «Matriz»: that is the view with one cell per check, and
-  // the one the class is looking at while the exam runs. «Lista» is the
-  // student-by-student reading and has no cell to click (T118).
-  await js(`[...document.querySelectorAll('main button')].find(b => b.textContent.trim() === 'Matriz').click()`)
   await wait(600)
-  // A cell shows the glyph of its state —that is what reads from the back
-  // row— and carries who and which check in its aria-label. The one that is
-  // wanted is unevaluated: there the reason names the machine and there is no
-  // command to read it from.
-  const opened = await js(`(() => {
-    const cells = [...document.querySelectorAll('main button[aria-label]')]
-      .filter(b => /: Sin evaluar$/.test(b.getAttribute('aria-label')))
-    const cell = cells[cells.length - 1]
-    if (cell) cell.click()
-    return !!cell
-  })()`)
-  await wait(500)
   const projected = await screen()
   if (process.env.DUMP === '1') {
     console.log('----- pantalla proyectada -----')
     console.log(projected)
     console.log('-------------------------------')
   }
-  check('P-0', opened === true, 'el detalle técnico de una comprobación se abre')
+  const sidebar = await js(`document.querySelectorAll('aside').length`)
+  check('P-0', sidebar === 0, `barras laterales y menús en pantalla: ${sidebar}`)
   check('P-1', !/\b\d{1,3}(\.\d{1,3}){3}\b/.test(projected), 'ninguna dirección IP en pantalla')
-  check('P-2', projected.includes('•'), 'la máquina aparece tapada')
+  check(
+    'P-2',
+    !/ssh |@|stdout|stderr|Orden enviada/i.test(projected),
+    'ni órdenes, ni usuarios, ni salida de las máquinas'
+  )
   const big = await js(`getComputedStyle(document.documentElement).fontSize`)
   check('P-3', big === '20px', `tamaño de letra proyectada: ${big}`)
+  check('P-4', /FINALIZADO|Esperando|Corrigiendo/.test(projected), 'cada alumno lleva su estado')
+
+  // P-5: se sale con una sola acción, y la aplicación vuelve entera.
+  await js(`document.dispatchEvent && window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))`)
+  await wait(500)
+  const backSidebar = await js(`document.querySelectorAll('aside').length`)
+  check('P-5', backSidebar === 1, 'Esc devuelve la aplicación completa')
 
   // C-1: closing with the exam on asks, and «Seguir corrigiendo» keeps it open.
   closeAnswer = 0
