@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import {
-  SCALES,
   gradeRows,
   moodleCsv,
   moodleCsvName,
   moodleRows,
   moodleSummary
 } from '../src/renderer/src/lib/export'
+import { SCALES } from '../src/renderer/src/lib/scale'
 import type { RunResult } from '../src/shared/artifact'
 import type { Score } from '../src/shared/events'
 
@@ -62,9 +62,9 @@ describe('exportación a Moodle', () => {
 
   it('la nota es la misma que se ve en pantalla, en la escala del profesor', () => {
     const lines = moodleCsv(moodleRows(rows())).split('\r\n')
-    expect(lines[1]).toBe('Alumna Uno;uno@elpuig.cat;8,0')
+    expect(lines[1]).toBe('Alumna Uno;uno@elpuig.cat;6,7')
     expect(moodleCsv(moodleRows(gradeRows(RUN, SCALES.hundred))).split('\r\n')[1]).toBe(
-      'Alumna Uno;uno@elpuig.cat;80'
+      'Alumna Uno;uno@elpuig.cat;67'
     )
   })
 

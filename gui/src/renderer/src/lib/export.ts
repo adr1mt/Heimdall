@@ -3,6 +3,7 @@ import type { AcademicStatus, Score, StudentStatus } from '../../../shared/event
 import type { Consolidation } from '../../../shared/consolidation'
 import type { Session } from '../../../shared/session'
 import { dateText } from './results'
+import { toScale, type Scale } from './scale'
 import { SESSION_STATUS_TEXT } from './session'
 
 /**
@@ -15,42 +16,6 @@ import { SESSION_STATUS_TEXT } from './session'
  * artifact is read and never written, so exporting cannot change a single
  * grade on disk.
  */
-
-/** A scale the teacher marks in. */
-export interface Scale {
-  id: ScaleId
-  /** What it is called on screen. */
-  label: string
-  /** The top mark. */
-  max: number
-  /** Decimals the mark is written with. */
-  decimals: number
-}
-
-export type ScaleId = 'ten' | 'hundred'
-
-/**
- * The two scales in use. There is no free-form scale: an arbitrary maximum
- * invites a conversion nobody can check afterwards, and these are the two the
- * marks are actually recorded in.
- */
-export const SCALES: Record<ScaleId, Scale> = {
-  ten: { id: 'ten', label: '0 a 10', max: 10, decimals: 1 },
-  hundred: { id: 'hundred', label: '0 a 100', max: 100, decimals: 0 }
-}
-
-export const DEFAULT_SCALE: ScaleId = 'ten'
-
-export function scaleOf(id: string | null | undefined): Scale {
-  return id === 'hundred' ? SCALES.hundred : SCALES.ten
-}
-
-/** The engine's 0-100 in the teacher's scale, written as it is marked. */
-export function toScale(score100: number, scale: Scale): string {
-  const factor = 10 ** scale.decimals
-  const value = Math.round((score100 * scale.max) / 100 * factor) / factor
-  return value.toFixed(scale.decimals).replace('.', ',')
-}
 
 /** One line of the export: a student, with a grade or with the reason there is none. */
 export interface GradeRow {

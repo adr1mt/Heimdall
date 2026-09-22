@@ -152,7 +152,7 @@ export const t = {
     none: 'Todavía no hay ninguna corrección abierta.',
     noneHint: 'Corrige una clase, o abre una corrección del histórico.',
     distribution: 'Cómo va el grupo',
-    band: (from: number, to: number) => `${from}–${to === 101 ? 100 : to - 1}`,
+    band: (from: string, to: string) => `${from}–${to}`,
     ungraded: (students: number) =>
       students === 1 ? '1 alumno sin nota' : `${students} alumnos sin nota`,
     ungradedHint: 'Su máquina no respondió a todo. No cuentan como un cero.',
@@ -333,7 +333,7 @@ export const t = {
     kpiPassedHint: (graded: number, students: number) =>
       `${graded} de ${students} alumnos con nota final`,
     kpiAverage: 'Nota media',
-    kpiAverageHint: (mark: number) => `Aprobado a partir de ${mark} sobre 100`,
+    kpiAverageHint: (pass: string, max: number) => `Aprobado a partir de ${pass} sobre ${max}`,
     kpiAttention: 'Requieren atención',
     kpiAttentionHint: 'Avería técnica primero, después quien va por debajo',
     kpiNoGrades: 'Todavía sin ninguna nota final',
@@ -468,11 +468,12 @@ export const t = {
     engineSection: 'Motor de corrección',
     scaleSection: 'Escala de las notas',
     scaleHint:
-      'Con qué escala se escriben las notas al exportarlas. La corrección guardada no cambia: el motor siempre calcula sobre 100 y la conversión es solo para la hoja que te llevas.',
-    scaleExample: (example: string) => `Un 87 sobre 100 se exporta como ${example}.`,
+      'Con qué escala se escriben las notas, en pantalla y al exportarlas. La corrección guardada no cambia: el motor siempre calcula sobre 100 y la conversión es solo para leerlas.',
+    scaleExample: (example: string) => `Un 87 del motor se escribe como ${example}.`,
     passSection: 'Marca de aprobado',
+    passExample: (example: string) => `Ahí está el aprobado: se escribe como un ${example}.`,
     passHint:
-      'Desde qué nota, sobre las 100 que publica el motor, se cuenta a un alumno como aprobado. Solo afecta a lo que resume la pantalla: ninguna nota cambia.',
+      'Desde qué puntuación, sobre las 100 que publica el motor, se cuenta a un alumno como aprobado. Es también donde cae el aprobado en la escala: lo que marques aquí es el 5. Ninguna nota del motor cambia.',
     passLabel: 'Aprobado a partir de',
     aboutSection: 'Acerca de',
     about:

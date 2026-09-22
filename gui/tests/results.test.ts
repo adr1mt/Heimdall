@@ -19,6 +19,7 @@ import {
   truncationNote,
   NO_FILTERS
 } from '../src/renderer/src/lib/results'
+import { SCALES } from '../src/renderer/src/lib/scale'
 import type { Score } from '../src/shared/events'
 
 /** The engine's own enums, so a cause added there fails here and not in class. */
@@ -69,14 +70,17 @@ function score(partial: Partial<Score>): Score {
 describe('scoreView', () => {
   it('publica la nota final solo cuando está todo evaluado', () => {
     const view = scoreView(
-      score({ obtained: 6, evaluable: 6, unevaluated: 0, provisional_score: 100, final_score: 100, status: 'COMPLETE' })
+      score({ obtained: 6, evaluable: 6, unevaluated: 0, provisional_score: 100, final_score: 100, status: 'COMPLETE' }),
+      SCALES.ten
     )
-    expect(view).toMatchObject({ value: 100, kind: 'final' })
+    // El motor publica 100; el profesor lee un 10.
+    expect(view).toMatchObject({ value: 100, text: '10,0', kind: 'final' })
   })
 
   it('un incompleto enseña la provisional, dicha como provisional, y nunca una final', () => {
     const view = scoreView(
-      score({ obtained: 4, evaluable: 5, unevaluated: 1, provisional_score: 80, final_score: null, status: 'INCOMPLETE' })
+      score({ obtained: 4, evaluable: 5, unevaluated: 1, provisional_score: 80, final_score: null, status: 'INCOMPLETE' }),
+      SCALES.ten
     )
     expect(view.kind).toBe('provisional')
     expect(view.value).toBe(80)
@@ -86,13 +90,13 @@ describe('scoreView', () => {
   })
 
   it('un alumno al que no se pudo llegar no saca un 0: no saca nota', () => {
-    const view = scoreView(score({ status: 'NOT_EVALUATED' }))
+    const view = scoreView(score({ status: 'NOT_EVALUATED' }), SCALES.ten)
     expect(view.value).toBeNull()
     expect(view.kind).toBe('none')
   })
 
   it('un alumno excluido tampoco saca nota', () => {
-    expect(scoreView(score({ status: 'EXCLUDED' })).value).toBeNull()
+    expect(scoreView(score({ status: 'EXCLUDED' }), SCALES.ten).value).toBeNull()
   })
 })
 

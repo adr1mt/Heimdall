@@ -8,6 +8,7 @@ import type {
   Stream,
   StudentResult
 } from '../../../shared/artifact'
+import { toScale, type Scale } from './scale'
 
 /**
  * The technical axis in words the teacher can act on. Every cause of the model
@@ -54,8 +55,16 @@ export const REMOTE_TEXT: Record<RemoteProcess, string | null> = {
 
 /** How a grade is allowed to be shown. */
 export interface ScoreView {
-  /** The number, or null when there is none to show. */
+  /** The engine's number over 100, or null when there is none to show. */
   value: number | null
+  /**
+   * That same grade written in the teacher's scale, ready for the screen.
+   *
+   * The screen shows this and never `value`: the teacher marks out of ten and
+   * reads these numbers out loud in front of a class. `value` stays for what
+   * has to compare against the pass mark, which is set over the engine's 100.
+   */
+  text: string
   /** What that number is. `none` means there is no grade at all. */
   kind: 'final' | 'provisional' | 'none'
   /** The sentence that goes with it, always. */
@@ -70,24 +79,26 @@ export interface ScoreView {
  * student nobody could reach gets no number at all, because a 0 would read as
  * "did it wrong" instead of "we could not look" (principio 3).
  */
-export function scoreView(score: Score): ScoreView {
+export function scoreView(score: Score, scale: Scale): ScoreView {
   switch (score.status) {
     case 'COMPLETE':
       return {
         value: score.final_score,
+        text: score.final_score === null ? '' : toScale(score.final_score, scale),
         kind: 'final',
         note: `sobre ${score.total} de peso, todo evaluado`
       }
     case 'INCOMPLETE':
       return {
         value: score.provisional_score,
+        text: score.provisional_score === null ? '' : toScale(score.provisional_score, scale),
         kind: 'provisional',
         note: `sobre lo evaluado (${score.evaluable} de ${score.total}); falta ${score.unevaluated} por comprobar`
       }
     case 'NOT_EVALUATED':
-      return { value: null, kind: 'none', note: 'no se pudo evaluar nada de este alumno' }
+      return { value: null, text: '', kind: 'none', note: 'no se pudo evaluar nada de este alumno' }
     case 'EXCLUDED':
-      return { value: null, kind: 'none', note: 'excluido del examen' }
+      return { value: null, text: '', kind: 'none', note: 'excluido del examen' }
   }
 }
 

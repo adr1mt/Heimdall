@@ -2098,6 +2098,183 @@
         "gui/tests/run.test.ts: el sobre de un aula sin contrasenas"
       ],
       "notes": "Encontrado el 2026-09-21 probando el modo examen de T105 contra el cuestionario (testdata/cuestionario, sin hosts): «heimdall run: los secretos de stdin no traen ninguna clave en \"secrets\"», exit 2. Afecta igual a Corregir. Toca secretos y el contrato motor-GUI: una tarea por sesion, sin encadenar."
+    },
+    {
+      "id": "T119",
+      "title": "Las notas se leen en la escala del profesor y el aprobado es el 5",
+      "phase": 6,
+      "status": "DONE",
+      "priority": "P0",
+      "depends_on": [],
+      "goal": "Que la aplicacion escriba las notas como las escribe un profesor: de 0 a 10, con el aprobado justo en el 5.",
+      "scope": [
+        "La conversion 0-100 -> escala del profesor pasa por (0,0), (marca de aprobado, mitad) y (100, maximo)",
+        "La marca de aprobado por defecto es 70, que es el 5 (Adria, 22-09-2026)",
+        "La escala se usa en pantalla, no solo al exportar: Resultados, Corregir, Analiticas y la cadena"
+      ],
+      "out_of_scope": [
+        "Tocar el motor: sigue publicando 0-100 y los numeros crudos (architecture.md 8)",
+        "Reordenar Analiticas o Resultados: va en su propia tarea"
+      ],
+      "acceptance": [
+        "La marca de aprobado que elija el profesor se escribe siempre como la mitad de la escala",
+        "Ninguna pantalla ensena ya el 0-100 del motor como si fuera la nota",
+        "El artefacto no cambia: la conversion no se guarda en ningun sitio"
+      ],
+      "tests": [
+        "gui/tests/export.test.ts: el aprobado cae en la mitad de la escala, y la marca arrastra la escala entera",
+        "gui/tests/results.test.ts: scoreView publica la nota ya convertida"
+      ],
+      "notes": "Sale de comparar Heimdall con teuton-gui delante de Adria (22-09-2026): teuton-gui ya convertia y Heimdall se habia quedado en los 100 puntos del motor."
+    },
+    {
+      "id": "T120",
+      "title": "Abrir la carpeta del examen desde Inicio",
+      "phase": 6,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "package": "P6",
+      "goal": "Que desde Inicio se pueda ir a donde esta el examen sin buscarlo a mano.",
+      "scope": [
+        "Un boton por proyecto que abre su carpeta en el gestor de archivos del sistema"
+      ],
+      "out_of_scope": [
+        "Abrir ficheros sueltos o editores externos"
+      ],
+      "acceptance": [
+        "Desde Inicio, un clic lleva al gestor de archivos abierto en la carpeta del examen"
+      ],
+      "tests": [
+        "gui/tests: el canal pide abrir la carpeta del proyecto y ninguna otra"
+      ],
+      "notes": "Pedido por Adria el 22-09-2026 comparando Inicio con teuton-gui."
+    },
+    {
+      "id": "T121",
+      "title": "Clases se ve sin entrar a editar, como en teuton-gui",
+      "phase": 6,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "package": "P6",
+      "goal": "Que el profesor vea una clase con un clic, no abriendo un modo edicion.",
+      "scope": [
+        "Lista de clases a la izquierda; al elegir una, se ve entera a la derecha",
+        "Editar sigue estando, pero deja de ser el camino para mirar"
+      ],
+      "out_of_scope": [
+        "Cambiar el modelo de clase (ADR-0021) ni el aula que sale de ella (ADR-0022)"
+      ],
+      "acceptance": [
+        "Con una clase elegida se ven sus alumnos y sus columnas sin pulsar «editar»"
+      ],
+      "tests": [
+        "gui/tests: elegir una clase la muestra sin ponerla en edicion"
+      ],
+      "notes": "Adria, 22-09-2026: «me gusta mas el clases de Teuton GUI»."
+    },
+    {
+      "id": "T122",
+      "title": "La pantalla Examenes dice que es",
+      "phase": 6,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "package": "P6",
+      "goal": "Que quede claro que «Examenes» ensena el examen abierto y no una lista de examenes.",
+      "scope": [
+        "Titulo y texto de la pantalla, y como se nombra en la barra lateral"
+      ],
+      "out_of_scope": [
+        "Anadir una biblioteca de examenes"
+      ],
+      "acceptance": [
+        "Al entrar se entiende, sin preguntar, de que examen se esta hablando"
+      ],
+      "tests": [
+        "gui/tests: el titulo nombra el examen abierto"
+      ],
+      "notes": "Adria, 22-09-2026: «pone examenes pero se abre el cuestionario de redes, no me queda claro»."
+    },
+    {
+      "id": "T123",
+      "title": "Corregir: la contrasena en cristiano y el modo examen a la vista",
+      "phase": 6,
+      "status": "READY",
+      "priority": "P0",
+      "depends_on": [],
+      "goal": "Que corregir se entienda sin saber como se llama una variable, y que el modo examen se vea como se veia en teuton-gui.",
+      "scope": [
+        "Pedir «la contrasena de las maquinas», no «AULA_PASSWORD»",
+        "Recuperar la tarjeta del modo examen: se guarda la mejor nota, de que vuelta sale y el intervalo",
+        "Los alumnos a evaluar, listados debajo"
+      ],
+      "out_of_scope": [
+        "Cambiar la politica de secretos (ADR-0009): la contrasena se sigue tecleando y no se guarda",
+        "Cambiar la sesion de examen (ADR-0020)"
+      ],
+      "acceptance": [
+        "En ningun sitio de Corregir aparece el nombre de una referencia del inventario",
+        "Con el modo examen encendido se ve, sin abrir nada, que se guarda la mejor nota y de que vuelta sale"
+      ],
+      "tests": [
+        "gui/tests: el texto que pide la contrasena no nombra ninguna referencia"
+      ],
+      "notes": "Adria, 22-09-2026. Toca secretos: tarea sola, sin encadenar."
+    },
+    {
+      "id": "T124",
+      "title": "Resultados vuelve al resumen de teuton-gui",
+      "phase": 6,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [
+        "T119"
+      ],
+      "package": "P6",
+      "goal": "Que al terminar una correccion se lea lo mismo que se leia en teuton-gui.",
+      "scope": [
+        "Repasar los tres numeros de cabecera y como se dicen",
+        "Explicar «bien / mal / sin evaluar» con palabras, no con etiquetas"
+      ],
+      "out_of_scope": [
+        "Tocar la matriz de OKs, que es lo que se proyecta"
+      ],
+      "acceptance": [
+        "Nadie tiene que preguntar que significa una etiqueta de la cabecera"
+      ],
+      "tests": [
+        "gui/tests: el resumen no ensena ninguna etiqueta sin su frase"
+      ],
+      "notes": "Adria, 22-09-2026."
+    },
+    {
+      "id": "T125",
+      "title": "Analiticas: solo lo que se mira",
+      "phase": 6,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [
+        "T119"
+      ],
+      "package": "P6",
+      "goal": "Dejar en Analiticas las tres cosas que el profesor mira de verdad.",
+      "scope": [
+        "Los objetivos mas fallados, tres o cuatro y no mas",
+        "La distribucion de notas",
+        "La tasa de exito por grupo"
+      ],
+      "out_of_scope": [
+        "«Como va el grupo» y «a quien atender primero»: se quitan"
+      ],
+      "acceptance": [
+        "Analiticas ensena esas tres cosas y ninguna mas"
+      ],
+      "tests": [
+        "gui/tests: la pantalla no monta las secciones retiradas"
+      ],
+      "notes": "Adria, 22-09-2026: «quiero la distribucion de notas y la tasa de exito, y ya esta»."
     }
   ]
 }

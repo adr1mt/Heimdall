@@ -1,5 +1,6 @@
 import type { Session, SessionStatus, SessionStudent } from '../../../shared/session'
 import { STUDENT_TEXT, dateText, scoreView } from './results'
+import type { Scale } from './scale'
 
 /**
  * An exam session, said in the teacher's words.
@@ -61,10 +62,10 @@ export function nextRoundText(student: SessionStudent): string | null {
 }
 
 /** One line per round: what it said about this student and whether it counts. */
-export function roundLines(student: SessionStudent): string[] {
+export function roundLines(student: SessionStudent, scale: Scale): string[] {
   return student.rounds.map((attempt) => {
-    const score = scoreView(attempt.score)
-    const grade = score.value == null ? 'sin nota' : `${score.value} sobre 100`
+    const score = scoreView(attempt.score, scale)
+    const grade = score.value == null ? 'sin nota' : `${score.text} sobre ${scale.max}`
     const counts = attempt.counts ? ' · es la que cuenta' : ''
     return `Vuelta ${attempt.round} (${dateText(attempt.finished_at)}): ${STUDENT_TEXT[attempt.status].toLowerCase()}, ${grade}${counts}.`
   })

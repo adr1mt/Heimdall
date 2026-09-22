@@ -1,6 +1,7 @@
+import { useMemo } from 'react'
 import { create } from 'zustand'
 import type { EngineStatus, OpenProject } from '../../../shared/types'
-import { DEFAULT_SCALE, type ScaleId } from '@/lib/export'
+import { DEFAULT_SCALE, markOf, scaleOf, type Scale, type ScaleId } from '@/lib/scale'
 import { DEFAULT_PASS_MARK } from '@/lib/summary'
 import {
   EXAM_OFF,
@@ -125,10 +126,12 @@ function readPassMark(saved: string | null): number {
   return clampMark(Number(saved))
 }
 
-/** A mark outside 0-100 is not a mark: the saved value is never trusted. */
+/**
+ * A mark outside 1-99 is not a mark: the saved value is never trusted. The
+ * limits are the scale's own, because this number is what anchors it.
+ */
 function clampMark(value: number): number {
-  if (!Number.isFinite(value)) return DEFAULT_PASS_MARK
-  return Math.min(100, Math.max(0, Math.round(value)))
+  return markOf(value)
 }
 
 /**
@@ -248,4 +251,18 @@ export function messageOf(error: unknown): string {
 /** Turns anything thrown into a sentence the teacher can read. */
 export function noticeFrom(prefix: string, error: unknown): string {
   return `${prefix}: ${messageOf(error)}`
+}
+
+/**
+ * The scale the teacher marks in, ready to hand to anything that writes a
+ * grade.
+ *
+ * It is one hook and not two reads because the top mark and the pass mark are
+ * one decision: a screen that took the scale and forgot the mark would put
+ * the 5 somewhere else than the report does, for the same student.
+ */
+export function useScale(): Scale {
+  const id = useApp((s) => s.scale)
+  const mark = useApp((s) => s.passMark)
+  return useMemo(() => scaleOf(id, mark), [id, mark])
 }

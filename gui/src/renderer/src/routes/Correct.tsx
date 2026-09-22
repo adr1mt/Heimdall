@@ -14,7 +14,7 @@ import {
   SegmentedItem,
   ViewHeader
 } from '@/components/ui'
-import { useApp, messageOf, noticeFrom } from '@/stores/app'
+import { useApp, useScale, messageOf, noticeFrom } from '@/stores/app'
 import { useClasses, groupById } from '@/stores/classes'
 import { groupLine, type ClassGroup } from '../../../shared/classes'
 import { useRun } from '@/stores/run'
@@ -29,8 +29,8 @@ import {
   sessionText
 } from '@/lib/session'
 import { scoreView } from '@/lib/results'
+
 import {
-  scaleOf,
   sessionCsv,
   sessionCsvName,
   sessionExportSummary,
@@ -579,6 +579,7 @@ function SessionPanel({
   problem: string | null
   loading: boolean
 }) {
+  const scale = useScale()
   if (rounds.length === 0) return null
 
   return (
@@ -617,7 +618,7 @@ function SessionPanel({
 
           <div className="space-y-2">
             {session.students.map((student) => {
-              const score = scoreView(student.score)
+              const score = scoreView(student.score, scale)
               const next = nextRoundText(student)
               return (
                 <div key={student.student_id} className="space-y-1 rounded-md border border-border p-3">
@@ -640,7 +641,7 @@ function SessionPanel({
                       {student.from_round === 0 ? (
                         <span className="text-sm text-muted-foreground">{t.results.noGrade}</span>
                       ) : (
-                        <span className="text-lg font-semibold tabular-nums">{score.value}</span>
+                        <span className="text-lg font-semibold tabular-nums">{score.text}</span>
                       )}
                       <span className="text-micro text-muted-foreground">
                         {fromRoundText(student)}
@@ -653,7 +654,7 @@ function SessionPanel({
                       {t.session.rounds}
                     </summary>
                     <div className="mt-1 space-y-0.5">
-                      {roundLines(student).map((line, index) => (
+                      {roundLines(student, scale).map((line, index) => (
                         <p key={index} className="text-micro text-muted-foreground">
                           {line}
                         </p>
@@ -672,10 +673,10 @@ function SessionPanel({
 
 /** The session's grades, in the file Moodle imports. */
 function SessionMoodleButton({ session }: { session: Session }) {
-  const scaleId = useApp((s) => s.scale)
+  const scale = useScale()
   return (
     <MoodleExportButton
-      rows={sessionGradeRows(session, scaleOf(scaleId))}
+      rows={sessionGradeRows(session, scale)}
       at={session.rounds[session.rounds.length - 1]?.finished_at ?? ''}
     />
   )
@@ -683,10 +684,9 @@ function SessionMoodleButton({ session }: { session: Session }) {
 
 /** The session's grades, out of the application, with the engine's numbers. */
 function SessionExportButton({ session }: { session: Session }) {
-  const scaleId = useApp((s) => s.scale)
+  const scale = useScale()
   const setNotice = useApp((s) => s.setNotice)
   const [confirm, setConfirm] = useState(false)
-  const scale = scaleOf(scaleId)
 
   async function save(): Promise<void> {
     setConfirm(false)

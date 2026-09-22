@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { Button, Input, SectionTitle, Segmented, SegmentedItem, ViewHeader } from '@/components/ui'
 import { useApp, noticeFrom } from '@/stores/app'
-import { SCALES, scaleOf, toScale, type ScaleId } from '@/lib/export'
+import { SCALES, scaleOf, toScale, type ScaleId } from '@/lib/scale'
 import { t } from '@/i18n/es'
 
 export default function SettingsView() {
@@ -97,20 +97,21 @@ export default function SettingsView() {
             ))}
           </Segmented>
           <p className="mt-2 text-xs text-muted-foreground">
-            {t.settings.scaleExample(toScale(87, scaleOf(scale)))}
+            {t.settings.scaleExample(toScale(87, scaleOf(scale, passMark)))}
           </p>
         </section>
 
-        {/* La marca de aprobado no toca ninguna nota: decide qué cuenta como
-            aprobado el resumen de la clase, y nada más. */}
+        {/* La marca de aprobado no cambia nada de lo que calculó el motor:
+            dice desde qué punto se cuenta a un alumno como aprobado y, con
+            eso, dónde cae el aprobado dentro de la escala del profesor. */}
         <section className="max-w-2xl">
           <SectionTitle hint={t.settings.passHint}>{t.settings.passSection}</SectionTitle>
           <label className="flex items-center gap-3">
             <span className="text-sm">{t.settings.passLabel}</span>
             <Input
               type="number"
-              min={0}
-              max={100}
+              min={1}
+              max={99}
               value={passMark}
               aria-label={t.settings.passLabel}
               onChange={(e) => setPassMark(Number(e.target.value))}
@@ -118,6 +119,9 @@ export default function SettingsView() {
             />
             <span className="text-sm text-muted-foreground">/ 100</span>
           </label>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {t.settings.passExample(toScale(passMark, scaleOf(scale, passMark)))}
+          </p>
         </section>
 
         <section className="max-w-2xl">

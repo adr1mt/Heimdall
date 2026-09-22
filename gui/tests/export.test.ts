@@ -1,15 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import {
-  DEFAULT_SCALE,
-  SCALES,
   csvName,
   exportSummary,
   gradeRow,
   gradeRows,
-  scaleOf,
-  toCsv,
-  toScale
+  toCsv
 } from '../src/renderer/src/lib/export'
+import { DEFAULT_PASS_MARK, DEFAULT_SCALE, SCALES, markOf, scaleOf, toScale } from '../src/renderer/src/lib/scale'
 import type { CheckResult, RunResult, StudentResult } from '../src/shared/artifact'
 import type { Score } from '../src/shared/events'
 
@@ -108,19 +105,34 @@ function run(students: StudentResult[]): RunResult {
 }
 
 describe('la escala del profesor', () => {
-  it('convierte el 0-100 del motor a la escala elegida', () => {
-    expect(toScale(90, SCALES.ten)).toBe('9,0')
-    expect(toScale(87, SCALES.ten)).toBe('8,7')
+  it('pone el aprobado justo en la mitad de la escala, no donde caiga', () => {
+    // Lo que el profesor da por aprobado es un 5, y de ahí sale todo lo demás.
+    expect(toScale(DEFAULT_PASS_MARK, SCALES.ten)).toBe('5,0')
     expect(toScale(0, SCALES.ten)).toBe('0,0')
     expect(toScale(100, SCALES.ten)).toBe('10,0')
-    expect(toScale(87, SCALES.hundred)).toBe('87')
+    // Por debajo del aprobado, repartido entre 0 y 5; por encima, entre 5 y 10.
+    expect(toScale(35, SCALES.ten)).toBe('2,5')
+    expect(toScale(85, SCALES.ten)).toBe('7,5')
+    expect(toScale(90, SCALES.ten)).toBe('8,3')
+  })
+
+  it('la marca que mueva el profesor arrastra la escala entera', () => {
+    const mitad = scaleOf('ten', 50)
+    expect(toScale(50, mitad)).toBe('5,0')
+    expect(toScale(90, mitad)).toBe('9,0')
+  })
+
+  it('una marca imposible no rompe la conversión', () => {
+    expect(markOf(0)).toBe(1)
+    expect(markOf(100)).toBe(99)
+    expect(markOf(Number.NaN)).toBe(DEFAULT_PASS_MARK)
   })
 
   it('por defecto se marca sobre 10 y una escala desconocida no inventa otra', () => {
     expect(DEFAULT_SCALE).toBe('ten')
-    expect(scaleOf(null)).toBe(SCALES.ten)
-    expect(scaleOf('lo-que-sea')).toBe(SCALES.ten)
-    expect(scaleOf('hundred')).toBe(SCALES.hundred)
+    expect(scaleOf(null)).toEqual(SCALES.ten)
+    expect(scaleOf('lo-que-sea')).toEqual(SCALES.ten)
+    expect(scaleOf('hundred')).toEqual(SCALES.hundred)
   })
 
   it('la conversión no toca el resultado del motor', () => {
@@ -137,7 +149,7 @@ describe('qué exporta cada alumno', () => {
     expect(gradeRow(evaluated, SCALES.ten)).toMatchObject({
       name: 'Alumna Uno',
       moodleId: '10234',
-      grade: '9,0',
+      grade: '8,3',
       note: '',
       pass: 1,
       fail: 1,
@@ -173,7 +185,7 @@ describe('el fichero de notas', () => {
   it('lleva una cabecera y una línea por alumno', () => {
     expect(lines).toHaveLength(5)
     expect(lines[0]).toBe('alumno;identificador;moodle;estado;nota;escala;observaciones;bien;mal;sin_evaluar')
-    expect(lines[1]).toBe('Alumna Uno;alu1;10234;Evaluado;9,0;10;;1;1;0')
+    expect(lines[1]).toBe('Alumna Uno;alu1;10234;Evaluado;8,3;10;;1;1;0')
   })
 
   it('lo abre una hoja de cálculo en español sin romper los acentos', () => {

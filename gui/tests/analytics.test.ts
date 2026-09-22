@@ -53,7 +53,8 @@ const broken = score({ status: 'INCOMPLETE', provisional_score: 100, evaluable: 
 /** Una clase con de todo: dos que van bien, una que suspende, una rota. */
 const CLASS = run([
   student('ana', 'Ana Ferrer', complete(90), [check('c1', 'PASS'), check('c2', 'PASS')]),
-  student('marc', 'Marc Oliva', complete(55), [check('c1', 'PASS'), check('c2', 'FAIL')]),
+  // 75 está por encima de la marca de aprobado: Marc es el que va justo pero pasa.
+  student('marc', 'Marc Oliva', complete(75), [check('c1', 'PASS'), check('c2', 'FAIL')]),
   student('laia', 'Laia Puig', complete(20), [check('c1', 'FAIL'), check('c2', 'FAIL')]),
   student(
     'noa',
@@ -72,7 +73,7 @@ describe('la distribución del grupo', () => {
     // La máquina caída no ha engordado la banda de abajo.
     expect(bands[0].students).toBe(0)
     expect(bands[1].students).toBe(1) // Laia, con 20
-    expect(bands[2].students).toBe(1) // Marc, con 55
+    expect(bands[3].students).toBe(1) // Marc, con 75
     expect(bands[4].students).toBe(1) // Ana, con 90
   })
 
@@ -100,7 +101,7 @@ describe('los números coinciden con los de Resultados', () => {
   })
 
   it('la nota que enseña es la que publicó el motor, sin recalcular nada', () => {
-    expect(CLASS.students.map(finalScore)).toEqual([90, 55, 20, null, 0])
+    expect(CLASS.students.map(finalScore)).toEqual([90, 75, 20, null, 0])
   })
 })
 

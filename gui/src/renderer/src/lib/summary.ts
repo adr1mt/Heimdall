@@ -1,4 +1,5 @@
 import type { RunResult, StudentResult } from '../../../shared/artifact'
+import { DEFAULT_PASS_MARK } from './scale'
 
 /**
  * How the class is doing, in the three numbers the teacher reads first.
@@ -25,8 +26,12 @@ export interface ClassSummary {
   attention: number
 }
 
-/** The pass mark, over the 0-100 the engine publishes. */
-export const DEFAULT_PASS_MARK = 50
+/**
+ * The pass mark lives with the scale it anchors: it is the same number that
+ * puts the 5 in the middle of «0 a 10», and two copies of it would eventually
+ * disagree.
+ */
+export { DEFAULT_PASS_MARK }
 
 function counts(student: StudentResult): boolean {
   return student.status !== 'EXCLUDED'

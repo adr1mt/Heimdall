@@ -1,6 +1,7 @@
 import { AlertTriangle, TrendingDown } from 'lucide-react'
 import { Badge, Card, CardContent, SectionTitle, ViewHeader } from '@/components/ui'
-import { useApp } from '@/stores/app'
+import { useApp, useScale } from '@/stores/app'
+import { toScale } from '@/lib/scale'
 import { useRun } from '@/stores/run'
 import { attentionList, distribution, failRate, failingChecks, type Attention } from '@/lib/analytics'
 import { t } from '@/i18n/es'
@@ -15,6 +16,7 @@ import { t } from '@/i18n/es'
 export default function AnalyticsView() {
   const artifact = useRun((s) => s.artifact)
   const passMark = useApp((s) => s.passMark)
+  const scale = useScale()
 
   if (!artifact) {
     return (
@@ -52,7 +54,10 @@ export default function AnalyticsView() {
                   style={{ height: `${(band.students / most) * 100}%`, minHeight: '2px' }}
                 />
                 <span className="text-micro text-muted-foreground">
-                  {t.analytics.band(band.from, band.to)}
+                  {t.analytics.band(
+                    toScale(band.from, scale),
+                    toScale(band.to === 101 ? 100 : band.to - 1, scale)
+                  )}
                 </span>
               </div>
             ))}
@@ -118,6 +123,7 @@ export default function AnalyticsView() {
  * and needs the opposite reaction (principio 3).
  */
 function AttentionRow({ entry }: { entry: Attention }) {
+  const scale = useScale()
   const broken = entry.reason === 'BROKEN'
   return (
     <Card className={broken ? 'border-warning/40' : undefined}>
@@ -141,7 +147,7 @@ function AttentionRow({ entry }: { entry: Attention }) {
         ) : (
           <>
             <Badge variant="secondary">{t.analytics.failing}</Badge>
-            <span className="font-mono text-sm">{entry.score}</span>
+            <span className="font-mono text-sm">{entry.score === null ? '—' : toScale(entry.score, scale)}</span>
           </>
         )}
       </CardContent>

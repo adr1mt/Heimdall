@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { GraduationCap } from 'lucide-react'
 import { Button, ConfirmDialog } from '@/components/ui'
-import { moodleCsv, moodleCsvName, moodleRows, moodleSummary, scaleOf } from '@/lib/export'
+import { moodleCsv, moodleCsvName, moodleRows, moodleSummary } from '@/lib/export'
+import { scaleOf } from '@/lib/scale'
 import { noticeFrom, useApp } from '@/stores/app'
 import { t } from '@/i18n/es'
 

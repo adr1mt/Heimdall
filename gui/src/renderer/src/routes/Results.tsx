@@ -14,7 +14,8 @@ import {
   Spinner,
   ViewHeader
 } from '@/components/ui'
-import { useApp, messageOf, noticeFrom } from '@/stores/app'
+import { useApp, useScale, messageOf, noticeFrom } from '@/stores/app'
+import { toScale } from '@/lib/scale'
 import { useRun } from '@/stores/run'
 import {
   CAUSE_TEXT,
@@ -44,9 +45,9 @@ import {
   gradeRows,
   csvName,
   exportSummary,
-  scaleOf,
   toCsv
 } from '@/lib/export'
+
 import { classSummary, needsAttention, shortName, type ClassSummary } from '@/lib/summary'
 import { buildMatrix, type MatrixRow } from '@/lib/matrix'
 import { attemptsText, chainTally, chainText, fromRunText } from '@/lib/chain'
@@ -175,7 +176,6 @@ export default function ResultsView() {
         {summary && (
           <KpiStrip
             summary={summary}
-            passMark={passMark}
             attentionOnly={attentionOnly}
             onAttention={() => setAttentionOnly((on) => !on)}
           />
@@ -281,15 +281,14 @@ export default function ResultsView() {
  */
 function KpiStrip({
   summary,
-  passMark,
   attentionOnly,
   onAttention
 }: {
   summary: ClassSummary
-  passMark: number
   attentionOnly: boolean
   onAttention: () => void
 }) {
+  const scale = useScale()
   return (
     <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3">
       <Reading
@@ -298,9 +297,13 @@ function KpiStrip({
         hint={t.results.kpiPassedHint(summary.graded, summary.students)}
       />
       <Reading
-        value={summary.average === null ? '—' : summary.average.toLocaleString('es-ES')}
+        value={summary.average === null ? '—' : toScale(summary.average, scale)}
         label={t.results.kpiAverage}
-        hint={summary.average === null ? t.results.kpiNoGrades : t.results.kpiAverageHint(passMark)}
+        hint={
+          summary.average === null
+            ? t.results.kpiNoGrades
+            : t.results.kpiAverageHint(toScale(scale.passMark, scale), scale.max)
+        }
       />
       <button
         type="button"
@@ -360,6 +363,7 @@ function MatrixView({
   selected: Selection | null
   onPick: (selection: Selection) => void
 }) {
+  const scale = useScale()
   const matrix = useMemo(() => buildMatrix(rows), [rows])
   const names = useMemo(() => {
     const taken: string[] = []
@@ -406,7 +410,7 @@ function MatrixView({
                 {t.results.matrixScore}
               </th>
               {matrix.students.map((student) => {
-                const score = scoreView(student.score)
+                const score = scoreView(student.score, scale)
                 return (
                   <td
                     key={student.student_id}
@@ -416,7 +420,7 @@ function MatrixView({
                       <span className="text-muted-foreground">—</span>
                     ) : (
                       <span className={score.kind === 'provisional' ? 'text-warning-strong' : ''}>
-                        {score.value}
+                        {score.text}
                       </span>
                     )}
                   </td>
@@ -551,10 +555,9 @@ function useMask(artifact: RunResult | null): (text: string) => string {
  */
 function ExportButton() {
   const artifact = useRun((s) => s.artifact)
-  const scaleId = useApp((s) => s.scale)
+  const scale = useScale()
   const setNotice = useApp((s) => s.setNotice)
   const [confirm, setConfirm] = useState(false)
-  const scale = scaleOf(scaleId)
 
   if (!artifact) return null
 
@@ -596,11 +599,11 @@ function ExportButton() {
 /** The same grades of this correction, in the file Moodle imports. */
 function RunMoodleButton() {
   const artifact = useRun((s) => s.artifact)
-  const scaleId = useApp((s) => s.scale)
+  const scale = useScale()
   if (!artifact) return null
   return (
     <MoodleExportButton
-      rows={gradeRows(artifact, scaleOf(scaleId))}
+      rows={gradeRows(artifact, scale)}
       at={artifact.finished_at}
     />
   )
@@ -667,7 +670,7 @@ function ChainPanel({ artifactPath }: { artifactPath: string | null }) {
 /** The class as the chain leaves it, student by student. */
 function ChainResult({ chain }: { chain: Consolidation }) {
   const counts = chainTally(chain)
-  const scaleId = useApp((s) => s.scale)
+  const scale = useScale()
   const [selected, setSelected] = useState<Selection | null>(null)
 
   const chosen = useMemo(() => {
@@ -687,14 +690,14 @@ function ChainResult({ chain }: { chain: Consolidation }) {
       <div className="flex flex-wrap gap-2">
         <ChainExportButton chain={chain} />
         <MoodleExportButton
-          rows={chainGradeRows(chain, scaleOf(scaleId))}
+          rows={chainGradeRows(chain, scale)}
           at={chain.runs[chain.runs.length - 1]?.finished_at ?? ''}
         />
       </div>
 
       <div className="space-y-2">
         {chain.students.map((student) => {
-          const score = scoreView(student.score)
+          const score = scoreView(student.score, scale)
           return (
             <div key={student.student_id} className="rounded-md border border-border p-3">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -707,7 +710,7 @@ function ChainResult({ chain }: { chain: Consolidation }) {
                     <span className="text-sm text-muted-foreground">{t.results.noGrade}</span>
                   ) : (
                     <>
-                      <span className="text-lg font-semibold tabular-nums">{score.value}</span>
+                      <span className="text-lg font-semibold tabular-nums">{score.text}</span>
                       {score.kind === 'provisional' && (
                         <span className="text-xs text-warning-strong">{t.results.provisional}</span>
                       )}
@@ -817,10 +820,9 @@ function ChainCheckDetail({
 
 /** The chain's grades, out of the application, with the rules of one correction. */
 function ChainExportButton({ chain }: { chain: Consolidation }) {
-  const scaleId = useApp((s) => s.scale)
+  const scale = useScale()
   const setNotice = useApp((s) => s.setNotice)
   const [confirm, setConfirm] = useState(false)
-  const scale = scaleOf(scaleId)
 
   async function save(): Promise<void> {
     setConfirm(false)
@@ -955,7 +957,8 @@ function StudentRow({
   onToggle: () => void
   onPick: (checkId: string) => void
 }) {
-  const score = scoreView(student.score)
+  const scale = useScale()
+  const score = scoreView(student.score, scale)
   const counts = tally(student.checks)
   // The technical reason is read without opening anything: a machine that did
   // not answer looks exactly like a student who did nothing, and the teacher
@@ -996,7 +999,7 @@ function StudentRow({
               )}
               title={score.note}
             >
-              {score.value}
+              {score.text}
             </span>
           )}
         </span>

@@ -4,7 +4,13 @@ import { parseConsolidation } from '../src/shared/consolidation'
 import type { Consolidation } from '../src/shared/consolidation'
 import type { Score } from '../src/shared/events'
 import { attemptsText, chainTally, chainText, fromRunText } from '../src/renderer/src/lib/chain'
-import { SCALES, chainCsv, chainExportSummary, chainGradeRows, chainCsvName } from '../src/renderer/src/lib/export'
+import {
+  chainCsv,
+  chainExportSummary,
+  chainGradeRows,
+  chainCsvName
+} from '../src/renderer/src/lib/export'
+import { SCALES } from '../src/renderer/src/lib/scale'
 
 function score(partial: Partial<Score>): Score {
   return {
@@ -223,7 +229,7 @@ describe('lo que se exporta de una cadena', () => {
   const rows = chainGradeRows(chain, SCALES.ten)
 
   it('el alumno que quedo entero entre dos correcciones sale con su nota final', () => {
-    expect(rows[0]).toMatchObject({ name: 'Alumna Uno', grade: '8,0', note: '' })
+    expect(rows[0]).toMatchObject({ name: 'Alumna Uno', grade: '6,7', note: '' })
   })
 
   it('el que sigue sin poder comprobarse sale sin nota y con el motivo', () => {
@@ -238,7 +244,7 @@ describe('lo que se exporta de una cadena', () => {
   it('el CSV lleva una linea por alumno y la nota solo de quien la tiene', () => {
     const lines = chainCsv(chain, SCALES.ten).trimEnd().split('\r\n')
     expect(lines).toHaveLength(3)
-    expect(lines[1]).toContain(';8,0;10;')
+    expect(lines[1]).toContain(';6,7;10;')
     expect(lines[2]).toContain(';;;sin nota')
   })
 

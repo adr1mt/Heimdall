@@ -11,13 +11,13 @@ import {
   sessionText
 } from '../src/renderer/src/lib/session'
 import {
-  SCALES,
   gradeRows,
   sessionCsv,
   sessionCsvName,
   sessionExportSummary,
   sessionGradeRows
 } from '../src/renderer/src/lib/export'
+import { SCALES } from '../src/renderer/src/lib/scale'
 import { runArgs } from '../src/main/run'
 import { parseArtifact } from '../src/shared/artifact'
 
@@ -165,7 +165,7 @@ describe('la sesión que enseña la pantalla', () => {
   })
 
   it('enseña lo que dijo cada vuelta, con la que cuenta señalada', () => {
-    const lines = roundLines(session.students[0])
+    const lines = roundLines(session.students[0], SCALES.ten)
     expect(lines).toHaveLength(4)
     expect(lines[2]).toContain('es la que cuenta')
     expect(lines[3]).not.toContain('es la que cuenta')
@@ -180,7 +180,7 @@ describe('la sesión que enseña la pantalla', () => {
 describe('lo que se exporta de una sesión', () => {
   it('lleva la nota del motor, en la escala del profesor, y de qué vuelta sale', () => {
     const rows = sessionGradeRows(session, SCALES.ten)
-    expect(rows[0]).toMatchObject({ name: 'Alumna Uno', grade: '9,0', round: '3', note: '' })
+    expect(rows[0]).toMatchObject({ name: 'Alumna Uno', grade: '8,3', round: '3', note: '' })
     expect(rows[1]).toMatchObject({ state: 'Terminado', grade: '10,0', round: '2' })
   })
 
@@ -201,7 +201,7 @@ describe('lo que se exporta de una sesión', () => {
     expect(csv.startsWith('﻿')).toBe(true)
     const lines = csv.trim().split('\r\n')
     expect(lines[0]).toBe('alumno;identificador;moodle;estado;nota;escala;vuelta;observaciones')
-    expect(lines[1]).toBe('Alumna Uno;alu1;m1;En curso;9,0;10;3;')
+    expect(lines[1]).toBe('Alumna Uno;alu1;m1;En curso;8,3;10;3;')
     expect(lines[3].split(';')[4]).toBe('')
   })
 })
@@ -265,7 +265,7 @@ describe('un alumno que va de 6 a 9 en cuatro vueltas', () => {
     expect(uno.rounds.map((r) => r.score.final_score)).toEqual([60, 70, 90, 80])
     expect(uno.score.final_score).toBe(90)
     expect(uno.from_round).toBe(3)
-    expect(sessionGradeRows(session, SCALES.hundred)[0].grade).toBe('90')
+    expect(sessionGradeRows(session, SCALES.ten)[0].grade).toBe('8,3')
   })
 })
 
