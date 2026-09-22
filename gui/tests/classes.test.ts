@@ -9,6 +9,7 @@ import {
   groupLine,
   problemWith,
   readGroup,
+  shownGroup,
   type ClassGroup
 } from '../src/shared/classes'
 
@@ -228,5 +229,28 @@ describe('la línea que dice qué clase hay elegida', () => {
   it('en plural cuando hay más de uno', () => {
     const two = group({ students: [group().students[0], { ...group().students[0], id: 'alu2' }] })
     expect(groupLine(two)).toBe('2SMX A · 2 alumnos')
+  })
+})
+
+// Ver una clase es elegirla, no abrir el editor: la pantalla enseña una sin
+// que nadie la elija, y la elegida para corregir es la que sale primero.
+describe('la clase que se ve', () => {
+  const a: ClassGroup = { id: 'a', name: '2SMX A', columns: [], students: [] }
+  const b: ClassGroup = { id: 'b', name: '2SMX B', columns: [], students: [] }
+
+  it('enseña la primera cuando todavía no se ha elegido ninguna', () => {
+    expect(shownGroup([a, b], null)?.id).toBe('a')
+  })
+
+  it('enseña la que se elige', () => {
+    expect(shownGroup([a, b], 'b')?.id).toBe('b')
+  })
+
+  it('no deja la mitad derecha vacía si la elegida ya no está', () => {
+    expect(shownGroup([a, b], 'se-borro')?.id).toBe('a')
+  })
+
+  it('no enseña nada cuando no hay ninguna clase', () => {
+    expect(shownGroup([], 'a')).toBeNull()
   })
 })

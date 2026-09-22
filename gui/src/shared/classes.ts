@@ -175,3 +175,14 @@ export function duplicateOf(group: ClassGroup, others: ClassGroup[], id: string)
     students: group.students.map((student) => ({ ...student, fields: { ...student.fields } }))
   }
 }
+
+/**
+ * The class on screen. «Clases» shows one without anybody choosing it: the
+ * one already chosen for correcting, and otherwise the first of the list.
+ *
+ * A class that is no longer there cannot stay on screen, so a stale choice
+ * falls back to the first one instead of leaving the right half empty.
+ */
+export function shownGroup(groups: ClassGroup[], chosen: string | null): ClassGroup | null {
+  return groups.find((group) => group.id === chosen) ?? groups[0] ?? null
+}

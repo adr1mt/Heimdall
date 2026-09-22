@@ -16,6 +16,7 @@ import {
   duplicateOf,
   emptyStudent,
   problemWith,
+  shownGroup,
   type ClassGroup,
   type ClassStudent
 } from '../../../shared/classes'
@@ -40,10 +41,19 @@ export default function ClassesView() {
   /** The class being edited, as a draft. Null when nobody is editing. */
   const [draft, setDraft] = useState<ClassGroup | null>(null)
   const [removing, setRemoving] = useState<ClassGroup | null>(null)
+  /**
+   * The class being looked at. Looking is not editing: the teacher clicks a
+   * name on the left and the class is on the right, whole, as it was in
+   * Teutón GUI. «Editar» is still there, but it stopped being the way to see
+   * anything (T121).
+   */
+  const [chosen, setChosen] = useState<string | null>(null)
 
   useEffect(() => {
     if (!loaded) void load()
   }, [loaded, load])
+
+  const shown = shownGroup(groups, chosen ?? classId)
 
   async function commit(next: ClassGroup[], after?: () => void): Promise<void> {
     try {
@@ -59,7 +69,8 @@ export default function ClassesView() {
   }
 
   async function duplicate(group: ClassGroup): Promise<void> {
-    await commit([...groups, duplicateOf(group, groups, crypto.randomUUID())])
+    const copy = duplicateOf(group, groups, crypto.randomUUID())
+    await commit([...groups, copy], () => setChosen(copy.id))
   }
 
   async function remove(group: ClassGroup): Promise<void> {
@@ -67,8 +78,10 @@ export default function ClassesView() {
     await commit(
       groups.filter((other) => other.id !== group.id),
       () => {
-        // The chosen class cannot stay chosen once it is gone.
+        // The chosen class cannot stay chosen once it is gone, neither for
+        // correcting nor on this screen.
         if (classId === group.id) setClassId(null)
+        if (chosen === group.id) setChosen(null)
         setNotice(t.classes.removed(group.name))
       }
     )
@@ -87,6 +100,7 @@ export default function ClassesView() {
             : [...groups, group]
           void commit(next, () => {
             setDraft(null)
+            setChosen(group.id)
             setNotice(t.classes.saved)
           })
         }}
@@ -105,57 +119,75 @@ export default function ClassesView() {
           </Button>
         }
       />
-      <div className="min-h-0 flex-1 space-y-4 overflow-auto p-6">
-        <p className="max-w-3xl text-sm text-muted-foreground">{t.classes.hint}</p>
 
-        {/* Un fichero ilegible no se sustituye por una lista vacía: se dice
-            qué pasó y no se guarda nada encima (ADR-0021 §5). */}
-        {problem && (
-          <div role="alert" className="space-y-1 rounded-md bg-destructive/10 p-4 text-sm text-destructive-strong">
-            <p className="font-medium">{t.classes.loadFailed}</p>
-            <p className="text-xs">{problem}</p>
-            <p className="text-xs">{t.classes.blocked}</p>
-          </div>
-        )}
+      {/* Un fichero ilegible no se sustituye por una lista vacía: se dice
+          qué pasó y no se guarda nada encima (ADR-0021 §5). */}
+      {problem && (
+        <div
+          role="alert"
+          className="m-6 space-y-1 rounded-md bg-destructive/10 p-4 text-sm text-destructive-strong"
+        >
+          <p className="font-medium">{t.classes.loadFailed}</p>
+          <p className="text-xs">{problem}</p>
+          <p className="text-xs">{t.classes.blocked}</p>
+        </div>
+      )}
 
-        {groups.length === 0 && !problem ? (
+      {!problem && groups.length === 0 ? (
+        <div className="p-6">
           <Card>
             <CardContent className="space-y-1 pt-5 text-sm">
               <p>{t.classes.empty}</p>
               <p className="text-xs text-muted-foreground">{t.classes.emptyHint}</p>
             </CardContent>
           </Card>
-        ) : (
-          <div className="space-y-2">
-            {groups.map((group) => (
-              <div
-                key={group.id}
-                className="flex flex-wrap items-center gap-3 rounded-md border border-border p-3"
-              >
-                <Users className="h-4 w-4 shrink-0 text-muted-foreground" />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-name font-semibold">{group.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {t.classes.count(group.students.length)}
-                  </p>
-                </div>
-                <Button variant="outline" size="sm" onClick={() => setDraft(group)}>
-                  <Pencil className="h-4 w-4" />
-                  {t.classes.edit}
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => void duplicate(group)}>
-                  <Copy className="h-4 w-4" />
-                  {t.classes.duplicate}
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => setRemoving(group)}>
-                  <Trash2 className="h-4 w-4" />
-                  {t.classes.remove}
-                </Button>
-              </div>
-            ))}
+        </div>
+      ) : (
+        !problem && (
+          <div className="flex min-h-0 flex-1">
+            <nav
+              aria-label={t.classes.listLabel}
+              className="w-60 shrink-0 overflow-auto border-r border-border p-2"
+            >
+              <p className="px-2 pb-2 text-micro text-muted-foreground">{t.classes.hint}</p>
+              <ul className="space-y-1">
+                {groups.map((group) => (
+                  <li key={group.id}>
+                    <button
+                      type="button"
+                      aria-current={shown?.id === group.id ? 'true' : undefined}
+                      onClick={() => setChosen(group.id)}
+                      className={cn(
+                        'flex w-full items-center gap-2 rounded-md px-2 py-2 text-left transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
+                        shown?.id === group.id && 'bg-accent'
+                      )}
+                    >
+                      <Users className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-medium">{group.name}</span>
+                        <span className="block text-xs text-muted-foreground">
+                          {t.classes.count(group.students.length)}
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <div className="min-w-0 flex-1 overflow-auto">
+              {shown && (
+                <ClassDetail
+                  group={shown}
+                  onEdit={() => setDraft(shown)}
+                  onDuplicate={() => void duplicate(shown)}
+                  onRemove={() => setRemoving(shown)}
+                />
+              )}
+            </div>
           </div>
-        )}
-      </div>
+        )
+      )}
 
       <ConfirmDialog
         open={removing !== null}
@@ -167,6 +199,95 @@ export default function ClassesView() {
       >
         {t.classes.removeBody}
       </ConfirmDialog>
+    </div>
+  )
+}
+
+/**
+ * One class, as it is: its students and its own columns, without putting
+ * anything in edit mode.
+ *
+ * Nothing here is a field. Looking at a class before an exam —who is in it,
+ * what machine each one has— used to mean opening the editor, and an editor
+ * open in front of a class is a class one keystroke away from changing.
+ */
+function ClassDetail({
+  group,
+  onEdit,
+  onDuplicate,
+  onRemove
+}: {
+  group: ClassGroup
+  onEdit: () => void
+  onDuplicate: () => void
+  onRemove: () => void
+}) {
+  return (
+    <div className="space-y-4 p-6">
+      <SectionTitle
+        hint={t.classes.count(group.students.length)}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" size="sm" onClick={onEdit}>
+              <Pencil className="h-4 w-4" />
+              {t.classes.edit}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onDuplicate}>
+              <Copy className="h-4 w-4" />
+              {t.classes.duplicate}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onRemove}>
+              <Trash2 className="h-4 w-4" />
+              {t.classes.remove}
+            </Button>
+          </div>
+        }
+      >
+        {group.name}
+      </SectionTitle>
+
+      {group.students.length === 0 ? (
+        <p className="text-sm text-muted-foreground">{t.classes.noStudents}</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-max text-left text-dense">
+            <thead>
+              <tr className="border-b border-border text-micro uppercase tracking-[0.09em] text-muted-foreground">
+                <th className="px-2 py-1.5 font-normal">{t.classes.col.id}</th>
+                <th className="px-2 py-1.5 font-normal">{t.classes.col.name}</th>
+                <th className="px-2 py-1.5 font-normal">{t.classes.col.contact}</th>
+                <th className="px-2 py-1.5 font-normal">{t.classes.col.host}</th>
+                <th className="px-2 py-1.5 font-normal">{t.classes.col.port}</th>
+                <th className="px-2 py-1.5 font-normal">{t.classes.col.user}</th>
+                {group.columns.map((column) => (
+                  <th key={column} className="px-2 py-1.5 font-mono font-normal normal-case tracking-normal">
+                    {column}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {group.students.map((student, index) => (
+                <tr key={index} className="border-b border-border/60 last:border-0">
+                  <td className="px-2 py-1.5 font-mono">{student.id || '—'}</td>
+                  <td className="px-2 py-1.5">{student.name || '—'}</td>
+                  <td className="px-2 py-1.5">{student.contact || '—'}</td>
+                  <td className="px-2 py-1.5 font-mono">{student.host || '—'}</td>
+                  <td className="px-2 py-1.5 font-mono">{student.port || '22'}</td>
+                  <td className="px-2 py-1.5 font-mono">{student.user || '—'}</td>
+                  {group.columns.map((column) => (
+                    <td key={column} className="px-2 py-1.5 font-mono">
+                      {student.fields[column] || '—'}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <p className="text-micro text-muted-foreground">{t.classes.noPasswords}</p>
     </div>
   )
 }

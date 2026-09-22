@@ -176,6 +176,9 @@ export const t = {
   classes: {
     title: 'Clases',
     hint: 'Los grupos del curso. Se apuntan una vez y se reutilizan en cada examen.',
+    // Ver una clase es elegirla en la lista, no abrir el editor (T121).
+    listLabel: 'Clases del curso',
+    noStudents: 'Esta clase todavía no tiene alumnos. Añádelos con «Editar».',
     empty: 'Todavía no hay ninguna clase.',
     emptyHint: 'Crea la primera con los alumnos del grupo: identificador, nombre, contacto, máquina y usuario.',
     create: 'Nueva clase',
