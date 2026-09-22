@@ -192,7 +192,7 @@ necesita un [ADR](docs/adr/).
 
 ## Licencia
 
-MPL-2.0.
+El código de este repositorio está bajo la [Mozilla Public License 2.0](LICENSE).
 
 ## Contexto
 
