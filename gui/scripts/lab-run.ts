@@ -195,11 +195,29 @@ app.whenReady().then(async () => {
     await wait(400)
   }
 
+  // VIEW switches Resultados to «Matriz» or «Lista» before the capture: the
+  // README shows the matrix, which is the view that says something about a
+  // whole class at once.
+  if (process.env.VIEW) {
+    await js(`(() => {
+      const tab = [...document.querySelectorAll('main button')]
+        .find(b => b.textContent.trim() === ${JSON.stringify(process.env.VIEW)})
+      if (tab) tab.click()
+      return !!tab
+    })()`).then((r) => console.log('[lab-run] vista:', process.env.VIEW, r))
+    await wait(600)
+  }
+
   const progress = await js(
     `document.querySelector('[role=progressbar]')?.getAttribute('aria-valuenow') ?? 'sin barra'`
   )
   const text = (await js(`document.querySelector('main').innerText`)) as string
-  if (shot) writeFileSync(shot, (await win.webContents.capturePage()).toPNG())
+  if (shot) {
+    // Give the view a beat to paint before the capture: a screenshot taken in
+    // the same tick as the last click comes out half rendered.
+    await wait(1500)
+    writeFileSync(shot, (await win.webContents.capturePage()).toPNG())
+  }
 
   const end = await js(`window.__heimdall_end && { status: window.__heimdall_end.status, exit_code: window.__heimdall_end.exit_code, artifact: window.__heimdall_end.artifact }`)
   const closed = await js(`window.__heimdall_closed`)

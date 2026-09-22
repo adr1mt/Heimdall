@@ -7,6 +7,10 @@ import { join } from 'node:path'
  * The class of the lab, written where the application keeps the teacher's
  * classes (ADR-0021). Fictional students, the two containers of test/lab.sh:
  * `alumne02` points at a closed port on purpose.
+ *
+ * CLASS_SIZE grows the class against the same container, keeping the last
+ * student on the closed port. It is for the screenshot of the README: a
+ * two-row matrix says nothing about what a class looks like.
  */
 export function writeLabClass(userData: string, id = 'clase-laboratorio'): string {
   const student = (
@@ -32,10 +36,7 @@ export function writeLabClass(userData: string, id = 'clase-laboratorio'): strin
             id,
             name: 'Laboratorio',
             columns: [],
-            students: [
-              student('alumne01', 'Alumna Uno', '2201'),
-              student('alumne02', 'Alumne Dos', '2299')
-            ]
+            students: classStudents(student)
           }
         ]
       },
@@ -45,6 +46,31 @@ export function writeLabClass(userData: string, id = 'clase-laboratorio'): strin
     'utf-8'
   )
   return id
+}
+
+/** The lab class: two students, or CLASS_SIZE of them. */
+function classStudents(
+  student: (id: string, name: string, port: string) => Record<string, unknown>
+): Record<string, unknown>[] {
+  const names = [
+    'Alumna Uno',
+    'Alumne Dos',
+    'Alumna Tres',
+    'Alumne Quatre',
+    'Alumna Cinc',
+    'Alumne Sis',
+    'Alumna Set',
+    'Alumne Vuit',
+    'Alumna Nou',
+    'Alumne Deu'
+  ]
+  const size = Math.min(Math.max(Number(process.env.CLASS_SIZE || 2), 2), names.length)
+  return names.slice(0, size).map((name, i) => {
+    const id = `alumne${String(i + 1).padStart(2, '0')}`
+    // The broken machine is always the last one: every run has to show that a
+    // student who cannot be reached does not cost the others their grade.
+    return student(id, name, i === size - 1 ? '2299' : '2201')
+  })
 }
 
 type Js = (code: string) => Promise<unknown>

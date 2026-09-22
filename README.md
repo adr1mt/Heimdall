@@ -17,163 +17,55 @@
 
 ---
 
-Heimdall es un evaluador automático de infraestructura: comprueba sobre un
-conjunto de máquinas que los servicios, la configuración y la red están como se
-pidió, y puntúa el resultado. Está orientado a sistemas, redes y servicios, y
-su uso principal son los exámenes, donde cada máquina se evalúa y se califica
-por separado. Escrito en Go, un binario único.
-
-El nombre viene de Heimdall, el guardián de la mitología nórdica, asociado a la
-vigilancia y la atención constante.
-
-La definición se escribe en YAML sencillo y legible. A partir de ella Heimdall
-entra por SSH en las máquinas, ejecuta las comprobaciones y produce los
-resultados y la calificación:
+Heimdall corrige prácticas de sistemas y redes: entra por SSH en la máquina de
+cada alumno, comprueba que los servicios, la configuración y la red están como
+se pidió, y pone la nota.
 
 ```
-examen.yaml + aula.yaml  →  Heimdall  →  máquinas del alumnado  →  resultados
+examen.yaml + la clase  →  Heimdall  →  máquinas del alumnado  →  notas
 ```
 
-Comprueba, entre otras cosas, configuración de servicios, ficheros y sus
-parámetros, comandos y estados del sistema, DNS, DHCP y red, y el resultado
-concreto que se espera de cada punto. Recorre decenas de máquinas de forma
-concurrente, controlada y reproducible, y deja un informe detallado de cada
-comprobación.
+El examen se escribe en YAML, o desde la propia aplicación. Cada comprobación
+termina en uno de tres estados —bien, mal o **sin evaluar**—, y esa tercera
+casilla es la razón de ser del proyecto: una máquina apagada no es un trabajo
+mal hecho.
 
-Cada comprobación termina en uno de tres estados —`PASS`, `FAIL` o
-`UNEVALUATED`—, de modo que un fallo real y un problema técnico del propio
-evaluador nunca se confunden: una máquina apagada no es un trabajo mal hecho.
+El nombre viene del guardián de la mitología nórdica, el que vigila sin
+descanso.
 
-## Estado del proyecto
+## Así se ve
 
-**Versión 0.9.0**, lista para el aula y pendiente de la prueba que falta: un
-examen real corregido de principio a fin. Esa es la 1.0.0.
+![Pantalla de Resultados de Heimdall: la matriz de la clase, una fila por comprobación y una columna por alumno](docs/img/resultados.png)
 
-Si lo que quieres es usarlo, la guía es [docs/GUIA.md](docs/GUIA.md).
+La matriz es la clase entera de un vistazo: una fila por comprobación, una
+columna por alumno. Al pulsar una celda se ve el comando que se ejecutó, lo
+que contestó la máquina y lo que se esperaba.
 
-- El motor evalúa y califica por SSH contra máquinas reales, en exámenes de
-  verdad.
-- La aplicación propia, **Heimdall GUI**, vive en [`gui/`](gui/) y está
-  completa: Inicio, Clases, El examen, Corregir, Resultados, Analíticas,
-  Histórico, Ajustes y Ayuda, con **modo examen** —vueltas encadenadas
-  mientras dura la práctica, cada alumno con su mejor vuelta entera— y **modo
-  proyector** para enseñar el progreso en pantalla grande.
-- La contraseña del aula se escribe una vez, se guarda cifrada y está auditada
-  de punta a punta: no aparece en `ps`, ni en los informes, ni en las
-  exportaciones ([los 16 modos de fallo](docs/MODOS-DE-FALLO-HEIMDALL.md)).
-- La aplicación se empaqueta en `.deb` y AppImage con el motor dentro, y
-  funciona en un equipo sin nada instalado. Todavía **no hay una descarga
-  publicada**: se construye con `make gui-dist`.
+La última alumna tiene la máquina apagada: sus comprobaciones salen **sin
+evaluar**, no suspensas, y se queda sin nota hasta que se pueda repetir. Los
+demás no se ven afectados.
 
-El estado detallado, sesión a sesión, está en
-[docs/project/PROGRESS.md](docs/project/PROGRESS.md).
-
-## La definición
-
-```yaml
-examen: "Servidor DHCP y DNS"
-version: 1
-hosts: [servidor]
-por_defecto: { peso: 1, timeout: 20s }
-
-grupos:
-  - grupo: "DHCP"
-    comprobaciones:
-      - id: kea-activo
-        descripcion: "El servicio de DHCP está levantado"
-        en: servidor
-        cmd: ["systemctl", "is-active", "kea-dhcp4-server"]
-        igual_a: "active"
-
-      - id: kea-rango
-        descripcion: "El rango es el que se pidió"
-        en: servidor
-        peso: 2
-        cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
-        cerca_de:
-          ancla: "pools"
-          lineas: 3
-          contiene: "${alumno.rango}"
-```
-
-Declarativo y nada más: sin condicionales, sin bucles, sin expresiones
-regulares y **sin shell**. Cada `cmd` es un vector de argumentos que llega
-literal a la máquina evaluada.
-
-El inventario (`aula.yaml`) dice a quién corresponde cada máquina y dónde está.
-Las contraseñas no van ahí: va una **referencia**, y el valor entra por stdin.
-
-## El resultado
-
-```
-Examen:   examen.yaml
-Aula:     aula.yaml
-Estado:   PARTIAL
-
-  alumne01     PARTIAL        provisional 80/100, 1 de peso sin evaluar
-  alumne02     NOT_EVALUATED  sin evaluar
-
-aviso HOST_KEY_ACCEPTED (student:alumne01/host:host1): la identidad de
-127.1.2.3:2201 se ha aceptado y anotado para esta ejecución: SHA256:EXIozD…
-
-Artefacto: var/run-01M2YYCQB3CT4ZM5DZ9JEAD15C.json
-```
-
-Junto al resumen queda un JSON con **todo**: qué comando se ejecutó, qué
-contestó la máquina, qué se esperaba y por qué cada comprobación salió como
-salió. Un suspenso siempre se puede enseñar; una avería también.
-
-Los códigos de salida discriminan: `0` todo evaluado · `2` configuración
-inválida · `3` ejecución parcial · `4` cancelado.
+<sub>Captura real contra el laboratorio de pruebas (`testdata/portada`), con
+nombres ficticios. Todas las máquinas del laboratorio son la misma, de ahí que
+las columnas salgan iguales.</sub>
 
 ## Lo que no se negocia
 
 1. **Un error técnico nunca es un suspenso.** Una máquina apagada sale *sin
    evaluar*, con el motivo escrito. Nunca un 0.
-2. **Ningún error silencioso.** Si el motor falla, lo dice en el informe.
-3. **Ningún alumno puede tumbar la evaluación de los demás.**
-4. **El denominador se fija antes de tocar ninguna máquina.** Todos los alumnos
-   reciben las mismas comprobaciones y los mismos pesos, pase lo que pase.
-5. **Ningún comando puede colgar la corrección.** Todo tiene tope.
-6. **Los secretos no aparecen** en el informe, ni en los logs, ni en `ps`.
+2. **Si queda algo sin evaluar, no hay nota final**, solo una provisional
+   marcada. La nota se publica cuando se puede defender.
+3. **Todos los alumnos reciben las mismas comprobaciones y los mismos pesos**,
+   y el denominador se fija antes de tocar ninguna máquina.
+4. **Ningún alumno puede tumbar la corrección de los demás**, y ningún comando
+   puede colgarla.
+5. **Los secretos no aparecen** en el informe, ni en los logs, ni en `ps`.
 
-Y una consecuencia incómoda a propósito: si quedan comprobaciones sin evaluar,
-**no hay nota final**, solo una provisional marcada. La nota se publica cuando
-se puede defender.
+## Estado
 
-## Ponerlo en marcha
-
-```bash
-make build          # binario en bin/heimdall
-make check          # suite rápida del motor: lógica pura, sin red (segundos)
-make lab            # laboratorio SSH en podman
-make test           # + integración y criterios de aceptación
-make rendimiento    # mide escalado y memoria (no es un test)
-```
-
-La aplicación es un árbol Node aparte, con su propio ciclo:
-
-```bash
-make gui-check      # suite de la GUI
-make gui-build      # compila la aplicación
-make gui-dist       # .deb y AppImage con el motor dentro, en gui/dist
-make gui-lab        # la arranca contra el laboratorio
-```
-
-El número de versión es uno solo para todo el producto: vive en `VERSION`, el
-motor se sella con él al compilar y `make version` comprueba que el motor y la
-aplicación dicen lo mismo.
-
-Corregir desde la terminal:
-
-```bash
-heimdall check ./examen-ra2                      # valida sin tocar ninguna máquina
-heimdall run --secrets=stdin ./examen-ra2        # corrige
-```
-
-Dependencias del módulo: `x/crypto/ssh` y `yaml.v3`. Ninguna más —los
-identificadores de ejecución los genera el propio motor—, y cualquier añadido
-necesita un [ADR](docs/adr/).
+**Versión 0.9.0**: la aplicación está completa y empaquetada en `.deb` y
+AppImage con el motor dentro. Falta la prueba de fuego —un examen real
+corregido de principio a fin— y esa será la 1.0.0.
 
 ## Documentación
 
@@ -181,14 +73,8 @@ necesita un [ADR](docs/adr/).
 |---|---|
 | Usarlo para corregir | [docs/GUIA.md](docs/GUIA.md) |
 | Qué trae cada versión | [docs/NOTAS-DE-VERSION.md](docs/NOTAS-DE-VERSION.md) |
-| Cómo está montado | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
+| Compilarlo, probarlo o escribir un examen | [docs/DESARROLLO.md](docs/DESARROLLO.md) |
 | Por qué está montado así | [docs/adr/](docs/adr/) |
-| Hacia dónde va | [docs/ROADMAP.md](docs/ROADMAP.md) |
-| Formato de la definición | [docs/design/02-FORMATO.md](docs/design/02-FORMATO.md) |
-| Estados y cálculo de la nota | [docs/design/03-ESTADOS-Y-NOTA.md](docs/design/03-ESTADOS-Y-NOTA.md) |
-| Contrato entre el motor y la aplicación | [docs/design/09-CONTRATO-GUI.md](docs/design/09-CONTRATO-GUI.md) |
-| Estado actual del trabajo | [docs/project/PROGRESS.md](docs/project/PROGRESS.md) |
-| Investigación previa y mediciones | [docs/research/](docs/research/) |
 
 ## Licencia
 

@@ -1,0 +1,55 @@
+# Examen de la captura del README. Corre contra el contenedor de test/lab.sh,
+# así que las comprobaciones son las que esa máquina puede contestar de
+# verdad: nada inventado, nada dibujado a mano.
+#
+# La clase que lo acompaña la escribe gui/scripts/lab-flow.ts con CLASS_SIZE,
+# y su último alumno apunta a un puerto cerrado: la captura tiene que enseñar
+# también qué pasa con una máquina que no responde.
+examen: "Servicios básicos"
+version: 1
+hosts: [host1]
+por_defecto: { peso: 1, timeout: 20s }
+grupos:
+  - grupo: "La máquina"
+    comprobaciones:
+      - id: hostname
+        descripcion: "La máquina se identifica"
+        en: host1
+        cmd: ["hostname"]
+        contiene: "alu"
+      - id: usuario
+        descripcion: "La cuenta del alumno existe"
+        en: host1
+        cmd: ["id", "-un"]
+        igual_a: "${alumno.usuario}"
+      - id: sistema
+        descripcion: "El sistema es el que se pidió"
+        en: host1
+        peso: 2
+        cmd: ["test", "-f", "/etc/os-release"]
+        exit_code: 0
+  - grupo: "Servicio web"
+    comprobaciones:
+      - id: web-instalado
+        descripcion: "El servidor web está instalado"
+        en: host1
+        cmd: ["test", "-x", "/usr/sbin/nginx"]
+        exit_code: 0
+      - id: web-raiz
+        descripcion: "La raíz del sitio existe"
+        en: host1
+        cmd: ["test", "-d", "/var/www/html"]
+        exit_code: 0
+  - grupo: "SSH"
+    comprobaciones:
+      - id: ssh-activo
+        descripcion: "El servidor SSH está escuchando"
+        en: host1
+        cmd: ["test", "-d", "/etc/ssh"]
+        exit_code: 0
+      - id: ssh-sin-root
+        descripcion: "No se entra como root por SSH"
+        en: host1
+        peso: 2
+        cmd: ["grep", "-c", "PermitRootLogin no", "/etc/ssh/sshd_config"]
+        exit_code: 0
