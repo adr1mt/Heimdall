@@ -1,8 +1,9 @@
 import type { CheckResult, RunResult, StudentResult } from '../../../shared/artifact'
 
 /**
- * Analíticas: who to walk over to first, and what the whole group is failing
- * (T110).
+ * Analíticas: the three things the teacher actually looks at after a
+ * correction (T125) — the objectives the group fails most, how the grades
+ * fall, and how each part of the exam went.
  *
  * Nothing here computes a grade. Every number is counted over the grades the
  * engine already published (principio 12), with the same two rules the class
@@ -24,20 +25,6 @@ export interface Band {
   from: number
   to: number
   students: number
-}
-
-/** Why a student is on the list, worst first. */
-export type Reason = 'BROKEN' | 'FAILING'
-
-export interface Attention {
-  student: StudentResult
-  reason: Reason
-  /** Checks left unevaluated. Zero for a student who is simply failing. */
-  unevaluated: number
-  /** The closed grade, or null when there is none. */
-  score: number | null
-  /** What went wrong on the machine, in the engine's words. */
-  detail: string | null
 }
 
 export interface FailingCheck {
@@ -90,39 +77,6 @@ export function distribution(run: RunResult): { bands: Band[]; ungraded: number 
 }
 
 /**
- * Who to walk over to, worst first.
- *
- * A machine nobody could reach comes before any low grade, however low: from
- * the teacher's desk the two look the same and they need opposite reactions,
- * and only one of them is fixed by walking over there (principio 3).
- */
-export function attentionList(run: RunResult, passMark: number): Attention[] {
-  const list: Attention[] = []
-  for (const student of run.students.filter(counts)) {
-    const broken = student.checks.filter((check) => check.status === 'UNEVALUATED')
-    const score = finalScore(student)
-    if (broken.length > 0) {
-      list.push({
-        student,
-        reason: 'BROKEN',
-        unevaluated: broken.length,
-        score,
-        detail: broken.find((check) => check.detail)?.detail ?? null
-      })
-      continue
-    }
-    if (score !== null && score < passMark) {
-      list.push({ student, reason: 'FAILING', unevaluated: 0, score, detail: null })
-    }
-  }
-  return list.sort((a, b) => {
-    if (a.reason !== b.reason) return a.reason === 'BROKEN' ? -1 : 1
-    if (a.reason === 'BROKEN') return b.unevaluated - a.unevaluated
-    return (a.score ?? 0) - (b.score ?? 0)
-  })
-}
-
-/**
  * The checks the group is getting wrong, worst first.
  *
  * A check nobody could be evaluated on is not a check everybody failed: the
@@ -162,4 +116,54 @@ function blank(check: CheckResult): FailingCheck {
 export function failRate(check: FailingCheck): number | null {
   if (check.evaluated === 0) return null
   return Math.round((check.failed / check.evaluated) * 100)
+}
+
+/** How many failing objectives are worth looking at. Past the fourth nobody reads. */
+export const MOST_FAILED = 4
+
+export interface GroupRate {
+  /** The group of checks, as the exam names it. */
+  group: string
+  /** Checks of the group that were actually evaluated, over every student. */
+  evaluated: number
+  /** Of those, the ones the student got right. */
+  passed: number
+  /** Share passed, 0-100, or null when nothing of the group was evaluated. */
+  rate: number | null
+  /** Checks of the group nobody could be evaluated on. */
+  unevaluated: number
+}
+
+/**
+ * How each part of the exam went, worst first.
+ *
+ * The share is over what was actually evaluated: a group nobody could be
+ * evaluated on is not a group everybody failed, and counting it as such would
+ * turn a broken lab into a teaching problem (principio 3).
+ */
+export function successByGroup(run: RunResult): GroupRate[] {
+  const byGroup = new Map<string, GroupRate>()
+  for (const student of run.students.filter(counts)) {
+    for (const check of student.checks) {
+      const entry = byGroup.get(check.group) ?? {
+        group: check.group,
+        evaluated: 0,
+        passed: 0,
+        rate: null,
+        unevaluated: 0
+      }
+      if (check.status === 'UNEVALUATED') entry.unevaluated += 1
+      else {
+        entry.evaluated += 1
+        if (check.status === 'PASS') entry.passed += 1
+      }
+      byGroup.set(check.group, entry)
+    }
+  }
+  return [...byGroup.values()]
+    .map((entry) => ({
+      ...entry,
+      rate: entry.evaluated === 0 ? null : Math.round((entry.passed / entry.evaluated) * 100)
+    }))
+    .sort((a, b) => (a.rate ?? 101) - (b.rate ?? 101) || a.group.localeCompare(b.group, 'es'))
 }

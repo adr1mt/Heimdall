@@ -1,21 +1,30 @@
-import { AlertTriangle, TrendingDown } from 'lucide-react'
 import { Badge, Card, CardContent, SectionTitle, ViewHeader } from '@/components/ui'
-import { useApp, useScale } from '@/stores/app'
+import { useScale } from '@/stores/app'
 import { toScale } from '@/lib/scale'
 import { useRun } from '@/stores/run'
-import { attentionList, distribution, failRate, failingChecks, type Attention } from '@/lib/analytics'
+import {
+  MOST_FAILED,
+  distribution,
+  failRate,
+  failingChecks,
+  successByGroup
+} from '@/lib/analytics'
 import { t } from '@/i18n/es'
 
 /**
- * Analíticas: who to walk over to first, and what the whole group is failing.
+ * Analíticas: three readings and no more (T125) — which objectives the group
+ * fails, how the grades fall, and how each part of the exam went.
  *
  * It reads the very artifact Resultados is showing, so the two screens cannot
  * disagree: no number here is computed from anything but the grades the
  * engine already published (principio 12).
+ *
+ * «Cómo va el grupo» and «A quién atender primero» are gone on purpose: the
+ * first was this same distribution under a title that said nothing, and the
+ * second was a list nobody read with the class in front of them.
  */
 export default function AnalyticsView() {
   const artifact = useRun((s) => s.artifact)
-  const passMark = useApp((s) => s.passMark)
   const scale = useScale()
 
   if (!artifact) {
@@ -31,8 +40,8 @@ export default function AnalyticsView() {
   }
 
   const { bands, ungraded } = distribution(artifact)
-  const attention = attentionList(artifact, passMark)
-  const failing = failingChecks(artifact)
+  const failing = failingChecks(artifact).slice(0, MOST_FAILED)
+  const groups = successByGroup(artifact)
   const most = Math.max(1, ...bands.map((band) => band.students))
 
   return (
@@ -70,19 +79,6 @@ export default function AnalyticsView() {
         </section>
 
         <section className="space-y-2">
-          <SectionTitle>{t.analytics.attention}</SectionTitle>
-          {attention.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{t.analytics.attentionNone}</p>
-          ) : (
-            <div className="space-y-2">
-              {attention.map((entry) => (
-                <AttentionRow key={entry.student.student_id} entry={entry} />
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="space-y-2">
           <SectionTitle>{t.analytics.failingChecks}</SectionTitle>
           {failing.length === 0 ? (
             <p className="text-sm text-muted-foreground">{t.analytics.failingNone}</p>
@@ -112,45 +108,40 @@ export default function AnalyticsView() {
             </div>
           )}
         </section>
+
+        <section className="space-y-2">
+          <SectionTitle hint={t.analytics.byGroupHint}>{t.analytics.byGroup}</SectionTitle>
+          {groups.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t.analytics.byGroupNone}</p>
+          ) : (
+            <div className="max-w-2xl space-y-2">
+              {groups.map((entry) => (
+                <div key={entry.group} className="space-y-1">
+                  <div className="flex items-baseline justify-between gap-3 text-sm">
+                    <span className="min-w-0 truncate">{entry.group}</span>
+                    <span className="shrink-0 tabular-nums text-muted-foreground">
+                      {entry.rate === null
+                        ? t.analytics.byGroupNothing
+                        : t.analytics.byGroupRate(entry.rate, entry.passed, entry.evaluated)}
+                    </span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded bg-muted">
+                    <div
+                      className="h-full rounded bg-primary/70"
+                      style={{ width: `${entry.rate ?? 0}%` }}
+                    />
+                  </div>
+                  {entry.unevaluated > 0 && (
+                    <p className="text-micro text-muted-foreground">
+                      {t.analytics.byGroupUnevaluated(entry.unevaluated)}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
     </div>
-  )
-}
-
-/**
- * One student to walk over to. The technical problem is first and says so in
- * words: a machine nobody could reach looks like a student who did nothing
- * and needs the opposite reaction (principio 3).
- */
-function AttentionRow({ entry }: { entry: Attention }) {
-  const scale = useScale()
-  const broken = entry.reason === 'BROKEN'
-  return (
-    <Card className={broken ? 'border-warning/40' : undefined}>
-      <CardContent className="flex flex-wrap items-center gap-x-3 gap-y-1 py-3 text-sm">
-        {broken ? (
-          <AlertTriangle className="h-4 w-4 shrink-0 text-warning-strong" aria-hidden />
-        ) : (
-          <TrendingDown className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-        )}
-        <span className="min-w-0 flex-1 truncate font-medium">{entry.student.name}</span>
-        {broken ? (
-          <>
-            <Badge variant="warning">{t.analytics.broken}</Badge>
-            <span className="text-xs text-muted-foreground">
-              {t.analytics.unevaluated(entry.unevaluated)}
-            </span>
-            {entry.detail && (
-              <span className="w-full truncate text-xs text-muted-foreground">{entry.detail}</span>
-            )}
-          </>
-        ) : (
-          <>
-            <Badge variant="secondary">{t.analytics.failing}</Badge>
-            <span className="font-mono text-sm">{entry.score === null ? '—' : toScale(entry.score, scale)}</span>
-          </>
-        )}
-      </CardContent>
-    </Card>
   )
 }

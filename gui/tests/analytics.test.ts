@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { attentionList, distribution, failRate, failingChecks, finalScore } from '@/lib/analytics'
+import {
+  MOST_FAILED,
+  distribution,
+  failRate,
+  failingChecks,
+  finalScore,
+  successByGroup
+} from '@/lib/analytics'
 import { DEFAULT_PASS_MARK, classSummary } from '@/lib/summary'
 import type { CheckResult, RunResult, StudentResult } from '../src/shared/artifact'
 import type { Score } from '../src/shared/events'
@@ -90,71 +97,17 @@ describe('la distribución del grupo', () => {
 })
 
 describe('los números coinciden con los de Resultados', () => {
-  it('cuenta los mismos alumnos, las mismas notas y los mismos que atender', () => {
+  it('cuenta los mismos alumnos y las mismas notas', () => {
     const summary = classSummary(CLASS, DEFAULT_PASS_MARK)
     const { bands, ungraded } = distribution(CLASS)
     const graded = bands.reduce((total, band) => total + band.students, 0)
 
     expect(graded).toBe(summary.graded)
     expect(graded + ungraded).toBe(summary.students)
-    expect(attentionList(CLASS, DEFAULT_PASS_MARK)).toHaveLength(summary.attention)
   })
 
   it('la nota que enseña es la que publicó el motor, sin recalcular nada', () => {
     expect(CLASS.students.map(finalScore)).toEqual([90, 75, 20, null, 0])
-  })
-})
-
-describe('a quién atender primero', () => {
-  it('una máquina caída pesa más que cualquier nota baja', () => {
-    const list = attentionList(CLASS, DEFAULT_PASS_MARK)
-    expect(list[0].student.student_id).toBe('noa')
-    expect(list[0].reason).toBe('BROKEN')
-    expect(list[1].student.student_id).toBe('laia')
-    expect(list[1].reason).toBe('FAILING')
-  })
-
-  it('dice qué pasó en la máquina, con las palabras del motor', () => {
-    expect(attentionList(CLASS, DEFAULT_PASS_MARK)[0].detail).toBe('no se pudo conectar')
-  })
-
-  it('quien aprueba y quien está excluido no salen en la lista', () => {
-    const ids = attentionList(CLASS, DEFAULT_PASS_MARK).map((a) => a.student.student_id)
-    expect(ids).not.toContain('ana')
-    expect(ids).not.toContain('marc')
-    expect(ids).not.toContain('fora')
-  })
-
-  it('entre dos rotos, primero el que tiene más sin evaluar', () => {
-    const list = attentionList(
-      run([
-        student('poco', 'Poco', broken, [check('c1', 'PASS'), check('c2', 'UNEVALUATED', 'TIMEOUT')], 'PARTIAL'),
-        student(
-          'mucho',
-          'Mucho',
-          broken,
-          [check('c1', 'UNEVALUATED', 'CONNECT_FAILED'), check('c2', 'UNEVALUATED', 'CONNECT_FAILED')],
-          'NOT_EVALUATED'
-        )
-      ]),
-      DEFAULT_PASS_MARK
-    )
-    expect(list.map((a) => a.student.student_id)).toEqual(['mucho', 'poco'])
-  })
-
-  it('entre dos que suspenden, primero el que va peor', () => {
-    const list = attentionList(
-      run([
-        student('a', 'A', complete(45), [check('c1', 'FAIL')]),
-        student('b', 'B', complete(10), [check('c1', 'FAIL')])
-      ]),
-      DEFAULT_PASS_MARK
-    )
-    expect(list.map((a) => a.student.student_id)).toEqual(['b', 'a'])
-  })
-
-  it('un alumno roto sale en la lista aunque su nota provisional apruebe', () => {
-    expect(attentionList(CLASS, DEFAULT_PASS_MARK).map((a) => a.student.student_id)).toContain('noa')
   })
 })
 
@@ -189,5 +142,75 @@ describe('qué comprobación está fallando al grupo', () => {
     expect(c1.unevaluated).toBe(1)
     expect(c1.evaluated).toBe(0)
     expect(failRate(c1)).toBeNull()
+  })
+})
+
+/** La misma comprobación, pero en el grupo del examen que se diga. */
+function inGroup(group: string, c: CheckResult): CheckResult {
+  return { ...c, group }
+}
+
+// Analíticas se quedó con tres cosas (T125). Dos son la distribución y los
+// objetivos más fallados, que ya estaban; la tercera es cómo ha ido cada
+// parte del examen.
+describe('la tasa de éxito por grupo', () => {
+  const GROUPED = run([
+    student('ana', 'Ana Ferrer', complete(50), [
+      inGroup('Red', check('r1', 'PASS')),
+      inGroup('DHCP', check('d1', 'FAIL'))
+    ]),
+    student('marc', 'Marc Oliva', complete(50), [
+      inGroup('Red', check('r1', 'PASS')),
+      inGroup('DHCP', check('d1', 'FAIL'))
+    ]),
+    student('laia', 'Laia Puig', complete(50), [
+      inGroup('Red', check('r1', 'FAIL')),
+      inGroup('DHCP', check('d1', 'PASS'))
+    ])
+  ])
+
+  it('cuenta cada grupo sobre lo que de verdad se comprobó, el peor primero', () => {
+    expect(successByGroup(GROUPED)).toEqual([
+      { group: 'DHCP', evaluated: 3, passed: 1, rate: 33, unevaluated: 0 },
+      { group: 'Red', evaluated: 3, passed: 2, rate: 67, unevaluated: 0 }
+    ])
+  })
+
+  it('un grupo que no se pudo comprobar no es un grupo que todos suspenden', () => {
+    const rate = successByGroup(
+      run([
+        student('noa', 'Noa Sala', broken, [
+          inGroup('Red', check('r1', 'UNEVALUATED', 'CONNECT_FAILED', 'no se pudo conectar'))
+        ])
+      ])
+    )
+    expect(rate).toEqual([{ group: 'Red', evaluated: 0, passed: 0, rate: null, unevaluated: 1 }])
+  })
+
+  it('no cuenta al alumno excluido, que no iba a evaluarse', () => {
+    const rate = successByGroup(
+      run([
+        student('ana', 'Ana Ferrer', complete(100), [inGroup('Red', check('r1', 'PASS'))]),
+        student('fuera', 'Fuera', complete(0), [inGroup('Red', check('r1', 'FAIL'))], 'EXCLUDED')
+      ])
+    )
+    expect(rate).toEqual([{ group: 'Red', evaluated: 1, passed: 1, rate: 100, unevaluated: 0 }])
+  })
+})
+
+// Tres o cuatro objetivos y no más: una lista de veinte no se mira.
+describe('los objetivos más fallados', () => {
+  it('no enseña más de cuatro', () => {
+    expect(MOST_FAILED).toBe(4)
+    const many = run([
+      student(
+        'ana',
+        'Ana Ferrer',
+        complete(0),
+        ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'].map((id) => check(id, 'FAIL'))
+      )
+    ])
+    expect(failingChecks(many).length).toBeGreaterThan(MOST_FAILED)
+    expect(failingChecks(many).slice(0, MOST_FAILED)).toHaveLength(4)
   })
 })

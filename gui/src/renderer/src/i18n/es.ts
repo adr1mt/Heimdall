@@ -155,25 +155,28 @@ export const t = {
     hint: 'De la corrección que tienes abierta en Resultados. Ninguna nota se recalcula aquí.',
     none: 'Todavía no hay ninguna corrección abierta.',
     noneHint: 'Corrige una clase, o abre una corrección del histórico.',
-    distribution: 'Cómo va el grupo',
+    distribution: 'Distribución de notas',
     band: (from: string, to: string) => `${from}–${to}`,
     ungraded: (students: number) =>
       students === 1 ? '1 alumno sin nota' : `${students} alumnos sin nota`,
     ungradedHint: 'Su máquina no respondió a todo. No cuentan como un cero.',
-    attention: 'A quién atender primero',
-    attentionNone: 'Nadie necesita que vayas: todos aprueban y ninguna máquina ha fallado.',
-    broken: 'Problema técnico',
-    failing: 'Va por debajo',
-    unevaluated: (checks: number) =>
-      checks === 1 ? '1 comprobación sin hacer' : `${checks} comprobaciones sin hacer`,
-    noScore: 'Sin nota',
-    failingChecks: 'Qué se le está atragantando al grupo',
+    failingChecks: 'Los objetivos que más se fallan',
     failingNone: 'Ninguna comprobación se le ha atragantado al grupo.',
     failedBy: (failed: number, evaluated: number) => `La fallan ${failed} de ${evaluated}`,
     couldNot: (students: number) =>
       students === 1
         ? 'No se pudo comprobar en 1 alumno'
-        : `No se pudo comprobar en ${students} alumnos`
+        : `No se pudo comprobar en ${students} alumnos`,
+    byGroup: 'Tasa de éxito por grupo',
+    byGroupHint: 'Los grupos de comprobaciones del examen, el peor primero.',
+    byGroupNone: 'El examen no tiene ningún grupo de comprobaciones.',
+    byGroupRate: (rate: number, passed: number, evaluated: number) =>
+      `${rate}% · ${passed} de ${evaluated}`,
+    byGroupNothing: 'No se pudo comprobar nada de este grupo',
+    byGroupUnevaluated: (checks: number) =>
+      checks === 1
+        ? '1 comprobación de este grupo se quedó sin evaluar'
+        : `${checks} comprobaciones de este grupo se quedaron sin evaluar`
   },
   classes: {
     title: 'Clases',
