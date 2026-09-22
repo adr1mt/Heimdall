@@ -29,7 +29,14 @@ import {
   sessionText
 } from '@/lib/session'
 import { scoreView } from '@/lib/results'
-import { scaleOf, sessionCsv, sessionCsvName, sessionExportSummary } from '@/lib/export'
+import {
+  scaleOf,
+  sessionCsv,
+  sessionCsvName,
+  sessionExportSummary,
+  sessionGradeRows
+} from '@/lib/export'
+import { MoodleExportButton } from '@/components/MoodleExport'
 import { startCorrection } from '@/lib/start-run'
 import type { Session } from '../../../shared/session'
 import type { Description } from '../../../shared/describe'
@@ -603,7 +610,10 @@ function SessionPanel({
             </p>
           </div>
 
-          <SessionExportButton session={session} />
+          <div className="flex flex-wrap gap-2">
+            <SessionExportButton session={session} />
+            <SessionMoodleButton session={session} />
+          </div>
 
           <div className="space-y-2">
             {session.students.map((student) => {
@@ -657,6 +667,17 @@ function SessionPanel({
         </>
       )}
     </div>
+  )
+}
+
+/** The session's grades, in the file Moodle imports. */
+function SessionMoodleButton({ session }: { session: Session }) {
+  const scaleId = useApp((s) => s.scale)
+  return (
+    <MoodleExportButton
+      rows={sessionGradeRows(session, scaleOf(scaleId))}
+      at={session.rounds[session.rounds.length - 1]?.finished_at ?? ''}
+    />
   )
 }
 

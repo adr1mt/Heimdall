@@ -367,6 +367,16 @@ export const t = {
     cancelled: 'No se ha guardado nada.',
     failed: 'No se pudieron guardar las notas'
   },
+  moodle: {
+    button: 'Exportar a Moodle…',
+    title: '¿Exportar las notas a Moodle?',
+    hint:
+      'Se guarda un fichero con tres columnas —alumno, correo y nota— que Moodle importa tal cual. Quien no tenga nota final va con la celda vacía: Moodle la deja como está y nadie se lleva un cero.',
+    noEmail:
+      'Moodle empareja por el correo. Quien no lo tenga en su ficha no puede ir en el fichero; añádeselo en Clases y vuelve a exportar.',
+    saved: (path: string) => `Fichero para Moodle guardado en ${path}`,
+    failed: 'No se pudo guardar el fichero para Moodle'
+  },
   chain: {
     title: 'La nota de toda la cadena',
     folded: 'Esta corrección repite otra anterior',

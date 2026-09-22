@@ -35,10 +35,13 @@ import {
   type Filters,
   type Pending
 } from '@/lib/results'
+import { MoodleExportButton } from '@/components/MoodleExport'
 import {
   chainCsv,
   chainCsvName,
   chainExportSummary,
+  chainGradeRows,
+  gradeRows,
   csvName,
   exportSummary,
   scaleOf,
@@ -163,6 +166,7 @@ export default function ResultsView() {
               </SegmentedItem>
             </Segmented>
             <ExportButton />
+            <RunMoodleButton />
           </>
         }
       />
@@ -589,6 +593,20 @@ function ExportButton() {
 }
 
 
+/** The same grades of this correction, in the file Moodle imports. */
+function RunMoodleButton() {
+  const artifact = useRun((s) => s.artifact)
+  const scaleId = useApp((s) => s.scale)
+  if (!artifact) return null
+  return (
+    <MoodleExportButton
+      rows={gradeRows(artifact, scaleOf(scaleId))}
+      at={artifact.finished_at}
+    />
+  )
+}
+
+
 /**
  * The grade of a whole chain of corrections.
  *
@@ -649,6 +667,7 @@ function ChainPanel({ artifactPath }: { artifactPath: string | null }) {
 /** The class as the chain leaves it, student by student. */
 function ChainResult({ chain }: { chain: Consolidation }) {
   const counts = chainTally(chain)
+  const scaleId = useApp((s) => s.scale)
   const [selected, setSelected] = useState<Selection | null>(null)
 
   const chosen = useMemo(() => {
@@ -665,7 +684,13 @@ function ChainResult({ chain }: { chain: Consolidation }) {
         <p className="text-xs text-muted-foreground">{t.chain.closed(counts.closed, counts.open)}</p>
       </div>
 
-      <ChainExportButton chain={chain} />
+      <div className="flex flex-wrap gap-2">
+        <ChainExportButton chain={chain} />
+        <MoodleExportButton
+          rows={chainGradeRows(chain, scaleOf(scaleId))}
+          at={chain.runs[chain.runs.length - 1]?.finished_at ?? ''}
+        />
+      </div>
 
       <div className="space-y-2">
         {chain.students.map((student) => {

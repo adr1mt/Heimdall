@@ -330,3 +330,88 @@ export function exportSummary(run: RunResult, scale: Scale): string {
   const graded = rows.filter((row) => row.grade !== '').length
   return `${rows.length} alumnos · ${graded} con nota final en escala ${scale.label} · ${rows.length - graded} sin nota · corrección del ${dateText(run.finished_at)}`
 }
+
+/**
+ * The grades as Moodle imports them.
+ *
+ * It is a second, narrower file and not a flag on the first one, because the
+ * two have opposite readers. The grade sheet is for the teacher and carries
+ * everything that explains a grade; this one is for a machine that matches
+ * students by e-mail and reads one number, and every extra column there is one
+ * more thing to map by hand at import time.
+ *
+ * Nothing is converted, decided or filled in here beyond what `gradeOf`
+ * already published: the number in this file is the number on screen.
+ */
+
+/** One line of the Moodle file: who, and the grade or nothing. */
+export interface MoodleRow {
+  name: string
+  email: string
+  /** The final grade in the teacher's scale, or '' when there is none. */
+  grade: string
+}
+
+/** What a Moodle export needs of a student, as every export already says it. */
+interface MoodleSource {
+  name: string
+  moodleId: string
+  grade: string
+}
+
+/**
+ * The students that can travel to Moodle, which are the ones with an e-mail:
+ * that is what Moodle matches on, and a line it cannot match is a line that
+ * makes the whole import fail.
+ *
+ * Leaving them out is not silent. `moodleSummary` says how many stayed behind
+ * and why, before the file is written.
+ */
+export function moodleRows(rows: MoodleSource[]): MoodleRow[] {
+  return rows
+    .filter((row) => row.moodleId.trim() !== '')
+    .map((row) => ({ name: row.name, email: row.moodleId.trim(), grade: row.grade }))
+}
+
+const MOODLE_HEADER = ['alumno', 'correo', 'nota']
+
+/**
+ * The Moodle file.
+ *
+ * Semicolons and a comma for decimals: that is what a Moodle in Spanish reads,
+ * and the separator is one of the ones its import form offers, so the file
+ * goes in as it is written.
+ *
+ * No BOM, unlike the grade sheet: this file is not opened in a spreadsheet,
+ * and the mark would land inside the name of the first column.
+ *
+ * A student with no final grade keeps their line with the grade cell empty.
+ * Moodle leaves an empty cell alone; a 0 would be a fail for a machine nobody
+ * could reach (principio 3, ADR-0006).
+ */
+export function moodleCsv(rows: MoodleRow[]): string {
+  const lines = [MOODLE_HEADER.join(';')]
+  for (const row of rows) {
+    lines.push([row.name, row.email, row.grade].map(field).join(';'))
+  }
+  return `${lines.join('\r\n')}\r\n`
+}
+
+/** What the teacher is told the Moodle file contains, before saving it. */
+export function moodleSummary(source: MoodleSource[], scale: Scale): string {
+  const rows = moodleRows(source)
+  const graded = rows.filter((row) => row.grade !== '').length
+  const left = source.length - rows.length
+  const parts = [
+    `${rows.length} alumnos en el fichero`,
+    `${graded} con nota en escala ${scale.label}`,
+    `${rows.length - graded} sin nota, con la celda vacía`
+  ]
+  if (left > 0) parts.push(`${left} fuera del fichero por no tener correo`)
+  return parts.join(' · ')
+}
+
+/** The Moodle file's name, said so it cannot be taken for the grade sheet. */
+export function moodleCsvName(iso: string): string {
+  return `moodle-${stamp(iso)}.csv`
+}
