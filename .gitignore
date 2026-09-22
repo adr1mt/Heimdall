@@ -5,3 +5,7 @@ workspace/
 # Binario compilado y artefactos de ejecución.
 bin/
 var/
+
+# Aula que la aplicación genera a partir de la clase antes de cada
+# corrección (ADR-0022): se rehace sola, no es del repositorio.
+aula-heimdall-*.yaml
