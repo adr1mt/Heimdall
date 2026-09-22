@@ -2131,7 +2131,7 @@
       "id": "T120",
       "title": "Abrir la carpeta del examen desde Inicio",
       "phase": 6,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "package": "P6",
@@ -2154,7 +2154,7 @@
       "id": "T121",
       "title": "Clases se ve sin entrar a editar, como en teuton-gui",
       "phase": 6,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "package": "P6",
@@ -2178,7 +2178,7 @@
       "id": "T122",
       "title": "La pantalla Examenes dice que es",
       "phase": 6,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "package": "P6",
@@ -2227,7 +2227,7 @@
       "id": "T124",
       "title": "Resultados vuelve al resumen de teuton-gui",
       "phase": 6,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T119"
@@ -2253,7 +2253,7 @@
       "id": "T125",
       "title": "Analiticas: solo lo que se mira",
       "phase": 6,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T119"
