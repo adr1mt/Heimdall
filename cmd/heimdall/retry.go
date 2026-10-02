@@ -6,43 +6,12 @@ package main
 // and no machine is touched (ADR-0002).
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
 
 	"heimdall/internal/engine"
 	"heimdall/internal/model"
 	"heimdall/internal/plan"
 )
-
-// readArtifact loads a finished artifact from disk. It refuses a schema it
-// does not know instead of guessing: a field that changed meaning would be
-// read as a result that is not there.
-func readArtifact(path string) (*model.RunResult, error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil, fmt.Errorf("no se pudo leer la corrección anterior de %s: %w", path, err)
-	}
-	var run model.RunResult
-	if err := json.Unmarshal(data, &run); err != nil {
-		return nil, fmt.Errorf("%s no es un resultado de Heimdall: %s", path, err)
-	}
-	if run.SchemaVersion != model.SchemaVersion {
-		return nil, fmt.Errorf(
-			"%s está escrito en la versión %d del formato y este motor entiende la %d",
-			path, run.SchemaVersion, model.SchemaVersion)
-	}
-	if run.RunID == "" {
-		return nil, fmt.Errorf("%s no dice de qué ejecución es", path)
-	}
-	if err := model.ValidateArtifactJSON(data); err != nil {
-		return nil, fmt.Errorf("%s: %w", path, err)
-	}
-	if err := model.ValidateArtifact(&run); err != nil {
-		return nil, fmt.Errorf("%s: %w", path, err)
-	}
-	return &run, nil
-}
 
 // planRetry builds the selection of a repeat run and trims the PLAN to the
 // students that have something to repeat.

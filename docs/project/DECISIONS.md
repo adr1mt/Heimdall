@@ -708,3 +708,19 @@ La admisión del PLAN y la persistencia comparten 64 MiB. Las comparaciones usan
 las capturas completas; solo la evidencia guardada se recorta de forma uniforme
 por celda, contando expansión JSON y con aviso. Se admiten hasta 2000 celdas y
 1 MiB de metadatos resueltos; se rechaza lo no soportado antes de SSH.
+
+## T156 · Lectura acotada de artefactos
+
+- Los 64 MiB de ADR-0027 se comprueban en los bytes leídos, no solo en una
+  consulta previa de tamaño. Un byte adicional basta para rechazar el fichero.
+- El lector Go se comparte entre reintento, consolidación y sesión sin mover
+  disco al modelo puro. La GUI concentra apertura, histórico y copias en su
+  lector, con recorridos síncrono y asíncrono según el consumidor existente.
+- La restauración conserva el texto exacto que validó; no vuelve a abrirlo
+  entre validación y escritura. Mantiene la prohibición de sobrescribir.
+- No se cambian el esquema, la definición de nota ni ningún ADR aceptado.
+- `make check`, ambos builds y tipos correctos; 433 tests GUI correctos fuera
+  del aislamiento. Dos tests de cierre fallaron por timeout dentro del
+  aislamiento tanto con el cambio como con HEAD anterior.
+- T157 y T158 registran las otras oportunidades autorizadas. Se conservan
+  separadas por la regla de una tarea por sesión para el contrato y notas.

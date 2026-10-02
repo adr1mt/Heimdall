@@ -1,10 +1,10 @@
 import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
-import { readdir, mkdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises'
+import { existsSync, mkdirSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { readdir, mkdir, rename, rm, stat, writeFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
-import { parseArtifact, type RunResult } from '../shared/artifact'
+import type { RunResult } from '../shared/artifact'
 import { gradesOnly, type BackupEntry, type RestoreReport } from '../shared/backup'
-import { MAX_ARTIFACT } from './artifact'
+import { readArtifact, readArtifactAsync, readArtifactSnapshot } from './artifact'
 import { RUN_FILE, varDirOf, readRunDate } from './history'
 
 /** Retain 50 recent heads and their dependencies, at most 2500 copies. */
@@ -98,8 +98,7 @@ async function copyRuns(dataDir:string,examPath:string):Promise<BackupReport> {
    if((error as NodeJS.ErrnoException).code!=='ENOENT') throw error
    path=join(slot,name)
   }
-  if((await stat(path)).size>MAX_ARTIFACT) throw new Error('resultado demasiado grande para copiar')
-  const run=parseArtifact(await readFile(path,'utf8')); cache.set(name,run); return run
+  const run=await readArtifactAsync(path); cache.set(name,run); return run
  }
  async function chainOf(name:string):Promise<string[]> {
   const chain:string[]=[],seen=new Set<string>();let expected:string|undefined,hash:string|undefined
@@ -133,8 +132,7 @@ async function copyRuns(dataDir:string,examPath:string):Promise<BackupReport> {
  const copies=new Map<string,RunResult>(),keep=new Set<string>()
  for(const name of await names(slot)) {
   try {
-   if((await stat(join(slot,name))).size>MAX_ARTIFACT) throw new Error('copia demasiado grande')
-   copies.set(name,parseArtifact(await readFile(join(slot,name),'utf8')))
+   copies.set(name,await readArtifactAsync(join(slot,name)))
   } catch(error) {failure(join(slot,name),error)}
  }
  let heads=0
@@ -196,9 +194,8 @@ export function restoreBackups(dataDir: string, examPath: string): RestoreReport
       report.kept += 1
       continue
     }
-    const text = readFileSync(join(slot, name), 'utf-8')
-    // Read before writing: a copy that is not an artifact is not restored.
-    parseArtifact(text)
+    // Preserve the exact text validated from this open file.
+    const { text } = readArtifactSnapshot(join(slot, name))
     mkdirSync(varDir, { recursive: true })
     writeAtomic(target, text)
     report.restored += 1
@@ -210,8 +207,7 @@ function readBackupRuns(slot: string): Map<string, RunResult> {
   const runs = new Map<string, RunResult>()
   for (const name of runFilesIn(slot)) {
     try {
-      if (statSync(join(slot, name)).size > MAX_ARTIFACT) continue
-      runs.set(name, parseArtifact(readFileSync(join(slot, name), 'utf8')))
+      runs.set(name, readArtifact(join(slot, name)))
     } catch { /* Invalid copies are never offered for recovery. */ }
   }
   return runs

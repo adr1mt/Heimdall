@@ -2995,6 +2995,64 @@
         "make check; duplicados id/nombre/moodle_id/excluido/hosts/campo libre rechazados con ambas líneas."
       ],
       "completed": "2026-10-02"
+    },
+    {
+      "id": "T156",
+      "title": "Lectura acotada de artefactos compartida por consumidores",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Concentrar la lectura y validación sin cambiar notas ni los ADR existentes.",
+      "scope": [
+        "cmd/heimdall: lector de artefactos",
+        "gui/src/main/artifact.ts y consumidores histórico/copias"
+      ],
+      "acceptance": [
+        "Go y GUI aceptan artefactos válidos de hasta 64 MiB y rechazan un byte adicional antes de parsear.",
+        "El límite se aplica a los bytes leídos, aunque el fichero crezca tras consultar su tamaño.",
+        "Apertura, histórico, copia y restauración usan el lector compartido; restauración conserva el texto validado sin releerlo.",
+        "Se conservan las reglas de corrupción, versión, copias sin evidencia, retención y no sobrescritura.",
+        "make check, suite GUI, tipos y build correctos."
+      ],
+      "tests": [
+        "make check y make build correctos; npm run typecheck y npm run build correctos; 433 tests GUI correctos fuera del aislamiento.",
+        "Lectores aceptan límite exacto y rechazan +1 byte; GUI prueba crecimiento tras stat, Go limita consumo a 64 MiB +1 incluso en fuentes sin tamaño conocido.",
+        "Dos tests de cierre fallaron dentro del aislamiento también con HEAD anterior; fuera de él la suite completa pasa."
+      ],
+      "completed": "2026-10-02"
+    },
+    {
+      "id": "T157",
+      "title": "Paridad de validación de artefactos Go y GUI",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [
+        "T156"
+      ],
+      "goal": "Definir corpus común de aceptación y rechazo antes de reducir duplicación semántica.",
+      "acceptance": [
+        "Corpus contrastado con ambos lectores, incluyendo decimales, campos ausentes/null, adiciones, excluidos y copias.",
+        "Diferencia de evidence_bytes_per_field explícito igual a cero resuelta conforme al contrato.",
+        "Cálculo autoritativo de nota en Go y defensas ADR-0025 conservados."
+      ]
+    },
+    {
+      "id": "T158",
+      "title": "Concentrar recorrido de cadenas de copias",
+      "phase": 9,
+      "status": "BLOCKED",
+      "priority": "P2",
+      "depends_on": [
+        "T157"
+      ],
+      "goal": "Unificar invariantes de los dos recorridos de copias sin cambiar resolución de rutas ni reglas académicas.",
+      "acceptance": [
+        "Una implementación de ciclo, identidad, PLAN y máximo de 50 para copias.",
+        "Regresiones de retención, recuperación y no sobrescritura correctas.",
+        "No se mezclan cadena de reintento y sesión."
+      ]
     }
   ]
 }

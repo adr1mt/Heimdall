@@ -1,10 +1,9 @@
-import { readdir, readFile, stat, open } from 'node:fs/promises'
+import { readdir, stat, open } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
-import { parseArtifact } from '../shared/artifact'
 import { classNameOf } from '../shared/aula'
 import type { ClassGroup } from '../shared/classes'
 import type { RunSummary } from '../shared/history'
-import { MAX_ARTIFACT, tooBigMessage } from './artifact'
+import { readArtifactAsync } from './artifact'
 
 /**
  * A finished artifact. The partials a killed run leaves behind end in
@@ -39,15 +38,15 @@ export async function listRuns(varDir: string, classes: ClassGroup[] = []): Prom
     return []
   }
 
-  const files: { path: string; mtimeMs: number; size: number; at: number; problem?: string }[] = []
+  const files: { path: string; mtimeMs: number; at: number; problem?: string }[] = []
   for (const name of names) {
     if (!RUN_FILE.test(name)) continue
     const path = join(varDir, name)
     try {
       const info = await stat(path)
       if (info.isFile()) {
-        try { files.push({ path, mtimeMs: info.mtimeMs, size: info.size, at: await readRunDate(path) }) }
-        catch (error) { files.push({ path, mtimeMs: info.mtimeMs, size: info.size, at: NaN, problem: error instanceof Error ? error.message : String(error) }) }
+        try { files.push({ path, mtimeMs: info.mtimeMs, at: await readRunDate(path) }) }
+        catch (error) { files.push({ path, mtimeMs: info.mtimeMs, at: NaN, problem: error instanceof Error ? error.message : String(error) }) }
       }
     } catch {
       // It was there a moment ago and is not now. Nothing to report about a
@@ -59,7 +58,7 @@ export async function listRuns(varDir: string, classes: ClassGroup[] = []): Prom
 
   const runs: RunSummary[] = []
   for (const file of dated.slice(0, MAX_RUNS)) {
-    runs.push(await summarise(file.path, file.mtimeMs, file.size, classes))
+    runs.push(await summarise(file.path, file.mtimeMs, classes))
   }
   // The artifact's own clock, not the file's: a copied directory keeps the
   // order of the corrections and not the order they were copied in.
@@ -76,7 +75,6 @@ export async function listRuns(varDir: string, classes: ClassGroup[] = []): Prom
 async function summarise(
   path: string,
   mtimeMs: number,
-  size: number,
   classes: ClassGroup[]
 ): Promise<RunSummary> {
   const fallback: RunSummary = {
@@ -92,10 +90,8 @@ async function summarise(
     problem: null
   }
 
-  if (size > MAX_ARTIFACT) return { ...fallback, problem: tooBigMessage(size) }
-
   try {
-    const run = parseArtifact(await readFile(path, 'utf-8'))
+    const run = await readArtifactAsync(path)
     return {
       path,
       at: run.started_at || fallback.at,
