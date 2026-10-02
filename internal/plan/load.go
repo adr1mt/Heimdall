@@ -1,8 +1,10 @@
 package plan
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"reflect"
 	"strings"
@@ -47,8 +49,19 @@ func readDocument(path string) (*yaml.Node, error) {
 		return nil, fmt.Errorf("no se puede leer %s: %w", path, err)
 	}
 	var doc yaml.Node
-	if err := yaml.Unmarshal(data, &doc); err != nil {
+	decoder := yaml.NewDecoder(bytes.NewReader(data))
+	if err := decoder.Decode(&doc); err != nil {
+		if err == io.EOF {
+			return nil, &Error{File: path, Line: 1, Msg: "el fichero está vacío"}
+		}
 		return nil, withFile(path, syntaxError(err))
+	}
+	var extra yaml.Node
+	if err := decoder.Decode(&extra); err != io.EOF {
+		if err != nil {
+			return nil, withFile(path, syntaxError(err))
+		}
+		return nil, &Error{File: path, Line: extra.Line, Msg: "solo se admite un documento YAML; elimina el documento adicional"}
 	}
 	if doc.Kind != yaml.DocumentNode || len(doc.Content) == 0 {
 		return nil, &Error{File: path, Line: 1, Msg: "el fichero está vacío"}

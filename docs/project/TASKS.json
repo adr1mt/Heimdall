@@ -2958,7 +2958,7 @@
       "id": "T154",
       "title": "R10 · Rechazar documentos YAML adicionales",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
@@ -2969,7 +2969,10 @@
         "Examen e inventario rechazan segundo documento válido, inválido, vacío o malformado con ubicación.",
         "Regresiones del área y suite rápida en verde."
       ],
-      "tests": []
+      "tests": [
+        "make check; examen e inventario: segundo documento válido, desconocido, vacío y malformado; comentarios finales válidos."
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T155",

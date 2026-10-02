@@ -313,3 +313,28 @@ func itoa(n int) string {
 	}
 	return string(b)
 }
+
+func TestYAMLRequiresExactlyOneDocument(t *testing.T) {
+	for _, name := range []string{ExamFile, InventoryFile} {
+		for _, extra := range []string{"---\nexamen: Otro\n", "---\nesto_no_es_un_examen: true\n", "---\n", "---\ninvalid: [unterminated\n", "...\nmalformed trailing text\n"} {
+			exam, inv := validExam, validInventory
+			if name == ExamFile {
+				exam += extra
+			} else {
+				inv += extra
+			}
+			dir := project(t, exam, inv)
+			_, err := Load(dir)
+			if err == nil {
+				t.Fatalf("%s ignored extra %q", name, extra)
+			}
+			if !strings.Contains(err.Error(), name+":") || strings.Contains(err.Error(), ":0:") {
+				t.Fatalf("missing file/line: %v", err)
+			}
+		}
+		dir := project(t, validExam+"\n# trailing comment\n", validInventory+"\n# trailing comment\n")
+		if _, err := Load(dir); err != nil {
+			t.Fatal("trailing comments refused", err)
+		}
+	}
+}
