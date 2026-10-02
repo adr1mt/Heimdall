@@ -149,11 +149,18 @@ func dialOnce(ctx context.Context, cfg Config, clientCfg *ssh.ClientConfig) (*ss
 	if deadline, ok := dialCtx.Deadline(); ok {
 		conn.SetDeadline(deadline)
 	}
+	stopClose := context.AfterFunc(dialCtx, func() { _ = conn.Close() })
+	defer stopClose()
 	c, chans, reqs, err := ssh.NewClientConn(conn, cfg.addr(), clientCfg)
 	if err != nil {
 		conn.Close()
 		return nil, err
 	}
+	if dialCtx.Err() != nil {
+		conn.Close()
+		return nil, dialCtx.Err()
+	}
+	stopClose()
 	conn.SetDeadline(time.Time{})
 	return ssh.NewClient(c, chans, reqs), nil
 }
@@ -249,6 +256,8 @@ func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration
 		RemoteProcess:   model.RemoteUnknown,
 	}
 	start := time.Now()
+	res.Stdout, res.Stderr = emptyStreams()
+	defer func() { res.DurationMS = time.Since(start).Milliseconds() }()
 
 	runCtx := ctx
 	if timeout > 0 {
@@ -257,6 +266,12 @@ func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration
 		defer cancel()
 	}
 
+	// Closing the transport releases NewSession, Start, Wait and stream reads.
+	stopClose := context.AfterFunc(runCtx, func() { _ = s.client.Close() })
+	defer stopClose()
+	if runCtx.Err() != nil {
+		return res
+	}
 	sess, err := s.client.NewSession()
 	if err != nil {
 		res.Stdout, res.Stderr = emptyStreams()
@@ -316,13 +331,21 @@ func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration
 		// that keeps it alive must not keep us waiting either: we give the
 		// close a short grace and then report what we have.
 		res.DurationMS = time.Since(start).Milliseconds()
-		sess.Close()
-		waitFor(done, closeGrace)
-		waitGroupFor(&wg, closeGrace)
+		s.client.Close()
+		<-done
+		wg.Wait()
 	}
 	if !timedOut {
 		res.DurationMS = time.Since(start).Milliseconds()
-		wg.Wait()
+		drained := make(chan struct{})
+		go func() { wg.Wait(); close(drained) }()
+		select {
+		case <-drained:
+		case <-runCtx.Done():
+			timedOut = true
+			s.client.Close()
+			<-drained
+		}
 	}
 
 	commandCode, commandFinished := stderr.completion(marker)

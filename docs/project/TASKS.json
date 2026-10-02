@@ -2477,7 +2477,7 @@
       "id": "T130",
       "title": "A04 · Abrir un canal SSH o iniciar el comando puede bloquear indefinidamente",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
@@ -2488,7 +2488,10 @@
         "servidor sin respuesta en apertura, exec y autenticación; cancelación en cada fase; los demás alumnos deben terminar y debe guardarse el artefacto final. ",
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
-      "tests": []
+      "tests": [
+        "make check; go test -race -tags=integration ./internal/ssh -run TestSSHRequests\\|TestHandshakeCancellation"
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T131",
