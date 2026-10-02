@@ -2637,7 +2637,7 @@
       "id": "T138",
       "title": "A12 · La redacción defensiva no recorre toda la metadata textual",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
@@ -2648,7 +2648,10 @@
         "Redactar secretos en toda la metadata textual manteniendo referencias coherentes; ejecutar aceptación de secretos.",
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
-      "tests": []
+      "tests": [
+        "make check; metadata redactada y referencias conservadas; test/secrets.sh completo"
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T139",

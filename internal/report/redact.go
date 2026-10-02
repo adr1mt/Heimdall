@@ -3,6 +3,7 @@ package report
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 
 	"heimdall/internal/model"
@@ -25,22 +26,43 @@ func Redact(run *model.RunResult, secrets []string) (*model.RunResult, error) {
 		return out, nil
 	}
 
+	// Longest first prevents one secret from exposing the suffix of another.
+	secrets = append([]string(nil), secrets...)
+	sort.Slice(secrets, func(i, j int) bool { return len(secrets[i]) > len(secrets[j]) })
 	hits := 0
 	scrub := func(s *string) {
 		for _, secret := range secrets {
-			if strings.Contains(*s, secret) {
+			if secret != "" && strings.Contains(*s, secret) {
 				*s = strings.ReplaceAll(*s, secret, Redacted)
 				hits++
 			}
 		}
 	}
 
+	// Identity keys, enum values and content digests are structural references,
+	// not display text. Keeping them stable preserves retry/consolidation links.
+	scrub(&out.Exam.Path)
+	scrub(&out.Exam.Version)
+	scrub(&out.Inventory.Path)
+	scrub(&out.Inventory.Version)
+	scrub(&out.EngineVersion)
+	if out.RetryOf != nil {
+		scrub(&out.RetryOf.Artifact)
+	}
 	for i := range out.Students {
 		st := &out.Students[i]
+		scrub(&st.Name)
+		scrub(&st.MoodleID)
+		scrub(&st.Reason)
 		for j := range st.Checks {
 			c := &st.Checks[j]
+			scrub(&c.Group)
+			scrub(&c.Description)
 			scrub(&c.Detail)
 			if e := c.Execution; e != nil {
+				scrub(&e.Host)
+				scrub(&e.Address)
+				scrub(&e.User)
 				for k := range e.Command {
 					scrub(&e.Command[k])
 				}
@@ -50,6 +72,7 @@ func Redact(run *model.RunResult, secrets []string) (*model.RunResult, error) {
 			if a := c.Assertion; a != nil {
 				scrub(&a.Expected)
 				scrub(&a.Found)
+				scrub(&a.Where)
 			}
 			if pv := c.Previous; pv != nil {
 				scrub(&pv.Detail)
@@ -58,6 +81,7 @@ func Redact(run *model.RunResult, secrets []string) (*model.RunResult, error) {
 	}
 	for i := range out.Warnings {
 		scrub(&out.Warnings[i].Message)
+		scrub(&out.Warnings[i].Scope)
 	}
 
 	if hits > 0 {

@@ -288,3 +288,25 @@ func assertNoLeftovers(t *testing.T, dir string) {
 		}
 	}
 }
+
+func TestRedactDisplayMetadataAndPreserveReferences(t *testing.T) {
+	const secret = "AUDIT_FAKE_PASSWORD"
+	run := &model.RunResult{RunID: "run", PlanHash: "hash", Exam: model.SourceRef{Path: secret}, Inventory: model.SourceRef{Path: secret}, Plan: model.PlanSummary{CheckIDs: []string{"c"}}, Students: []model.StudentResult{{StudentID: "s", Name: secret, MoodleID: secret, Reason: secret, Checks: []model.CheckResult{{CheckID: "c", Group: secret, Description: secret, Execution: &model.ExecutionResult{Host: secret, Address: secret, User: secret}, Assertion: &model.AssertionResult{Where: secret}}}}}, Warnings: []model.Warning{{Scope: secret, Message: secret}}}
+	clean, err := Redact(run, []string{"", secret})
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, err := model.MarshalCanonical(clean)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(data), secret) || len(clean.Warnings) != 2 {
+		t.Fatalf("%s", data)
+	}
+	if clean.RunID != run.RunID || clean.PlanHash != run.PlanHash || clean.Plan.CheckIDs[0] != clean.Students[0].Checks[0].CheckID || clean.Students[0].StudentID != "s" {
+		t.Fatal("structural references changed")
+	}
+	if run.Students[0].Checks[0].Execution.User != secret {
+		t.Fatal("original mutated")
+	}
+}
