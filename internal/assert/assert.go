@@ -61,6 +61,9 @@ var ErrNotCompleted = errors.New("assert: la ejecución no se completó, no hay 
 // a student's failed check.
 var ErrUnknownKind = errors.New("assert: tipo de aserción no soportado")
 
+// ErrIncompleteOutput means the retained evidence cannot decide this assertion.
+var ErrIncompleteOutput = errors.New("assert: la salida conservada está recortada y no permite decidir esta aserción")
+
 // Eval compares exec against spec.
 //
 // It refuses an execution that did not complete: with no exit status, or with
@@ -69,6 +72,31 @@ var ErrUnknownKind = errors.New("assert: tipo de aserción no soportado")
 func Eval(exec model.ExecutionResult, spec Spec) (model.AssertionResult, error) {
 	if !exec.Completed {
 		return model.AssertionResult{}, ErrNotCompleted
+	}
+	if exec.Stdout.Truncated {
+		// A witnessed occurrence proves presence even in a prefix. Absence and
+		// equality require the entire stream. Exit status is independent of it.
+		switch spec.Kind {
+		case KindContains:
+			if found := evalContains(exec.Stdout.Text, spec.Expected); found.Matched {
+				return found, nil
+			}
+		case KindNotContains:
+			if found := evalNotContains(exec.Stdout.Text, spec.Expected); !found.Matched {
+				return found, nil
+			}
+		case KindNear:
+			if found := evalNear(exec.Stdout.Text, spec); found.Matched {
+				return found, nil
+			}
+		case KindExitCode:
+			return evalExitCode(exec.ExitCode, spec.ExitCode)
+		default:
+			if spec.Kind != KindEquals {
+				return model.AssertionResult{}, fmt.Errorf("%w: %q", ErrUnknownKind, spec.Kind)
+			}
+		}
+		return model.AssertionResult{}, ErrIncompleteOutput
 	}
 
 	switch spec.Kind {

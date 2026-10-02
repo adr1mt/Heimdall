@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"strconv"
@@ -230,6 +231,9 @@ func failedAssertion(out model.CheckResult, err error) model.CheckResult {
 	out.Assertion = nil
 	out.Status = model.Unevaluated
 	out.Cause = model.CauseEngineError
+	if errors.Is(err, assert.ErrIncompleteOutput) {
+		out.Cause = model.CauseOutputOverflow
+	}
 	out.Detail = oneLine(err)
 	return out
 }

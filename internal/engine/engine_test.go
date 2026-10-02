@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"heimdall/internal/assert"
 	"heimdall/internal/model"
 	"heimdall/internal/plan"
 	"heimdall/internal/ssh"
@@ -419,5 +420,12 @@ func TestOverflowBeatsALostConnection(t *testing.T) {
 	}
 	if gotCause != model.CauseOutputOverflow {
 		t.Errorf("la causa se pierde por el camino: %q", gotCause)
+	}
+}
+
+func TestTruncatedAssertionHasTechnicalCause(t *testing.T) {
+	out := failedAssertion(model.CheckResult{Weight: 1}, assert.ErrIncompleteOutput)
+	if out.Status != model.Unevaluated || out.Cause != model.CauseOutputOverflow || out.Assertion != nil {
+		t.Fatalf("%+v", out)
 	}
 }

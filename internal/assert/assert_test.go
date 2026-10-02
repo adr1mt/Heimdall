@@ -180,3 +180,32 @@ func sourceOf(t *testing.T, path string) string {
 	}
 	return string(b)
 }
+
+func TestTruncatedEvidence(t *testing.T) {
+	for _, tc := range []struct {
+		spec            Spec
+		text            string
+		decide, matched bool
+	}{
+		{Spec{Kind: KindContains, Expected: "FOUND"}, "FOUND", true, true},
+		{Spec{Kind: KindContains, Expected: "FOUND"}, "prefix", false, false},
+		{Spec{Kind: KindNotContains, Expected: "FOUND"}, "FOUND", true, false},
+		{Spec{Kind: KindNotContains, Expected: "FOUND"}, "prefix", false, false},
+		{Spec{Kind: KindEquals, Expected: "prefix"}, "prefix", false, false},
+		{Spec{Kind: KindNear, Anchor: "anchor", Lines: 1, Expected: "FOUND"}, "anchor\nFOUND", true, true},
+		{Spec{Kind: KindNear, Anchor: "anchor", Lines: 1, Expected: "FOUND"}, "prefix", false, false},
+		{Spec{Kind: KindExitCode, ExitCode: 0}, "prefix", true, true},
+	} {
+		exec := completed(tc.text, 0)
+		exec.Stdout.Truncated = true
+		exec.Stdout.BytesTotal++
+		got, err := Eval(exec, tc.spec)
+		if tc.decide {
+			if err != nil || got.Matched != tc.matched {
+				t.Errorf("%s: %+v %v", tc.spec.Kind, got, err)
+			}
+		} else if !errors.Is(err, ErrIncompleteOutput) {
+			t.Errorf("%s: expected incomplete output, got %+v %v", tc.spec.Kind, got, err)
+		}
+	}
+}
