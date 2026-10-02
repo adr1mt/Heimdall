@@ -97,7 +97,7 @@ func detailFor(cause Cause) string {
 // It never returns EXCLUDED: exclusion is decided from the inventory before
 // any check exists, and the caller sets it.
 func ComputeScore(plan PlanSummary, checks []CheckResult) Score {
-	var obtained, evaluable float64
+	var obtained, evaluable, pending float64
 	for _, c := range checks {
 		switch c.Status {
 		case Pass:
@@ -105,12 +105,16 @@ func ComputeScore(plan PlanSummary, checks []CheckResult) Score {
 			evaluable += c.Weight
 		case Fail:
 			evaluable += c.Weight
+		case Unevaluated:
+			pending += c.Weight
 		}
 	}
 
 	total := plan.TotalWeight
 	unevaluated := total - evaluable
-	if isZeroWeight(unevaluated) {
+	if pending > 0 {
+		unevaluated = pending
+	} else if isZeroWeight(unevaluated) {
 		unevaluated = 0
 	}
 
@@ -121,7 +125,7 @@ func ComputeScore(plan PlanSummary, checks []CheckResult) Score {
 		Unevaluated: unevaluated,
 	}
 
-	if isZeroWeight(evaluable) {
+	if evaluable == 0 {
 		// Nothing could be evaluated. This is not a zero: a zero would say the
 		// student did nothing, and what happened is that we could not look.
 		score.Status = ScoreNotEvaluated
@@ -144,7 +148,7 @@ func ComputeScore(plan PlanSummary, checks []CheckResult) Score {
 // percent renders part/whole as the 0-100 integer the engine publishes.
 // Converting to the teacher's own scale is the GUI's job.
 func percent(part, whole float64) *int {
-	p := int(math.Round(100 * part / whole))
+	p := int(math.Round(100 * (part / whole)))
 	return &p
 }
 

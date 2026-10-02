@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"sort"
@@ -141,6 +142,12 @@ func Resolve(exam *Exam, inventory *Inventory, examPath, inventoryPath string) (
 	var examErrs, inventoryErrs []error
 
 	checks := validateExam(exam, &examErrs)
+	if weight := totalWeight(checks); math.IsNaN(weight) || math.IsInf(weight, 0) {
+		examErrs = append(examErrs, errf(1, "la suma de pesos debe ser un número finito"))
+	}
+	if exam.Defaults.Weight != nil && (math.IsNaN(*exam.Defaults.Weight) || math.IsInf(*exam.Defaults.Weight, 0) || *exam.Defaults.Weight < 0) {
+		examErrs = append(examErrs, errf(1, "por_defecto.peso debe ser finito y no negativo"))
+	}
 	validateInventory(inventory, &inventoryErrs)
 
 	if err := join(examErrs); err != nil {
@@ -212,9 +219,9 @@ func validateExam(exam *Exam, errs *[]error) []Check {
 			}
 
 			// 7. negative weight. Zero is legal and reported without grade.
-			if check.Weight != nil && *check.Weight < 0 {
+			if check.Weight != nil && (math.IsNaN(*check.Weight) || math.IsInf(*check.Weight, 0) || *check.Weight < 0) {
 				*errs = append(*errs, errf(check.Line,
-					"peso negativo (%v) en %q", *check.Weight, check.ID))
+					"peso negativo o no finito (%v) en %q: debe ser finito y no negativo", *check.Weight, check.ID))
 			}
 
 			// 3. logical host used but not declared. A check without a

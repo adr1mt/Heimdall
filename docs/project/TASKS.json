@@ -2611,7 +2611,7 @@
       "id": "T137",
       "title": "A11 · Los límites numéricos permiten estados incompatibles con la política",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
@@ -2622,7 +2622,10 @@
         "Regresión del caso de auditoría en verde.",
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
-      "tests": []
+      "tests": [
+        "make check; NaN/Inf, suma infinita, pesos pendientes 1e-10/1e-100/1e-300 y porcentajes extremos"
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T138",

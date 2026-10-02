@@ -297,3 +297,19 @@ func show(p *int) any {
 	}
 	return *p
 }
+
+func TestPositivePendingWeightNeverDisappears(t *testing.T) {
+	for _, weight := range []float64{1e-10, 1e-100, 1e-300} {
+		checks := []CheckResult{check(1, Pass), check(weight, Unevaluated)}
+		got := ComputeScore(planOf(1+weight), checks)
+		if got.Status != ScoreIncomplete || got.Final != nil || got.Unevaluated != weight || StudentStatusOf(checks) != StudentPartial {
+			t.Fatalf("%v: %+v", weight, got)
+		}
+	}
+	for _, weight := range []float64{1e-300, 1e308} {
+		got := ComputeScore(planOf(weight), []CheckResult{check(weight, Pass)})
+		if got.Final == nil || *got.Final != 100 {
+			t.Fatalf("%v: %+v", weight, got)
+		}
+	}
+}

@@ -392,3 +392,18 @@ func TestMissingProjectFiles(t *testing.T) {
 		t.Fatal("un directorio vacío debe ser error")
 	}
 }
+
+func TestNonfiniteWeightsRejected(t *testing.T) {
+	for _, weight := range []string{".nan", ".inf", "-.inf"} {
+		for _, exam := range []string{strings.Replace(validExam, "peso: 2", "peso: "+weight, 1), strings.Replace(validExam, "peso: 1", "peso: "+weight, 1)} {
+			_, err := Load(project(t, exam, validInventory))
+			if err == nil || !strings.Contains(err.Error(), "finito") {
+				t.Fatalf("%s: %v", weight, err)
+			}
+		}
+	}
+	exam := strings.ReplaceAll(strings.Replace(validExam, "peso: 1", "peso: 1e308", 1), "peso: 2", "peso: 1e308")
+	if _, err := Load(project(t, exam, validInventory)); err == nil {
+		t.Fatal("nonfinite sum accepted")
+	}
+}
