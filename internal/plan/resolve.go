@@ -144,6 +144,8 @@ func Resolve(exam *Exam, inventory *Inventory, examPath, inventoryPath string) (
 	checks := validateExam(exam, &examErrs)
 	if weight := totalWeight(checks); math.IsNaN(weight) || math.IsInf(weight, 0) {
 		examErrs = append(examErrs, errf(1, "la suma de pesos debe ser un número finito"))
+	} else if weight <= 0 {
+		examErrs = append(examErrs, errf(1, "el examen debe tener al menos una comprobación con peso positivo"))
 	}
 	if exam.Defaults.Weight != nil && (math.IsNaN(*exam.Defaults.Weight) || math.IsInf(*exam.Defaults.Weight, 0) || *exam.Defaults.Weight < 0) {
 		examErrs = append(examErrs, errf(1, "por_defecto.peso debe ser finito y no negativo"))

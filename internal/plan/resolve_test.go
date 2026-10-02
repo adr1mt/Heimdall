@@ -425,3 +425,29 @@ func TestResultBudgetRejectsUnsupportedConfiguration(t *testing.T) {
 		t.Fatal("inventory evidence counted as metadata", err)
 	}
 }
+
+func TestZeroTotalWeightRejectedButDiagnosticChecksAllowed(t *testing.T) {
+	exam := `examen: Diagnóstico ficticio
+version: 1
+hosts: []
+por_defecto: {peso: 0}
+grupos:
+  - grupo: G
+    comprobaciones:
+      - id: zero
+        valor: yes
+        contiene: yes
+`
+	inventory := "aula: Ficticia\nversion: 1\nalumnos:\n  - id: fake\n    nombre: Ficticio\n"
+	if _, err := Load(project(t, exam, inventory)); err == nil || !strings.Contains(err.Error(), "peso positivo") {
+		t.Fatalf("zero total: %v", err)
+	}
+	mixed := exam + "      - id: positive\n        peso: 1\n        valor: yes\n        contiene: yes\n"
+	p, err := Load(project(t, mixed, inventory))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p.Summary.TotalWeight != 1 || p.Students[0].Checks[0].Weight != 0 {
+		t.Fatal("diagnostic weight changed")
+	}
+}

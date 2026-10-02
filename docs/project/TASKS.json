@@ -2878,7 +2878,7 @@
       "id": "T150",
       "title": "R06 · Exigir peso total positivo",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
@@ -2889,7 +2889,10 @@
         "Solo pesos cero se rechaza antes de ejecutar; mezcla con positivos se conserva.",
         "Regresiones del área y suite rápida en verde."
       ],
-      "tests": []
+      "tests": [
+        "make check; regresión CLI: pesos cero exit 2 sin resultado, mezcla cero/positivo exit 0 y lectura válida."
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T151",

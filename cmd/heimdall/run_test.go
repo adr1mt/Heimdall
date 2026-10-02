@@ -199,3 +199,31 @@ func TestRunRejectsAnUnknownEventFormat(t *testing.T) {
 	}
 	assertEmptyDir(t, out)
 }
+
+func TestZeroWeightExamStopsBeforeWritingAndMixedExamIsReadable(t *testing.T) {
+	dir := t.TempDir()
+	out := t.TempDir()
+	exam := "examen: Ficticio\nversion: 1\nhosts: []\npor_defecto: {peso: 0}\ngrupos:\n  - grupo: G\n    comprobaciones:\n      - id: zero\n        valor: yes\n        contiene: yes\n"
+	os.WriteFile(filepath.Join(dir, "examen.yaml"), []byte(exam), 0600)
+	os.WriteFile(filepath.Join(dir, "aula.yaml"), []byte("aula: Ficticia\nversion: 1\nalumnos:\n  - id: fake\n    nombre: Ficticio\n"), 0600)
+	var stdout, stderr bytes.Buffer
+	if code := run([]string{"run", "--secrets=env", "--var=" + out, dir}, &stdout, &stderr); code != exitInvalidConfig {
+		t.Fatalf("zero exam exit %d: %s", code, stderr.String())
+	}
+	assertEmptyDir(t, out)
+	exam += "      - id: positive\n        peso: 1\n        valor: yes\n        contiene: yes\n"
+	os.WriteFile(filepath.Join(dir, "examen.yaml"), []byte(exam), 0600)
+	stdout.Reset()
+	stderr.Reset()
+	if code := run([]string{"run", "--secrets=env", "--var=" + out, dir}, &stdout, &stderr); code != exitOK {
+		t.Fatalf("mixed exam exit %d: %s", code, stderr.String())
+	}
+	paths, _ := filepath.Glob(filepath.Join(out, "run-*.json"))
+	result, err := readArtifact(paths[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Students[0].Checks[0].Weight != 0 || *result.Students[0].Score.Final != 100 {
+		t.Fatal("mixed grade changed")
+	}
+}
