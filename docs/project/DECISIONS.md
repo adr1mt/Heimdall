@@ -695,3 +695,9 @@ Dos decisiones menores:
   vuelta sin redondear. Sustituye el criterio de elección de ADR-0020 §1.
 - T127–T144 reparan las 18 incidencias; evidencia y límites en
   `docs/audits/2026-10-02/REPARACION.md`.
+
+## T148 · Retención de cadenas de copias (ADR-0026)
+
+Las 50 correcciones recientes conservan todos sus antecedentes, hasta 50 por
+cadena y 2500 ficheros por examen. Una cadena incompleta se avisa y no se ofrece
+como recuperable. Se seleccionan las copias existentes después de copiar.

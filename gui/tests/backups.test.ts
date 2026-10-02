@@ -288,3 +288,36 @@ it('serializes overlapping passes for the same exam',async()=> {
  const reports=await Promise.all([backupRuns(dataDir,examPath),backupRuns(dataDir,examPath)])
  expect(reports.map(x=>x.saved)).toEqual([1,0]);expect(reports.every(x=>x.failures.length===0)).toBe(true)
 })
+
+it.each([2, 4])('retains complete chains through rotations and recovery (%i links)', async links => {
+ const {dataDir,examPath,varDir}=workspace()
+ const root='2026-09-01T10:00:00Z'
+ writeRun(varDir,'ROOT',root)
+ for(let i=0;i<60;i++) writeRun(varDir,`I${i}`,new Date(Date.UTC(2026,9,2,0,i)).toISOString())
+ let previous='ROOT'
+ for(let i=1;i<links;i++) {
+  const run=JSON.parse(artifact(`RETRY${i}`,new Date(Date.UTC(2026,9,2,2,i)).toISOString()))
+  run.retry_of={run_id:previous,artifact:join(varDir,`run-${previous}.json`),run_at:root,students:1,checks:1}
+  writeFileSync(join(varDir,`run-RETRY${i}.json`),JSON.stringify(run));previous=`RETRY${i}`
+ }
+ for(let pass=0;pass<3;pass++) {
+  expect((await backupRuns(dataDir,examPath)).failures).toEqual([])
+  const ids=listBackups(dataDir,examPath).map(x=>x.runId)
+  expect(ids).toContain('ROOT')
+  for(let i=1;i<links;i++) expect(ids).toContain(`RETRY${i}`)
+  expect(ids.length).toBeLessThanOrEqual(MAX_BACKUPS+links-1)
+ }
+ rmSync(varDir,{recursive:true});restoreBackups(dataDir,examPath)
+ // Every offered chain can now be followed using only the restored files.
+ for(const entry of listBackups(dataDir,examPath)) {
+  let run=parseArtifact(readFileSync(join(varDir,`run-${entry.runId}.json`),'utf8'))
+  while(run.retry_of) run=parseArtifact(readFileSync(join(varDir,`run-${run.retry_of.run_id}.json`),'utf8'))
+ }
+})
+it('reports and hides a chain with a missing ancestor',async()=> {
+ const {dataDir,examPath,varDir}=workspace(),run=JSON.parse(artifact('RETRY','2026-10-02T10:00:00Z'))
+ run.retry_of={run_id:'MISSING',artifact:join(varDir,'run-MISSING.json'),run_at:run.started_at,students:1,checks:1}
+ writeFileSync(join(varDir,'run-RETRY.json'),JSON.stringify(run))
+ expect((await backupRuns(dataDir,examPath)).failures.length).toBeGreaterThan(0)
+ expect(listBackups(dataDir,examPath)).toEqual([])
+})

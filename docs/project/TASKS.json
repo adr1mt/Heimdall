@@ -2838,7 +2838,7 @@
       "id": "T148",
       "title": "R04 · Retener cadenas completas de copias",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
@@ -2849,7 +2849,10 @@
         "Más de 50 resultados y rotaciones conservan cadenas recuperables completas con límite explícito.",
         "Regresiones del área y suite rápida en verde."
       ],
-      "tests": []
+      "tests": [
+        "27 tests backups/shutdown; tipos; cadenas de 2 y 4 eslabones, tres rotaciones y restauración sin originales."
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T149",
