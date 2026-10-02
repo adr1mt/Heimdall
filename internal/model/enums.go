@@ -102,7 +102,7 @@ type RemoteProcessState string
 const (
 	// RemoteFinished means the process ended and its exit status was received.
 	RemoteFinished RemoteProcessState = "FINISHED"
-	// RemoteKilledRemote means the engine closed the channel on timeout.
+	// RemoteKilledRemote means the remote timeout confirmed termination.
 	RemoteKilledRemote RemoteProcessState = "KILLED_REMOTE"
 	// RemoteUnknown means the engine cannot tell.
 	RemoteUnknown RemoteProcessState = "UNKNOWN"

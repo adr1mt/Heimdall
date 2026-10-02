@@ -6,6 +6,8 @@ package ssh
 
 import (
 	"context"
+	"errors"
+	"heimdall/internal/assert"
 	"os"
 	"os/exec"
 	"runtime"
@@ -304,5 +306,41 @@ func TestCancellationDoesNotClaimRemoteKill(t *testing.T) {
 	res := s.Run(ctx, []string{"sleep", "2"}, 20*time.Second)
 	if res.Completed || res.RemoteProcess != model.RemoteUnknown {
 		t.Fatalf("%+v", res)
+	}
+}
+
+func TestTextAssertionsUseOnlyDecisiveTruncatedEvidence(t *testing.T) {
+	s := dialLab(t)
+	for _, tc := range []struct {
+		script          string
+		spec            assert.Spec
+		decide, matched bool
+	}{
+		{"printf FORBIDDEN; printf '%*s' 65536 ''", assert.Spec{Kind: assert.KindContains, Expected: "FORBIDDEN"}, true, true},
+		{"printf FORBIDDEN; printf '%*s' 65536 ''", assert.Spec{Kind: assert.KindNotContains, Expected: "FORBIDDEN"}, true, false},
+		{"printf '%*s' 65536 ''; printf FORBIDDEN", assert.Spec{Kind: assert.KindContains, Expected: "FORBIDDEN"}, false, false},
+		{"printf '%*s' 65536 ''; printf FORBIDDEN", assert.Spec{Kind: assert.KindNotContains, Expected: "FORBIDDEN"}, false, false},
+		{"printf '%*s' 65536 ''; printf suffix", assert.Spec{Kind: assert.KindEquals, Expected: ""}, false, false},
+		{"printf '%*s' 65536 ''; printf '\\nanchor\\nFOUND'", assert.Spec{Kind: assert.KindNear, Anchor: "anchor", Lines: 1, Expected: "FOUND"}, false, false},
+	} {
+		res := s.Run(context.Background(), []string{"sh", "-c", tc.script}, time.Second)
+		if !res.Completed || !res.Stdout.Truncated {
+			t.Fatalf("%+v", res)
+		}
+		got, err := assert.Eval(*res, tc.spec)
+		if tc.decide {
+			if err != nil || got.Matched != tc.matched {
+				t.Fatalf("%+v %v", got, err)
+			}
+		} else if !errors.Is(err, assert.ErrIncompleteOutput) {
+			t.Fatalf("%+v %v", got, err)
+		}
+	}
+	for _, argv := range [][]string{{"heimdall_command_that_does_not_exist"}, {"cat", "/heimdall_missing_file"}} {
+		res := s.Run(context.Background(), argv, time.Second)
+		got, err := assert.Eval(*res, assert.Spec{Kind: assert.KindNotContains, Expected: "FORBIDDEN"})
+		if err != nil || got.Matched {
+			t.Fatalf("%+v %v", got, err)
+		}
 	}
 }

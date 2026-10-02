@@ -13,8 +13,8 @@ import "math"
 // zero. Weights are teacher-written decimals, so a plan of 0.1 + 0.2 + 0.7
 // leaves a residue around 1e-16 in total-evaluable. Without this, that residue
 // would read as "something is still unevaluated" and would deny a final grade
-// to a student who earned one. Any real weight is many orders of magnitude
-// above it.
+// to a student who earned one. This slack only removes arithmetic residue
+// when no positive-weight check is pending; real weights may be smaller.
 const weightEpsilon = 1e-9
 
 // isZeroWeight reports whether an accumulated weight is zero within the slack.

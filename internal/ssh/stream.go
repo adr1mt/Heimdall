@@ -31,9 +31,14 @@ type capWriter struct {
 
 func (w *capWriter) Write(p []byte) (int, error) {
 	w.total += int64(len(p))
-	w.tail = append(w.tail, p...)
-	if len(w.tail) > 512 {
-		w.tail = append([]byte(nil), w.tail[len(w.tail)-512:]...)
+	const tailLimit = 512
+	if len(p) >= tailLimit {
+		w.tail = append(w.tail[:0], p[len(p)-tailLimit:]...)
+	} else {
+		if len(w.tail)+len(p) > tailLimit {
+			w.tail = w.tail[len(w.tail)+len(p)-tailLimit:]
+		}
+		w.tail = append(w.tail, p...)
 	}
 	if room := keepLimit - len(w.kept); room > 0 {
 		if len(p) < room {

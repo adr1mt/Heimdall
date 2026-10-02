@@ -31,9 +31,6 @@ const (
 	// remoteGrace is how long the local clock waits beyond the remote timeout,
 	// so that `timeout -k 5s` gets to kill the process and report it.
 	remoteGrace = 8 * time.Second
-	// closeGrace bounds how long a timed-out command may hold the worker after
-	// its channel was closed.
-	closeGrace = 2 * time.Second
 	// transport names what the artifact records for every execution here.
 	transport = "ssh"
 )
@@ -328,8 +325,8 @@ func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration
 	case <-runCtx.Done():
 		timedOut = true
 		// Closing the channel does not kill the remote process, and a server
-		// that keeps it alive must not keep us waiting either: we give the
-		// close a short grace and then report what we have.
+		// that keeps it alive must not keep us waiting either: closing the
+		// transport unblocks all requests and stream readers.
 		res.DurationMS = time.Since(start).Milliseconds()
 		s.client.Close()
 		<-done
@@ -394,29 +391,6 @@ func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration
 	res.Completed = true
 	res.RemoteProcess = model.RemoteFinished
 	return res
-}
-
-// waitFor drains c or gives up after d.
-func waitFor(c <-chan error, d time.Duration) {
-	t := time.NewTimer(d)
-	defer t.Stop()
-	select {
-	case <-c:
-	case <-t.C:
-	}
-}
-
-// waitGroupFor waits for wg or gives up after d. The readers left behind are
-// capped, so abandoning them cannot grow memory.
-func waitGroupFor(wg *sync.WaitGroup, d time.Duration) {
-	done := make(chan struct{})
-	go func() { wg.Wait(); close(done) }()
-	t := time.NewTimer(d)
-	defer t.Stop()
-	select {
-	case <-done:
-	case <-t.C:
-	}
 }
 
 func emptyStreams() (model.Stream, model.Stream) {

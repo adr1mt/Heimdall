@@ -6,6 +6,7 @@ import (
 	"context"
 	"crypto/ed25519"
 	"crypto/rand"
+	"fmt"
 	xssh "golang.org/x/crypto/ssh"
 	"heimdall/internal/model"
 	"net"
@@ -120,5 +121,62 @@ func TestHandshakeCancellationClosesTransport(t *testing.T) {
 		}
 	case <-time.After(500 * time.Millisecond):
 		t.Fatal("handshake ignored cancellation")
+	}
+}
+
+func TestAuthenticationCancellationClosesTransport(t *testing.T) {
+	_, key, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	signer, err := xssh.NewSignerFromKey(key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	entered, release := make(chan struct{}), make(chan struct{})
+	defer close(release)
+	config := &xssh.ServerConfig{PasswordCallback: func(_ xssh.ConnMetadata, _ []byte) (*xssh.Permissions, error) {
+		close(entered)
+		<-release
+		return nil, fmt.Errorf("rejected")
+	}}
+	config.AddHostKey(signer)
+	listener, err := net.Listen("tcp", "127.1.2.3:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer listener.Close()
+	go func() {
+		raw, err := listener.Accept()
+		if err != nil {
+			return
+		}
+		defer raw.Close()
+		server, _, _, err := xssh.NewServerConn(raw, config)
+		if err == nil {
+			server.Close()
+		}
+	}()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	cfg := Config{Address: "127.1.2.3", Port: listener.Addr().(*net.TCPAddr).Port, User: "fake", ConnectTimeout: time.Second}
+	done := make(chan error, 1)
+	go func() {
+		_, err := dialOnce(ctx, cfg, &xssh.ClientConfig{User: "fake", Auth: []xssh.AuthMethod{xssh.Password("fake")}, HostKeyCallback: xssh.InsecureIgnoreHostKey()})
+		done <- err
+	}()
+	select {
+	case <-entered:
+	case <-time.After(time.Second):
+		t.Fatal("authentication did not start")
+	}
+	cancel()
+	select {
+	case err := <-done:
+		if err == nil {
+			t.Fatal("cancelled authentication succeeded")
+		}
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("authentication ignored cancellation")
 	}
 }
