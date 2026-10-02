@@ -73,6 +73,12 @@ func Eval(exec model.ExecutionResult, spec Spec) (model.AssertionResult, error) 
 	if !exec.Completed {
 		return model.AssertionResult{}, ErrNotCompleted
 	}
+	if spec.Kind == KindNotContains && exec.ExitCode != nil && *exec.ExitCode != 0 {
+		return model.AssertionResult{
+			Kind: string(KindNotContains), Expected: spec.Expected,
+			Where: fmt.Sprintf("el comando terminó con código %d; no demuestra ausencia", *exec.ExitCode),
+		}, nil
+	}
 	if exec.Stdout.Truncated {
 		// A witnessed occurrence proves presence even in a prefix. Absence and
 		// equality require the entire stream. Exit status is independent of it.

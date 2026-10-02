@@ -209,3 +209,17 @@ func TestTruncatedEvidence(t *testing.T) {
 		}
 	}
 }
+
+func TestAbsenceRequiresSuccessfulCommand(t *testing.T) {
+	for _, code := range []int{0, 1, 2, 127} {
+		got, err := Eval(completed("", code), Spec{Kind: KindNotContains, Expected: "FORBIDDEN"})
+		if err != nil || got.Matched != (code == 0) {
+			t.Fatalf("code %d: %+v %v", code, got, err)
+		}
+	}
+	// A nonzero status can still be requested explicitly by the teacher.
+	got, err := Eval(completed("", 1), Spec{Kind: KindExitCode, ExitCode: 1})
+	if err != nil || !got.Matched {
+		t.Fatalf("explicit exit status: %+v %v", got, err)
+	}
+}
