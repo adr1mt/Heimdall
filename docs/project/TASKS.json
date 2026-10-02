@@ -2551,7 +2551,7 @@
       "id": "T134",
       "title": "A08 · Una vuelta perfecta puede no dar al alumno por terminado",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
@@ -2562,7 +2562,10 @@
         "Regresión del caso de auditoría en verde.",
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
-      "tests": []
+      "tests": [
+        "make check; regresión de sesión 249/250 → 250/250"
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T135",

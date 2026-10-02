@@ -229,7 +229,7 @@ func sessionStudent(id string, rounds []SessionRound) SessionStudent {
 		if a.Score.Status != ScoreComplete || a.Score.Final == nil {
 			continue
 		}
-		if best < 0 || *a.Score.Final > *out.Rounds[best].Score.Final {
+		if best < 0 || a.Score.Obtained > out.Rounds[best].Score.Obtained {
 			best = i
 		}
 	}
@@ -260,7 +260,13 @@ func sessionStudent(id string, rounds []SessionRound) SessionStudent {
 	// FINISHED is the full weight of the PLAN, not merely a complete grade:
 	// every check evaluated and every check PASS. Compared on the raw weights,
 	// because the published 0-100 integer rounds (ADR-0020 §4).
-	if isZeroWeight(out.Score.Total - out.Score.Obtained) {
+	perfect := true
+	for _, c := range studentIn(rounds[out.FromRound-1].Run, id).Checks {
+		if c.Weight > 0 && c.Status != Pass {
+			perfect = false
+		}
+	}
+	if perfect {
 		out.Status = SessionFinished
 	} else {
 		out.Status = SessionActive
