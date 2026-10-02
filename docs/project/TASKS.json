@@ -2597,7 +2597,7 @@
       "id": "T136",
       "title": "A10 · Un fichero de clases parcialmente corrupto pierde datos al guardar",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
@@ -2608,7 +2608,10 @@
         "Rechazar datos parciales inválidos con su ubicación y preservar el fichero original.",
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
-      "tests": []
+      "tests": [
+        "Tipos GUI; Vitest classes: 39 pruebas; corrupción parcial y preservación del original"
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T137",

@@ -254,3 +254,17 @@ describe('la clase que se ve', () => {
     expect(shownGroup([], 'a')).toBeNull()
   })
 })
+
+it.each([
+ {...group(),name:''},
+ {...group(),students:[{name:'Missing id'}]},
+ {...group(),columns:['nombre']},
+ {...group(),students:[{...group().students[0],fields:{subdominio:4}}]},
+ {...group(),students:'invalid'}
+])('blocks partial corruption without overwriting valid data',bad=> {
+ const dir=emptyDir(),original=JSON.stringify({classes:[group(),bad]})
+ writeFileSync(classesFile(dir),original)
+ expect(()=>readClasses(dir)).toThrow(/classes\[2\]/)
+ expect(()=>writeClasses(dir,[group()])).toThrow()
+ expect(readFileSync(classesFile(dir),'utf8')).toBe(original)
+})
