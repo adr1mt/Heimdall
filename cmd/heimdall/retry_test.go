@@ -253,3 +253,35 @@ func TestRetryOfRetriesKeepsEarlierAcademicResults(t *testing.T) {
 		t.Fatal("missing ancestor accepted")
 	}
 }
+
+func TestRetryChecksAllAncestorsAndChainLimitBeforeSelection(t *testing.T) {
+	for _, kind := range []string{"other-plan", "wrong-id", "limit"} {
+		dir := t.TempDir()
+		root := sessionRun("ROOT", 10, "fake", model.Pass, model.Unevaluated)
+		path := writeRun(t, dir, "run-ROOT.json", root)
+		previous := root
+		count := 1
+		if kind == "limit" {
+			count = maxChain - 1
+		}
+		for i := 1; i <= count; i++ {
+			next := sessionRun(fmt.Sprintf("R%d", i), 10, "fake", model.Unevaluated, model.Unevaluated)
+			next.RetryOf = &model.RetryRef{RunID: previous.RunID, Artifact: path, RunAt: previous.FinishedAt, Students: 1, Checks: 1}
+			previous = next
+			path = writeRun(t, dir, fmt.Sprintf("run-R%d.json", i), next)
+		}
+		if kind == "other-plan" {
+			root.PlanHash = "other"
+			writeRun(t, dir, "run-ROOT.json", root)
+		}
+		if kind == "wrong-id" {
+			root.RunID = "WRONG"
+			writeRun(t, dir, "run-ROOT.json", root)
+		}
+		p := retryPlan("fake")
+		p.Hash = previous.PlanHash
+		if _, err := planRetry(p, previous, path); err == nil {
+			t.Fatalf("%s accepted", kind)
+		}
+	}
+}

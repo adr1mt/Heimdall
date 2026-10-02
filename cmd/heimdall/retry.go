@@ -68,6 +68,9 @@ func planRetry(p *plan.Plan, previous *model.RunResult, path string) (*engine.Re
 			return nil, err
 		}
 	}
+	if len(chain) >= maxChain {
+		return nil, fmt.Errorf("la cadena ya tiene %d correcciones; otro reintento superaría el límite recuperable", maxChain)
+	}
 	effective, err := model.Consolidate(chain)
 	if err != nil {
 		return nil, err
