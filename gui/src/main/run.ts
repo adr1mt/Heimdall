@@ -127,8 +127,11 @@ export class RunSession {
   private child: ChildProcessWithoutNullStreams
   private stderr = ''
   private cancelled = false
+  readonly closed: Promise<void>
+  private resolveClosed!: () => void
 
   constructor(enginePath: string, target: RunTarget, secrets: Record<string, string>, cb: RunCallbacks) {
+    this.closed = new Promise(resolve => { this.resolveClosed = resolve })
     this.child = spawn(enginePath, runArgs(target), {
       cwd: target.dir,
       stdio: ['pipe', 'pipe', 'pipe']
@@ -164,7 +167,8 @@ export class RunSession {
         const event = parseEvent(line)
         if (event) cb.onEvent(event)
       })
-      cb.onClose(code, this.stderr.slice(0, MAX_STDERR))
+      try { cb.onClose(code, this.stderr.slice(0, MAX_STDERR)) }
+      finally { this.resolveClosed() }
     }
 
     this.child.on('error', (error) => {

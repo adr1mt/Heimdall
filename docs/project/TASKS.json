@@ -2798,7 +2798,7 @@
       "id": "T146",
       "title": "R02 · Cierre espera motor y copia",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
@@ -2809,7 +2809,10 @@
         "Cierre activo, entre vueltas y durante copia espera original y copia; fallo de copia visible.",
         "Regresiones del área y suite rápida en verde."
       ],
-      "tests": []
+      "tests": [
+        "32 tests run/ipc/shutdown; tipos y build; cierre real Electron+SSH y recuperación tras borrar originales."
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T147",

@@ -1,8 +1,8 @@
 import { app, BrowserWindow, dialog, session, shell } from 'electron'
 import { join } from 'node:path'
 import { allowQuit, guardClose } from './close-guard'
-import { registerIpc } from './ipc'
-import { hasPendingBackups, waitForBackups } from './backup'
+import { registerIpc, isRunActive, finishCorrections } from './ipc'
+import { hasPendingBackups } from './backup'
 import { applyPendingUpdate, startUpdates } from './update-service'
 
 // Avoids the compositor/GPU hangs that are common on Linux (the usual cause
@@ -104,11 +104,16 @@ function createWindow(): void {
   }
 }
 
-app.on('before-quit', allowQuit)
+let closing: Promise<void> | null = null
 app.on('before-quit', (event) => {
-  if (!hasPendingBackups()) return
+  allowQuit()
+  if (!isRunActive() && !hasPendingBackups() && !closing) return
   event.preventDefault()
-  void waitForBackups().then(()=>app.quit())
+  if (closing) return
+  closing = finishCorrections().then(() => {
+    closing = null
+    app.quit()
+  })
 })
 
 // The only moment at which replacing the program cannot interrupt anything:

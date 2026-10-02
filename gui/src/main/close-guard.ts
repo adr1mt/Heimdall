@@ -9,7 +9,7 @@
  */
 
 import { dialog, type BrowserWindow } from 'electron'
-import { cancelActiveRun, endExamMode, isExamModeActive, isRunActive } from './ipc'
+import { cancelActiveRun, endExamMode, finishCorrections, isExamModeActive, isRunActive } from './ipc'
 
 /** Set when the quit was asked of the application: log out, `kill`, Ctrl+Q. */
 let quitRequested = false
@@ -49,6 +49,6 @@ export function guardClose(win: BrowserWindow): void {
     // Cancelled, never killed: the engine writes the partial artifact and
     // what the class had already earned is kept.
     cancelActiveRun()
-    win.close()
+    void finishCorrections().then(() => { if (!win.isDestroyed()) win.close() })
   })
 }

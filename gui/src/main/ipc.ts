@@ -16,7 +16,7 @@ import { consolidateChain } from './consolidate'
 import { readExamSession } from './session'
 import { listRuns, varDirOf } from './history'
 import { correctionStarting } from './activity'
-import { backupRuns, listBackups, restoreBackups } from './backup'
+import { backupRuns, listBackups, restoreBackups, waitForBackups } from './backup'
 import { RunSession, projectDirOf } from './run'
 import { describeExam } from './describe'
 import { secretRefsIn } from './secrets'
@@ -73,6 +73,24 @@ const cipher: Cipher = {
  * which artifact is which.
  */
 let session: RunSession | null = null
+let shuttingDown = false
+
+/** Stop accepting rounds, finish the engine's artifact, then finish its copy. */
+export async function finishCorrections(): Promise<void> {
+  shuttingDown = true
+  endExamMode()
+  const active = session
+  active?.cancel()
+  await active?.closed
+  await waitForBackups()
+}
+
+function backupFailed(sender: WebContents, message: string): void {
+  send(sender, IPC.backupWarning, message)
+  if (shuttingDown) dialog.showMessageBoxSync({
+    type: 'warning', buttons: ['Cerrar'], title: 'La copia de seguridad ha fallado', message
+  })
+}
 
 /** Whether an engine is alive right now. The window asks before closing. */
 export function isRunActive(): boolean {
@@ -302,6 +320,7 @@ export function registerIpc(): void {
   ipcMain.handle(IPC.setExamMode, (_e, request: unknown): void => {
     const raw = (request ?? {}) as Partial<ExamModeRequest>
     if (typeof raw.active !== 'boolean') throw new Error('El modo examen no es válido.')
+    if (raw.active && shuttingDown) throw new Error('La aplicación se está cerrando.')
     if (!raw.active) {
       endExamMode()
       return
@@ -319,6 +338,7 @@ export function registerIpc(): void {
     // Last line of defence against two engines writing into the same var/.
     // The renderer's timer already refuses to launch one on top of another;
     // this one does not depend on the renderer being right.
+    if (shuttingDown) throw new Error('La aplicación se está cerrando.')
     if (session) throw new Error('Ya hay una corrección en marcha.')
     const { examPath, classId, secrets, retryFrom, sessionRounds } = readRunRequest(request)
     // Passes after the first carry no credentials: the teacher typed them
@@ -344,8 +364,8 @@ export function registerIpc(): void {
         const closed: RunClosed = { exitCode, stderr }
         send(sender, IPC.runClosed, closed)
         void backupRuns(settingsDir(), examPath).then(report=> {
-          if(report.failures.length) send(sender,IPC.backupWarning,`La corrección terminó, pero falló la copia de seguridad (${report.failures.length} incidencias). Las notas originales siguen en ${dir}. Revisa el destino de las copias. ${report.failures[0]}`)
-        }).catch(error=>send(sender,IPC.backupWarning,`No se pudo hacer la copia de seguridad: ${String(error)}`))
+          if(report.failures.length) backupFailed(sender,`La corrección terminó, pero falló la copia de seguridad (${report.failures.length} incidencias). Las notas originales siguen en ${dir}. Revisa el destino de las copias. ${report.failures[0]}`)
+        }).catch(error=>backupFailed(sender,`No se pudo hacer la copia de seguridad: ${String(error)}`))
       }
     })
 
