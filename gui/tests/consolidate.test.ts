@@ -252,3 +252,13 @@ describe('lo que se exporta de una cadena', () => {
     expect(chainExportSummary(chain, SCALES.ten)).toMatch(/2 correcciones leídas juntas/)
   })
 })
+
+it('counts retry work from the effective chain, including zero-weight diagnostics', async () => {
+  const { retryScope, pendingStudents } = await import('../src/renderer/src/lib/results')
+  const view = structuredClone(chain)
+  view.students[1].checks.find(c => c.status === 'UNEVALUATED')!.weight = 0
+  expect(retryScope(view)).toEqual({ students: 1, checks: 1 })
+  view.students[1].checks.forEach(c => { c.status = 'PASS'; c.cause = 'NONE' })
+  expect(retryScope(view)).toBeNull()
+  expect(pendingStudents(view)).toEqual([])
+})

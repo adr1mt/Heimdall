@@ -1,3 +1,4 @@
+import type { Consolidation, ConsolidatedStudent } from '../../../shared/consolidation'
 import type { AcademicStatus, Score, StudentStatus } from '../../../shared/events'
 import type {
   Cause,
@@ -194,7 +195,7 @@ export function tally(checks: CheckResult[]): { pass: number; fail: number; unev
  * from adding anything up here.
  */
 export interface Pending {
-  student: StudentResult
+  student: StudentResult | ConsolidatedStudent
   /** Checks with no academic result in this run. */
   checks: number
   /** Checks the PLAN gave this student. */
@@ -214,7 +215,7 @@ export interface Pending {
  * does not hold back a final grade, so a student can be here with a grade
  * already closed; the row says so by itself, because its missing weight is 0.
  */
-export function pendingStudents(run: RunResult): Pending[] {
+export function pendingStudents(run: RunResult | Consolidation): Pending[] {
   const out: Pending[] = []
   for (const student of run.students) {
     if (student.status === 'EXCLUDED') continue
@@ -239,7 +240,7 @@ export function pendingStudents(run: RunResult): Pending[] {
  * Only UNEVALUATED is counted. A FAIL is never repeated automatically
  * (ADR-0018 §2).
  */
-export function retryScope(run: RunResult): { students: number; checks: number } | null {
+export function retryScope(run: RunResult | Consolidation): { students: number; checks: number } | null {
   const pending = pendingStudents(run)
   if (pending.length === 0) return null
   return {

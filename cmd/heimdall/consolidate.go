@@ -74,11 +74,15 @@ func consolidateCmd(args []string, stdout, stderr io.Writer) int {
 func readChain(path string) ([]model.ChainLink, error) {
 	chain := []model.ChainLink{}
 	seen := map[string]bool{}
+	expectedID := ""
 
 	for {
 		run, err := readArtifact(path)
 		if err != nil {
 			return nil, err
+		}
+		if expectedID != "" && run.RunID != expectedID {
+			return nil, fmt.Errorf("%s no contiene la corrección anterior %s", path, expectedID)
 		}
 		if seen[run.RunID] {
 			return nil, fmt.Errorf(
@@ -94,6 +98,7 @@ func readChain(path string) ([]model.ChainLink, error) {
 			return nil, fmt.Errorf(
 				"la cadena de correcciones pasa de %d: se para aquí en vez de seguir tirando del hilo", maxChain)
 		}
+		expectedID = run.RetryOf.RunID
 		path, err = previousArtifact(path, run.RetryOf.Artifact)
 		if err != nil {
 			return nil, err

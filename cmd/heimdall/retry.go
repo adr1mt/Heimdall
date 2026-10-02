@@ -58,17 +58,28 @@ func planRetry(p *plan.Plan, previous *model.RunResult, path string) (*engine.Re
 				"no se puede repetir sobre este PLAN sin cambiarle el denominador a la clase", path)
 	}
 
+	// Read every ancestor before selecting work. NOT_RUN in a retry does not
+	// erase a PASS/FAIL in an older artifact.
+	chain := []model.ChainLink{{Artifact: path, Run: previous}}
+	if previous.RetryOf != nil {
+		var err error
+		chain, err = readChain(path)
+		if err != nil {
+			return nil, err
+		}
+	}
+	effective, err := model.Consolidate(chain)
+	if err != nil {
+		return nil, err
+	}
 	byStudent := map[string]map[string]model.PreviousAttempt{}
 	selected := 0
-	for _, s := range previous.Students {
+	for _, s := range effective.Students {
 		checks := map[string]model.PreviousAttempt{}
 		for _, c := range s.Checks {
 			checks[c.CheckID] = model.PreviousAttempt{
-				RunID:      previous.RunID,
-				Status:     c.Status,
-				Cause:      c.Cause,
-				Detail:     c.Detail,
-				FinishedAt: s.FinishedAt,
+				RunID: c.FromRun, Status: c.Status, Cause: c.Cause,
+				Detail: c.Detail, FinishedAt: c.FromRunAt,
 			}
 			if c.Status == model.Unevaluated {
 				selected++

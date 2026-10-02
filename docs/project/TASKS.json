@@ -2773,6 +2773,196 @@
         "Vitest run: 19 pruebas; una finalización con ENOENT, EACCES y cierre normal"
       ],
       "completed": "2026-10-02"
+    },
+    {
+      "id": "T145",
+      "title": "R01 · Reintentos sobre toda la cadena",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
+      "scope": [
+        "docs/audits/2026-10-02/post/AUDITORIA.md#R01"
+      ],
+      "acceptance": [
+        "Tres reintentos conservan PASS/FAIL, se rechazan antecedentes ausentes o incompatibles antes de SSH y GUI muestra la selección efectiva.",
+        "Regresiones del área y suite rápida en verde."
+      ],
+      "tests": [
+        "make check; tipos GUI; Vitest results/consolidate; tres reintentos y antecedente ausente."
+      ],
+      "completed": "2026-10-02"
+    },
+    {
+      "id": "T146",
+      "title": "R02 · Cierre espera motor y copia",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
+      "scope": [
+        "docs/audits/2026-10-02/post/AUDITORIA.md#R02"
+      ],
+      "acceptance": [
+        "Cierre activo, entre vueltas y durante copia espera original y copia; fallo de copia visible.",
+        "Regresiones del área y suite rápida en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T147",
+      "title": "R03 · Verificar tamaño y digest de actualizaciones",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
+      "scope": [
+        "docs/audits/2026-10-02/post/AUDITORIA.md#R03"
+      ],
+      "acceptance": [
+        "Vacío, HTML, tamaño y digest incorrectos conservan instalación; asset válido se instala.",
+        "Regresiones del área y suite rápida en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T148",
+      "title": "R04 · Retener cadenas completas de copias",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
+      "scope": [
+        "docs/audits/2026-10-02/post/AUDITORIA.md#R04"
+      ],
+      "acceptance": [
+        "Más de 50 resultados y rotaciones conservan cadenas recuperables completas con límite explícito.",
+        "Regresiones del área y suite rápida en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T149",
+      "title": "R05 · Presupuesto compatible de resultados",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
+      "scope": [
+        "docs/audits/2026-10-02/post/AUDITORIA.md#R05"
+      ],
+      "acceptance": [
+        "Resultados soportados con flujos grandes y expansión JSON se abren y copian; configuración no soportada se rechaza antes de SSH.",
+        "Regresiones del área y suite rápida en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T150",
+      "title": "R06 · Exigir peso total positivo",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
+      "scope": [
+        "docs/audits/2026-10-02/post/AUDITORIA.md#R06"
+      ],
+      "acceptance": [
+        "Solo pesos cero se rechaza antes de ejecutar; mezcla con positivos se conserva.",
+        "Regresiones del área y suite rápida en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T151",
+      "title": "R07 · Limitar valores de inventario",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
+      "scope": [
+        "docs/audits/2026-10-02/post/AUDITORIA.md#R07"
+      ],
+      "acceptance": [
+        "Valores resueltos de 65535, 65536 y 65537 bytes, también UTF-8, tienen límite coherente.",
+        "Regresiones del área y suite rápida en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T152",
+      "title": "R08 · Histórico por fecha canónica",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
+      "scope": [
+        "docs/audits/2026-10-02/post/AUDITORIA.md#R08"
+      ],
+      "acceptance": [
+        "Últimas 50 fechas canónicas visibles aunque cambien fechas de fichero; errores relevantes visibles.",
+        "Regresiones del área y suite rápida en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T153",
+      "title": "R09 · Reconocer vueltas perfectas sin pérdida de precisión",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P3",
+      "depends_on": [],
+      "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
+      "scope": [
+        "docs/audits/2026-10-02/post/AUDITORIA.md#R09"
+      ],
+      "acceptance": [
+        "Vuelta imperfecta seguida de perfecta con pesos 1 y 1e-100 termina y conserva procedencia perfecta.",
+        "Regresiones del área y suite rápida en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T154",
+      "title": "R10 · Rechazar documentos YAML adicionales",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
+      "scope": [
+        "docs/audits/2026-10-02/post/AUDITORIA.md#R10"
+      ],
+      "acceptance": [
+        "Examen e inventario rechazan segundo documento válido, inválido, vacío o malformado con ubicación.",
+        "Regresiones del área y suite rápida en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T155",
+      "title": "R11 · Rechazar claves repetidas del alumno",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
+      "scope": [
+        "docs/audits/2026-10-02/post/AUDITORIA.md#R11"
+      ],
+      "acceptance": [
+        "Duplicados de id, nombre, exclusión, hosts y campos libres se rechazan con ambas líneas.",
+        "Regresiones del área y suite rápida en verde."
+      ],
+      "tests": []
     }
   ]
 }

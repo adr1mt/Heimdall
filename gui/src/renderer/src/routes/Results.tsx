@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AlertTriangle, Download, Grid3x3, Layers, List, RotateCcw, X } from 'lucide-react'
 import {
   Badge,
@@ -902,9 +902,28 @@ function PendingPanel({ artifactPath }: { artifactPath: string | null }) {
   const [dismissed, setDismissed] = useState(false)
   const [confirm, setConfirm] = useState(false)
 
-  const pending = useMemo(() => (artifact ? pendingStudents(artifact) : []), [artifact])
-  const scope = useMemo(() => (artifact ? retryScope(artifact) : null), [artifact])
+  const [effective, setEffective] = useState<{ path: string; chain: Consolidation } | null>(null)
+  const [problem, setProblem] = useState<string | null>(null)
+  useEffect(() => {
+    let current = true
+    setEffective(null)
+    setProblem(null)
+    setDismissed(false)
+    setConfirm(false)
+    if (artifact?.retry_of && artifactPath) {
+      void window.heimdall.consolidate(artifactPath).then(chain => {
+        if (current) setEffective({ path: artifactPath, chain })
+      }).catch(error => { if (current) setProblem(messageOf(error)) })
+    }
+    return () => { current = false }
+  }, [artifact, artifactPath])
+  const source = artifact?.retry_of
+    ? (effective?.path === artifactPath ? effective.chain : null)
+    : artifact
+  const pending = useMemo(() => source ? pendingStudents(source) : [], [source])
+  const scope = useMemo(() => source ? retryScope(source) : null, [source])
 
+  if (problem) return <p role="alert" className="text-sm text-destructive-strong">{problem}</p>
   if (!artifact || pending.length === 0) return null
   if (dismissed) return <p className="text-xs text-muted-foreground">{t.pending.left}</p>
 

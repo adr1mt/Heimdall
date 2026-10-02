@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -38,6 +39,7 @@ func artifactOf(hash string, byStudent map[string][2]model.AcademicStatus) *mode
 		SchemaVersion: model.SchemaVersion,
 		RunID:         "R1",
 		PlanHash:      hash,
+		Plan:          retryPlan().Summary,
 		FinishedAt:    time.Now(),
 	}
 	for id, statuses := range byStudent {
@@ -201,5 +203,53 @@ func TestReadArtifactRejectsUnsupportedGrades(t *testing.T) {
 	path = writeRun(t, t.TempDir(), "backup.json", r)
 	if _, err := readArtifact(path); err != nil {
 		t.Fatalf("valid backup refused: %v", err)
+	}
+}
+
+func TestRetryOfRetriesKeepsEarlierAcademicResults(t *testing.T) {
+	dir := t.TempDir()
+	previous := sessionRun("R0", 10, "fake", model.Fail, model.Unevaluated)
+	path := writeRun(t, dir, "run-R0.json", previous)
+	for i := 1; i <= 3; i++ {
+		p := retryPlan("fake")
+		p.Hash = previous.PlanHash
+		retry, err := planRetry(p, previous, path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if retry.Repeat("fake", "c1") || !retry.Repeat("fake", "c2") || retry.Ref.Checks != 1 {
+			t.Fatalf("retry %d changed selection: %+v", i, retry)
+		}
+		next := sessionRun(fmt.Sprintf("R%d", i), 10+i, "fake", model.Unevaluated, model.Unevaluated)
+		next.Students[0].Checks[0].Cause = model.CauseNotRun
+		next.RetryOf = &model.RetryRef{RunID: previous.RunID, Artifact: path, RunAt: previous.FinishedAt, Students: 1, Checks: 1}
+		previous = next
+		path = writeRun(t, dir, fmt.Sprintf("run-R%d.json", i), next)
+	}
+	previous.Students[0].Checks[1] = chainCheckOf("c2", 4, model.Pass)
+	previous.Students[0].Score = model.ComputeScore(previous.Plan, previous.Students[0].Checks)
+	previous.Students[0].Status = model.StudentStatusOf(previous.Students[0].Checks)
+	writeRun(t, dir, "run-R3.json", previous)
+	p := retryPlan("fake")
+	p.Hash = previous.PlanHash
+	if _, err := planRetry(p, previous, path); err == nil {
+		t.Fatal("closed chain offered another retry")
+	}
+	chain, err := readChain(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	view, err := model.Consolidate(chain)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if view.Students[0].Checks[0].Status != model.Fail || *view.Students[0].Score.Final != 40 {
+		t.Fatal("original fail lost")
+	}
+	os.Remove(chain[len(chain)-1].Artifact)
+	p = retryPlan("fake")
+	p.Hash = previous.PlanHash
+	if _, err = planRetry(p, previous, path); err == nil {
+		t.Fatal("missing ancestor accepted")
 	}
 }
