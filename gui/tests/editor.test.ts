@@ -222,3 +222,19 @@ describe('el comando como una línea', () => {
     expect(readCommandLine('grep "" fichero')).toEqual(['grep', '', 'fichero'])
   })
 })
+
+describe('original YAML format is never silently normalized',()=> {
+ const valid='examen: P\nversion: 1\nhosts: [host1]\npor_defecto: {peso: 1}\ngrupos:\n- grupo: G\n  comprobaciones:\n  - id: c\n    descripcion: C\n    en: host1\n    cmd: ["true"]\n    contiene: yes\n'
+ it.each([
+  valid+'unknown: x\n',
+  valid.replace('peso: 1','peso: 1, unknown: x'),
+  valid.replace('grupo: G','grupo: G\n  unknown: x'),
+  valid+'    unknown: x\n',
+  valid+'    no_contiene: no\n',
+  valid.replace('contiene: yes','cerca_de: {ancla: a, contiene: b, lineas: 0, unknown: x}'),
+  valid.replace('cmd: ["true"]','cmd: false'),
+  valid.replace('peso: 1','peso: "1"'),
+  valid.replace('descripcion: C','descripcion: [C]')
+ ])('refuses unrepresentable data: %s',(yaml)=>expect(readExam(yaml)).toHaveProperty('problem'))
+ it('preserves valid meaning',()=>expect(parse(examYaml(parse(valid)))).toEqual(parse(valid)))
+})

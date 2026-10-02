@@ -100,7 +100,7 @@ function readAssertion(raw: Record<string, unknown>): Assertion {
       kind: 'cerca_de',
       value: text(near.contiene),
       anchor: text(near.ancla),
-      lines: text(near.lineas)
+      lines: text(near.lineas ?? 0)
     }
   }
   for (const kind of ['contiene', 'igual_a', 'no_contiene', 'exit_code'] as const) {
@@ -123,6 +123,49 @@ function readCheck(value: unknown): Check {
   }
 }
 
+/** Reject anything the form cannot represent without discarding input. */
+function formatProblem(doc: unknown): string | null {
+  const object=(value:unknown,path:string,keys:string[]):Record<string,unknown>=> {
+    if (!value || typeof value!=='object' || Array.isArray(value)) throw new Error(`${path}: se esperaba un objeto.`)
+    const raw=value as Record<string,unknown>
+    for(const key of Object.keys(raw)) if(!keys.includes(key)) throw new Error(`${path}.${key}: clave desconocida.`)
+    return raw
+  }
+  const field=(raw:Record<string,unknown>,key:string,path:string,kind:'string'|'number'|'integer'):void=> {
+    if(raw[key]===undefined) return
+    const v=raw[key]
+    if(typeof v!==(kind==='string'?'string':'number') || (typeof v==='number' && (!Number.isFinite(v) || (kind==='integer' && !Number.isInteger(v))))) throw new Error(`${path}.${key}: tipo incorrecto; se esperaba ${kind==='string'?'texto':'un número'}.`)
+  }
+  const array=(value:unknown,path:string):unknown[]=> { if(value===undefined) return []; if(!Array.isArray(value)) throw new Error(`${path}: se esperaba una lista.`);return value }
+  try {
+    const raw=object(doc,'examen',['examen','version','hosts','por_defecto','grupos'])
+    field(raw,'examen','examen','string');field(raw,'version','examen','integer')
+    for(const host of array(raw.hosts,'hosts')) if(typeof host!=='string') throw new Error('hosts: cada máquina debe ser texto.')
+    if(raw.por_defecto!==undefined) {
+      const defaults=object(raw.por_defecto,'por_defecto',['peso','timeout'])
+      field(defaults,'peso','por_defecto','number');field(defaults,'timeout','por_defecto','string')
+    }
+    for(const [i,value] of array(raw.grupos,'grupos').entries()) {
+      const path=`grupos[${i+1}]`
+      const group=object(value,path,['grupo','comprobaciones']);field(group,'grupo',path,'string')
+      for(const [j,value] of array(group.comprobaciones,`${path}.comprobaciones`).entries()) {
+        const at=`${path}.comprobaciones[${j+1}]`
+        const c=object(value,at,['id','descripcion','en','cmd','valor','peso','timeout',...ASSERTIONS])
+        for(const key of ['id','descripcion','en','valor','timeout','contiene','igual_a','no_contiene']) field(c,key,at,'string')
+        field(c,'peso',at,'number');field(c,'exit_code',at,'integer')
+        for(const arg of array(c.cmd,`${at}.cmd`)) if(typeof arg!=='string') throw new Error(`${at}.cmd: cada argumento debe ser texto.`)
+        if(ASSERTIONS.filter(key=>c[key]!==undefined).length!==1) throw new Error(`${at}: debe tener exactamente una aserción.`)
+        if(c.cmd!==undefined && c.valor!==undefined) throw new Error(`${at}: cmd y valor no pueden aparecer juntos.`)
+        if(c.cerca_de!==undefined) {
+          const near=object(c.cerca_de,`${at}.cerca_de`,['ancla','lineas','contiene'])
+          field(near,'ancla',`${at}.cerca_de`,'string');field(near,'contiene',`${at}.cerca_de`,'string');field(near,'lineas',`${at}.cerca_de`,'integer')
+        }
+      }
+    }
+    return null
+  } catch(error) { return error instanceof Error ? error.message : String(error) }
+}
+
 /**
  * Reads an exam from its YAML.
  *
@@ -138,6 +181,8 @@ export function readExam(yaml: string): { exam: Exam } | { problem: string } {
     return { problem: error instanceof Error ? error.message : String(error) }
   }
   if (!doc || typeof doc !== 'object') return { problem: 'El examen está vacío.' }
+  const problem=formatProblem(doc)
+  if(problem) return {problem}
   const raw = doc as Record<string, unknown>
   const defaults = (raw.por_defecto ?? {}) as Record<string, unknown>
   const groups = Array.isArray(raw.grupos) ? raw.grupos : []
@@ -180,6 +225,7 @@ function writeCheck(check: Check): Record<string, unknown> {
     if (check.peso.trim()) out.peso = count(check.peso)
     out.valor = check.valor
   }
+  if (check.timeout.trim()) out.timeout=check.timeout.trim()
   const { kind, value, anchor, lines } = check.assertion
   if (kind === 'cerca_de') {
     out.cerca_de = { ancla: anchor ?? '', lineas: count(lines ?? ''), contiene: value }

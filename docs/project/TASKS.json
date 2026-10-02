@@ -2537,7 +2537,7 @@
       "id": "T133",
       "title": "A07 · El editor elimina errores de formato antes de que el motor los vea",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
@@ -2548,7 +2548,10 @@
         "claves desconocidas en todos los niveles, dos aserciones, valores de tipo incorrecto y documentos válidos sin cambios semánticos. ",
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
-      "tests": []
+      "tests": [
+        "Vitest editor: 29 pruebas; claves desconocidas en cada nivel, varias aserciones y tipos incorrectos"
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T134",
