@@ -2697,7 +2697,7 @@
       "id": "T141",
       "title": "A15 · El fallo de la copia automática queda oculto",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
@@ -2708,7 +2708,10 @@
         "Avisar de errores de copia sin invalidar la corrección; E/S asíncrona y retención limitada.",
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
-      "tests": []
+      "tests": [
+        "Tipos GUI; Vitest backups/ipc-run: 29 pruebas; destino inválido, 100 originales y concurrencia; cierre antes de copia y aviso explícito"
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T142",

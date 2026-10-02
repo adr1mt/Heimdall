@@ -338,9 +338,11 @@ export function registerIpc(): void {
         // The grades leave the exam's folder the moment they exist. It never
         // throws and it never blocks: a copy that fails must not turn a
         // finished correction into an error (T113).
-        backupRuns(settingsDir(), examPath)
         const closed: RunClosed = { exitCode, stderr }
         send(sender, IPC.runClosed, closed)
+        void backupRuns(settingsDir(), examPath).then(report=> {
+          if(report.failures.length) send(sender,IPC.backupWarning,`La corrección terminó, pero falló la copia de seguridad (${report.failures.length} incidencias). Las notas originales siguen en ${dir}. Revisa el destino de las copias. ${report.failures[0]}`)
+        }).catch(error=>send(sender,IPC.backupWarning,`No se pudo hacer la copia de seguridad: ${String(error)}`))
       }
     })
 

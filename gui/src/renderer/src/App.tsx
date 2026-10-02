@@ -87,6 +87,7 @@ function AppBody() {
   // on a line that can be dismissed and nothing else happens until the
   // teacher closes the application.
   useEffect(() => window.heimdall.onUpdateReady(setUpdate), [setUpdate])
+  useEffect(() => window.heimdall.onBackupWarning(setNotice), [setNotice])
 
   useEffect(() => {
     window.heimdall

@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { open, readdir, mkdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 import { parseArtifact } from '../shared/artifact'
 import { gradesOnly, type BackupEntry, type RestoreReport } from '../shared/backup'
@@ -54,50 +55,65 @@ function writeAtomic(path: string, text: string): void {
  * It never throws. A backup that fails must not take down the correction that
  * just finished; what it could not copy comes back as a count.
  */
-export function backupRuns(dataDir: string, examPath: string): number {
-  const varDir = varDirOf(examPath)
-  const slot = slotFor(dataDir, examPath)
-  let saved = 0
-  // Select by the correction's own date before copying. A copy's mtime is
-  // unrelated to when its grades were obtained.
-  const candidates = runFilesIn(varDir).flatMap((name) => {
-    try {
-      const source = join(varDir, name)
-      if (statSync(source).size > MAX_ARTIFACT) return []
-      const run = parseArtifact(readFileSync(source, 'utf-8'))
-      return [{ name, run }]
-    } catch { return [] }
-  }).sort((a,b) => Date.parse(b.run.started_at)-Date.parse(a.run.started_at) || b.name.localeCompare(a.name))
-  for (const {name,run} of candidates.slice(0,MAX_BACKUPS)) {
-    const target=join(slot,name)
-    if (existsSync(target)) continue
-    try {
-      mkdirSync(slot,{recursive:true})
-      writeAtomic(target,`${JSON.stringify(gradesOnly(run))}\n`)
-      saved+=1
-    } catch { /* Reported separately by the backup service. */ }
-  }
-  prune(slot)
-  return saved
+export interface BackupReport { saved: number; failures: string[] }
+
+// Serialise passes for the same slot: two close notifications must not race
+// over temporary files or prune copies while another pass is writing them.
+const passes=new Map<string,Promise<BackupReport>>()
+export function backupRuns(dataDir:string,examPath:string):Promise<BackupReport> {
+ const slot=slotFor(dataDir,examPath),previous=passes.get(slot) ?? Promise.resolve({saved:0,failures:[]})
+ const next=previous.then(()=>copyRuns(dataDir,examPath))
+ passes.set(slot,next)
+ const release=():void=>{if(passes.get(slot)===next) passes.delete(slot)}
+ void next.then(release,release)
+ return next
 }
 
-/** Drops the oldest copies past the cap. The newest are the ones that matter. */
-function prune(slot: string): void {
-  const files = runFilesIn(slot)
-  if (files.length <= MAX_BACKUPS) return
-  const dated = files.flatMap((name) => {
+export function hasPendingBackups():boolean {return passes.size>0}
+export async function waitForBackups():Promise<void> {await Promise.allSettled(passes.values())}
+
+async function copyRuns(dataDir:string,examPath:string):Promise<BackupReport> {
+ const report:BackupReport={saved:0,failures:[]},sourceDir=varDirOf(examPath),slot=slotFor(dataDir,examPath)
+ const failure=(path:string,error:unknown):void=> {report.failures.push(`${path}: ${error instanceof Error?error.message:String(error)}`)}
+ async function names(dir:string):Promise<string[]> {
+  try {return (await readdir(dir)).filter(name=>RUN_FILE.test(name))} catch(error) {if((error as NodeJS.ErrnoException).code!=='ENOENT') failure(dir,error);return []}
+ }
+ // Only a bounded header is read for retention. At most 50 full artifacts are
+ // parsed/copied, regardless of the size of the teacher's original history.
+ async function dated(dir:string):Promise<{name:string;at:number}[]> {
+  const entries=[]
+  for(const name of await names(dir)) {
+   const path=join(dir,name)
+   try {
+    const file=await open(path,'r')
     try {
-      const run=parseArtifact(readFileSync(join(slot,name),'utf-8'))
-      return [{name,at:Date.parse(run.started_at)}]
-    } catch { return [] }
-  }).sort((a,b) => b.at-a.at || b.name.localeCompare(a.name))
-  for (const file of dated.slice(MAX_BACKUPS)) {
-    try {
-      rmSync(join(slot, file.name))
-    } catch {
-      // Already gone. Nothing to report about a file that is not there.
-    }
+     const buffer=Buffer.alloc(4096),{bytesRead}=await file.read(buffer,0,buffer.length,0)
+     const found=buffer.toString('utf8',0,bytesRead).match(/"started_at"\s*:\s*"([^"\r\n]+)"/)
+     const at=found?Date.parse(found[1]):NaN
+     if(!Number.isFinite(at)) throw new Error('fecha de corrección ilegible en la cabecera')
+     entries.push({name,at})
+    } finally {await file.close()}
+   } catch(error) {failure(path,error)}
   }
+  return entries.sort((a,b)=>b.at-a.at || b.name.localeCompare(a.name))
+ }
+ const candidates=(await dated(sourceDir)).slice(0,MAX_BACKUPS)
+ for(const {name} of candidates) {
+  const target=join(slot,name),source=join(sourceDir,name)
+  try {
+   try {await stat(target);continue} catch(error) {if((error as NodeJS.ErrnoException).code!=='ENOENT') throw error}
+   if((await stat(source)).size>MAX_ARTIFACT) throw new Error('resultado demasiado grande para copiar')
+   const run=parseArtifact(await readFile(source,'utf8'))
+   await mkdir(slot,{recursive:true})
+   const tmp=`${target}.tmp`
+   try {await writeFile(tmp,`${JSON.stringify(gradesOnly(run))}\n`,'utf8');await rename(tmp,target)} finally {await rm(tmp,{force:true}).catch(()=>undefined)}
+   report.saved++
+  } catch(error) {failure(source,error)}
+ }
+ for(const {name} of (await dated(slot)).slice(MAX_BACKUPS)) {
+  try {await rm(join(slot,name))} catch(error) {failure(join(slot,name),error)}
+ }
+ return report
 }
 
 /** The copies of one exam, newest correction first. */

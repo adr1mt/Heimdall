@@ -189,6 +189,7 @@ export interface HeimdallApi {
   setExamMode: (request: ExamModeRequest) => Promise<void>
   cancelRun: () => Promise<void>
   /** Subscribes to the stream. Returns the unsubscribe function. */
+  onBackupWarning: (listener: (message: string) => void) => () => void
   onRunEvent: (listener: (event: EngineEvent) => void) => () => void
   onRunClosed: (listener: (closed: RunClosed) => void) => () => void
   /** A new version is on disk; it installs itself when the teacher closes. */

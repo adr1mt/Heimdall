@@ -121,7 +121,7 @@ function writeRun(varDir: string, runId: string, at: string, score = 80): void {
 }
 
 describe('gradesOnly', () => {
-  it('keeps the grade and drops what the machines said', () => {
+  it('keeps the grade and drops what the machines said', async () => {
     const run = gradesOnly(parseArtifact(artifact('R1', '2026-09-21T09:00:00Z')))
     expect(run.students[0].score.final_score).toBe(80)
     expect(run.students[0].checks[0].status).toBe('PASS')
@@ -130,12 +130,12 @@ describe('gradesOnly', () => {
     expect(run.students[0].checks[0].assertion).toBeNull()
   })
 
-  it('says in the file itself that it came from a copy', () => {
+  it('says in the file itself that it came from a copy', async () => {
     const run = gradesOnly(parseArtifact(artifact('R1', '2026-09-21T09:00:00Z')))
     expect(run.warnings?.some((w) => w.code === FROM_BACKUP.code)).toBe(true)
   })
 
-  it('leaves the original untouched', () => {
+  it('leaves the original untouched', async () => {
     const original = parseArtifact(artifact('R1', '2026-09-21T09:00:00Z'))
     gradesOnly(original)
     expect(original.students[0].checks[0].execution).not.toBeNull()
@@ -143,54 +143,54 @@ describe('gradesOnly', () => {
 })
 
 describe('backupRuns', () => {
-  it('copies the grades outside the exam folder', () => {
+  it('copies the grades outside the exam folder', async () => {
     const { dataDir, examPath } = workspace()
     writeRun(varDirOf(examPath), 'R1', '2026-09-21T09:00:00Z')
-    expect(backupRuns(dataDir, examPath)).toBe(1)
+    expect((await backupRuns(dataDir, examPath)).saved).toBe(1)
     expect(slotFor(dataDir, examPath).startsWith(backupsRoot(dataDir))).toBe(true)
     expect(listBackups(dataDir, examPath)).toHaveLength(1)
   })
 
-  it('does not copy the same correction twice', () => {
+  it('does not copy the same correction twice', async () => {
     const { dataDir, examPath } = workspace()
     writeRun(varDirOf(examPath), 'R1', '2026-09-21T09:00:00Z')
-    backupRuns(dataDir, examPath)
-    expect(backupRuns(dataDir, examPath)).toBe(0)
+    await backupRuns(dataDir, examPath)
+    expect((await backupRuns(dataDir, examPath)).saved).toBe(0)
   })
 
-  it('copies again the correction whose copy was deleted', () => {
+  it('copies again the correction whose copy was deleted', async () => {
     const { dataDir, examPath } = workspace()
     writeRun(varDirOf(examPath), 'R1', '2026-09-21T09:00:00Z')
-    backupRuns(dataDir, examPath)
+    await backupRuns(dataDir, examPath)
     rmSync(join(slotFor(dataDir, examPath), 'run-R1.json'))
-    expect(backupRuns(dataDir, examPath)).toBe(1)
+    expect((await backupRuns(dataDir, examPath)).saved).toBe(1)
   })
 
-  it('no password travels in the copy', () => {
+  it('no password travels in the copy', async () => {
     const { dataDir, examPath } = workspace()
     writeRun(varDirOf(examPath), 'R1', '2026-09-21T09:00:00Z')
-    backupRuns(dataDir, examPath)
+    await backupRuns(dataDir, examPath)
     const copy = readFileSync(join(slotFor(dataDir, examPath), 'run-R1.json'), 'utf-8')
     expect(copy).not.toContain(PASSWORD)
   })
 
-  it('keeps the number of copies bounded', () => {
+  it('keeps the number of copies bounded', async () => {
     const { dataDir, examPath } = workspace()
     for (let i = 0; i < MAX_BACKUPS + 5; i += 1) {
       writeRun(varDirOf(examPath), `R${i}`, `2026-09-21T09:${String(i).padStart(2, '0')}:00Z`)
     }
-    backupRuns(dataDir, examPath)
+    await backupRuns(dataDir, examPath)
     expect(listBackups(dataDir, examPath).length).toBeLessThanOrEqual(MAX_BACKUPS)
   })
 
-  it('a broken artifact does not stop the rest', () => {
+  it('a broken artifact does not stop the rest', async () => {
     const { dataDir, examPath, varDir } = workspace()
     writeFileSync(join(varDir, 'run-ROTO.json'), 'esto no es un JSON', 'utf-8')
     writeRun(varDir, 'R1', '2026-09-21T09:00:00Z')
-    expect(backupRuns(dataDir, examPath)).toBe(1)
+    expect((await backupRuns(dataDir, examPath)).saved).toBe(1)
   })
 
-  it('two exams with the same folder name do not share their copies', () => {
+  it('two exams with the same folder name do not share their copies', async () => {
     const a = workspace()
     const b = workspace()
     expect(slotFor(a.dataDir, a.examPath)).not.toBe(slotFor(b.dataDir, b.examPath))
@@ -198,10 +198,10 @@ describe('backupRuns', () => {
 })
 
 describe('restoreBackups', () => {
-  it('recovers the grades after the exam folder is deleted', () => {
+  it('recovers the grades after the exam folder is deleted', async () => {
     const { dataDir, examPath, varDir } = workspace()
     writeRun(varDir, 'R1', '2026-09-21T09:00:00Z', 73)
-    backupRuns(dataDir, examPath)
+    await backupRuns(dataDir, examPath)
 
     rmSync(varDir, { recursive: true, force: true })
     expect(restoreBackups(dataDir, examPath)).toEqual({ restored: 1, kept: 0 })
@@ -211,10 +211,10 @@ describe('restoreBackups', () => {
     expect(run.students[0].name).toBe('Alumna Primera')
   })
 
-  it('restoring lowers no grade already saved', () => {
+  it('restoring lowers no grade already saved', async () => {
     const { dataDir, examPath, varDir } = workspace()
     writeRun(varDir, 'R1', '2026-09-21T09:00:00Z', 73)
-    backupRuns(dataDir, examPath)
+    await backupRuns(dataDir, examPath)
 
     expect(restoreBackups(dataDir, examPath)).toEqual({ restored: 0, kept: 1 })
     // The artifact in the folder is the one the engine wrote, whole.
@@ -223,27 +223,27 @@ describe('restoreBackups', () => {
     expect(run.students[0].checks[0].execution).not.toBeNull()
   })
 
-  it('only the missing corrections come back', () => {
+  it('only the missing corrections come back', async () => {
     const { dataDir, examPath, varDir } = workspace()
     writeRun(varDir, 'R1', '2026-09-21T09:00:00Z')
     writeRun(varDir, 'R2', '2026-09-21T10:00:00Z')
-    backupRuns(dataDir, examPath)
+    await backupRuns(dataDir, examPath)
     rmSync(join(varDir, 'run-R2.json'))
     expect(restoreBackups(dataDir, examPath)).toEqual({ restored: 1, kept: 1 })
   })
 
-  it('says so when there is nothing to restore', () => {
+  it('says so when there is nothing to restore', async () => {
     const { dataDir, examPath } = workspace()
     expect(() => restoreBackups(dataDir, examPath)).toThrow(/copia de seguridad/)
   })
 })
 
 describe('listBackups', () => {
-  it('newest correction first, and says which are only a copy', () => {
+  it('newest correction first, and says which are only a copy', async () => {
     const { dataDir, examPath, varDir } = workspace()
     writeRun(varDir, 'R1', '2026-09-21T09:00:00Z')
     writeRun(varDir, 'R2', '2026-09-21T10:00:00Z')
-    backupRuns(dataDir, examPath)
+    await backupRuns(dataDir, examPath)
     rmSync(join(varDir, 'run-R1.json'))
 
     const entries = listBackups(dataDir, examPath)
@@ -252,24 +252,39 @@ describe('listBackups', () => {
     expect(entries[0].students).toBe(1)
   })
 
-  it('an exam with no copies is an empty list, not a failure', () => {
+  it('an exam with no copies is an empty list, not a failure', async () => {
     const { dataDir, examPath } = workspace()
     expect(listBackups(dataDir, examPath)).toEqual([])
   })
 })
 
-it.each([51,100])('retains the latest grades over three passes and restore (%i originals)', (count) => {
+it.each([51,100])('retains the latest grades over three passes and restore (%i originals)', async (count) => {
  const {dataDir,examPath,varDir}=workspace()
  for(let i=1;i<=count;i++) writeRun(varDir,`R${String(i).padStart(3,'0')}`,new Date(Date.UTC(2026,9,2,0,i)).toISOString())
- backupRuns(dataDir,examPath)
+ await backupRuns(dataDir,examPath)
  const expected=listBackups(dataDir,examPath).map(x=>x.runId)
  expect(expected).toHaveLength(MAX_BACKUPS)
  expect(expected[0]).toBe(`R${String(count).padStart(3,'0')}`)
  for(let pass=0;pass<2;pass++) {
-  expect(backupRuns(dataDir,examPath)).toBe(0)
+  expect((await backupRuns(dataDir,examPath)).saved).toBe(0)
   expect(listBackups(dataDir,examPath).map(x=>x.runId)).toEqual(expected)
  }
  rmSync(varDir,{recursive:true})
  expect(restoreBackups(dataDir,examPath).restored).toBe(MAX_BACKUPS)
  expect(listBackups(dataDir,examPath).every(x=>x.onDisk)).toBe(true)
+})
+
+
+it('reports an unwritable destination without failing the correction',async()=> {
+ const {dataDir,examPath,varDir}=workspace()
+ writeRun(varDir,'R1','2026-10-02T10:00:00Z')
+ mkdirSync(dataDir,{recursive:true});writeFileSync(backupsRoot(dataDir),'cannot create directory here')
+ const report=await backupRuns(dataDir,examPath)
+ expect(report.saved).toBe(0);expect(report.failures.length).toBeGreaterThan(0)
+ expect(readFileSync(join(varDir,'run-R1.json'),'utf8')).toContain('R1')
+})
+it('serializes overlapping passes for the same exam',async()=> {
+ const {dataDir,examPath,varDir}=workspace();writeRun(varDir,'R1','2026-10-02T10:00:00Z')
+ const reports=await Promise.all([backupRuns(dataDir,examPath),backupRuns(dataDir,examPath)])
+ expect(reports.map(x=>x.saved)).toEqual([1,0]);expect(reports.every(x=>x.failures.length===0)).toBe(true)
 })

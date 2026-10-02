@@ -48,6 +48,7 @@ const api: HeimdallApi = {
   saveCsv: (name, text) => ipcRenderer.invoke(IPC.saveCsv, name, text),
   listClasses: () => ipcRenderer.invoke(IPC.listClasses),
   saveClasses: (classes) => ipcRenderer.invoke(IPC.saveClasses, classes),
+  onBackupWarning: (listener) => subscribe<string>(IPC.backupWarning, listener),
   onRunEvent: (listener) => subscribe<EngineEvent>(IPC.runEvent, listener),
   onRunClosed: (listener) => subscribe<RunClosed>(IPC.runClosed, listener),
   onUpdateReady: (listener) => subscribe<string>(IPC.updateReady, listener)
