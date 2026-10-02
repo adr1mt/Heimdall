@@ -57,8 +57,13 @@ export default function EditorView() {
   }, [classesLoaded, loadClasses])
   const group = groupById(groups, classId)
 
-  const [exam, setExam] = useState<Exam | null>(null)
-  const [yamlView, setYamlView] = useState(false)
+  const draft=useApp(s=>s.editorDraft)
+  const setDraft=useApp(s=>s.setEditorDraft)
+  const parsed=draft ? readExam(draft.text) : null
+  const problem=parsed && 'problem' in parsed ? parsed.problem : null
+  const exam=parsed && 'exam' in parsed ? parsed.exam : project && draft ? emptyExam(project.name) : null
+  const yamlView=!!draft && (draft.yamlView || !!problem)
+  const setYamlView=(next:boolean):void=> {if(draft && !problem) setDraft({...draft,yamlView:next})}
   const [editing, setEditing] = useState<{ group: number; check: number | null } | null>(null)
   const [removingGroup, setRemovingGroup] = useState<number | null>(null)
   const [verdict, setVerdict] = useState<{ ok: boolean; message: string } | null>(null)
@@ -66,17 +71,17 @@ export default function EditorView() {
 
   useEffect(() => {
     if (!project) return
+    if (useApp.getState().editorDraft?.path===project.examPath) return
     let current = true
     window.heimdall
       .readExam(project.examPath)
       .then((yaml) => {
         if (!current) return
         const read = readExam(yaml)
-        setExam('problem' in read ? emptyExam(project.name) : read.exam)
+        setDraft({path:project.examPath,text:yaml,savedText:yaml,yamlView:'problem' in read})
         // An exam the model cannot read is not replaced by an empty one
         // behind the teacher's back: the YAML is opened and it is said why.
         if ('problem' in read) {
-          setYamlView(true)
           setNotice(`${t.editor.readFailed}: ${read.problem}`)
         }
       })
@@ -84,21 +89,22 @@ export default function EditorView() {
     return () => {
       current = false
     }
-  }, [project, setNotice])
+  }, [project, setNotice, setDraft])
 
   function change(next: Exam): void {
-    setExam(next)
+    if (!draft) return
+    setDraft({...draft,text:examYaml(next)})
     // The engine's last word is about the exam that was checked, not this one.
     setVerdict(null)
   }
 
   async function save(): Promise<void> {
-    if (!exam || !project) return
+    if (!exam || !project || !draft || problem || checking) return
     if (!group) {
       setVerdict({ ok: false, message: t.editor.needClass })
       return
     }
-    const yaml = examYaml(exam)
+    const yaml = draft.text
     setChecking(true)
     try {
       const answer = await window.heimdall.validateExam({
@@ -106,9 +112,11 @@ export default function EditorView() {
         classId: group.id,
         yaml
       })
+      if (useApp.getState().editorDraft?.text!==yaml || useApp.getState().project?.examPath!==project.examPath) return
       setVerdict(answer)
       if (!answer.ok) return
       await window.heimdall.writeExam(project.examPath, yaml)
+      setDraft({...draft,savedText:yaml})
       setNotice(t.editor.saved)
     } catch (error) {
       setNotice(noticeFrom(t.editor.saveFailed, error))
@@ -159,16 +167,16 @@ export default function EditorView() {
           <Badge variant="secondary">{t.editor.summary(checkCount(exam), totalWeight(exam))}</Badge>
         }
         actions={
-          <Button variant="outline" size="sm" onClick={() => setYamlView(!yamlView)}>
+          <Button variant="outline" size="sm" disabled={!!problem || checking} onClick={() => setYamlView(!yamlView)}>
             {yamlView ? <FileText className="h-4 w-4" /> : <Code2 className="h-4 w-4" />}
             {yamlView ? t.editor.formView : t.editor.yamlView}
           </Button>
         }
       />
 
-      <div className="min-h-0 flex-1 space-y-5 overflow-auto p-6">
+      <fieldset disabled={checking} className="min-h-0 flex-1 space-y-5 overflow-auto p-6">
         {yamlView ? (
-          <YamlView exam={exam} onChange={change} />
+          <YamlView text={draft?.text ?? ''} problem={problem} disabled={checking} onChange={(text)=> { if(draft) setDraft({...draft,text}); setVerdict(null); setNotice(null) }} />
         ) : (
           <>
             {/* Que la pantalla se llame «Exámenes» y enseñe uno solo no se
@@ -327,7 +335,7 @@ export default function EditorView() {
             )}
           </>
         )}
-      </div>
+      </fieldset>
 
       <ConfirmDialog
         open={removingGroup !== null}
@@ -350,7 +358,7 @@ export default function EditorView() {
           no se escribe hasta que lo acepta. */}
       <div className="shrink-0 space-y-2 border-t border-border p-4">
         <div className="flex flex-wrap items-center gap-3">
-          <Button disabled={checking} onClick={() => void save()}>
+          <Button disabled={checking || !!problem} onClick={() => void save()}>
             {checking ? <Spinner className="h-4 w-4" /> : <CheckIcon className="h-4 w-4" />}
             {checking ? t.editor.checking : t.editor.save}
           </Button>
@@ -413,10 +421,7 @@ function Field({
  * that cannot be read yet —halfway through a line— leaves the exam exactly as
  * it was and says so: nothing the teacher typed is thrown away silently.
  */
-function YamlView({ exam, onChange }: { exam: Exam; onChange: (exam: Exam) => void }) {
-  const [text, setText] = useState(() => examYaml(exam))
-  const [problem, setProblem] = useState<string | null>(null)
-
+function YamlView({ text, problem, disabled, onChange }: { text: string; problem: string | null; disabled: boolean; onChange: (text: string) => void }) {
   return (
     <div className="space-y-2">
       <p className="text-xs text-muted-foreground">{t.editor.yamlHint}</p>
@@ -424,16 +429,9 @@ function YamlView({ exam, onChange }: { exam: Exam; onChange: (exam: Exam) => vo
         aria-label={t.editor.yamlView}
         value={text}
         spellCheck={false}
-        onChange={(e) => {
-          setText(e.target.value)
-          const read = readExam(e.target.value)
-          if ('problem' in read) {
-            setProblem(read.problem)
-            return
-          }
-          setProblem(null)
-          onChange(read.exam)
-        }}
+        disabled={disabled}
+        aria-invalid={!!problem}
+        onChange={(e) => onChange(e.target.value)}
         className="h-[60vh] w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-dense focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       />
       {problem && (

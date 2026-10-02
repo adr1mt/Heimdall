@@ -2517,7 +2517,7 @@
       "id": "T132",
       "title": "A06 · «Guardar» confirma un examen distinto al borrador YAML visible",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
@@ -2528,7 +2528,10 @@
         "borrador inválido, alternancia de vistas, navegación y apertura de un fichero con error. Nunca confirmar como guardado contenido anterior. ",
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
-      "tests": []
+      "tests": [
+        "Tipos GUI y compilación; aceptación Electron: D1–D7 y A06-1–A06-7"
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T133",

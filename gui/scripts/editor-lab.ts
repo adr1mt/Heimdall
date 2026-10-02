@@ -18,6 +18,8 @@ const secret = process.env.LAB_SECRET || ''
 const project = join(mkdtempSync(join(tmpdir(), 'heimdall-editor-')), 'examen del editor')
 const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms))
 
+app.setPath('userData', mkdtempSync(join(tmpdir(), 'heimdall-editor-profile-')))
+
 let failed = false
 function check(id: string, ok: boolean, detail: string): void {
   if (!ok) failed = true
@@ -38,6 +40,7 @@ app.whenReady().then(async () => {
     width: 1280, height: 900, show: true, backgroundColor: '#0b0f19',
     webPreferences: { preload: join(root, 'out/preload/index.cjs'), sandbox: false, contextIsolation: true, nodeIntegration: false }
   })
+  win.webContents.on('console-message', (_event, level, message)=>console.log('[renderer]',level,message))
   await win.loadFile(join(root, 'out/renderer/index.html'))
   await wait(1500)
   const js = win.webContents.executeJavaScript.bind(win.webContents)
@@ -71,7 +74,7 @@ app.whenReady().then(async () => {
   await wait(600)
 
   // Exámenes: añadir un grupo y una comprobación desde el formulario.
-  await js(`[...document.querySelectorAll('aside button')].find(b => b.textContent.trim() === 'Exámenes').click()`)
+  await js(`[...document.querySelectorAll('aside button')].find(b => b.textContent.trim() === 'El examen').click()`)
   await wait(700)
   // El nombre del grupo vive en un campo; lo que se lee en pantalla es la
   // comprobación con la que nace un examen nuevo.
@@ -135,6 +138,42 @@ app.whenReady().then(async () => {
   const saved = readFileSync(join(project, 'examen.yaml'), 'utf-8')
   check('D-6', saved.includes('cuenta-alumno'), 'el examen del formulario está guardado en su carpeta')
 
+  // Audit regressions: the visible draft is the only save candidate.
+  const invalid = saved + '\nfoo: [\n'
+  await type('Ver el YAML', invalid)
+  await wait(100)
+  const blocked = await js(`[...document.querySelectorAll('main button')].find(b=>b.textContent.trim()==='Guardar el examen').disabled`)
+  check('A06-1', !!blocked, 'el borrador inválido bloquea Guardar')
+  await click('Guardar el examen')
+  await click('Volver al formulario')
+  check('A06-2', await js(`document.querySelector('textarea').value`)===invalid, 'alternar vistas conserva el borrador inválido')
+  check('A06-3', readFileSync(join(project,'examen.yaml'),'utf-8')===saved, 'no se guarda la última versión válida por error')
+  await js(`[...document.querySelectorAll('aside button')].find(b=>b.textContent.trim()==='Histórico').click()`)
+  await wait(100)
+  check('A06-4', /Hay cambios sin guardar/.test(await js('document.body.innerText')), 'salir advierte de los cambios pendientes')
+  await click('Cancelar', 'body')
+  await wait(100)
+  check('A06-5', await js(`document.querySelector('textarea').value`)===invalid, 'cancelar la salida conserva el borrador')
+  await type('Ver el YAML', saved)
+  await click('Guardar el examen')
+  await wait(700)
+  const annotated=saved+'\n# Texto conservado exactamente\n'
+  await type('Ver el YAML', annotated)
+  await click('Guardar el examen')
+  await wait(700)
+  check('A06-6', readFileSync(join(project,'examen.yaml'),'utf-8')===annotated, 'se guarda exactamente el YAML validado, incluidos comentarios')
+  writeFileSync(join(project,'examen.yaml'),invalid)
+  await js(`[...document.querySelectorAll('aside button')].find(b=>b.textContent.trim()==='Inicio').click()`)
+  await wait(300)
+  await js(`[...document.querySelectorAll('header button')].find(b=>b.textContent.includes('Abrir')).click()`)
+  await wait(500)
+  await js(`[...document.querySelectorAll('aside button')].find(b=>b.textContent.trim()==='El examen').click()`)
+  await wait(300)
+  check('A06-7', await js(`document.querySelector('textarea').value`)===invalid, 'abrir un fichero roto conserva su texto original')
+  await type('Ver el YAML',saved)
+  await click('Guardar el examen')
+  await wait(700)
+
   // El aula sale de la clase, como en cada corrección (ADR-0022).
   const group = readClasses(app.getPath('userData'))[0]
   const cname = writeGeneratedAula(project, group)
@@ -152,4 +191,4 @@ app.whenReady().then(async () => {
   console.log(failed ? 'Hay fallos.' : 'El editor escribe exámenes que el motor corrige.')
   app.quit()
   process.exitCode = failed ? 1 : 0
-})
+}).catch(error=> {console.error(error);app.exit(1)})

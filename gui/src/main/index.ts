@@ -1,4 +1,4 @@
-import { app, BrowserWindow, session, shell } from 'electron'
+import { app, BrowserWindow, dialog, session, shell } from 'electron'
 import { join } from 'node:path'
 import { allowQuit, guardClose } from './close-guard'
 import { registerIpc } from './ipc'
@@ -72,6 +72,10 @@ function createWindow(): void {
   })
 
   win.on('ready-to-show', () => win.show())
+  win.webContents.on('will-prevent-unload', (event) => {
+    const choice=dialog.showMessageBoxSync(win,{type:'question',buttons:['Volver al editor','Descartar y cerrar'],defaultId:0,cancelId:0,title:'Cambios sin guardar',message:'El borrador del examen no se ha guardado.'})
+    if(choice===1) event.preventDefault()
+  })
 
   guardClose(win)
   startUpdates(win)

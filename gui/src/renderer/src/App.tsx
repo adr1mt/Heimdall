@@ -26,6 +26,7 @@ import { shouldStartPass } from './lib/exam'
 import { startCorrection } from './lib/start-run'
 import { t } from './i18n/es'
 import logo from './assets/logo.png'
+import { ConfirmDialog } from '@/components/ui'
 
 const HomeView = lazy(() => import('./routes/Home'))
 const SettingsView = lazy(() => import('./routes/Settings'))
@@ -72,6 +73,14 @@ function AppBody() {
   const hasProject = useApp((s) => s.project !== null)
   const projector = useApp((s) => s.projector)
   const update = useApp((s) => s.update)
+ const draft=useApp((s)=>s.editorDraft)
+ const pendingNavigation=useApp((s)=>s.pendingNavigation)
+ useEffect(()=> {
+  if (!draft || draft.text===draft.savedText) return
+  const prevent=(event:BeforeUnloadEvent):void=> {event.preventDefault(); event.returnValue=""}
+  window.addEventListener("beforeunload",prevent)
+  return ()=>window.removeEventListener("beforeunload",prevent)
+ },[draft])
   const setUpdate = useApp((s) => s.setUpdate)
 
   // A version waiting to be installed is news, not an interruption: it lands
@@ -166,6 +175,9 @@ function AppBody() {
 
   return (
     <div className="flex h-full w-full overflow-hidden">
+      <ConfirmDialog open={pendingNavigation!==null} title="Hay cambios sin guardar" confirmLabel="Descartar y salir" onCancel={()=>useApp.getState().resolveNavigation(false)} onConfirm={()=>useApp.getState().resolveNavigation(true)}>
+        El borrador del examen no se ha guardado. Puedes volver al editor o descartarlo para salir.
+      </ConfirmDialog>
       {/* Al proyectar desaparece entera: la barra es del profesor, no de la
           clase, y en la pared solo roba sitio a lo que se está mirando. */}
       {!projector && (
