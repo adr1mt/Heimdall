@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated": "2026-09-22",
+  "updated": "2026-10-02",
   "status_values": [
     "BLOCKED",
     "READY",
@@ -2412,6 +2412,312 @@
         "gui/tests: el texto que pide la contrasena no nombra ninguna referencia"
       ],
       "notes": "Adria, 22-09-2026: en Teuton la contrasena vivia en config.yaml y de ahi acababa en resume.json. Aqui se guarda cifrada y nunca sale en un informe. El aula real: usuario/usuario en todas las maquinas, la misma todo el curso. Toca secretos: tarea sola, sin encadenar."
+    },
+    {
+      "id": "T127",
+      "title": "A01 · Se decide la nota usando una salida recortada",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
+      "scope": [
+        "docs/audits/2026-10-02/AUDITORIA.md#A01"
+      ],
+      "acceptance": [
+        "probar coincidencias y texto prohibido antes y después del límite, igualdad con un sufijo descartado y `cerca_de` fuera del prefijo. ",
+        "Pruebas de regresión pertinentes y suites del área en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T128",
+      "title": "A02 · Una anticomprobación aprueba si el comando no existe",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
+      "scope": [
+        "docs/audits/2026-10-02/AUDITORIA.md#A02"
+      ],
+      "acceptance": [
+        "comando inexistente, lectura fallida y anticomprobación válida con stdout vacío. La prueba actual del exit 127 usa `exit_code`, por lo que no cubre este caso. ",
+        "Pruebas de regresión pertinentes y suites del área en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T129",
+      "title": "A03 · Un timeout que necesita SIGKILL se trata como resultado académico",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
+      "scope": [
+        "docs/audits/2026-10-02/AUDITORIA.md#A03"
+      ],
+      "acceptance": [
+        "timeout con TERM, escalada a KILL, y comando que devuelva legítimamente 124 o 137 sin agotar el límite. ",
+        "Pruebas de regresión pertinentes y suites del área en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T130",
+      "title": "A04 · Abrir un canal SSH o iniciar el comando puede bloquear indefinidamente",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
+      "scope": [
+        "docs/audits/2026-10-02/AUDITORIA.md#A04"
+      ],
+      "acceptance": [
+        "servidor sin respuesta en apertura, exec y autenticación; cancelación en cada fase; los demás alumnos deben terminar y debe guardarse el artefacto final. ",
+        "Pruebas de regresión pertinentes y suites del área en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T131",
+      "title": "A05 · La rotación de copias elimina los resultados más recientes",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
+      "scope": [
+        "docs/audits/2026-10-02/AUDITORIA.md#A05"
+      ],
+      "acceptance": [
+        "51 y 100 originales, tres pasadas sucesivas, restauración tras eliminar los originales y comprobación de que siguen las últimas notas. ",
+        "Pruebas de regresión pertinentes y suites del área en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T132",
+      "title": "A06 · «Guardar» confirma un examen distinto al borrador YAML visible",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
+      "scope": [
+        "docs/audits/2026-10-02/AUDITORIA.md#A06"
+      ],
+      "acceptance": [
+        "borrador inválido, alternancia de vistas, navegación y apertura de un fichero con error. Nunca confirmar como guardado contenido anterior. ",
+        "Pruebas de regresión pertinentes y suites del área en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T133",
+      "title": "A07 · El editor elimina errores de formato antes de que el motor los vea",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
+      "scope": [
+        "docs/audits/2026-10-02/AUDITORIA.md#A07"
+      ],
+      "acceptance": [
+        "claves desconocidas en todos los niveles, dos aserciones, valores de tipo incorrecto y documentos válidos sin cambios semánticos. ",
+        "Pruebas de regresión pertinentes y suites del área en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T134",
+      "title": "A08 · Una vuelta perfecta puede no dar al alumno por terminado",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
+      "scope": [
+        "docs/audits/2026-10-02/AUDITORIA.md#A08"
+      ],
+      "acceptance": [
+        "Regresión del caso de auditoría en verde.",
+        "Pruebas de regresión pertinentes y suites del área en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T135",
+      "title": "A09 · El editor no conserva pesos decimales que el motor admite",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
+      "scope": [
+        "docs/audits/2026-10-02/AUDITORIA.md#A09"
+      ],
+      "acceptance": [
+        "Regresión del caso de auditoría en verde.",
+        "Pruebas de regresión pertinentes y suites del área en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T136",
+      "title": "A10 · Un fichero de clases parcialmente corrupto pierde datos al guardar",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
+      "scope": [
+        "docs/audits/2026-10-02/AUDITORIA.md#A10"
+      ],
+      "acceptance": [
+        "Rechazar datos parciales inválidos con su ubicación y preservar el fichero original.",
+        "Pruebas de regresión pertinentes y suites del área en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T137",
+      "title": "A11 · Los límites numéricos permiten estados incompatibles con la política",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
+      "scope": [
+        "docs/audits/2026-10-02/AUDITORIA.md#A11"
+      ],
+      "acceptance": [
+        "Regresión del caso de auditoría en verde.",
+        "Pruebas de regresión pertinentes y suites del área en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T138",
+      "title": "A12 · La redacción defensiva no recorre toda la metadata textual",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
+      "scope": [
+        "docs/audits/2026-10-02/AUDITORIA.md#A12"
+      ],
+      "acceptance": [
+        "Redactar secretos en toda la metadata textual manteniendo referencias coherentes; ejecutar aceptación de secretos.",
+        "Pruebas de regresión pertinentes y suites del área en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T139",
+      "title": "A13 · Se acepta como resultado una nota sin comprobaciones que la sustenten",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
+      "scope": [
+        "docs/audits/2026-10-02/AUDITORIA.md#A13"
+      ],
+      "acceptance": [
+        "Rechazar artefactos incoherentes en CLI y GUI; aceptar excluidos, reintentos y copias legítimas.",
+        "Pruebas de regresión pertinentes y suites del área en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T140",
+      "title": "A14 · Cancelar afirma que ha matado un proceso que sigue vivo",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
+      "scope": [
+        "docs/audits/2026-10-02/AUDITORIA.md#A14"
+      ],
+      "acceptance": [
+        "detener antes del timeout, agotar el presupuesto del alumno y perder la conexión. No declarar muerte remota sin evidencia. ",
+        "Pruebas de regresión pertinentes y suites del área en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T141",
+      "title": "A15 · El fallo de la copia automática queda oculto",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
+      "scope": [
+        "docs/audits/2026-10-02/AUDITORIA.md#A15"
+      ],
+      "acceptance": [
+        "Avisar de errores de copia sin invalidar la corrección; E/S asíncrona y retención limitada.",
+        "Pruebas de regresión pertinentes y suites del área en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T142",
+      "title": "A16 · Contraste insuficiente en estados de la barra lateral y botones rojos",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
+      "scope": [
+        "docs/audits/2026-10-02/AUDITORIA.md#A16"
+      ],
+      "acceptance": [
+        "estado listo y ausente, botones destructivos y sus estados de interacción en ambos temas. Mantener icono y texto además del color. ",
+        "Pruebas de regresión pertinentes y suites del área en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T143",
+      "title": "A17 · Una descarga de actualización puede comenzar durante una corrección",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
+      "scope": [
+        "docs/audits/2026-10-02/AUDITORIA.md#A17"
+      ],
+      "acceptance": [
+        "Recomprobar actividad antes de descargar, cancelar al iniciar corrección y limitar tiempo y tamaño de descarga.",
+        "Pruebas de regresión pertinentes y suites del área en verde."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T144",
+      "title": "A18 · Un motor que no puede arrancar notifica el cierre dos veces",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
+      "scope": [
+        "docs/audits/2026-10-02/AUDITORIA.md#A18"
+      ],
+      "acceptance": [
+        "Regresión del caso de auditoría en verde.",
+        "Pruebas de regresión pertinentes y suites del área en verde."
+      ],
+      "tests": []
     }
   ]
 }

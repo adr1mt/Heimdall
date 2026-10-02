@@ -1,0 +1,11 @@
+backup first: 100
+backup first retained: 50 run-audit-051.json run-audit-100.json
+backup second: 50
+backup second retained: 50 run-audit-001.json run-audit-050.json
+decimal weight written:         peso: "0.5"
+unknown and extra assertion silently dropped: true true
+class corruption: disk had 2 classes, read returned 1 and save wrote 1
+artifact with missing checks accepted: 100
+missing engine close notifications: 2
+updater outcome: ready download began during correction: true
+probe directory: /tmp/heimdall-audit-node-lT1cQw

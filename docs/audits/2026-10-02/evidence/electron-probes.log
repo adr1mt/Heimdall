@@ -1,0 +1,69 @@
+storage: {"available":false,"backend":"basic_text","stored":false}
+clicked: Auditoría ficticia true
+clicked: El examen true
+editor: Heimdall
+Inicio
+Clases
+El examen
+Corregir
+Resultados
+Analíticas
+Histórico
+Ajustes
+Ayuda
+Motor listo · 0.9.0
+Modo proyector
+Tema claro
+El examen: Auditoría ficticia
+1 comprobación · 1 de peso total
+Ver el YAML
+
+Es el examen que tienes abierto, el que se corrige en «Corregir». Aquí se escribe lo que se comprueba en cada máquina y cuánto pesa cada comprobación.
+
+Nombre del examen
+Máquinas del examen
+Los nombres que usa el examen: host1, host2. La dirección de cada alumno sale de la clase.
+Por defecto: Peso
+Por defecto: Tiempo máximo
+Grupos de comprobaciones
+Añadir grupo
+Añadir comprobación
+audit
+Audit
+1
+Editar
+Guardar el examen
+clicked: YAML true
+invalid YAML save: {
+  saveDisabled: false,
+  parseError: true,
+  textarea: 'code: 0\n\nfoo: ['
+}
+clicked: Guardar true
+after save: rico
+Ajustes
+Ayuda
+Motor listo · 0.9.0
+Modo proyector
+Tema claro
+Examen guardado.
+El examen: Auditoría ficticia
+1 comprobación · 1 de peso total
+Volver al formulario
+
+El mismo examen, en el fichero que lee el motor. Lo que cambies aquí vuelve al formulario.
+
+Este YAML no se puede leer, así que el formulario se queda como estaba:
+
+unexpected end of the stream within a flow collection (16:1)
+
+ 13 |         exit_code: 0
+ 14 | 
+ 15 | foo: [
+ 16 | 
+------^
+Guardar el examen
+El motor acepta el examen.
+invalid draft written: false
+dark DOM: { classes: 'dark', background: 'rgb(9, 14, 26)' }
+output directory: /tmp/heimdall-audit-electron-sdD2pO

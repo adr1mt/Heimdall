@@ -1,0 +1,91 @@
+package ssh
+
+import (
+ "context"
+ "crypto/ed25519"
+ "crypto/rand"
+ "net"
+ "strings"
+ "testing"
+ "time"
+
+ xssh "golang.org/x/crypto/ssh"
+ "heimdall/internal/assert"
+ "heimdall/internal/model"
+)
+
+func TestAuditTruncatedOutput(t *testing.T) {
+ var w capWriter
+ _, _ = w.Write([]byte(strings.Repeat("x", keepLimit) + "FORBIDDEN"))
+ stream, _ := w.stream()
+ zero := 0
+ execution := model.ExecutionResult{Completed: true, ExitCode: &zero, Stdout: stream}
+ contains, _ := assert.Eval(execution, assert.Spec{Kind: assert.KindContains, Expected: "FORBIDDEN"})
+ absent, _ := assert.Eval(execution, assert.Spec{Kind: assert.KindNotContains, Expected: "FORBIDDEN"})
+ t.Logf("actual bytes=%d retained=%d truncated=%v contains=%v not_contains=%v", stream.BytesTotal, stream.Bytes, stream.Truncated, contains.Matched, absent.Matched)
+ if contains.Matched || !absent.Matched { t.Fatal("reproduction changed") }
+}
+
+func auditSession(t *testing.T, mode string) *Session {
+ t.Helper()
+ _, key, err := ed25519.GenerateKey(rand.Reader)
+ if err != nil { t.Fatal(err) }
+ signer, err := xssh.NewSignerFromKey(key)
+ if err != nil { t.Fatal(err) }
+ cfg := &xssh.ServerConfig{NoClientAuth: true}
+ cfg.AddHostKey(signer)
+ listener, err := net.Listen("tcp", "127.1.2.3:0")
+ if err != nil { t.Fatal(err) }
+ t.Cleanup(func() { listener.Close() })
+ go func() {
+  raw, err := listener.Accept()
+  if err != nil { return }
+  server, channels, requests, err := xssh.NewServerConn(raw, cfg)
+  if err != nil { return }
+  defer server.Close()
+  go xssh.DiscardRequests(requests)
+  for incoming := range channels {
+   if mode == "open" { continue }
+   channel, reqs, err := incoming.Accept()
+   if err != nil { return }
+   go func() {
+    for req := range reqs {
+     if mode == "start" { continue }
+     req.Reply(true, nil)
+     channel.SendRequest("exit-status", false, xssh.Marshal(struct{ Status uint32 }{137}))
+     channel.Close()
+    }
+   }()
+  }
+ }()
+ client, err := xssh.Dial("tcp", listener.Addr().String(), &xssh.ClientConfig{User: "audit", HostKeyCallback: xssh.InsecureIgnoreHostKey(), Timeout: time.Second})
+ if err != nil { t.Fatal(err) }
+ t.Cleanup(func() { client.Close() })
+ return &Session{client: client, cfg: Config{Host: "audit"}}
+}
+
+func TestAuditSSHRequestTimeouts(t *testing.T) {
+ for _, mode := range []string{"open", "start"} {
+  t.Run(mode, func(t *testing.T) {
+   session := auditSession(t, mode)
+   ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+   defer cancel()
+   done := make(chan *model.ExecutionResult, 1)
+   go func() { done <- session.Run(ctx, []string{"true"}, 50*time.Millisecond) }()
+   select {
+   case <-done: t.Fatal("reproduction changed: request respected timeout")
+   case <-time.After(250*time.Millisecond): t.Logf("SSH %s request remained blocked after 50ms context and timeout", mode)
+   }
+   session.Close()
+   select { case <-done: case <-time.After(time.Second): t.Fatal("cleanup did not finish") }
+  })
+ }
+}
+
+func TestAuditForcedTimeoutKill(t *testing.T) {
+ session := auditSession(t, "kill")
+ session.hasRemoteKill = true
+ execution := session.Run(context.Background(), []string{"true"}, time.Second)
+ t.Logf("timeout wrapper exit=137 completed=%v remote_process=%s", execution.Completed, execution.RemoteProcess)
+ if !execution.Completed || execution.ExitCode == nil || *execution.ExitCode != 137 { t.Fatal("reproduction changed") }
+}

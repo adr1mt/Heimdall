@@ -1,0 +1,8 @@
+ok  	heimdall/cmd/heimdall	5.063s	coverage: 78.8% of statements
+ok  	heimdall/internal/assert	0.003s	coverage: 98.5% of statements
+ok  	heimdall/internal/engine	0.133s	coverage: 88.4% of statements
+ok  	heimdall/internal/events	0.003s	coverage: 100.0% of statements
+ok  	heimdall/internal/model	0.005s	coverage: 95.8% of statements
+ok  	heimdall/internal/plan	0.017s	coverage: 86.0% of statements
+ok  	heimdall/internal/report	0.084s	coverage: 78.7% of statements
+ok  	heimdall/internal/ssh	0.002s	coverage: 13.5% of statements

@@ -1,0 +1,11 @@
+=== RUN   TestAuditSessionRoundedTie
+    audit_probe_test.go:23: round1 obtained=249/250 final=100; round2 obtained=250/250 final=100; session status=ACTIVE from_round=1 obtained=249
+--- PASS: TestAuditSessionRoundedTie (0.00s)
+=== RUN   TestAuditSmallUnevaluatedWeight
+    audit_probe_test.go:31: weighted UNEVALUATED check=1e-10; score status=COMPLETE final=100 student=PARTIAL
+--- PASS: TestAuditSmallUnevaluatedWeight (0.00s)
+=== RUN   TestAuditSecretInMetadata
+    audit_probe_test.go:40: known fake secret in execution.user survives redaction=true warnings=0
+--- PASS: TestAuditSecretInMetadata (0.00s)
+PASS
+ok  	heimdall/internal/model	0.002s

@@ -1,0 +1,16 @@
+=== RUN   TestAuditTruncatedOutput
+    audit_probe_test.go:25: actual bytes=65545 retained=65536 truncated=true contains=false not_contains=true
+--- PASS: TestAuditTruncatedOutput (0.00s)
+=== RUN   TestAuditSSHRequestTimeouts
+=== RUN   TestAuditSSHRequestTimeouts/open
+    audit_probe_test.go:77: SSH open request remained blocked after 50ms context and timeout
+=== RUN   TestAuditSSHRequestTimeouts/start
+    audit_probe_test.go:77: SSH start request remained blocked after 50ms context and timeout
+--- PASS: TestAuditSSHRequestTimeouts (0.54s)
+    --- PASS: TestAuditSSHRequestTimeouts/open (0.27s)
+    --- PASS: TestAuditSSHRequestTimeouts/start (0.27s)
+=== RUN   TestAuditForcedTimeoutKill
+    audit_probe_test.go:89: timeout wrapper exit=137 completed=true remote_process=FINISHED
+--- PASS: TestAuditForcedTimeoutKill (0.02s)
+PASS
+ok  	heimdall/internal/ssh	1.567s

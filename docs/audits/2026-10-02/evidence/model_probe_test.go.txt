@@ -1,0 +1,42 @@
+package model_test
+
+import (
+ "strings"
+ "testing"
+ "time"
+ "heimdall/internal/model"
+ "heimdall/internal/report"
+)
+
+func TestAuditSessionRoundedTie(t *testing.T) {
+ plan := model.PlanSummary{TotalWeight: 250, CheckCount: 2, CheckIDs: []string{"a", "b"}}
+ rounds := []model.SessionRound{}
+ for i, second := range []model.AcademicStatus{model.Fail, model.Pass} {
+  checks := []model.CheckResult{{CheckID: "a", Weight: 249, Status: model.Pass}, {CheckID: "b", Weight: 1, Status: second}}
+  run := &model.RunResult{PlanHash: "audit", RunID: string(rune('a'+i)), FinishedAt: time.Unix(int64(i+1),0), Plan: plan,
+   Students: []model.StudentResult{{StudentID: "alu1", Name: "Audit", Status: model.StudentOK, Score: model.ComputeScore(plan, checks), Checks: checks}}}
+  rounds = append(rounds, model.SessionRound{Run: run})
+ }
+ session, err := model.BuildSession(rounds)
+ if err != nil { t.Fatal(err) }
+ s := session.Students[0]
+ t.Logf("round1 obtained=249/250 final=100; round2 obtained=250/250 final=100; session status=%s from_round=%d obtained=%v",s.Status,s.FromRound,s.Score.Obtained)
+ if s.Status != model.SessionActive || s.FromRound != 1 { t.Fatal("reproduction changed") }
+}
+
+func TestAuditSmallUnevaluatedWeight(t *testing.T) {
+ plan := model.PlanSummary{TotalWeight: 1.0000000001}
+ checks := []model.CheckResult{{CheckID: "a", Weight: 1, Status: model.Pass}, {CheckID: "b", Weight: 1e-10, Status: model.Unevaluated}}
+ score := model.ComputeScore(plan,checks)
+ t.Logf("weighted UNEVALUATED check=1e-10; score status=%s final=%v student=%s",score.Status,*score.Final,model.StudentStatusOf(checks))
+ if score.Status != model.ScoreComplete { t.Fatal("reproduction changed") }
+}
+
+func TestAuditSecretInMetadata(t *testing.T) {
+ run := &model.RunResult{Students: []model.StudentResult{{StudentID:"audit",Name:"Audit",Checks:[]model.CheckResult{{Execution:&model.ExecutionResult{User:"AUDIT_FAKE_PASSWORD"}}}}}}
+ clean, err := report.Redact(run,[]string{"AUDIT_FAKE_PASSWORD"})
+ if err != nil {t.Fatal(err)}
+ data,_ := model.MarshalCanonical(clean)
+ t.Logf("known fake secret in execution.user survives redaction=%v warnings=%d",strings.Contains(string(data),"AUDIT_FAKE_PASSWORD"),len(clean.Warnings))
+ if !strings.Contains(string(data),"AUDIT_FAKE_PASSWORD") {t.Fatal("reproduction changed")}
+}

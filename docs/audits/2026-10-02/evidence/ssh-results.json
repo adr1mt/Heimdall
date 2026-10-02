@@ -1,0 +1,112 @@
+[
+  {
+    "run_case": "ssh-project",
+    "run_status": "COMPLETE",
+    "student_score": {
+      "obtained": 2,
+      "evaluable": 4,
+      "total": 4,
+      "unevaluated": 0,
+      "provisional_score": 50,
+      "final_score": 50,
+      "status": "COMPLETE"
+    },
+    "check_id": "contains-late",
+    "status": "FAIL",
+    "cause": "NONE",
+    "detail": null,
+    "exit_code": 0,
+    "completed": true,
+    "remote_process": "FINISHED",
+    "stdout_bytes_total": 65545,
+    "stdout_truncated": true
+  },
+  {
+    "run_case": "ssh-project",
+    "run_status": "COMPLETE",
+    "student_score": {
+      "obtained": 2,
+      "evaluable": 4,
+      "total": 4,
+      "unevaluated": 0,
+      "provisional_score": 50,
+      "final_score": 50,
+      "status": "COMPLETE"
+    },
+    "check_id": "not-contains-late",
+    "status": "PASS",
+    "cause": "NONE",
+    "detail": null,
+    "exit_code": 0,
+    "completed": true,
+    "remote_process": "FINISHED",
+    "stdout_bytes_total": 65545,
+    "stdout_truncated": true
+  },
+  {
+    "run_case": "ssh-project",
+    "run_status": "COMPLETE",
+    "student_score": {
+      "obtained": 2,
+      "evaluable": 4,
+      "total": 4,
+      "unevaluated": 0,
+      "provisional_score": 50,
+      "final_score": 50,
+      "status": "COMPLETE"
+    },
+    "check_id": "command-missing",
+    "status": "PASS",
+    "cause": "NONE",
+    "detail": null,
+    "exit_code": 127,
+    "completed": true,
+    "remote_process": "FINISHED",
+    "stdout_bytes_total": 0,
+    "stdout_truncated": false
+  },
+  {
+    "run_case": "ssh-project",
+    "run_status": "COMPLETE",
+    "student_score": {
+      "obtained": 2,
+      "evaluable": 4,
+      "total": 4,
+      "unevaluated": 0,
+      "provisional_score": 50,
+      "final_score": 50,
+      "status": "COMPLETE"
+    },
+    "check_id": "timeout-kill",
+    "status": "FAIL",
+    "cause": "NONE",
+    "detail": null,
+    "exit_code": 137,
+    "completed": true,
+    "remote_process": "FINISHED",
+    "stdout_bytes_total": 0,
+    "stdout_truncated": false
+  },
+  {
+    "run_case": "cancel-project",
+    "run_status": "CANCELLED",
+    "student_score": {
+      "obtained": 0,
+      "evaluable": 0,
+      "total": 1,
+      "unevaluated": 1,
+      "provisional_score": null,
+      "final_score": null,
+      "status": "NOT_EVALUATED"
+    },
+    "check_id": "cancel",
+    "status": "UNEVALUATED",
+    "cause": "TIMEOUT",
+    "detail": "el comando no terminó en 20s y se ha matado en la máquina del alumno",
+    "exit_code": null,
+    "completed": false,
+    "remote_process": "KILLED_REMOTE",
+    "stdout_bytes_total": 0,
+    "stdout_truncated": false
+  }
+]
