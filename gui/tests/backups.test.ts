@@ -321,3 +321,124 @@ it('reports and hides a chain with a missing ancestor',async()=> {
  expect((await backupRuns(dataDir,examPath)).failures.length).toBeGreaterThan(0)
  expect(listBackups(dataDir,examPath)).toEqual([])
 })
+
+/** References deliberately point at an old location: copies use basenames. */
+function linkedRun(id: string, previous?: string) {
+  const run = parseArtifact(artifact(id, '2026-10-02T10:00:00Z'))
+  if (previous) run.retry_of = {
+    run_id: previous,
+    artifact: `/old/exam/var/run-${previous}.json`,
+    run_at: run.started_at,
+    students: 1,
+    checks: 1
+  }
+  return run
+}
+
+describe('copy chain invariants across writing and recovery', () => {
+  const brokenChains = [
+    { reason: 'cycle', runs: [linkedRun('HEAD', 'ROOT'), linkedRun('ROOT', 'HEAD')] },
+    { reason: 'identity', runs: [linkedRun('HEAD', 'ROOT'), linkedRun('WRONG')] },
+    { reason: 'PLAN', runs: [linkedRun('HEAD', 'ROOT'), { ...linkedRun('ROOT'), plan_hash: 'd'.repeat(64) }] },
+    { reason: 'missing ancestor', runs: [linkedRun('HEAD', 'ROOT')] }
+  ]
+
+  it.each(brokenChains)('rejects $reason before copying or restoring the head', async ({ runs }) => {
+    const { dataDir, examPath, varDir } = workspace()
+    const slot = slotFor(dataDir, examPath)
+    mkdirSync(slot, { recursive: true })
+    runs.forEach((run, i) => {
+      // In the identity case, the file exists under the expected name but
+      // contains a different correction. Each artifact is valid on its own.
+      const name = i === 0 ? 'run-HEAD.json' : 'run-ROOT.json'
+      writeFileSync(join(varDir, name), JSON.stringify(run))
+    })
+    const originals = runs.map((_, i) => readFileSync(join(varDir, i === 0 ? 'run-HEAD.json' : 'run-ROOT.json'), 'utf8'))
+    const report = await backupRuns(dataDir, examPath)
+    expect(report.failures.some(message => message.includes('run-HEAD.json'))).toBe(true)
+    expect(listBackups(dataDir, examPath).some(entry => entry.runId === 'HEAD')).toBe(false)
+    expect(() => readFileSync(join(slot, 'run-HEAD.json'))).toThrow()
+
+    // Also exercise copies already on disk, without going through copying.
+    runs.forEach((run, i) => writeFileSync(join(slot, i === 0 ? 'run-HEAD.json' : 'run-ROOT.json'), JSON.stringify(gradesOnly(run))))
+    expect(listBackups(dataDir, examPath).some(entry => entry.runId === 'HEAD')).toBe(false)
+    expect(() => restoreBackups(dataDir, examPath)).toThrow()
+    originals.forEach((text, i) => expect(readFileSync(join(varDir, i === 0 ? 'run-HEAD.json' : 'run-ROOT.json'), 'utf8')).toBe(text))
+    rmSync(varDir, { recursive: true })
+    expect(() => restoreBackups(dataDir, examPath)).toThrow()
+    expect(() => readFileSync(join(varDir, 'run-HEAD.json'))).toThrow()
+  })
+
+  it.each([49, 50, 51])('enforces the boundary with %i links', async count => {
+    const { dataDir, examPath, varDir } = workspace()
+    const runs = Array.from({ length: count }, (_, i) => linkedRun(`R${i}`, i ? `R${i - 1}` : undefined))
+    runs.forEach(run => writeFileSync(join(varDir, `run-${run.run_id}.json`), JSON.stringify(run)))
+    const headId = `R${count - 1}`
+    const report = await backupRuns(dataDir, examPath)
+    expect(report.failures.some(message => message.includes(`run-${headId}.json`))).toBe(count > 50)
+    expect(listBackups(dataDir, examPath).some(entry => entry.runId === headId)).toBe(count <= 50)
+    // Seed the same chain for the synchronous path, including the 51st link
+    // which the writing path refused to publish.
+    const slot = slotFor(dataDir, examPath)
+    runs.forEach(run => writeFileSync(join(slot, `run-${run.run_id}.json`), JSON.stringify(gradesOnly(run))))
+    expect(listBackups(dataDir, examPath).some(entry => entry.runId === headId)).toBe(count <= 50)
+    rmSync(varDir, { recursive: true })
+    if (count > 50) {
+      expect(() => restoreBackups(dataDir, examPath)).toThrow(/50/)
+      expect(() => readFileSync(join(varDir, 'run-R0.json'))).toThrow()
+    } else {
+      expect(restoreBackups(dataDir, examPath)).toEqual({ restored: count, kept: 0 })
+      expect((await backupRuns(dataDir, examPath)).failures).toEqual([])
+    }
+  })
+
+  it('rejects a corrupt ancestor and preserves its file during rotation', async () => {
+    const { dataDir, examPath, varDir } = workspace()
+    const slot = slotFor(dataDir, examPath)
+    mkdirSync(slot, { recursive: true })
+    const root = gradesOnly(linkedRun('ROOT'))
+    root.students[0].score.final_score = 0
+    const corrupt = JSON.stringify(root)
+    writeFileSync(join(slot, 'run-ROOT.json'), corrupt)
+    writeFileSync(join(slot, 'run-HEAD.json'), JSON.stringify(gradesOnly(linkedRun('HEAD', 'ROOT'))))
+    expect(listBackups(dataDir, examPath)).toEqual([])
+    expect(() => restoreBackups(dataDir, examPath)).toThrow()
+    expect(() => readFileSync(join(varDir, 'run-HEAD.json'))).toThrow()
+    const report = await backupRuns(dataDir, examPath)
+    expect(report.failures.some(message => message.includes('run-ROOT.json'))).toBe(true)
+    expect(report.failures.some(message => message.includes('run-HEAD.json'))).toBe(true)
+    expect(readFileSync(join(slot, 'run-ROOT.json'), 'utf8')).toBe(corrupt)
+  })
+
+  it('keeps source precedence and falls back to the slot when an ancestor disappears', async () => {
+    const { dataDir, examPath, varDir } = workspace()
+    const root = linkedRun('ROOT'), head = linkedRun('HEAD', 'ROOT')
+    writeFileSync(join(varDir, 'run-ROOT.json'), JSON.stringify(root))
+    expect((await backupRuns(dataDir, examPath)).failures).toEqual([])
+    writeFileSync(join(varDir, 'run-HEAD.json'), JSON.stringify(head))
+    writeFileSync(join(varDir, 'run-ROOT.json'), JSON.stringify({ ...root, plan_hash: 'd'.repeat(64) }))
+    // A valid stored copy must not hide an invalid source that still exists.
+    expect((await backupRuns(dataDir, examPath)).failures.some(message => message.includes('run-HEAD.json'))).toBe(true)
+    rmSync(join(varDir, 'run-ROOT.json'))
+    expect((await backupRuns(dataDir, examPath)).failures).toEqual([])
+    expect(listBackups(dataDir, examPath).map(entry => entry.runId).sort()).toEqual(['HEAD', 'ROOT'])
+    const original = readFileSync(join(varDir, 'run-HEAD.json'), 'utf8')
+    expect(restoreBackups(dataDir, examPath)).toEqual({ restored: 1, kept: 1 })
+    expect(readFileSync(join(varDir, 'run-HEAD.json'), 'utf8')).toBe(original)
+  })
+
+  it('does not infer retries or a session from dates and a shared PLAN', async () => {
+    const { dataDir, examPath, varDir } = workspace()
+    writeFileSync(join(varDir, 'run-HEAD.json'), JSON.stringify(linkedRun('HEAD', 'MISSING')))
+    writeRun(varDir, 'INDEPENDENT', '2026-10-02T09:00:00Z')
+    const report = await backupRuns(dataDir, examPath)
+    expect(report.saved).toBe(1)
+    expect(report.failures.some(message => message.includes('run-HEAD.json'))).toBe(true)
+    expect(listBackups(dataDir, examPath).map(entry => entry.runId)).toEqual(['INDEPENDENT'])
+    rmSync(varDir, { recursive: true })
+    expect(restoreBackups(dataDir, examPath)).toEqual({ restored: 1, kept: 0 })
+    const restored = parseArtifact(readFileSync(join(varDir, 'run-INDEPENDENT.json'), 'utf8'))
+    expect(restored.retry_of).toBeUndefined()
+    expect(restored.students[0].score.final_score).toBe(80)
+  })
+})

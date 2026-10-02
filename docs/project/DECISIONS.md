@@ -724,3 +724,18 @@ por celda, contando expansión JSON y con aviso. Se admiten hasta 2000 celdas y
   aislamiento tanto con el cambio como con HEAD anterior.
 - T157 y T158 registran las otras oportunidades autorizadas. Se conservan
   separadas por la regla de una tarea por sesión para el contrato y notas.
+
+## T158 · Recorrido común de cadenas de copias
+
+- Un estado privado en `backup.ts` concentra ciclo, identidad, PLAN, límite de
+  50 y avance por `retry_of`. Los dos consumidores aportan artefactos ya
+  validados: lectura asíncrona al copiar y mapa síncrono al conservar/recuperar.
+- La búsqueda por nombre, prioridad de original frente a copia, escritura de
+  antiguo a reciente y selección de retención permanecen en sus consumidores.
+  No se crea un recorrido genérico para consolidación o sesiones.
+- Las notas siguen siendo autoritativas en Go; la GUI conserva sus defensas
+  frente a corrupción y no infiere relaciones por fecha o PLAN compartido.
+- Sin cambios de política ni nuevo ADR. Regresiones públicas sobre los dos
+  consumidores, incluyendo frontera 49/50/51 y originales byte a byte.
+- Base inicial: `2d16110e1b63506d86a1e1694270d129a4010161`, árbol limpio;
+  `make check`, ambos builds, tipos y 516 tests GUI correctos.

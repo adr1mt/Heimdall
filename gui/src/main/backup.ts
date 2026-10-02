@@ -11,6 +11,32 @@ import { RUN_FILE, varDirOf, readRunDate } from './history'
 export const MAX_BACKUPS = 50
 export const MAX_BACKUP_CHAIN = 50
 
+/**
+ * Shared walk state for copying and for retention/recovery. Callers supply
+ * already validated runs using their own sync or async lookup; only retry_of
+ * advances the walk. This neither locates files nor composes grades/sessions.
+ */
+class BackupChain {
+  readonly members: string[] = []
+  private readonly seen = new Set<string>()
+  private expectedId: string | undefined
+  private planHash: string | undefined
+
+  /** Accept one link and return the basename to load next, or finish. */
+  add(name: string, run: RunResult): string | undefined {
+    if (this.seen.has(run.run_id)) throw new Error('ciclo en la cadena de copias')
+    if (this.expectedId && run.run_id !== this.expectedId) throw new Error('identidad de antecedente incorrecta')
+    if (this.planHash && run.plan_hash !== this.planHash) throw new Error('antecedente de otro PLAN')
+    this.planHash = run.plan_hash
+    this.seen.add(run.run_id)
+    this.members.push(name)
+    if (!run.retry_of) return undefined
+    if (this.members.length >= MAX_BACKUP_CHAIN) throw new Error(`La cadena de copias supera ${MAX_BACKUP_CHAIN} correcciones.`)
+    this.expectedId = run.retry_of.run_id
+    return basename(run.retry_of.artifact)
+  }
+}
+
 /** Where every copy lives: the app's own data directory, never the exam's. */
 export function backupsRoot(dataDir: string): string {
   return join(dataDir, 'copias')
@@ -101,17 +127,10 @@ async function copyRuns(dataDir:string,examPath:string):Promise<BackupReport> {
   const run=await readArtifactAsync(path); cache.set(name,run); return run
  }
  async function chainOf(name:string):Promise<string[]> {
-  const chain:string[]=[],seen=new Set<string>();let expected:string|undefined,hash:string|undefined
-  while(true) {
-   const run=await load(name)
-   if(seen.has(run.run_id)) throw new Error('ciclo en la cadena de copias')
-   if(expected && run.run_id!==expected) throw new Error('identidad de antecedente incorrecta')
-   if(hash && run.plan_hash!==hash) throw new Error('antecedente de otro PLAN')
-   hash=run.plan_hash;seen.add(run.run_id);chain.push(name)
-   if(!run.retry_of) return chain
-   if(chain.length>=MAX_BACKUP_CHAIN) throw new Error('cadena de copias demasiado larga')
-   expected=run.retry_of.run_id;name=basename(run.retry_of.artifact)
-  }
+  const chain = new BackupChain()
+  let next: string | undefined = name
+  while (next !== undefined) next = chain.add(next, await load(next))
+  return chain.members
  }
  for(const {name} of (await dated(sourceDir)).slice(0,MAX_BACKUPS)) {
   try {
@@ -214,17 +233,12 @@ function readBackupRuns(slot: string): Map<string, RunResult> {
 }
 
 function backupChain(name: string, copies: Map<string, RunResult>): string[] {
-  const chain: string[] = [], seen = new Set<string>()
-  let expected: string | undefined, hash: string | undefined
-  while (true) {
-    const run = copies.get(name)
-    if (!run) throw new Error(`Falta el antecedente ${name} en las copias.`)
-    if (seen.has(run.run_id) || (expected && expected !== run.run_id) || (hash && hash !== run.plan_hash)) {
-      throw new Error('La cadena de copias tiene referencias incoherentes.')
-    }
-    seen.add(run.run_id); hash = run.plan_hash; chain.push(name)
-    if (!run.retry_of) return chain
-    if (chain.length >= MAX_BACKUP_CHAIN) throw new Error('La cadena de copias supera 50 correcciones.')
-    expected = run.retry_of.run_id; name = basename(run.retry_of.artifact)
+  const chain = new BackupChain()
+  let next: string | undefined = name
+  while (next !== undefined) {
+    const run = copies.get(next)
+    if (!run) throw new Error(`Falta el antecedente ${next} en las copias.`)
+    next = chain.add(next, run)
   }
+  return chain.members
 }

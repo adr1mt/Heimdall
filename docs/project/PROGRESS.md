@@ -5,23 +5,22 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T157 · Paridad de validación Go/GUI.**
+**T158 · Recorrido común de cadenas de copias.**
 
-- Corpus común de 72 artefactos con decisiones explícitas de aceptación:
-  decimales, pesos diminutos/cero, ausencias/null, adiciones, cancelados,
-  excluidos, reintentos y copias; lector Go y ambos lectores GUI contrastados.
-- Presupuesto omitido sigue válido; explícito debe ser 1…65536.
-  Go rechaza ahora 0/null, como GUI y esquema publicado.
-- Go rechaza procedencia sin fecha, avisos incompletos y null que ocultaban
-  datos de evidencia. GUI rechaza sumas infinitas incluso en resultados FAIL.
-- Nota autoritativa, excepciones de copias y reglas de composición conservadas.
-  Sin cambios YAML/NDJSON, nuevos ADR, dependencias ni abstracciones.
-- `make check`, ambos builds y tipos correctos; 506 tests GUI pasan fuera
+- Copia, retención, listado y recuperación comparten ciclo, identidad,
+  PLAN y máximo de 50 eslabones; solo `retry_of` declara un antecedente.
+- Se conserva la búsqueda por nombre: original primero, copia si falta.
+  Validación completa antes de escribir y escritura del antiguo al reciente.
+- Retención de 50 correcciones recientes y todos sus antecedentes conservada;
+  recuperación sin sobrescribir originales ni eliminar ficheros corruptos.
+- Go sigue calculando notas; sesiones y reintentos conservan reglas distintas.
+  Lectores, corpus común de 72 artefactos y defensas de corrupción intactos.
+- 10 nuevas regresiones: ciclo/identidad/PLAN, ausente/corrupto, 49/50/51,
+  prioridad de búsqueda y ejecuciones independientes; originales byte a byte.
+- `make check`, ambos builds y tipos correctos; 516 tests GUI pasan fuera
   del aislamiento (localhost no resuelve dentro). Caché Go temporal escribible.
-- Corpus y alcance: `testdata/artifacts/README.md`. Regresiones A11/A13
-  conservadas y ampliadas; límite de lectura T156 sigue cubierto.
-- Base de esta mejora: d45041c. Commit local por tarea, sin publicación.
-- T158 READY, sin iniciar; una tarea por sesión en esta zona crítica.
+- Base inicial: 2d16110e1b63506d86a1e1694270d129a4010161; árbol limpio.
+  Commit local de T158, sin publicación ni tarea encadenada. Sin nuevo ADR.
 
 **T127–T155 · Auditorías reparadas.**
 - 18 incidencias iniciales y 11 posteriores reparadas, incluyendo cadenas
@@ -47,13 +46,14 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Siguiente tarea recomendada
 
-**T158**: concentrar el recorrido de cadenas de copias. **T070** sigue desbloqueando **T084**,
-examen real de aula de principio a fin que ejecuta Adrià antes de la 1.0.0.
+Revisión pendiente de improve-codebase-architecture, descrita debajo.
+**T070** sigue desbloqueando **T084**, examen real de aula que ejecuta Adrià.
 
 ## Revisión pendiente solicitada
 Usar la skill code-review para revisar improve-codebase-architecture sin
 modificar archivos: fijar el commit anterior a aquella mejora e incluir todo
 lo posterior y sin commit; preguntar si la base no se identifica con certeza.
+La base de T158 no identifica por sí sola la base de esa revisión.
 Separar normas/ADR y especificación aprobada; comprobar contratos, notas,
 estados, reintentos, cancelación, secretos, simplicidad y REPARACION.md.
 Informar prioridad, archivo/línea, impacto y evidencia; defectos frente a dudas,

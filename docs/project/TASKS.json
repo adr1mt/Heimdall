@@ -3048,7 +3048,7 @@
       "id": "T158",
       "title": "Concentrar recorrido de cadenas de copias",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [
         "T157"
@@ -3058,6 +3058,13 @@
         "Una implementación de ciclo, identidad, PLAN y máximo de 50 para copias.",
         "Regresiones de retención, recuperación y no sobrescritura correctas.",
         "No se mezclan cadena de reintento y sesión."
+      ],
+      "completed": "2026-10-02",
+      "tests": [
+        "Estado de recorrido compartido por copia asíncrona y retención/listado/recuperación síncronos; sin cambios en resolución de rutas ni cálculo Go.",
+        "10 nuevas regresiones públicas: ciclo, identidad, PLAN, antecedente ausente/corrupto, límites independientes 49/50/51, prioridad del original y recuperación desde copia, ejecuciones independientes sin relación inferida.",
+        "Regresiones de retención y recuperación conservadas; originales comparados byte a byte y fichero corrupto conservado durante rotación.",
+        "make check y make build correctos; tipos y build GUI correctos; 516 tests GUI fuera del aislamiento (localhost no resuelve dentro). Base inicial: 2d16110e1b63506d86a1e1694270d129a4010161."
       ]
     }
   ]
