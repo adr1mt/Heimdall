@@ -148,3 +148,20 @@ describe('listRuns', () => {
     expect(await listRuns(dir)).toHaveLength(MAX_RUNS)
   })
 })
+
+it('selects the latest 50 correction dates despite reversed file dates', async () => {
+ const { utimesSync } = await import('node:fs'),dir=emptyDir()
+ for(let i=0;i<51;i++) {
+  const name=`run-R${String(i).padStart(2,'0')}.json`
+  write(dir,name,artifact(`R${i}`,new Date(Date.UTC(2026,9,2,0,i)).toISOString()))
+  utimesSync(join(dir,name),51-i,51-i)
+ }
+ const rows=await listRuns(dir)
+ expect(rows).toHaveLength(50)
+ expect(rows[0].runId).toBe('R50')
+ expect(rows.some(row=>row.runId==='R0')).toBe(false)
+ write(dir,'run-BROKEN.json','not json')
+ const withError=await listRuns(dir)
+ expect(withError.filter(row=>!row.problem)).toHaveLength(50)
+ expect(withError.some(row=>row.path.endsWith('run-BROKEN.json')&&row.problem)).toBe(true)
+})

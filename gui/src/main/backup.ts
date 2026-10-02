@@ -1,11 +1,11 @@
 import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
-import { open, readdir, mkdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises'
+import { readdir, mkdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 import { parseArtifact, type RunResult } from '../shared/artifact'
 import { gradesOnly, type BackupEntry, type RestoreReport } from '../shared/backup'
 import { MAX_ARTIFACT } from './artifact'
-import { RUN_FILE, varDirOf } from './history'
+import { RUN_FILE, varDirOf, readRunDate } from './history'
 
 /** Retain 50 recent heads and their dependencies, at most 2500 copies. */
 export const MAX_BACKUPS = 50
@@ -82,14 +82,7 @@ async function copyRuns(dataDir:string,examPath:string):Promise<BackupReport> {
   for(const name of await names(dir)) {
    const path=join(dir,name)
    try {
-    const file=await open(path,'r')
-    try {
-     const buffer=Buffer.alloc(4096),{bytesRead}=await file.read(buffer,0,buffer.length,0)
-     const found=buffer.toString('utf8',0,bytesRead).match(/"started_at"\s*:\s*"([^"\r\n]+)"/)
-     const at=found?Date.parse(found[1]):NaN
-     if(!Number.isFinite(at)) throw new Error('fecha de corrección ilegible en la cabecera')
-     entries.push({name,at})
-    } finally {await file.close()}
+    entries.push({name,at:await readRunDate(path)})
    } catch(error) {failure(path,error)}
   }
   return entries.sort((a,b)=>b.at-a.at || b.name.localeCompare(a.name))

@@ -2918,7 +2918,7 @@
       "id": "T152",
       "title": "R08 · Histórico por fecha canónica",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
@@ -2929,7 +2929,10 @@
         "Últimas 50 fechas canónicas visibles aunque cambien fechas de fichero; errores relevantes visibles.",
         "Regresiones del área y suite rápida en verde."
       ],
-      "tests": []
+      "tests": [
+        "32 tests history/backups; tipos; 51 fechas canónicas con fechas de fichero invertidas y errores visibles."
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T153",
