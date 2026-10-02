@@ -394,7 +394,7 @@ function EngineBadge() {
   }
 
   return engine.found ? (
-    <div className="flex items-center gap-2 rounded-md bg-success/10 px-3 py-2 text-xs text-success-strong">
+    <div className="flex items-center gap-2 rounded-md bg-sidebar-success/10 px-3 py-2 text-xs text-sidebar-success">
       <CheckCircle2 className="h-4 w-4 shrink-0" />
       <span className="truncate">
         {t.engine.ready} · {engine.version}
@@ -403,7 +403,7 @@ function EngineBadge() {
   ) : (
     <button
       onClick={() => setView('settings')}
-      className="flex w-full items-center gap-2 rounded-md bg-destructive/10 px-3 py-2 text-left text-xs text-destructive-strong transition-colors hover:bg-destructive/20"
+      className="flex w-full items-center gap-2 rounded-md bg-sidebar-destructive/10 px-3 py-2 text-left text-xs text-sidebar-destructive transition-colors hover:bg-sidebar-destructive/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-foreground"
     >
       <AlertTriangle className="h-4 w-4 shrink-0" />
       <span className="truncate">{t.engine.missing}</span>

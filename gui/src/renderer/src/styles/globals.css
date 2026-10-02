@@ -20,6 +20,7 @@
     --accent-foreground: 221 83% 45%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
+    --destructive-hover: 0 72% 45%;
     /* Verde oscurecido: con el 40% anterior, el texto blanco de los chips «OK»
        de la matriz se quedaba en 2,8:1 y el «7/9» verde sobre blanco en 3:1. */
     --success: 142 76% 29%;
@@ -39,6 +40,8 @@
     --ring: 217 91% 52%;
     --sidebar: 222 47% 11%;
     --sidebar-foreground: 220 14% 90%;
+    --sidebar-success: 142 62% 65%;
+    --sidebar-destructive: 0 85% 80%;
     /* Consola del CLI: siempre oscura en los dos temas (es una terminal), pero
        declarada como token para que no haya literales sueltos en los componentes. */
     --console: 222 47% 6%;
@@ -61,8 +64,9 @@
     --muted-foreground: 220 10% 60%;
     --accent: 217 45% 24%;
     --accent-foreground: 213 94% 85%;
-    --destructive: 0 72% 58%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
+    --destructive-hover: 0 72% 45%;
     --success: 142 65% 47%;
     /* Texto oscuro sobre el verde claro del tema oscuro (mismo criterio que
        --warning-foreground): en blanco se quedaba en 2,2:1. */

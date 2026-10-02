@@ -2717,7 +2717,7 @@
       "id": "T142",
       "title": "A16 · Contraste insuficiente en estados de la barra lateral y botones rojos",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
@@ -2728,7 +2728,10 @@
         "estado listo y ausente, botones destructivos y sus estados de interacción en ambos temas. Mantener icono y texto además del color. ",
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
-      "tests": []
+      "tests": [
+        "WCAG AA: estados laterales y botones destructivos normal/hover, temas claro y oscuro; 2 regresiones de contraste y capturas Electron a 1280×820 y 960×640 revisadas."
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T143",

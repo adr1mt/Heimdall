@@ -29,7 +29,8 @@ export default {
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))',
-          strong: 'hsl(var(--destructive-strong))'
+          strong: 'hsl(var(--destructive-strong))',
+          hover: 'hsl(var(--destructive-hover))'
         },
         success: {
           DEFAULT: 'hsl(var(--success))',
@@ -52,7 +53,9 @@ export default {
         },
         sidebar: {
           DEFAULT: 'hsl(var(--sidebar))',
-          foreground: 'hsl(var(--sidebar-foreground))'
+          foreground: 'hsl(var(--sidebar-foreground))',
+          success: 'hsl(var(--sidebar-success))',
+          destructive: 'hsl(var(--sidebar-destructive))'
         },
         console: {
           DEFAULT: 'hsl(var(--console))',
