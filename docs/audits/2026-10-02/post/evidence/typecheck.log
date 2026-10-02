@@ -1,0 +1,15 @@
+
+> heimdall-gui@0.9.0 typecheck
+> npm run typecheck:node && npm run typecheck:web && npm run typecheck:test
+
+
+> heimdall-gui@0.9.0 typecheck:node
+> tsc --noEmit -p tsconfig.node.json --composite false
+
+
+> heimdall-gui@0.9.0 typecheck:web
+> tsc --noEmit -p tsconfig.web.json --composite false
+
+
+> heimdall-gui@0.9.0 typecheck:test
+> tsc --noEmit -p tsconfig.test.json

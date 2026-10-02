@@ -1,0 +1,12 @@
+zero Error: El resultado está incompleto o es incoherente (plan): cantidades inválidas.
+longvalue Error: El resultado está incompleto o es incoherente (student:fake/check:c): flujo inválido.
+history { count: 50, newestShown: 'R49', includesNewest: false }
+backup { saved: 50, failures: [] }
+backup_oldest_exists false
+instalada la versión 1.0.0
+empty_update { check: 'ready', applied: true, bytes: 0 }
+large_schema_accepted true
+large_file {
+  bytes: 72343104,
+  problem: 'Error: El fichero de resultados ocupa 69 MB y la aplicación no abre más de 64 MB.'
+}

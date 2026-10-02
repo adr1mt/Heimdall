@@ -1,0 +1,14 @@
+package model
+import("encoding/json";"os";"testing";"time")
+func TestPostAuditPerfectRound(t *testing.T){
+ data,err:=os.ReadFile("/tmp/heimdall-post-audit/rounding/var/latest.json");if err!=nil{t.Fatal(err)}
+ var first RunResult;if err=json.Unmarshal(data,&first);err!=nil{t.Fatal(err)}
+ if err=ValidateArtifact(&first);err!=nil{t.Fatal(err)}
+ var second RunResult;json.Unmarshal(data,&second);second.RunID="SECOND";second.FinishedAt=second.FinishedAt.Add(time.Second)
+ c:=&second.Students[0].Checks[1];c.Status=Pass;c.Assertion.Matched=true;c.Assertion.Found="yes";c.Execution.Stdout=Stream{Text:"yes",Bytes:3,BytesTotal:3}
+ second.Students[0].Score=ComputeScore(second.Plan,second.Students[0].Checks)
+ if err=ValidateArtifact(&second);err!=nil{t.Fatal(err)}
+ out,err:=BuildSession([]SessionRound{{Run:&first},{Run:&second}});if err!=nil{t.Fatal(err)}
+ t.Logf("obtained first=%g second=%g; all PASS in round 2; chosen=%d status=%s",first.Students[0].Score.Obtained,second.Students[0].Score.Obtained,out.Students[0].FromRound,out.Students[0].Status)
+ if out.Students[0].Status!=SessionFinished {t.Error("a perfect later round must finish the student")}
+}

@@ -1,0 +1,14 @@
+cd gui && ./scripts/secretos.sh
+OK     S-0   la corrección del laboratorio ha llegado hasta el final
+OK     S-1   ninguna contraseña en argv de ningún proceso
+OK     S-2   ninguna contraseña en el entorno de ningún proceso
+OK     S-3   ninguna contraseña en los ficheros de la aplicación
+OK     S-4   ninguna contraseña en la salida de la aplicación
+OK     H-1   reabrir la corrección desde el histórico da la misma pantalla
+OK     X-1   las notas se exportan a CSV desde la aplicación
+OK     X-2   ninguna contraseña en el fichero de notas
+OK     B-1   al terminar la corrección hay copia de las notas fuera del examen
+OK     B-2   borrada la carpeta del examen, las notas se recuperan desde la aplicación
+OK     B-3   ninguna contraseña viaja en la copia
+
+Los secretos no salen de la memoria.

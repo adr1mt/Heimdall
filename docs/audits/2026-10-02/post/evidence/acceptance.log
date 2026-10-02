@@ -1,0 +1,123 @@
+go vet ./...
+go test ./...
+ok  	heimdall/cmd/heimdall	(cached)
+ok  	heimdall/internal/assert	(cached)
+ok  	heimdall/internal/engine	(cached)
+ok  	heimdall/internal/events	(cached)
+ok  	heimdall/internal/model	(cached)
+ok  	heimdall/internal/plan	(cached)
+ok  	heimdall/internal/report	(cached)
+ok  	heimdall/internal/ssh	(cached)
+go build -ldflags "-X main.version=0.9.0" -o bin/heimdall ./cmd/heimdall
+go test -tags=integration ./...
+ok  	heimdall/cmd/heimdall	5.045s
+ok  	heimdall/internal/assert	0.003s
+ok  	heimdall/internal/engine	8.340s
+ok  	heimdall/internal/events	0.003s
+ok  	heimdall/internal/model	0.006s
+ok  	heimdall/internal/plan	0.018s
+ok  	heimdall/internal/report	0.073s
+ok  	heimdall/internal/ssh	23.768s
+test/version.sh
+ok: motor, aplicación y VERSION dicen 0.9.0
+test/secrets.sh
+ok: stdin cerrado y vacío aborta con exit 2 y no escribe nada
+ok: stdin abierto y sin datos aborta con exit 2 a los 5s
+ok: una referencia sin variable es exit 2 y nombra la variable
+ok: el secreto no aparece en argv con el proceso vivo
+ok: la ejecución completa sale con exit 3 (parcial), como manda el prototipo
+ok: artefacto en run-01M3YRN4E4MKA17C5RQ08WYPJY.json con latest.json y sin parcial
+ok: cero coincidencias del secreto en var/ y en la salida del terminal
+ok: ninguna traza de pila en la salida
+ok: cero coincidencias en los eventos y en los artefactos de reintento y sesión
+test/secrets.sh: todo verde
+test/acceptance.sh
+OK     A-1   los dos alumnos reciben las mismas 5 comprobaciones
+OK     A-1   los dos alumnos se miden sobre el mismo peso total
+OK     A-1   los dos alumnos reciben la misma lista de comprobaciones
+OK     A-2   ninguna causa técnica produce un suspenso
+OK     A-3   con algo sin evaluar no hay nota final
+OK     A-3   con algo sin evaluar la nota está INCOMPLETE o NOT_EVALUATED
+OK     A-4   el alumno con la máquina accesible tiene 3 o más comprobaciones evaluadas
+OK     A-4   el alumno del puerto cerrado sale entero con CONNECT_FAILED
+OK     A-4   el artefacto contiene a los dos alumnos
+OK     A-4   la ejecución parcial sale con exit 3, no con 1
+OK     A-5   el run completo termina en 0:04.68 (< 90 s) con un sleep 30 y un host inalcanzable dentro
+OK     A-5   la comprobación lenta corta a su timeout (3005 ms entre 3000 y 5000)
+OK     A-5   la comprobación lenta sale UNEVALUATED por TIMEOUT
+OK     A-7   el secreto no aparece en var/ ni en la salida del terminal
+OK     A-7   el secreto no aparece en /proc/<pid>/cmdline con el proceso vivo
+OK     A-8   toda comprobación evaluada trae aserción y código de salida
+OK     A-8   toda comprobación sin evaluar trae causa y explicación
+OK     A-11  el transporte es ssh, no ejecución local
+OK     A-11  el hostname devuelto es el del contenedor
+OK     A-14  el comando inexistente suspende, no avería
+OK     A-6   la salida enorme queda marcada como truncada
+OK     A-6   se conservan 64 kB como máximo
+OK     A-6   se contabiliza todo lo que produjo el comando
+OK     A-6   el motivo nombra el desbordamiento, no una conexión perdida
+OK     A-6   nadie suspende por una salida enorme
+OK     A-6   la memoria del motor se queda en 13 MB (< 100 MB)
+OK     A-9   el parcial de un run matado trae al menos un alumno terminado
+PEND   A-10  artefactos del formato viejo: retirados con la capa de compatibilidad (T060)
+OK     A-12  el mismo examen bajo es_ES.UTF-8 y bajo LC_ALL=C da notas idénticas
+OK     A-13  una clave desconocida sale con exit 2
+OK     A-13  el error dice el fichero y la línea
+OK     A-13  una clave desconocida no crea nada en var/
+OK     A-13  una clave desconocida no abre ninguna conexión al contenedor
+
+acceptance: los 13 criterios de la fase 1 en verde (A-10 retirado en T060)
+test/eventos.sh
+OK     E-1   la primera línea es run.start con su versión de contrato
+OK     E-2   run.start publica el denominador exacto del PLAN
+OK     E-3   se emite una comprobación por cada una anunciada
+OK     E-4   los eventos van numerados sin saltos
+OK     E-5   cada comprobación llega al flujo con el mismo estado y la misma causa que al artefacto
+OK     E-6   toda comprobación sin evaluar viaja con su causa técnica y su detalle
+OK     E-7   un alumno con la máquina apagada no publica nota final
+OK     E-8   ni contraseñas ni salida sin acotar en el flujo
+OK     E-9   run.end coincide con el artefacto y con el código de salida
+OK     E-10  una ejecución cancelada cierra el flujo con su estado real
+
+eventos: el contrato nativo pasa sus criterios
+test/sesion.sh
+OK     S-1   la primera vuelta evalúa entero al alumno que lo tiene todo bien
+OK     S-2   la sesión da por terminado a ese alumno
+OK     S-2   la sesión sale por la salida estándar con su propio kind
+OK     S-3   la segunda vuelta no abre ninguna conexión contra su máquina
+OK     S-4   el artefacto dice por qué no se corrigió a ese alumno
+OK     S-4   el motivo dice de qué vuelta viene su nota
+OK     S-5   el resto de la clase recibe las mismas comprobaciones y los mismos pesos
+OK     S-5   las dos vueltas son del mismo examen
+OK     S-6   la nota de la sesión sigue siendo la que ya tenía
+OK     S-6   queda alguien sin nota de sesión, y el código de salida lo dice
+OK     S-6   el histórico guarda las dos vueltas de cada alumno
+OK     S-7   sin --session esa misma vuelta sí abre conexión: S-3 mide algo
+OK     S-8   una sesión de otro examen sale con exit 2
+OK     S-8   y no toca ninguna máquina
+OK     S-8   y no escribe nada en var/
+
+sesion: la sesión de examen en verde (S-1 a S-8)
+test/ra2.sh
+OK     exit-code                el examen se ejecuta entero
+OK     estado                   todos los alumnos evaluados
+OK     denominador              las 16 comprobaciones del examen
+OK     comprobaciones           16 comprobaciones por alumno
+OK     nota-01                  el ejercicio completo saca 100
+OK     pass-01                  y sus 16 comprobaciones en verde
+OK     nota-02                  el ejercicio con cinco fallos saca 69
+OK     fallos-02                y falla exactamente lo que hizo mal
+OK     sin-tecnicos             ningún fallo técnico enmascarado de suspenso
+OK     explicable-cmd           cada resultado dice qué se ejecutó
+OK     explicable-fallo         cada suspenso dice qué se esperaba y qué se encontró
+OK     huella                   la identidad de cada máquina queda anotada
+OK     secreto                  la contraseña del aula no aparece en ningún sitio
+
+ra2: el examen RA2 se ejecuta entero y cada resultado es explicable
+test/carga.sh
+carga: 100 alumnos contra 127.1.2.3:2201, MaxStartups por defecto
+carga: acotada (8 alumnos, 4 conexiones por máquina): 3s, 0 conexiones con reintento
+OK     A-15                     ninguna comprobación sin evaluar con el tope puesto
+OK     A-15-exit                exit 0: la clase entera se ha evaluado
+carga: control sin tope por máquina (100 a la vez): 2s, 0 sin evaluar (0 por conexión rechazada), 44 conexiones con reintento, exit 0
+carga: todo en verde

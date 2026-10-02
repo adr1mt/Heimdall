@@ -1,0 +1,4 @@
+round 1 checks [('academic', 'FAIL', 'NONE', True), ('technical', 'UNEVALUATED', 'TIMEOUT', True)]
+round 2 checks [('academic', 'UNEVALUATED', 'NOT_RUN', False), ('technical', 'UNEVALUATED', 'TIMEOUT', True)]
+round 3 checks [('academic', 'PASS', 'NONE', True), ('technical', 'PASS', 'NONE', True)]
+consolidated_exit 0 final_score 100 expected_if_original_FAIL_preserved 50

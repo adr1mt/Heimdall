@@ -1,0 +1,3 @@
+multiple-documents check_exit 0 run_exit 0 stderr
+duplicate-student-id check_exit 0 run_exit 0 stderr
+student_used replaced

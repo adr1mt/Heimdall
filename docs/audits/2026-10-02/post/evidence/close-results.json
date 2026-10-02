@@ -1,0 +1,59 @@
+[
+  {
+    "attempt": 1,
+    "final_artifacts": 1,
+    "backup_artifacts": 0,
+    "child_close_callback_delivered": false,
+    "run_status": "CANCELLED",
+    "students": [
+      [
+        "fast",
+        "OK",
+        100
+      ],
+      [
+        "slow",
+        "NOT_EVALUATED",
+        null
+      ]
+    ]
+  },
+  {
+    "attempt": 2,
+    "final_artifacts": 1,
+    "backup_artifacts": 0,
+    "child_close_callback_delivered": false,
+    "run_status": "CANCELLED",
+    "students": [
+      [
+        "fast",
+        "OK",
+        100
+      ],
+      [
+        "slow",
+        "NOT_EVALUATED",
+        null
+      ]
+    ]
+  },
+  {
+    "attempt": 3,
+    "final_artifacts": 1,
+    "backup_artifacts": 0,
+    "child_close_callback_delivered": false,
+    "run_status": "CANCELLED",
+    "students": [
+      [
+        "fast",
+        "OK",
+        100
+      ],
+      [
+        "slow",
+        "NOT_EVALUATED",
+        null
+      ]
+    ]
+  }
+]

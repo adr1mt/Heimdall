@@ -1,0 +1,7 @@
+real_GUI_reader Error: El fichero de resultados ocupa 69 MB y la aplicación no abre más de 64 MB.
+real_backup {
+  saved: 0,
+  failures: [
+    '/tmp/heimdall-post-audit/large-real/var/run-01M3YRWAR0ZBFSG0S8GTPBMNRQ.json: resultado demasiado grande para copiar'
+  ]
+}

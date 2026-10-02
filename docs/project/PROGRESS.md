@@ -6,6 +6,14 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
+**Segunda auditoría, posterior a T127–T144.** Solo documentación y evidencias:
+`docs/audits/2026-10-02/post/AUDITORIA.md`. Confirma 11 incidencias pendientes:
+2 P1, 8 P2 y 1 P3. R01: segundo reintento repite un FAIL y puede subir 50 → 100;
+R02: cerrar durante la corrección conserva original, pero no inicia su copia.
+Suites motor/SSH con carreras, 410 tests GUI, tipos, build y aceptación del
+editor/GUI verdes; secretos GUI comprobados en ejecución secuencial.
+Cada hallazgo incluye reproducción y aceptación. Código del producto sin cambios.
+
 **T127–T144 · Reparación de las 18 incidencias de la auditoría.**
 
 - A01–A18 reparadas, con commits separados y regresiones.
@@ -38,6 +46,9 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 - Autenticación por clave SSH pendiente (T023).
 
 ## Siguiente tarea recomendada
+
+Resolver **R01 y R02** del informe nuevo, cada uno en una tarea crítica separada,
+antes de publicar notas reales. Los P2 preceden al cierre de la 1.0.
 
 **T070** (exámenes del curso en formato nativo) desbloquea **T084**:
 examen real de aula de principio a fin, que ejecuta Adrià antes de la 1.0.0.

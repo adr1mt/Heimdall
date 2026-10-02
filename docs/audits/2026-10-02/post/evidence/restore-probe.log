@@ -1,0 +1,13 @@
+restored { restored: 50, kept: 0 }
+consolidate_restored {
+  exit: 2,
+  problem: 'heimdall consolidate: la corrección anterior se guardó en /tmp/heimdall-post-audit/history/var/run-R0.json y ahí no está; tampoco al lado de /tmp/heimdall-post-audit/history/var/run-R50.json'
+}
+zero cli_reader {
+  exit: 2,
+  problem: 'heimdall session: /tmp/heimdall-post-audit/zero/var/latest.json: resultado incoherente en plan: cantidades inválidas'
+}
+longvalue cli_reader {
+  exit: 2,
+  problem: 'heimdall session: /tmp/heimdall-post-audit/longvalue/var/latest.json: resultado incoherente en student:fake/check:c: flujo inválido'
+}

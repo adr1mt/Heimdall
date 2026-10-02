@@ -1,0 +1,15 @@
+cd gui && ./scripts/secretos.sh
+OK     S-0   la corrección del laboratorio ha llegado hasta el final
+FALLO  S-1   contraseña en /proc/230909/cmdline
+FALLO  S-2   contraseña en /proc/231151/environ
+OK     S-3   ninguna contraseña en los ficheros de la aplicación
+OK     S-4   ninguna contraseña en la salida de la aplicación
+OK     H-1   reabrir la corrección desde el histórico da la misma pantalla
+OK     X-1   las notas se exportan a CSV desde la aplicación
+OK     X-2   ninguna contraseña en el fichero de notas
+OK     B-1   al terminar la corrección hay copia de las notas fuera del examen
+OK     B-2   borrada la carpeta del examen, las notas se recuperan desde la aplicación
+OK     B-3   ninguna contraseña viaja en la copia
+
+Hay fallos.
+make: *** [Makefile:87: gui-lab] Error 1

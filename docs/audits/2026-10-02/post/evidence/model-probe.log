@@ -1,0 +1,7 @@
+=== RUN   TestPostAuditPerfectRound
+    post_audit_test.go:12: obtained first=1 second=1; all PASS in round 2; chosen=1 status=ACTIVE
+    post_audit_test.go:13: a perfect later round must finish the student
+--- FAIL: TestPostAuditPerfectRound (0.00s)
+FAIL
+FAIL	heimdall/internal/model	0.003s
+FAIL

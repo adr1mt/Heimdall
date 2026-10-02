@@ -1,0 +1,10 @@
+go vet ./...
+go test ./...
+ok  	heimdall/cmd/heimdall	(cached)
+ok  	heimdall/internal/assert	(cached)
+ok  	heimdall/internal/engine	(cached)
+ok  	heimdall/internal/events	(cached)
+ok  	heimdall/internal/model	(cached)
+ok  	heimdall/internal/plan	(cached)
+ok  	heimdall/internal/report	(cached)
+ok  	heimdall/internal/ssh	(cached)
