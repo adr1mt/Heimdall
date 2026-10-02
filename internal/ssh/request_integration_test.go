@@ -56,7 +56,14 @@ func unresponsiveSession(t *testing.T, mode string) *Session {
 						continue
 					}
 					req.Reply(true, nil)
-					channel.SendRequest("exit-status", false, xssh.Marshal(struct{ Status uint32 }{137}))
+					code := uint32(137)
+					if mode == "no-marker" || mode == "wrong-marker" {
+						code = 0
+					}
+					if mode == "wrong-marker" {
+						channel.Stderr().Write([]byte("\x1eHEIMDALL_expected:1\x1f"))
+					}
+					channel.SendRequest("exit-status", false, xssh.Marshal(struct{ Status uint32 }{code}))
 					channel.Close()
 				}
 			}()
@@ -68,6 +75,16 @@ func unresponsiveSession(t *testing.T, mode string) *Session {
 	}
 	t.Cleanup(func() { client.Close() })
 	return &Session{client: client, cfg: Config{Host: "audit"}}
+}
+
+func TestUnconfirmedCompletionHasNoExitCode(t *testing.T) {
+	for _, mode := range []string{"no-marker", "wrong-marker"} {
+		s := unresponsiveSession(t, mode)
+		res := s.exec(context.Background(), []string{"true"}, time.Second, "\x1eHEIMDALL_expected:")
+		if res.Completed || res.ExitCode != nil || res.RemoteProcess != model.RemoteUnknown {
+			t.Fatalf("%s: %+v", mode, res)
+		}
+	}
 }
 
 func TestSSHRequestsRespectTimeoutAndCancellation(t *testing.T) {

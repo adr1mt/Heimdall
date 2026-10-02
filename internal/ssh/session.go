@@ -385,6 +385,7 @@ func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration
 
 	if marker != "" {
 		if !commandFinished || res.ExitCode == nil || *res.ExitCode != commandCode {
+			res.ExitCode = nil
 			return res
 		}
 	}
