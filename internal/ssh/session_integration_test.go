@@ -296,3 +296,13 @@ func TestRemoteTimeoutEscalatesToKill(t *testing.T) {
 		t.Fatalf("%+v", res)
 	}
 }
+
+func TestCancellationDoesNotClaimRemoteKill(t *testing.T) {
+	s := dialLab(t)
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
+	res := s.Run(ctx, []string{"sleep", "2"}, 20*time.Second)
+	if res.Completed || res.RemoteProcess != model.RemoteUnknown {
+		t.Fatalf("%+v", res)
+	}
+}

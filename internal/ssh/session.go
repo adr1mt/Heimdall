@@ -233,7 +233,7 @@ func (s *Session) Run(ctx context.Context, argv []string, timeout time.Duration)
 		marker = "\x1eHEIMDALL_" + hex.EncodeToString(nonce[:]) + ":"
 		// The fixed supervisor invokes only positional arguments. Its completion
 		// record distinguishes a command's own 124/137 from timeout's status.
-		script := `"$@"; code=$?; printf '\036HEIMDALL_` + hex.EncodeToString(nonce[:]) + `:%s\037' "$code" >&2; exit "$code"`
+		script := `trap ':' TERM; "$@"; code=$?; printf '\036HEIMDALL_` + hex.EncodeToString(nonce[:]) + `:%s\037' "$code" >&2; exit "$code"`
 		secs := strconv.FormatFloat(timeout.Seconds(), 'f', -1, 64)
 		sent = append([]string{"timeout", "-k", "5s", secs + "s", "sh", "-c", script, "heimdall-command"}, argv...)
 		local = timeout + remoteGrace
@@ -363,9 +363,6 @@ func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration
 
 	switch {
 	case timedOut:
-		if s.hasRemoteKill {
-			res.RemoteProcess = model.RemoteKilledRemote
-		}
 		return res
 	case waitErr == nil:
 		code := 0
@@ -381,7 +378,7 @@ func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration
 		res.ExitCode = &code
 	}
 
-	if marker != "" && !commandFinished && res.ExitCode != nil && (*res.ExitCode == 124 || *res.ExitCode == 137) {
+	if marker != "" && res.ExitCode != nil && (*res.ExitCode == 124 || *res.ExitCode == 137) && (!commandFinished || *res.ExitCode != commandCode) {
 		// coreutils timeout killed it: the check timed out, and the process is
 		// gone for sure.
 		res.ExitCode = nil

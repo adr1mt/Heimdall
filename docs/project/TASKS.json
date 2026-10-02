@@ -2650,7 +2650,7 @@
       "id": "T140",
       "title": "A14 · Cancelar afirma que ha matado un proceso que sigue vivo",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
@@ -2661,7 +2661,10 @@
         "detener antes del timeout, agotar el presupuesto del alumno y perder la conexión. No declarar muerte remota sin evidencia. ",
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
-      "tests": []
+      "tests": [
+        "make check; integración SSH: cancelación con UNKNOWN y timeout TERM/KILL"
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T141",

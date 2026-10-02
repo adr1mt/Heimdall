@@ -429,3 +429,12 @@ func TestTruncatedAssertionHasTechnicalCause(t *testing.T) {
 		t.Fatalf("%+v", out)
 	}
 }
+
+func TestCancellationPrecedesRemoteTimeout(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	cause, _ := causeOf(ctx, ctx, plan.StudentPlan{ID: "fake"}, time.Minute, &model.ExecutionResult{RemoteProcess: model.RemoteKilledRemote}, plan.ResolvedCheck{Timeout: time.Second})
+	if cause != model.CauseCancelled {
+		t.Fatalf("%s", cause)
+	}
+}

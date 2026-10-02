@@ -245,6 +245,8 @@ func causeOf(runCtx, studentCtx context.Context, sp plan.StudentPlan, budget tim
 		return model.CauseNone, ""
 	}
 	switch {
+	case runCtx.Err() != nil:
+		return model.CauseCancelled, "la corrección se detuvo; no se ha confirmado la terminación del proceso remoto"
 	case exec.Overflow:
 		// The command was cut off for printing too much. Naming it a lost
 		// connection would send the teacher to look at the network.
@@ -253,8 +255,7 @@ func causeOf(runCtx, studentCtx context.Context, sp plan.StudentPlan, budget tim
 	case exec.RemoteProcess == model.RemoteKilledRemote:
 		return model.CauseTimeout, fmt.Sprintf(
 			"el comando no terminó en %s y se ha matado en la máquina del alumno", c.Timeout)
-	case runCtx.Err() != nil:
-		return model.CauseCancelled, ""
+
 	case studentCtx.Err() != nil:
 		return model.CauseTimeout, fmt.Sprintf(
 			"el alumno %s agotó su presupuesto de %s durante esta comprobación", sp.ID, budget)
