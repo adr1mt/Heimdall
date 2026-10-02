@@ -24,6 +24,7 @@ export interface Score {
 }
 
 export interface PlanSummary {
+  evidence_bytes_per_field?: number
   check_count: number
   total_weight: number
   check_ids: string[]

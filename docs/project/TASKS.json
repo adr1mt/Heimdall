@@ -2858,7 +2858,7 @@
       "id": "T149",
       "title": "R05 · Presupuesto compatible de resultados",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
@@ -2869,7 +2869,10 @@
         "Resultados soportados con flujos grandes y expansión JSON se abren y copian; configuración no soportada se rechaza antes de SSH.",
         "Regresiones del área y suite rápida en verde."
       ],
-      "tests": []
+      "tests": [
+        "make check; límites JSON/UTF-8 y notas; 73 tests GUI; caso real 30×20: 6358272 bytes, exit 0, apertura GUI y copia correctas."
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T150",

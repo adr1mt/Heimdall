@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"heimdall/internal/model"
 	"os"
 	"path/filepath"
 	"strings"
@@ -405,5 +406,22 @@ func TestNonfiniteWeightsRejected(t *testing.T) {
 	exam := strings.ReplaceAll(strings.Replace(validExam, "peso: 1", "peso: 1e308", 1), "peso: 2", "peso: 1e308")
 	if _, err := Load(project(t, exam, validInventory)); err == nil {
 		t.Fatal("nonfinite sum accepted")
+	}
+}
+
+func TestResultBudgetRejectsUnsupportedConfiguration(t *testing.T) {
+	p := &Plan{Summary: model.PlanSummary{CheckCount: model.MaxResultCells + 1}, Students: []StudentPlan{{ID: "fake"}}}
+	if err := validateResultBudget(p); err == nil {
+		t.Fatal("oversized matrix accepted")
+	}
+	p.Summary.CheckCount = 1
+	p.Students[0].Name = strings.Repeat("x", model.MaxResultMetadataBytes)
+	if err := validateResultBudget(p); err == nil {
+		t.Fatal("oversized metadata accepted")
+	}
+	p.Students[0].Name = "Ficticio"
+	p.Students[0].Checks = []ResolvedCheck{{Value: strings.Repeat("x", 65536)}}
+	if err := validateResultBudget(p); err != nil {
+		t.Fatal("inventory evidence counted as metadata", err)
 	}
 }

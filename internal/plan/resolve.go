@@ -187,6 +187,13 @@ func Resolve(exam *Exam, inventory *Inventory, examPath, inventoryPath string) (
 			HostConcurrency: DefaultHostConcurrency,
 		},
 	}
+	if err := validateResultBudget(plan); err != nil {
+		return nil, withFile(examPath, errf(1, "%s", err))
+	}
+	plan.Summary.EvidenceBytesPerField = (16 << 20) / (3 * len(students) * len(checks))
+	if plan.Summary.EvidenceBytesPerField > 65536 {
+		plan.Summary.EvidenceBytesPerField = 65536
+	}
 	plan.Hash = hashPlan(plan)
 	return plan, nil
 }
@@ -610,4 +617,29 @@ func assertionOf(c ResolvedCheck) (string, string) {
 	default:
 		return "", ""
 	}
+}
+
+// Budget the configuration copied into results, excluding inventory responses
+// (runtime evidence). This reserve includes JSON escaping and repeated fields.
+func validateResultBudget(p *Plan) error {
+	cells := len(p.Students) * p.Summary.CheckCount
+	if cells > model.MaxResultCells {
+		return fmt.Errorf("el examen y el aula superan el límite de %d comprobaciones por corrección; divide el aula o el examen antes de corregir", model.MaxResultCells)
+	}
+	projected := *p
+	projected.Students = append([]StudentPlan(nil), p.Students...)
+	for i := range projected.Students {
+		projected.Students[i].Checks = append([]ResolvedCheck(nil), p.Students[i].Checks...)
+		for j := range projected.Students[i].Checks {
+			projected.Students[i].Checks[j].Value = ""
+		}
+	}
+	data, err := json.Marshal(projected)
+	if err != nil {
+		return err
+	}
+	if len(data) > model.MaxResultMetadataBytes {
+		return fmt.Errorf("el examen y el aula superan el presupuesto de 1 MiB de datos descriptivos del resultado; reduce textos y argumentos antes de corregir")
+	}
+	return nil
 }

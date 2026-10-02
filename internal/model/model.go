@@ -19,6 +19,12 @@ import (
 // SchemaVersion is the version of the canonical artifact this package writes.
 const SchemaVersion = 1
 
+// Shared artifact budget: PLAN admission reserves metadata space; the writer
+// bounds retained evidence only after assertions and grades are final.
+const MaxArtifactBytes = 64 << 20
+const MaxResultCells = 2000
+const MaxResultMetadataBytes = 1 << 20
+
 // RunResult is the complete artifact of one run. It is written once,
 // atomically, and never modified.
 type RunResult struct {
@@ -65,9 +71,10 @@ type SourceRef struct {
 // PlanSummary is what the PLAN fixed before any machine was contacted. It is
 // identical for every student: that is what makes the denominator fair.
 type PlanSummary struct {
-	CheckCount  int      `json:"check_count"`
-	TotalWeight float64  `json:"total_weight"`
-	CheckIDs    []string `json:"check_ids"` // in order
+	EvidenceBytesPerField int      `json:"evidence_bytes_per_field,omitempty"`
+	CheckCount            int      `json:"check_count"`
+	TotalWeight           float64  `json:"total_weight"`
+	CheckIDs              []string `json:"check_ids"` // in order
 
 	// Concurrency is how many students were evaluated at once and
 	// HostConcurrency how many sessions were opened at once against one
@@ -190,11 +197,12 @@ type Stream struct {
 
 // AssertionResult states what was compared and what was found. No grade.
 type AssertionResult struct {
-	Kind     string `json:"kind"`     // contains|equals|not_contains|exit_code|near
-	Expected string `json:"expected"` // already substituted
-	Found    string `json:"found"`    // the fragment found, or ""
-	Matched  bool   `json:"matched"`
-	Where    string `json:"where,omitempty"` // "stdout linea 12"
+	EvidenceTruncated bool   `json:"evidence_truncated,omitempty"`
+	Kind              string `json:"kind"`     // contains|equals|not_contains|exit_code|near
+	Expected          string `json:"expected"` // already substituted
+	Found             string `json:"found"`    // the fragment found, or ""
+	Matched           bool   `json:"matched"`
+	Where             string `json:"where,omitempty"` // "stdout linea 12"
 }
 
 // Warning records something the teacher must know that is not a check result.

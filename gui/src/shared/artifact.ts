@@ -63,6 +63,7 @@ export interface ExecutionResult {
 
 /** What was compared and what was found. No grade. */
 export interface AssertionResult {
+  evidence_truncated?: boolean
   kind: string
   expected: string
   found: string
@@ -185,6 +186,7 @@ function validateArtifact(value: unknown): void {
  text(run.run_id,'run_id',true);text(run.engine_version,'engine_version',true);text(run.plan_hash,'plan_hash',true)
  if(date(run.finished_at,'finished_at')<date(run.started_at,'started_at')) bad('run','fechas invertidas')
  for(const key of ['exam','inventory']) {const ref=object(run[key],key);text(ref.path,`${key}.path`,true);text(ref.sha256,`${key}.sha256`,true)}
+ if (p.evidence_bytes_per_field !== undefined) {const limit=number(p.evidence_bytes_per_field,'evidence_bytes_per_field',true);if(limit<1 || limit>65536) bad('evidence_bytes_per_field','límite inválido')}
  const count=number(p.check_count,'check_count',true),total=number(p.total_weight,'total_weight'),ids=list(p.check_ids,'check_ids').map((id)=>text(id,'check_ids',true))
  if(count<1 || total<=0 || ids.length!==count || new Set(ids).size!==count || number(p.concurrency,'concurrency',true)<1 || number(p.host_concurrency,'host_concurrency',true)<1) bad('plan','cantidades inválidas')
  const warnings=run.warnings===undefined?[]:list(run.warnings,'warnings')
@@ -237,6 +239,7 @@ function validateArtifact(value: unknown): void {
    }
    if(c.assertion!==null) {
     const a=object(c.assertion,`${where}.assertion`)
+    if(a.evidence_truncated!==undefined && typeof a.evidence_truncated!=='boolean') bad(where,'marcador de evidencia inválido')
     for(const key of ['kind','expected','found']) text(a[key],`${where}.assertion.${key}`)
     if(!['contains','not_contains','equals','exit_code','near'].includes(String(a.kind)) || typeof a.matched!=='boolean' || (c.status==='PASS')!==a.matched || c.status==='UNEVALUATED') bad(where,'aserción incoherente')
    }

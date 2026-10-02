@@ -701,3 +701,10 @@ Dos decisiones menores:
 Las 50 correcciones recientes conservan todos sus antecedentes, hasta 50 por
 cadena y 2500 ficheros por examen. Una cadena incompleta se avisa y no se ofrece
 como recuperable. Se seleccionan las copias existentes después de copiar.
+
+## T149 · Presupuesto de evidencia (ADR-0027)
+
+La admisión del PLAN y la persistencia comparten 64 MiB. Las comparaciones usan
+las capturas completas; solo la evidencia guardada se recorta de forma uniforme
+por celda, contando expansión JSON y con aviso. Se admiten hasta 2000 celdas y
+1 MiB de metadatos resueltos; se rechaza lo no soportado antes de SSH.

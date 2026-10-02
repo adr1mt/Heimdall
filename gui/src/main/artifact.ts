@@ -1,11 +1,7 @@
 import { readFileSync, statSync } from 'node:fs'
 import { parseArtifact, type RunResult } from '../shared/artifact'
 
-/**
- * Largest artifact this reads. A class of thirty with twenty checks fits well
- * inside it; anything bigger is said out loud instead of freezing the window
- * while it loads.
- */
+/** Must match model.MaxArtifactBytes and the PLAN/writer evidence budget. */
 export const MAX_ARTIFACT = 64 << 20
 
 /** Said the same way whether the file was opened or only summarised. */

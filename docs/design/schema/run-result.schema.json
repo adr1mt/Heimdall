@@ -178,6 +178,12 @@
         },
         "host_concurrency": {
           "type": "integer"
+        },
+        "evidence_bytes_per_field": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65536,
+          "description": "Presupuesto de evidencia JSON por campo, fijado antes de filtrar reintentos."
         }
       }
     },
@@ -484,6 +490,10 @@
         "where": {
           "type": "string",
           "description": "Por ejemplo: stdout linea 12."
+        },
+        "evidence_truncated": {
+          "type": "boolean",
+          "description": "El fragmento encontrado o su ubicación se recortó después de comparar."
         }
       }
     },

@@ -1169,6 +1169,7 @@ function CheckDetail({
           </p>
           <p className="text-dense">
             {t.results.found}:{' '}
+            {check.assertion.evidence_truncated && <span className="text-warning-strong">Se muestra un extracto de la evidencia; la comparación se hizo antes de recortarla.</span>}
             {check.assertion.found ? (
               <span className="font-mono">{check.assertion.found}</span>
             ) : (

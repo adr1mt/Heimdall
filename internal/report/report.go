@@ -90,9 +90,13 @@ func (w *Writer) write(run *model.RunResult, path string) error {
 	if err != nil {
 		return err
 	}
+	boundEvidence(clean)
 	data, err := model.MarshalCanonical(clean)
 	if err != nil {
 		return fmt.Errorf("report: no se pudo serializar el artefacto: %w", err)
+	}
+	if len(data) > model.MaxArtifactBytes {
+		return fmt.Errorf("report: el resultado supera el presupuesto de 64 MiB")
 	}
 	return WriteAtomic(path, data)
 }

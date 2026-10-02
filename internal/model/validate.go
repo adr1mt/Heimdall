@@ -22,6 +22,9 @@ func ValidateArtifact(run *RunResult) error {
 	if p.CheckCount < 1 || len(p.CheckIDs) != p.CheckCount || !finiteWeight(p.TotalWeight) || p.TotalWeight <= 0 || p.Concurrency < 1 || p.HostConcurrency < 1 {
 		return bad("plan", "cantidades inválidas")
 	}
+	if p.EvidenceBytesPerField < 0 || p.EvidenceBytesPerField > 65536 {
+		return bad("plan.evidence_bytes_per_field", "límite inválido")
+	}
 	ids := map[string]bool{}
 	for _, id := range p.CheckIDs {
 		if id == "" || ids[id] {
