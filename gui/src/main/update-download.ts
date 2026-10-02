@@ -12,6 +12,10 @@ export class DownloadBudget extends Transform {
 
   constructor(private readonly limit = MAX_UPDATE_BYTES) { super() }
 
+  override _flush(done: TransformCallback): void {
+    done(this.bytes === 0 ? new Error('la descarga llegó vacía') : undefined)
+  }
+
   override _transform(chunk: Buffer, _encoding: BufferEncoding, done: TransformCallback): void {
     this.bytes += chunk.length
     if (this.bytes > this.limit) done(new Error('la actualización supera el límite de tamaño'))

@@ -17,8 +17,11 @@
  * teacher gets without a network of their own.
  */
 
-import { chmodSync, copyFileSync, mkdirSync, renameSync, rmSync } from 'node:fs'
+import { chmodSync, copyFileSync, mkdirSync, renameSync, rmSync, createReadStream, openSync, closeSync, readSync, fstatSync } from 'node:fs'
 import { join } from 'node:path'
+import { createHash } from 'node:crypto'
+import { stat } from 'node:fs/promises'
+import { MAX_UPDATE_BYTES } from './update-download'
 
 /** Where the released versions are published. */
 export const RELEASE_FEED = 'https://api.github.com/repos/adr1mt/Heimdall/releases/latest'
@@ -30,6 +33,8 @@ const ALLOWED_HOSTS = new Set(['github.com', 'api.github.com', 'objects.githubus
 export interface Release {
   version: string
   url: string
+  size: number
+  digest: string
 }
 
 /**
@@ -78,10 +83,13 @@ export function parseRelease(body: string): Release | null {
   if (!PLAIN_VERSION.test(tag)) return null
   const assets = Array.isArray(feed.assets) ? feed.assets : []
   for (const asset of assets) {
-    const url = (asset as { browser_download_url?: unknown }).browser_download_url
+    if (!asset || typeof asset !== 'object') continue
+    const { browser_download_url: url, size, digest } = asset as { browser_download_url?: unknown; size?: unknown; digest?: unknown }
     if (typeof url !== 'string' || !url.endsWith('.AppImage')) continue
     if (!isAllowed(url)) continue
-    return { version: tag, url }
+    if (typeof size !== 'number' || !Number.isSafeInteger(size) || size <= 0 || size > MAX_UPDATE_BYTES) continue
+    if (typeof digest !== 'string' || !/^sha256:[0-9a-f]{64}$/i.test(digest)) continue
+    return { version: tag, url, size, digest: digest.toLowerCase() }
   }
   return null
 }
@@ -122,13 +130,13 @@ export type CheckOutcome =
   | 'failed'
 
 export class Updater {
-  private pending: { version: string; file: string } | null = null
+  private pending: { release: Release; file: string } | null = null
 
   constructor(private readonly deps: UpdaterDeps) { }
 
   /** The version waiting to be installed, if any. For the interface. */
   pendingVersion(): string | null {
-    return this.pending?.version ?? null
+    return this.pending?.release.version ?? null
   }
 
   private inFlight: Promise<CheckOutcome> | null = null
@@ -162,12 +170,13 @@ export class Updater {
       mkdirSync(this.deps.downloadDir, { recursive: true })
       if (busy() || controller.signal.aborted) return 'busy'
       await this.deps.download(release.url, file, signal)
+      await verifyDownloaded(file, release, signal)
       signal.throwIfAborted()
       if (busy() || controller.signal.aborted) {
         rmSync(file, { force: true })
         return 'busy'
       }
-      this.pending = { version: release.version, file }
+      this.pending = { release, file }
       this.deps.announce(release.version)
       return 'ready'
     } catch (error) {
@@ -200,14 +209,15 @@ export class Updater {
     if (!pending || !target) return false
     this.pending = null
     try {
+      verifyBeforeInstall(pending.file, pending.release)
       chmodSync(pending.file, 0o755)
       replaceFile(pending.file, target)
-      this.deps.log(`instalada la versión ${pending.version}`)
+      this.deps.log(`instalada la versión ${pending.release.version}`)
       return true
     } catch (error) {
       // The download stays behind on a failure only to be cleaned up: half an
       // application on disk is worse than the version that already works.
-      this.deps.log(`no se pudo instalar la versión ${pending.version}: ${messageOf(error)}`)
+      this.deps.log(`no se pudo instalar la versión ${pending.release.version}: ${messageOf(error)}`)
       try {
         rmSync(pending.file, { force: true })
       } catch {
@@ -242,4 +252,24 @@ function replaceFile(source: string, target: string): void {
 
 function messageOf(error: unknown): string {
   return error instanceof Error ? error.message : String(error)
+}
+
+/** Stream the verification so a large download cannot freeze a correction. */
+async function verifyDownloaded(file: string, release: Release, signal: AbortSignal): Promise<void> {
+  if ((await stat(file)).size !== release.size) throw new Error('tamaño de actualización incorrecto')
+  const hash = createHash('sha256')
+  for await (const chunk of createReadStream(file, { signal })) hash.update(chunk)
+  if (`sha256:${hash.digest('hex')}` !== release.digest) throw new Error('digest de actualización incorrecto')
+}
+
+/** Recheck the bytes at quit: the staged file may have changed meanwhile. */
+function verifyBeforeInstall(file: string, release: Release): void {
+  const fd = openSync(file, 'r')
+  try {
+    if (fstatSync(fd).size !== release.size) throw new Error('tamaño de actualización incorrecto')
+    const hash = createHash('sha256'), buffer = Buffer.alloc(1 << 20)
+    let count: number
+    while ((count = readSync(fd, buffer, 0, buffer.length, null)) > 0) hash.update(buffer.subarray(0, count))
+    if (`sha256:${hash.digest('hex')}` !== release.digest) throw new Error('digest de actualización incorrecto')
+  } finally { closeSync(fd) }
 }

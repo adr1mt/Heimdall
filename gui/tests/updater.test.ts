@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -16,7 +17,9 @@ function feed(version: string): string {
     assets: [
       { browser_download_url: 'https://github.com/adr1mt/Heimdall/releases/notas.csv' },
       {
-        browser_download_url: `https://github.com/adr1mt/Heimdall/releases/Heimdall-${version}.AppImage`
+        browser_download_url: `https://github.com/adr1mt/Heimdall/releases/Heimdall-${version}.AppImage`,
+        size: Buffer.byteLength('la versión nueva'),
+        digest: `sha256:${createHash('sha256').update('la versión nueva').digest('hex')}`
       }
     ]
   })
@@ -95,7 +98,9 @@ describe('leer lo publicado', () => {
   it('se queda con la aplicación y descarta lo demás', () => {
     expect(parseRelease(feed('0.3.0'))).toEqual({
       version: '0.3.0',
-      url: 'https://github.com/adr1mt/Heimdall/releases/Heimdall-0.3.0.AppImage'
+      url: 'https://github.com/adr1mt/Heimdall/releases/Heimdall-0.3.0.AppImage',
+      size: Buffer.byteLength('la versión nueva'),
+      digest: `sha256:${createHash('sha256').update('la versión nueva').digest('hex')}`
     })
   })
 
@@ -222,4 +227,21 @@ it('shares one pending check between concurrent callers', async () => {
   expect(second).toBe(first)
   release()
   expect(await first).toBe('ready'); expect(h.announced).toEqual(['0.2.0'])
+})
+
+it.each(['', '<html>error</html>', 'x'.repeat(Buffer.byteLength('la versión nueva'))])('refuses corrupt bytes without replacing the installed program: %s', async bytes => {
+  const h = harness({ download: async (_url, dest) => { writeFileSync(dest, bytes) } })
+  expect(await h.updater.check()).toBe('failed')
+  expect(h.updater.applyOnQuit()).toBe(false)
+  expect(readFileSync(h.appImage, 'utf8')).toBe('la versión que hay instalada')
+})
+it('checks the staged file again before replacing the installation', async () => {
+  const h = harness()
+  expect(await h.updater.check()).toBe('ready')
+  writeFileSync(join(dir, 'descargas', 'Heimdall-0.2.0.AppImage'), '')
+  expect(h.updater.applyOnQuit()).toBe(false)
+  expect(readFileSync(h.appImage, 'utf8')).toBe('la versión que hay instalada')
+})
+it.each([{}, {size: 0, digest: 'sha256:' + 'a'.repeat(64)}, {size: 10, digest:'bad'}])('requires valid release integrity metadata: %j', metadata => {
+  expect(parseRelease(JSON.stringify({tag_name:'v1.0.0', assets:[{browser_download_url:'https://github.com/adr1mt/Heimdall/releases/new.AppImage', ...metadata}]}))).toBeNull()
 })

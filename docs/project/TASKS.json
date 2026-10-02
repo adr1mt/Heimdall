@@ -2818,7 +2818,7 @@
       "id": "T147",
       "title": "R03 · Verificar tamaño y digest de actualizaciones",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
@@ -2829,7 +2829,10 @@
         "Vacío, HTML, tamaño y digest incorrectos conservan instalación; asset válido se instala.",
         "Regresiones del área y suite rápida en verde."
       ],
-      "tests": []
+      "tests": [
+        "29 tests updater/download y tipos GUI; verificación SHA-256 antes de ready y de instalación."
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T148",

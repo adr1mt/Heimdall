@@ -34,3 +34,11 @@ it('enforces the download deadline on a stream that never ends', async () => {
   expect(timeout).toHaveBeenCalledWith(180_000)
   expect(existsSync(dest)).toBe(false); expect(existsSync(dest + '.part')).toBe(false)
 })
+
+it('rejects a 200 response with a zero-byte body and removes the partial', async () => {
+  const dest = join(mkdtempSync(join(tmpdir(), 'heimdall-update-')), 'new.AppImage')
+  vi.stubGlobal('fetch', vi.fn(async () => new Response('', {headers:{'content-length':'0'}})))
+  await expect(downloadUpdate('https://example.invalid/file', dest, new AbortController().signal)).rejects.toThrow(/vacía/)
+  expect(existsSync(dest)).toBe(false)
+  expect(existsSync(dest + '.part')).toBe(false)
+})
