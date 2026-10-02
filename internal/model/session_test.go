@@ -505,18 +505,20 @@ func TestSessionKeepsTheGradeOfAStudentLeftOutAfterFinishing(t *testing.T) {
 }
 
 func TestSessionRoundedHundredDoesNotHidePerfectRound(t *testing.T) {
-	p := PlanSummary{CheckCount: 2, TotalWeight: 250, CheckIDs: []string{"a", "b"}}
-	var rounds []SessionRound
-	for i, status := range []AcademicStatus{Fail, Pass} {
-		checks := []CheckResult{{CheckID: "a", Weight: 249, Status: Pass}, {CheckID: "b", Weight: 1, Status: status}}
-		rounds = append(rounds, SessionRound{Run: &RunResult{RunID: fmt.Sprint(i), PlanHash: "same", Plan: p, FinishedAt: time.Unix(int64(i), 0), Students: []StudentResult{{StudentID: "fake", Status: StudentOK, Checks: checks, Score: ComputeScore(p, checks)}}}})
-	}
-	session, err := BuildSession(rounds)
-	if err != nil {
-		t.Fatal(err)
-	}
-	got := session.Students[0]
-	if got.Status != SessionFinished || got.FromRound != 2 || got.Score.Obtained != 250 {
-		t.Fatalf("%+v", got)
+	for _, weights := range [][2]float64{{249, 1}, {1, 1e-100}} {
+		p := PlanSummary{CheckCount: 2, TotalWeight: weights[0] + weights[1], CheckIDs: []string{"a", "b"}}
+		var rounds []SessionRound
+		for i, status := range []AcademicStatus{Fail, Pass} {
+			checks := []CheckResult{{CheckID: "a", Weight: weights[0], Status: Pass}, {CheckID: "b", Weight: weights[1], Status: status}}
+			rounds = append(rounds, SessionRound{Run: &RunResult{RunID: fmt.Sprint(i), PlanHash: "same", Plan: p, FinishedAt: time.Unix(int64(i), 0), Students: []StudentResult{{StudentID: "fake", Status: StudentOK, Checks: checks, Score: ComputeScore(p, checks)}}}})
+		}
+		session, err := BuildSession(rounds)
+		if err != nil {
+			t.Fatal(err)
+		}
+		got := session.Students[0]
+		if got.Status != SessionFinished || got.FromRound != 2 || got.Score.Obtained != p.TotalWeight {
+			t.Fatalf("%+v", got)
+		}
 	}
 }

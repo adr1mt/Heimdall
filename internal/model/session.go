@@ -225,12 +225,15 @@ func sessionStudent(id string, rounds []SessionRound) SessionStudent {
 	// Only complete rounds compete (ADR-0020 §2). Ties go to the first round
 	// that reached the grade: that is when the student got there.
 	best := -1
+	bestPerfect := false
 	for i, a := range out.Rounds {
 		if a.Score.Status != ScoreComplete || a.Score.Final == nil {
 			continue
 		}
-		if best < 0 || a.Score.Obtained > out.Rounds[best].Score.Obtained {
+		perfect := perfectPositiveChecks(studentIn(rounds[a.Round-1].Run, id))
+		if best < 0 || (perfect && !bestPerfect) || (perfect == bestPerfect && a.Score.Obtained > out.Rounds[best].Score.Obtained) {
 			best = i
+			bestPerfect = perfect
 		}
 	}
 
@@ -260,13 +263,7 @@ func sessionStudent(id string, rounds []SessionRound) SessionStudent {
 	// FINISHED is the full weight of the PLAN, not merely a complete grade:
 	// every check evaluated and every check PASS. Compared on the raw weights,
 	// because the published 0-100 integer rounds (ADR-0020 §4).
-	perfect := true
-	for _, c := range studentIn(rounds[out.FromRound-1].Run, id).Checks {
-		if c.Weight > 0 && c.Status != Pass {
-			perfect = false
-		}
-	}
-	if perfect {
+	if bestPerfect {
 		out.Status = SessionFinished
 	} else {
 		out.Status = SessionActive
@@ -283,4 +280,22 @@ func studentIn(run *RunResult, id string) *StudentResult {
 		}
 	}
 	return nil
+}
+
+// A tiny failed weight can disappear in a float64 sum. The checks themselves
+// still prove whether this round is perfect; that proof wins rounded ties.
+func perfectPositiveChecks(s *StudentResult) bool {
+	if s == nil || s.Status == StudentExcluded {
+		return false
+	}
+	positive := false
+	for _, c := range s.Checks {
+		if c.Weight > 0 {
+			positive = true
+			if c.Status != Pass {
+				return false
+			}
+		}
+	}
+	return positive
 }

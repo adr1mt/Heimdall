@@ -2938,7 +2938,7 @@
       "id": "T153",
       "title": "R09 · Reconocer vueltas perfectas sin pérdida de precisión",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P3",
       "depends_on": [],
       "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
@@ -2949,7 +2949,10 @@
         "Vuelta imperfecta seguida de perfecta con pesos 1 y 1e-100 termina y conserva procedencia perfecta.",
         "Regresiones del área y suite rápida en verde."
       ],
-      "tests": []
+      "tests": [
+        "make check; pesos 249/1 y 1/1e-100; vuelta perfecta posterior gana y termina conservando su procedencia."
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T154",
