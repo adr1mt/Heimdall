@@ -21,6 +21,7 @@ const SchemaVersion = 1
 
 // Shared artifact budget: PLAN admission reserves metadata space; the writer
 // bounds retained evidence only after assertions and grades are final.
+const MaxStreamBytes = 65536
 const MaxArtifactBytes = 64 << 20
 const MaxResultCells = 2000
 const MaxResultMetadataBytes = 1 << 20

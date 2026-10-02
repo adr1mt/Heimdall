@@ -106,7 +106,7 @@ func ValidateArtifact(run *RunResult) error {
 					return bad(where, "proceso remoto inválido")
 				}
 				for _, stream := range []Stream{e.Stdout, e.Stderr} {
-					if stream.Bytes < 0 || stream.Bytes > 65536 || stream.BytesTotal < stream.Bytes || (stream.BytesTotal > stream.Bytes && !stream.Truncated) {
+					if stream.Bytes < 0 || stream.Bytes > MaxStreamBytes || stream.BytesTotal < stream.Bytes || (stream.BytesTotal > stream.Bytes && !stream.Truncated) {
 						return bad(where, "flujo inválido")
 					}
 				}

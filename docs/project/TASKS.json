@@ -2898,7 +2898,7 @@
       "id": "T151",
       "title": "R07 · Limitar valores de inventario",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
@@ -2909,7 +2909,10 @@
         "Valores resueltos de 65535, 65536 y 65537 bytes, también UTF-8, tienen límite coherente.",
         "Regresiones del área y suite rápida en verde."
       ],
-      "tests": []
+      "tests": [
+        "make check; límites resueltos 65535/65536/65537 bytes ASCII y UTF-8; límite compartido motor/lectores/SSH."
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T152",

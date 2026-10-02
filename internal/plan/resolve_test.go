@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"fmt"
 	"heimdall/internal/model"
 	"os"
 	"path/filepath"
@@ -449,5 +450,35 @@ grupos:
 	}
 	if p.Summary.TotalWeight != 1 || p.Students[0].Checks[0].Weight != 0 {
 		t.Fatal("diagnostic weight changed")
+	}
+}
+
+func TestResolvedInventoryValuesRespectByteLimit(t *testing.T) {
+	for _, utf := range []bool{false, true} {
+		for _, size := range []int{65535, 65536, 65537} {
+			value := strings.Repeat("x", size)
+			if utf {
+				value = strings.Repeat("é", size/2) + strings.Repeat("x", size%2)
+			}
+			exam := `examen: Ficticio
+version: 1
+hosts: []
+grupos:
+  - grupo: G
+    comprobaciones:
+      - id: c
+        valor: "${alumno.answer}"
+        contiene: x
+`
+			inventory := fmt.Sprintf("aula: Ficticia\nversion: 1\nalumnos:\n  - id: fake\n    nombre: Ficticio\n    answer: %q\n", value)
+			p, err := Load(project(t, exam, inventory))
+			if size > model.MaxStreamBytes {
+				if err == nil || !strings.Contains(err.Error(), "65536 bytes") {
+					t.Fatalf("%d bytes accepted: %v", size, err)
+				}
+			} else if err != nil || len(p.Students[0].Checks[0].Value) != size {
+				t.Fatalf("valid %d bytes refused: %v", size, err)
+			}
+		}
 	}
 }

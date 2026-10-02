@@ -13,7 +13,7 @@ import (
 const (
 	// keepLimit is how much of one stream ends up in the artifact. 64 kB is
 	// plenty to see why a check failed.
-	keepLimit = 64 * 1024
+	keepLimit = model.MaxStreamBytes
 	// hardLimit is where the reader stops reading altogether. It protects the
 	// run from the accidental `cat` of a 300 MB file.
 	hardLimit = 8 * 1024 * 1024

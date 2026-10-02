@@ -462,6 +462,9 @@ func resolveCheck(check Check, sc scope, exam *Exam) (ResolvedCheck, error) {
 	if out.Value, err = substitute(check.Value, sc); err != nil {
 		return ResolvedCheck{}, err
 	}
+	if len(out.Value) > model.MaxStreamBytes {
+		return ResolvedCheck{}, fmt.Errorf("el valor resuelto de %q supera el límite de %d bytes", check.ID, model.MaxStreamBytes)
+	}
 	if out.Contains, err = substitutePtr(check.Contains, sc); err != nil {
 		return ResolvedCheck{}, err
 	}
