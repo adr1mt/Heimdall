@@ -186,7 +186,7 @@ describe('lo que no se deja escribir', () => {
     expect(checkProblem(base({ assertion: { kind: 'exit_code', value: 'cero' } }), exam, [])).toMatch(
       /número/
     )
-    expect(checkProblem(base({ peso: '0' }), exam, [])).toMatch(/peso/)
+    expect(checkProblem(base({ peso: '-1' }), exam, [])).toMatch(/peso/)
     expect(checkProblem(base({ peso: '2' }), exam, [])).toBeNull()
   })
 
@@ -237,4 +237,14 @@ describe('original YAML format is never silently normalized',()=> {
   valid.replace('descripcion: C','descripcion: [C]')
  ])('refuses unrepresentable data: %s',(yaml)=>expect(readExam(yaml)).toHaveProperty('problem'))
  it('preserves valid meaning',()=>expect(parse(examYaml(parse(valid)))).toEqual(parse(valid)))
+})
+
+
+it.each(['0','0.5','1'])('preserves numeric weight %s in open/save cycle',(peso)=> {
+ const exam=emptyExam('P');exam.porDefecto.peso=peso
+ const check={...emptyCheck('host1'),id:'c',descripcion:'C',cmd:['true'],peso,assertion:{kind:'cerca_de' as const,value:'yes',anchor:'yes',lines:'0'}}
+ exam.grupos=[{grupo:'G',comprobaciones:[check]}]
+ expect(checkProblem(check,exam,[])).toBeNull()
+ expect(parse(examYaml(exam))).toEqual(exam)
+ expect(examYaml(exam)).toContain(`peso: ${peso}`)
 })

@@ -2577,7 +2577,7 @@
       "id": "T135",
       "title": "A09 · El editor no conserva pesos decimales que el motor admite",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
@@ -2588,7 +2588,10 @@
         "Regresión del caso de auditoría en verde.",
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
-      "tests": []
+      "tests": [
+        "Tipos GUI; Vitest editor: 32 pruebas; ciclo abrir/guardar/check del motor con pesos 0, 0.5 y 1 y cerca_de 0 líneas"
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T136",

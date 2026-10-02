@@ -209,6 +209,12 @@ export function readExam(yaml: string): { exam: Exam } | { problem: string } {
  * `yes` or `on` read as YAML is a boolean, and the check would then compare
  * the output against `true`.
  */
+function weight(value: string): number | string {
+ const clean=value.trim()
+ const numeric=/^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(clean) ? Number(clean) : NaN
+ return Number.isFinite(numeric) ? numeric : clean
+}
+
 function count(value: string): number | string {
   const clean = value.trim()
   return /^-?\d+$/.test(clean) ? Number(clean) : clean
@@ -218,11 +224,11 @@ function writeCheck(check: Check): Record<string, unknown> {
   const out: Record<string, unknown> = { id: check.id, descripcion: check.descripcion }
   if (check.cmd.length > 0) {
     if (check.en) out.en = check.en
-    if (check.peso.trim()) out.peso = count(check.peso)
+    if (check.peso.trim()) out.peso = weight(check.peso)
     if (check.timeout.trim()) out.timeout = check.timeout.trim()
     out.cmd = check.cmd
   } else {
-    if (check.peso.trim()) out.peso = count(check.peso)
+    if (check.peso.trim()) out.peso = weight(check.peso)
     out.valor = check.valor
   }
   if (check.timeout.trim()) out.timeout=check.timeout.trim()
@@ -249,7 +255,7 @@ export function examYaml(exam: Exam): string {
     hosts: exam.hosts
   }
   const defaults: Record<string, unknown> = {}
-  if (exam.porDefecto.peso.trim()) defaults.peso = count(exam.porDefecto.peso)
+  if (exam.porDefecto.peso.trim()) defaults.peso = weight(exam.porDefecto.peso)
   if (exam.porDefecto.timeout.trim()) defaults.timeout = exam.porDefecto.timeout.trim()
   if (Object.keys(defaults).length > 0) doc.por_defecto = defaults
   doc.grupos = exam.grupos.map((group) => ({
@@ -313,12 +319,12 @@ export function checkProblem(check: Check, exam: Exam, others: Check[]): string 
   }
   if (kind === 'cerca_de') {
     if (!anchor?.trim()) return 'La búsqueda por cercanía necesita una línea de anclaje.'
-    if (!/^[1-9]\d*$/.test((lines ?? '').trim())) {
+    if (!/^\d+$/.test((lines ?? '').trim())) {
       return 'Di cuántas líneas después del anclaje se miran.'
     }
   }
-  if (check.peso.trim() && !/^[1-9]\d*$/.test(check.peso.trim())) {
-    return 'El peso es un número entero mayor que cero.'
+  if (check.peso.trim() && (typeof weight(check.peso)!=='number' || Number(check.peso)<0)) {
+    return 'El peso debe ser un número finito mayor o igual que cero.'
   }
   if (check.timeout.trim() && !/^\d+(s|m|h)$/.test(check.timeout.trim())) {
     return 'El tiempo máximo se escribe como «20s», «2m» o «1h».'
