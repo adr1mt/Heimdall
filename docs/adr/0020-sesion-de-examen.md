@@ -1,6 +1,7 @@
 # ADR-0020 · La sesión de examen: la mejor nota completa
 
 - Estado: **aceptada** · 2026-09-20
+- Elección y empate de §1 sustituidos por ADR-0025 (2026-10-02).
 - Cierra D-10
 - Contexto: ADR-0004, ADR-0006, ADR-0007, ADR-0018, ADR-0019, principios 1, 6,
   7 y 12

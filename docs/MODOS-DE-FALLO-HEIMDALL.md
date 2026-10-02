@@ -5,6 +5,11 @@ Qué hace Heimdall con cada fallo documentado en
 describe **Teuton** y es histórico; este dice en qué estado queda cada caso
 aquí, con la evidencia que lo sostiene.
 
+La auditoría del 02-10-2026 encontró además 18 incidencias fuera de esta tabla
+histórica. Están reparadas en T127–T144 y verificadas con integración y aceptación
+completas; véase [el cierre](audits/2026-10-02/REPARACION.md). F-12 y el examen
+real T084 siguen pendientes: esta tabla no sustituye esa prueba de aula.
+
 Estados: **corregido** · **no aplicable** (el mecanismo no existe en Heimdall)
 · **abierto** (queda trabajo, con su tarea).
 
@@ -24,7 +29,7 @@ que verifica cada caso, no como ejecutados.
 | F-06 | corregido | Sin aula no hay alumno inventado: exit 2 |
 | F-07 | corregido | Avería técnica y suspenso son cosas distintas |
 | F-08 | corregido | Misma nota con cualquier idioma del equipo |
-| F-09 | corregido | Sin shell: el código de salida es el del comando |
+| F-09 | corregido | Argumentos literales; terminación distinguida del timeout |
 | F-10 | corregido | Los errores se explican; nunca una traza |
 | F-11 | no aplicable | No hay macros ni `tt_skip` |
 | F-12 | **abierto** | Solo contraseña; la clave SSH es T023 |
@@ -127,9 +132,10 @@ sensación de seguridad sobre un examen que compare textos del sistema.
 
 ## F-09 · Exit codes inconsistentes según los metacaracteres
 
-**Corregido.** Los comandos son vectores de argumentos y no hay shell en ningún
-punto (ADR-0003, regla de arquitectura 7). Un valor sustituido entra tal cual,
-con espacios, comillas o `;`. El código de salida es siempre el del comando.
+**Corregido.** El cliente local usa vectores y SSH entrecomilla los argumentos
+para el shell del servidor. Un valor sustituido entra tal cual, con espacios,
+comillas o `;`. El supervisor fijo de ADR-0024 prueba la terminación normal;
+124/137 tras vencer el límite remoto no se publican como resultados académicos.
 
 Tests: `TestExitCode`, `TestClassifyExitCode127IsAcademic`,
 `TestRunSeparatesTheTwoStreamsAndReportsTheExitCode`.
@@ -240,5 +246,5 @@ Dos observaciones, ninguna es un fallo:
 | Qué | Dónde |
 |---|---|
 | Autenticación por clave SSH (F-12) | T023 |
-| Documentación de usuario y versión | T083 |
+| Publicación de las reparaciones de la auditoría | Pendiente de decisión del propietario |
 | Un examen real de aula corregido entero | T084 |

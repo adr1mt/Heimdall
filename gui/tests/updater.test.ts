@@ -201,10 +201,10 @@ it('does not download when a correction starts while the feed is pending', async
 })
 it('aborts an in-flight download when the correction begins', async () => {
   let startBusy: () => void = () => { }, h: Harness
-  h = harness({    
+  h = harness({
 onBusy: listener => { startBusy = listener; return () => { } }, download: async (_url, _dest, signal) => {
       h.busy = true; startBusy(); signal.throwIfAborted()
-    }  
+    }
 })
   expect(await h.updater.check()).toBe('busy'); expect(h.updater.pendingVersion()).toBeNull(); expect(h.announced).toEqual([])
   expect(readFileSync(h.appImage, 'utf8')).toBe('la versión que hay instalada')

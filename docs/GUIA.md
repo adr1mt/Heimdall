@@ -85,6 +85,12 @@ se ejecuta en qué máquina, qué se espera y cuánto pesa.
 
 Si ya tienes el examen escrito, **Inicio → Abrir…** y elige su carpeta.
 
+**Guardar el examen** valida y guarda el borrador visible. Si el YAML contiene
+un error, lo conserva y bloquea el guardado hasta corregirlo. Al salir con cambios
+pendientes puedes volver al editor o descartarlos. Guardar desde la vista YAML
+conserva su texto y comentarios; editar en el formulario vuelve a formatearlo.
+Los pesos admiten decimales y cero para comprobaciones diagnósticas.
+
 ### 4.3 Corrige
 
 **Corregir.** Elige la clase, escribe la contraseña de las máquinas y adelante.
@@ -143,11 +149,17 @@ corregido.
 - El **histórico** de un examen se consulta desde la propia aplicación, y
   abrir una corrección antigua no toca ninguna máquina.
 
+Las copias automáticas conservan las 50 correcciones más recientes por su fecha
+real. Se hacen en segundo plano; si fallan, un aviso indica que no se creó la
+copia aunque la corrección permanezca guardada en su carpeta.
+
 ## 8. Actualizaciones
 
 La aplicación mira si hay una versión nueva publicada y, si la hay, la deja
 descargada y avisa sin interrumpir. Se instala al cerrar el programa. Solo
-funciona con el AppImage; el `.deb` se actualiza con `apt`.
+funciona con el AppImage; el `.deb` se actualiza con `apt`. Si empieza una
+corrección o el modo examen, aplaza la actualización y cancela la descarga en
+curso. Las descargas tienen un límite de tiempo y tamaño.
 
 ## 9. Desde la terminal
 

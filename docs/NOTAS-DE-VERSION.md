@@ -8,6 +8,21 @@ El número es uno solo para todo el producto: lo dice el fichero `VERSION` de
 la raíz, el motor se sella con él al compilar y la aplicación lo lleva en su
 paquete. `test/version.sh` comprueba que no se separan.
 
+## Pendiente de publicación — reparaciones del 02-10-2026
+
+Resueltas las 18 incidencias de la auditoría, con regresiones y aceptación:
+
+- Las salidas recortadas y los comandos fallidos no producen aprobados sin
+  prueba; los límites SSH y la cancelación dejan estados técnicos correctos.
+- Guardar valida el borrador visible y conserva los errores y cambios pendientes.
+- Las copias retienen las notas recientes y avisan si no pudieron guardarlas.
+- Pesos decimales, vueltas perfectas, clases corruptas y resultados incompletos
+  se tratan de forma coherente; se ocultan credenciales en la metadata textual.
+- Mejor contraste en ambos temas y actualizaciones aplazadas durante la corrección.
+
+Paquetes locales reconstruidos; no se ha publicado una nueva versión.
+[Detalle y pruebas](audits/2026-10-02/REPARACION.md).
+
 ## 0.9.0 — 22-09-2026
 
 Primera versión completa, lista para usarse en el aula. Todavía no se ha

@@ -28,3 +28,5 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 | [0021](0021-datos-propios-de-la-gui.md) | Los datos propios de la aplicación: dónde viven, escritura atómica y ninguna contraseña |
 | [0022](0022-aula-generada-derivada-de-la-clase.md) | El aula que escribe la aplicación es un artefacto derivado de la clase, con nombre reservado |
 | [0023](0023-la-contrasena-del-aula-se-recuerda-cifrada.md) | La contraseña del aula se recuerda cifrada; sustituye el punto 4 de ADR-0021 |
+| [0024](0024-evidencia-de-terminacion-remota.md) | Supervisor remoto fijo que distingue timeout y códigos propios 124/137 |
+| [0025](0025-integridad-en-los-limites-de-evidencia-y-peso.md) | Prueba suficiente para evaluar, pesos finitos y elección sin redondear |

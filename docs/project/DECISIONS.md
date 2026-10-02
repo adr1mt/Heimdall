@@ -686,3 +686,12 @@ Dos decisiones menores:
 5. **ADR-0023 sustituye el punto 4 de ADR-0021**, que prohibía escribir
    cualquier contraseña. La prohibición sigue en pie para `settings.json` y
    `classes.json`.
+
+## 2026-10-02 · Cierre de la auditoría
+
+- ADR-0024: supervisor remoto con argumentos literales y prueba de terminación;
+  cancelación local publica UNKNOWN. La señal TERM invalida el registro normal.
+- ADR-0025: evidencia recortada, anticomprobaciones, límites numéricos y mejor
+  vuelta sin redondear. Sustituye el criterio de elección de ADR-0020 §1.
+- T127–T144 reparan las 18 incidencias; evidencia y límites en
+  `docs/audits/2026-10-02/REPARACION.md`.

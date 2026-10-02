@@ -157,19 +157,25 @@ Cada uno es comprobable y tiene su test:
 
 - **Transporte**: SSH nativo (`x/crypto/ssh`), una sesión por alumno y host,
   reutilizada. Sin pty; los flujos nunca se mezclan.
-- **Comandos**: vector de argumentos. Nunca hay shell.
+- **Comandos**: vector de argumentos, sin shell local. SSH entrecomilla cada
+  argumento para el shell del servidor; el supervisor remoto fijo de ADR-0024
+  invoca el vector mediante `"$@"`, sin interpolarlo en el programa.
 - **Timeouts**: conexión 10 s · comprobación 20 s (configurable) · alumno 10 min
   · cancelación por señal. No hay timeout global separado.
-- **Proceso remoto**: se envuelve en `timeout -k 5s N` de coreutils si el host
-  lo tiene (`remote_process: KILLED_REMOTE`); si no, `UNKNOWN` y `Warning`. La
-  incertidumbre se publica, no se esconde.
+- **Proceso remoto**: coreutils timeout y un registro privado distinguen los
+  códigos propios 124/137 del vencimiento remoto. KILLED_REMOTE solo se publica
+  con terminación confirmada por el timeout; cerrar el transporte por cancelación
+  o pérdida de red publica UNKNOWN. Sin timeout remoto también hay un aviso.
+- **Fases SSH**: TCP, handshake, autenticación, apertura, envío y lectura quedan
+  dentro del contexto. Su cancelación cierra el transporte y libera al trabajador.
 - **Reintentos**: solo lo que con seguridad no se ejecutó (2 de conexión, con
   espera y jitter). Nunca tras enviar el comando. Nunca en `AUTH_FAILED`.
 - **Salida**: 64 kB conservados por flujo, corte duro a 8 MB, `bytes_total`
-  siempre real, `truncated` explícito.
-- **Concurrencia**: tope global de alumnos a la vez (8) y tope de aperturas de
+  siempre real, `truncated` explícito. Una aserción sin prueba suficiente en el
+  prefijo queda UNEVALUATED / OUTPUT_OVERFLOW (ADR-0025).
+- **Concurrencia**: tope global de alumnos a la vez (16) y tope de aperturas de
   sesión simultáneas contra una misma máquina (4), ambos publicados en el
-  artefacto y ajustables desde la línea de órdenes (ADR-0012). Sin el segundo,
+  artefacto y ajustables desde la línea de órdenes (ADR-0012, ADR-0013). Sin el segundo,
   casi la mitad de una clase de 100 choca con `MaxStartups`.
 - **Aislamiento**: un contexto y un presupuesto por alumno. Un alumno roto no
   puede abortar la pasada ni alterar la nota de otro.

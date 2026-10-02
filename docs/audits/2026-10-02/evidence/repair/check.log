@@ -1,0 +1,10 @@
+go vet ./...
+go test ./...
+ok  	heimdall/cmd/heimdall	5.065s
+ok  	heimdall/internal/assert	(cached)
+ok  	heimdall/internal/engine	0.134s
+ok  	heimdall/internal/events	(cached)
+ok  	heimdall/internal/model	0.004s
+ok  	heimdall/internal/plan	(cached)
+ok  	heimdall/internal/report	(cached)
+ok  	heimdall/internal/ssh	0.002s

@@ -33,7 +33,7 @@ es siempre `NONE`.
 | `AUTH_FAILED` | La sesión TCP se estableció y el servidor **rechazó las credenciales** | `s03-sshfail`: contraseña o usuario incorrectos |
 | `TIMEOUT` | El comando se envió y **no terminó** dentro del `timeout` de la comprobación | `s05-hang`: `sleep 100000` |
 | `CONNECTION_LOST` | La sesión estaba establecida y se **cayó** a mitad: la máquina se apaga, la red se corta, EOF inesperado | `s06-drop`: apagón durante la 2ª de 3 |
-| `OUTPUT_OVERFLOW` | El comando produjo más salida de la que el motor lee y se **dejó de leer** antes de que terminara (ADR-0015) | `cat` de un fichero de 300 MB |
+| `OUTPUT_OVERFLOW` | Corte duro del lector o evidencia conservada insuficiente para probar la aserción (ADR-0015, ADR-0025) | `cat` de un fichero de 300 MB |
 | `NOT_RUN` | El motor **decidió no ejecutarla**: una comprobación anterior del mismo alumno dejó la sesión inservible, o se agotó el presupuesto del alumno | Las 2 restantes de `s06-drop` |
 | `CANCELLED` | El profesor paró la ejecución antes de que le llegase el turno o mientras corría | Botón «Parar» de la GUI, `Ctrl-C` |
 | `ENGINE_ERROR` | Fallo del propio motor: pánico recuperado, error de escritura, bug. **Nunca silencioso** | Cualquier defecto nuestro |
@@ -59,8 +59,10 @@ profesor.
 
 ### El caso frontera que conviene dejar escrito
 
-Un comando que devuelve exit 127 «command not found» **es `FAIL`**, no
-`UNEVALUATED`: la máquina respondió, y que falte el paquete es parte del examen.
+Un comando que devuelve exit 127 «command not found» es un resultado académico:
+la máquina respondió. `no_contiene` con cualquier exit distinto de 0 es FAIL;
+no prueba ausencia. Una aserción `exit_code: 127` puede aprobar porque exige ese
+código explícitamente. La falta de evidencia por recorte sigue siendo técnica.
 Es justo lo contrario de F-09, donde el exit code dependía del shell del
 profesor: con vector de argumentos, el 127 lo da el servidor del alumno y
 significa exactamente eso.

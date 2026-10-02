@@ -2,41 +2,42 @@
 
 Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
-**Actualizado**: 2026-09-22 · **Fase**: 9 — Endurecimiento y publicación
+**Actualizado**: 2026-10-02 · **Fase**: 9 — Endurecimiento y publicación
 
 ## Última sesión
 
-**T081, T082 y T083 · Revisión, auditoría y versión 0.9.0.** Antes T080.
+**T127–T144 · Reparación de las 18 incidencias de la auditoría.**
 
-- T080, demasiado grande, partida en T081 (revisión de fallos), T082
-  (secretos), T083 (documentación y versión) y T084 (examen real de aula).
-- `docs/MODOS-DE-FALLO-HEIMDALL.md`: los 16 fallos del sistema viejo, uno a
-  uno. **Solo queda abierto F-12**, corregir con clave SSH, que ya era T023.
-- Auditoría de la contraseña con el laboratorio levantado: cero coincidencias
-  en `argv` del proceso vivo, terminal, `var/`, eventos, reintento, vuelta de
-  sesión, aula generada, exportaciones y copias.
-- **Versión 0.9.0**, un solo número en `VERSION`: el motor se sella al
-  compilar, la aplicación lo lleva en su paquete y `test/version.sh` vigila
-  que no se separen. Paquete 0.9.0 construido y `make gui-paquete` verde.
-- `docs/GUIA.md` (guía del profesor) y `docs/NOTAS-DE-VERSION.md`.
-- Verde: motor 163 tests, aplicación 357, `test/secrets.sh`, `test/version.sh`
-  y `make gui-paquete`.
+- A01–A18 reparadas, con commits separados y regresiones.
+- Notas: no se decide sin evidencia; ausencia exige exit 0; pesos finitos y
+  pendientes positivos sin tolerancia; mejor vuelta por peso sin redondear.
+- SSH: contexto en todas las fases, supervisor fijo y terminación confirmada;
+  cancelación local publica UNKNOWN. ADR-0024 y ADR-0025.
+- Editor: se valida y guarda el borrador visible, errores conservados,
+  aviso de cambios pendientes y pesos decimales/cero editables.
+- Datos: clases corruptas bloquean escritura; lectura de artefactos comprueba
+  coherencia; metadata textual redactada sin alterar referencias estructurales.
+- Copias: últimas 50 por fecha real, trabajo asíncrono y aviso de fallo.
+- GUI: contraste AA en los estados auditados y actualización cancelada al
+  empezar una corrección, con presupuesto de tiempo y tamaño.
+- Pruebas, paquetes y límites: `docs/audits/2026-10-02/REPARACION.md`.
+- AppImage y .deb locales reconstruidos. Versión sigue en 0.9.0; sin publicación.
 
-## Problemas conocidos
+## Problemas conocidos y límites
 
-- Laboratorio en **`127.1.2.3`**, nunca `127.0.0.x` (F-01, A-11).
-- Un reintento exige el mismo PLAN. Intervalo mínimo del modo examen, 5 min.
+- Laboratorio en **127.1.2.3**, nunca 127.0.0.x.
+- Un reintento exige el mismo PLAN. Intervalo mínimo del modo examen: 5 min.
 - El proyector no tapa los nombres del alumnado: el profesor eligió la clase.
-- La copia guarda las notas, no las pruebas: una corrección recuperada no
-  enseña la salida de las máquinas, y lo dice en la propia pantalla.
-- El paquete es Linux x64; Windows y macOS quedan fuera (2026-09-21).
-- La actualización automática solo toca el AppImage; el `.deb` lo lleva apt.
-  No hay ninguna release publicada contra la que probarla de verdad.
-- El editor reescribe el YAML con su formato: mismo examen, otra disposición,
-  y los comentarios del fichero no sobreviven a un guardado.
+- La copia guarda notas y comprobaciones, no las salidas de las máquinas;
+  una corrección recuperada explica esa falta de evidencia.
+- Paquete Linux x64; Windows y macOS quedan fuera.
+- Actualización automática solo para AppImage; el .deb lo lleva apt.
+  Sin release publicada para probar una actualización real.
+- Editar mediante el formulario vuelve a formatear el YAML y sus comentarios;
+  guardar el YAML directamente conserva su texto exacto.
+- Autenticación por clave SSH pendiente (T023).
 
 ## Siguiente tarea recomendada
 
-**T070** (exámenes del curso en formato nativo), que es lo que desbloquea
-**T084**: el examen real de aula, la prueba que falta para la 1.0.0 y que
-ejecuta Adrià.
+**T070** (exámenes del curso en formato nativo) desbloquea **T084**:
+examen real de aula de principio a fin, que ejecuta Adrià antes de la 1.0.0.

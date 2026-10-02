@@ -88,7 +88,7 @@ comando del alumno, se sustituye por `«[oculto]»` y se añade un `Warning`.
 - **Límite por flujo y comprobación: 64 kB.** Se conservan los **primeros** 64 kB
   y se marca `truncated: true`, con `bytes_total` real.
 - **Corte duro del lector: 8 MB por flujo.** Pasado ese punto el motor deja de
-  leer, cierra el canal, marca la comprobación `UNEVALUATED` / `ENGINE_ERROR`
+  leer, cierra el canal, marca la comprobación `UNEVALUATED` / `OUTPUT_OVERFLOW`
   con `detail: "salida desbordada"` y añade un `Warning`. Protege contra el
   `cat` accidental de 300 MB que hoy pide 970 MB de RAM y mata la pasada entera
   (`PERFORMANCE.md` §2).
@@ -97,11 +97,15 @@ comando del alumno, se sustituye por `«[oculto]»` y se añade un `Warning`.
   salida, que es lo que hay que medir.
 - El texto se guarda como UTF-8 válido; los bytes inválidos se sustituyen y se
   marca en el `Warning`. El corte se hace en frontera de runa, no a mitad.
-- `bytes_total` se cuenta siempre, aunque no se conserve el contenido: el
-  profesor debe saber que había 300 MB.
+- `bytes_total` cuenta los bytes recibidos, aunque no se conserve su contenido;
+  al cortar la lectura no puede medir lo que no se llegó a recibir.
 
-64 kB es suficiente para ver por qué falló una comprobación de examen y es
-~64.000 veces menos de lo que hoy se paga en memoria por no guardar nada.
+Los 64 KiB son evidencia conservada, no la salida completa. Si el prefijo no
+prueba la aserción, queda UNEVALUATED / OUTPUT_OVERFLOW. Una coincidencia de
+`contiene`/`cerca_de` o el texto prohibido de `no_contiene` sí permiten decidir.
+`igual_a` no se decide sobre un flujo recortado (ADR-0025).
+`bytes_total` cuenta lo recibido hasta EOF o hasta el corte duro, no los bytes
+que el proceso pueda seguir generando después del cierre.
 
 ---
 
@@ -139,12 +143,17 @@ máquina del alumno lo tiene:
 
 1. Al abrir la sesión, una vez por host: `command -v timeout`.
 2. Si existe: el comando se lanza como
-   `timeout -k 5s <N>s <argv…>` (sigue siendo un vector, sin shell).
-   Al vencer, el proceso remoto **muere de verdad** → `remote_process: "KILLED_REMOTE"`.
+   `timeout -k 5s <N>s sh -c <supervisor fijo> heimdall-command <argv…>`.
+   El supervisor invoca `"$@"` y emite un registro privado solo si no recibió TERM.
+   Así un exit 124/137 propio no se confunde con el límite, ni un manejador TERM
+   que devuelva 124 lo oculta. Terminación confirmada por timeout → KILLED_REMOTE.
+   El shell local nunca interpreta argumentos; SSH los entrecomilla para el
+   shell del servidor (ADR-0024).
 3. Si no existe: se ejecuta tal cual, se registra un `Warning`
    `REMOTE_TIMEOUT_UNAVAILABLE` para ese host, y al vencer el timeout local →
    `remote_process: "UNKNOWN"`.
-4. Cuando la sesión se cae a mitad (`CONNECTION_LOST`) el estado es siempre
+4. Al cancelar localmente o cuando la sesión se cae a mitad (`CONNECTION_LOST`),
+   el estado es siempre
    `UNKNOWN`: no hay forma de saber qué pasó al otro lado.
 
 `remote_process` tiene tres valores y `UNKNOWN` significa literalmente «puede
@@ -179,7 +188,7 @@ la diferencia. Un reintento invisible es otra forma de error silencioso (F-15).
 
 El reintento de conexión **no** es la solución a F-05 (53 ceros de 100 alumnos):
 eso lo resuelve el tope de concurrencia. El reintento cubre el parpadeo real de
-red del aula. Por defecto: **8 alumnos en vuelo**, y además **máximo 4 sesiones
+red del aula. Por defecto: **16 alumnos en vuelo**, y además **máximo 4 sesiones
 simultáneas por host de destino** para el caso de varios alumnos contra un mismo
-servidor. Ambos configurables; los valores definitivos se miden con el aula real
-(D-6 sigue abierta en cuanto al número, no al mecanismo).
+servidor. Ambos configurables. ADR-0013 cierra D-6 con mediciones del laboratorio;
+el examen real de aula sigue pendiente en T084.

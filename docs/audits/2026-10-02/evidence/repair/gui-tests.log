@@ -1,0 +1,13 @@
+
+> heimdall-gui@0.9.0 test
+> vitest run
+
+
+ RUN  v4.1.11 /mnt/datos/Applications/Claude/Heimdall/gui
+
+
+ Test Files  29 passed (29)
+      Tests  410 passed (410)
+   Start at  18:32:29
+   Duration  624ms (transform 2.94s, setup 0ms, import 3.80s, tests 700ms, environment 3ms)
+
