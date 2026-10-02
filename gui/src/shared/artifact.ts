@@ -180,7 +180,7 @@ function validateArtifact(value: unknown): void {
  const number=(v:unknown,at:string,integer=false):number=> typeof v==='number' && Number.isFinite(v) && v>=0 && (!integer || Number.isInteger(v)) ? v : bad(at,'número inválido')
  const list=(v:unknown,at:string):unknown[]=> Array.isArray(v) ? v : bad(at,'se esperaba una lista')
  const date=(v:unknown,at:string):number=> {const d=Date.parse(text(v,at,true));return Number.isFinite(d)?d:bad(at,'fecha inválida')}
- const close=(a:number,b:number):boolean=> a===b || Math.abs(a-b)<=1e-12*Math.max(Math.abs(a),Math.abs(b))
+ const close=(a:number,b:number):boolean=> Number.isFinite(a) && Number.isFinite(b) && (a===b || Math.abs(a-b)<=1e-12*Math.max(Math.abs(a),Math.abs(b)))
  const statusCause=(c:Record<string,unknown>,at:string):void=> {if((c.status==='PASS' || c.status==='FAIL') ? c.cause!=='NONE' : c.status!=='UNEVALUATED' || !CAUSES.includes(String(c.cause))) bad(at,'estado o causa inválidos')}
  const run=object(value,'run'),p=object(run.plan,'plan')
  text(run.run_id,'run_id',true);text(run.engine_version,'engine_version',true);text(run.plan_hash,'plan_hash',true)

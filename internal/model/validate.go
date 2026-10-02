@@ -76,7 +76,7 @@ func ValidateArtifact(run *RunResult) error {
 			if !validStatusCause(c.Status, c.Cause) {
 				return bad(where, "estado o causa inválidos")
 			}
-			if c.Previous != nil && (c.Previous.RunID == "" || !validStatusCause(c.Previous.Status, c.Previous.Cause)) {
+			if c.Previous != nil && (c.Previous.RunID == "" || c.Previous.FinishedAt.IsZero() || !validStatusCause(c.Previous.Status, c.Previous.Cause)) {
 				return bad(where, "procedencia inválida")
 			}
 			if c.Status != Unevaluated && !restored {
@@ -119,7 +119,7 @@ func ValidateArtifact(run *RunResult) error {
 	if run.Status != RunCancelled && run.Status != RunStatusOf(run.Students) {
 		return bad("status", "no coincide con los alumnos")
 	}
-	if r := run.RetryOf; r != nil && (r.RunID == "" || r.RunID == run.RunID || r.Artifact == "" || r.Students < 1 || r.Students > len(run.Students) || r.Checks < 1 || r.Checks > r.Students*p.CheckCount) {
+	if r := run.RetryOf; r != nil && (r.RunID == "" || r.RunAt.IsZero() || r.RunID == run.RunID || r.Artifact == "" || r.Students < 1 || r.Students > len(run.Students) || r.Checks < 1 || r.Checks > r.Students*p.CheckCount) {
 		return bad("retry_of", "procedencia inválida")
 	}
 	return nil

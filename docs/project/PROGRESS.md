@@ -1,30 +1,29 @@
 # Estado del proyecto
 
 Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
-
 **Actualizado**: 2026-10-02 · **Fase**: 9 — Endurecimiento y publicación
 
 ## Última sesión
 
-**T156 · Lectura acotada de artefactos.**
+**T157 · Paridad de validación Go/GUI.**
 
-- Motor y GUI aplican los 64 MiB sobre los bytes realmente leídos.
-  Un fichero que crece después de consultar su tamaño también se rechaza.
-- Lector Go compartido por reintento, consolidación y sesión; conserva
-  validación de campos obligatorios y coherencia antes de utilizar notas.
-- Apertura, histórico y copias GUI usan el mismo módulo de lectura.
-  La restauración escribe el mismo texto que validó, sin releer el fichero.
-- Sin cambios de nota, formatos, ADR, retención ni reglas de composición.
-- `make check`, `make build`, tipos y build GUI correctos; 433 tests GUI pasan.
-  Se probaron límite exacto, exceso y crecimiento; las copias conservan
-  su excepción sin evidencia y nunca sobrescriben originales.
-- El aislamiento falló al resolver localhost y en dos tests de cierre.
-  Los dos fallan también en HEAD anterior; fuera del aislamiento pasan todos.
-- T157 (paridad de validadores) READY; T158 (recorrido de copias) depende de ella.
-  Una tarea por sesión en esta zona crítica, conforme a CLAUDE.md.
+- Corpus común de 72 artefactos con decisiones explícitas de aceptación:
+  decimales, pesos diminutos/cero, ausencias/null, adiciones, cancelados,
+  excluidos, reintentos y copias; lector Go y ambos lectores GUI contrastados.
+- Presupuesto omitido sigue válido; explícito debe ser 1…65536.
+  Go rechaza ahora 0/null, como GUI y esquema publicado.
+- Go rechaza procedencia sin fecha, avisos incompletos y null que ocultaban
+  datos de evidencia. GUI rechaza sumas infinitas incluso en resultados FAIL.
+- Nota autoritativa, excepciones de copias y reglas de composición conservadas.
+  Sin cambios YAML/NDJSON, nuevos ADR, dependencias ni abstracciones.
+- `make check`, ambos builds y tipos correctos; 506 tests GUI pasan fuera
+  del aislamiento (localhost no resuelve dentro). Caché Go temporal escribible.
+- Corpus y alcance: `testdata/artifacts/README.md`. Regresiones A11/A13
+  conservadas y ampliadas; límite de lectura T156 sigue cubierto.
+- Base de esta mejora: d45041c. Commit local por tarea, sin publicación.
+- T158 READY, sin iniciar; una tarea por sesión en esta zona crítica.
 
 **T127–T155 · Auditorías reparadas.**
-
 - 18 incidencias iniciales y 11 posteriores reparadas, incluyendo cadenas
   completas, cierre, actualizaciones, presupuestos de evidencia y YAML.
 - Evidencias: `docs/audits/2026-10-02/REPARACION.md` y
@@ -48,6 +47,14 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Siguiente tarea recomendada
 
-**T157**: corpus común para comprobar paridad de aceptación Go/GUI sin
-cambiar la autoridad de la nota. **T070** sigue desbloqueando **T084**,
+**T158**: concentrar el recorrido de cadenas de copias. **T070** sigue desbloqueando **T084**,
 examen real de aula de principio a fin que ejecuta Adrià antes de la 1.0.0.
+
+## Revisión pendiente solicitada
+Usar la skill code-review para revisar improve-codebase-architecture sin
+modificar archivos: fijar el commit anterior a aquella mejora e incluir todo
+lo posterior y sin commit; preguntar si la base no se identifica con certeza.
+Separar normas/ADR y especificación aprobada; comprobar contratos, notas,
+estados, reintentos, cancelación, secretos, simplicidad y REPARACION.md.
+Informar prioridad, archivo/línea, impacto y evidencia; defectos frente a dudas,
+aptitud para integración, bloqueos y validaciones pendientes.

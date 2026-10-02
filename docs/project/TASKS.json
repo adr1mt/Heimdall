@@ -3026,7 +3026,7 @@
       "id": "T157",
       "title": "Paridad de validación de artefactos Go y GUI",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [
         "T156"
@@ -3036,13 +3036,19 @@
         "Corpus contrastado con ambos lectores, incluyendo decimales, campos ausentes/null, adiciones, excluidos y copias.",
         "Diferencia de evidence_bytes_per_field explícito igual a cero resuelta conforme al contrato.",
         "Cálculo autoritativo de nota en Go y defensas ADR-0025 conservados."
+      ],
+      "completed": "2026-10-02",
+      "tests": [
+        "Corpus común de 72 artefactos: lector Go, parser GUI y lectores síncrono/asíncrono; decisiones esperadas independientes de la implementación.",
+        "Regresiones rojas de presupuesto 0/null, procedencia, avisos, marcador/argumento null y suma desbordada; reparadas sin alterar cálculo de notas.",
+        "make check y make build correctos; tipos y build GUI correctos; 506 tests GUI fuera del aislamiento."
       ]
     },
     {
       "id": "T158",
       "title": "Concentrar recorrido de cadenas de copias",
       "phase": 9,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P2",
       "depends_on": [
         "T157"

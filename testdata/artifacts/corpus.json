@@ -1,0 +1,6479 @@
+[
+  {
+    "name": "complete-pass",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "complete-fail",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 0,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 0,
+            "final_score": 0,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "FAIL",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "additions",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4,
+        "future": null
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              },
+              "future": [
+                1
+              ]
+            }
+          ]
+        }
+      ],
+      "future": {
+        "anything": null
+      }
+    }
+  },
+  {
+    "name": "evidence-limit-1",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4,
+        "evidence_bytes_per_field": 1
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "evidence-limit-65536",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4,
+        "evidence_bytes_per_field": 65536
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "evidence-limit-0",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4,
+        "evidence_bytes_per_field": 0
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "evidence-limit--1",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4,
+        "evidence_bytes_per_field": -1
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "evidence-limit-65537",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4,
+        "evidence_bytes_per_field": 65537
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "evidence-limit-None",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4,
+        "evidence_bytes_per_field": null
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "evidence-limit-1.5",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4,
+        "evidence_bytes_per_field": 1.5
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "cancelled",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "CANCELLED",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "excluded-null-checks",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "EXCLUDED",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 0,
+            "evaluable": 0,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": null,
+            "final_score": null,
+            "status": "EXCLUDED"
+          },
+          "checks": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "excluded-empty-checks",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "EXCLUDED",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 0,
+            "evaluable": 0,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": null,
+            "final_score": null,
+            "status": "EXCLUDED"
+          },
+          "checks": []
+        }
+      ]
+    }
+  },
+  {
+    "name": "restored-backup",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": null,
+              "assertion": null
+            }
+          ]
+        }
+      ],
+      "warnings": [
+        {
+          "scope": "run",
+          "code": "RESTORED_FROM_BACKUP",
+          "message": "Sin evidencia"
+        }
+      ]
+    }
+  },
+  {
+    "name": "backup-forged-score",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 99,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": null,
+              "assertion": null
+            }
+          ]
+        }
+      ],
+      "warnings": [
+        {
+          "scope": "run",
+          "code": "RESTORED_FROM_BACKUP",
+          "message": "Sin evidencia"
+        }
+      ]
+    }
+  },
+  {
+    "name": "unevaluated-CONNECT_FAILED",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "PARTIAL",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "NOT_EVALUATED",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 0,
+            "evaluable": 0,
+            "total": 1,
+            "unevaluated": 1,
+            "provisional_score": null,
+            "final_score": null,
+            "status": "NOT_EVALUATED"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "UNEVALUATED",
+              "cause": "CONNECT_FAILED",
+              "execution": null,
+              "assertion": null,
+              "detail": "No se pudo evaluar"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "unevaluated-AUTH_FAILED",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "PARTIAL",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "NOT_EVALUATED",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 0,
+            "evaluable": 0,
+            "total": 1,
+            "unevaluated": 1,
+            "provisional_score": null,
+            "final_score": null,
+            "status": "NOT_EVALUATED"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "UNEVALUATED",
+              "cause": "AUTH_FAILED",
+              "execution": null,
+              "assertion": null,
+              "detail": "No se pudo evaluar"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "unevaluated-TIMEOUT",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "PARTIAL",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "NOT_EVALUATED",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 0,
+            "evaluable": 0,
+            "total": 1,
+            "unevaluated": 1,
+            "provisional_score": null,
+            "final_score": null,
+            "status": "NOT_EVALUATED"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "UNEVALUATED",
+              "cause": "TIMEOUT",
+              "execution": null,
+              "assertion": null,
+              "detail": "No se pudo evaluar"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "unevaluated-CONNECTION_LOST",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "PARTIAL",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "NOT_EVALUATED",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 0,
+            "evaluable": 0,
+            "total": 1,
+            "unevaluated": 1,
+            "provisional_score": null,
+            "final_score": null,
+            "status": "NOT_EVALUATED"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "UNEVALUATED",
+              "cause": "CONNECTION_LOST",
+              "execution": null,
+              "assertion": null,
+              "detail": "No se pudo evaluar"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "unevaluated-NOT_RUN",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "PARTIAL",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "NOT_EVALUATED",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 0,
+            "evaluable": 0,
+            "total": 1,
+            "unevaluated": 1,
+            "provisional_score": null,
+            "final_score": null,
+            "status": "NOT_EVALUATED"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "UNEVALUATED",
+              "cause": "NOT_RUN",
+              "execution": null,
+              "assertion": null,
+              "detail": "No se pudo evaluar"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "unevaluated-CANCELLED",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "PARTIAL",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "NOT_EVALUATED",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 0,
+            "evaluable": 0,
+            "total": 1,
+            "unevaluated": 1,
+            "provisional_score": null,
+            "final_score": null,
+            "status": "NOT_EVALUATED"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "UNEVALUATED",
+              "cause": "CANCELLED",
+              "execution": null,
+              "assertion": null,
+              "detail": "No se pudo evaluar"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "unevaluated-OUTPUT_OVERFLOW",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "PARTIAL",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "NOT_EVALUATED",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 0,
+            "evaluable": 0,
+            "total": 1,
+            "unevaluated": 1,
+            "provisional_score": null,
+            "final_score": null,
+            "status": "NOT_EVALUATED"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "UNEVALUATED",
+              "cause": "OUTPUT_OVERFLOW",
+              "execution": null,
+              "assertion": null,
+              "detail": "No se pudo evaluar"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "unevaluated-ENGINE_ERROR",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "PARTIAL",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "NOT_EVALUATED",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 0,
+            "evaluable": 0,
+            "total": 1,
+            "unevaluated": 1,
+            "provisional_score": null,
+            "final_score": null,
+            "status": "NOT_EVALUATED"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "UNEVALUATED",
+              "cause": "ENGINE_ERROR",
+              "execution": null,
+              "assertion": null,
+              "detail": "No se pudo evaluar"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "decimal-weights",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 3,
+        "total_weight": 1.0,
+        "check_ids": [
+          "c0",
+          "c1",
+          "c2"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1.0,
+            "evaluable": 1.0,
+            "total": 1.0,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c0",
+              "group": "G",
+              "description": "C",
+              "weight": 0.1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            },
+            {
+              "check_id": "c1",
+              "group": "G",
+              "description": "C",
+              "weight": 0.2,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            },
+            {
+              "check_id": "c2",
+              "group": "G",
+              "description": "C",
+              "weight": 0.7,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "tiny-pending-1e-10",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "PARTIAL",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 2,
+        "total_weight": 1.0000000001,
+        "check_ids": [
+          "c0",
+          "c1"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "PARTIAL",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1.0000000001,
+            "unevaluated": 1e-10,
+            "provisional_score": 100,
+            "final_score": null,
+            "status": "INCOMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c0",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            },
+            {
+              "check_id": "c1",
+              "group": "G",
+              "description": "C",
+              "weight": 1e-10,
+              "status": "UNEVALUATED",
+              "cause": "TIMEOUT",
+              "execution": null,
+              "assertion": null
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "tiny-pending-1e-100",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "PARTIAL",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 2,
+        "total_weight": 1.0,
+        "check_ids": [
+          "c0",
+          "c1"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "PARTIAL",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1.0,
+            "unevaluated": 1e-100,
+            "provisional_score": 100,
+            "final_score": null,
+            "status": "INCOMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c0",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            },
+            {
+              "check_id": "c1",
+              "group": "G",
+              "description": "C",
+              "weight": 1e-100,
+              "status": "UNEVALUATED",
+              "cause": "TIMEOUT",
+              "execution": null,
+              "assertion": null
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "tiny-pending-1e-300",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "PARTIAL",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 2,
+        "total_weight": 1.0,
+        "check_ids": [
+          "c0",
+          "c1"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "PARTIAL",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1.0,
+            "unevaluated": 1e-300,
+            "provisional_score": 100,
+            "final_score": null,
+            "status": "INCOMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c0",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            },
+            {
+              "check_id": "c1",
+              "group": "G",
+              "description": "C",
+              "weight": 1e-300,
+              "status": "UNEVALUATED",
+              "cause": "TIMEOUT",
+              "execution": null,
+              "assertion": null
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "zero-diagnostic",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 2,
+        "total_weight": 1,
+        "check_ids": [
+          "c0",
+          "c1"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c0",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            },
+            {
+              "check_id": "c1",
+              "group": "G",
+              "description": "C",
+              "weight": 0,
+              "status": "UNEVALUATED",
+              "cause": "TIMEOUT",
+              "execution": null,
+              "assertion": null
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "large-weight",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1e+308,
+        "check_ids": [
+          "c0"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1e+308,
+            "evaluable": 1e+308,
+            "total": 1e+308,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c0",
+              "group": "G",
+              "description": "C",
+              "weight": 1e+308,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "null-students-0-name",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": null,
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "missing-students-0-name",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "null-students-0-checks-0-group",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": null,
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "missing-students-0-checks-0-group",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "null-students-0-checks-0-weight",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": null,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "missing-students-0-checks-0-weight",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "null-students-0-checks-0-execution-completed",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": null,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "missing-students-0-checks-0-execution-completed",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "null-students-0-checks-0-execution-stdout-bytes",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": null,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": null,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "missing-students-0-checks-0-execution-stdout-bytes",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "null-students-0-checks-0-assertion-matched",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": null
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "missing-students-0-checks-0-assertion-matched",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "null-students-0-score-obtained",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": null,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "missing-students-0-score-obtained",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "null-students-0-score-final_score",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": null,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "missing-students-0-score-final_score",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "null-plan-concurrency",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": null,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "missing-plan-concurrency",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "corrupt-students-0-score-final_score",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 99,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "corrupt-students-0-checks-0-cause",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "TIMEOUT",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "corrupt-students-0-checks-0-execution",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": null,
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "corrupt-students-0-checks-0-execution-remote_process",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "UNKNOWN"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "corrupt-students-0-checks-0-execution-stdout-bytes_total",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 1,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 1,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "corrupt-plan-check_ids",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "other"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "corrupt-plan-total_weight",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 2,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "corrupt-students-0-checks-0-weight",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": -1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "retry-provenance",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              },
+              "previous": {
+                "run_id": "R0",
+                "status": "UNEVALUATED",
+                "cause": "TIMEOUT",
+                "finished_at": "2026-10-02T10:00:00Z"
+              }
+            }
+          ]
+        }
+      ],
+      "retry_of": {
+        "run_id": "R0",
+        "artifact": "run-R0.json",
+        "run_at": "2026-10-02T10:00:00Z",
+        "students": 1,
+        "checks": 1
+      }
+    }
+  },
+  {
+    "name": "missing-retry_of-run_at",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              },
+              "previous": {
+                "run_id": "R0",
+                "status": "UNEVALUATED",
+                "cause": "TIMEOUT",
+                "finished_at": "2026-10-02T10:00:00Z"
+              }
+            }
+          ]
+        }
+      ],
+      "retry_of": {
+        "run_id": "R0",
+        "artifact": "run-R0.json",
+        "run_at": null,
+        "students": 1,
+        "checks": 1
+      }
+    }
+  },
+  {
+    "name": "missing-students-0-checks-0-previous-finished_at",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              },
+              "previous": {
+                "run_id": "R0",
+                "status": "UNEVALUATED",
+                "cause": "TIMEOUT",
+                "finished_at": null
+              }
+            }
+          ]
+        }
+      ],
+      "retry_of": {
+        "run_id": "R0",
+        "artifact": "run-R0.json",
+        "run_at": "2026-10-02T10:00:00Z",
+        "students": 1,
+        "checks": 1
+      }
+    }
+  },
+  {
+    "name": "warning-missing-scope",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ],
+      "warnings": [
+        {
+          "code": "INFO",
+          "message": "Aviso"
+        }
+      ]
+    }
+  },
+  {
+    "name": "warning-missing-code",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ],
+      "warnings": [
+        {
+          "scope": "run",
+          "message": "Aviso"
+        }
+      ]
+    }
+  },
+  {
+    "name": "warning-missing-message",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ],
+      "warnings": [
+        {
+          "scope": "run",
+          "code": "INFO"
+        }
+      ]
+    }
+  },
+  {
+    "name": "warnings-null",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ],
+      "warnings": null
+    }
+  },
+  {
+    "name": "assertion-truncated-null",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true,
+                "evidence_truncated": null
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "command-null-element",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [
+                  null
+                ],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "command-null",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": null,
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "evidence-truncated-after-comparison",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 100,
+                  "truncated": true
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true,
+                "evidence_truncated": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "duplicate-student",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        },
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "different-student-weights",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        },
+        {
+          "student_id": "fake2",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 2,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "backup-without-marker",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 1,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": 100,
+            "final_score": 100,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": null,
+              "assertion": null
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "excluded-with-grade",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 1,
+        "total_weight": 1,
+        "check_ids": [
+          "c"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "EXCLUDED",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 0,
+            "evaluable": 0,
+            "total": 1,
+            "unevaluated": 0,
+            "provisional_score": null,
+            "final_score": 0,
+            "status": "EXCLUDED"
+          },
+          "checks": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "half-rounding",
+    "accept": true,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 2,
+        "total_weight": 200,
+        "check_ids": [
+          "c",
+          "d"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 1,
+            "evaluable": 200,
+            "total": 200,
+            "unevaluated": 0,
+            "provisional_score": 1,
+            "final_score": 1,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1,
+              "status": "PASS",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": true
+              }
+            },
+            {
+              "check_id": "d",
+              "group": "G",
+              "description": "C",
+              "weight": 199,
+              "status": "FAIL",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "overflowed-weight-sum",
+    "accept": false,
+    "artifact": {
+      "schema_version": 1,
+      "run_id": "R1",
+      "engine_version": "test",
+      "started_at": "2026-10-02T10:00:00Z",
+      "finished_at": "2026-10-02T10:00:00Z",
+      "status": "COMPLETE",
+      "exam": {
+        "path": "examen.yaml",
+        "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "inventory": {
+        "path": "aula.yaml",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "plan_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "plan": {
+        "check_count": 2,
+        "total_weight": 1e+308,
+        "check_ids": [
+          "c",
+          "d"
+        ],
+        "concurrency": 16,
+        "host_concurrency": 4
+      },
+      "students": [
+        {
+          "student_id": "fake",
+          "name": "Ficticio",
+          "status": "OK",
+          "started_at": "2026-10-02T10:00:00Z",
+          "finished_at": "2026-10-02T10:00:00Z",
+          "score": {
+            "obtained": 0,
+            "evaluable": 1e+308,
+            "total": 1e+308,
+            "unevaluated": 0,
+            "provisional_score": 0,
+            "final_score": 0,
+            "status": "COMPLETE"
+          },
+          "checks": [
+            {
+              "check_id": "c",
+              "group": "G",
+              "description": "C",
+              "weight": 1e+308,
+              "status": "FAIL",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": false
+              }
+            },
+            {
+              "check_id": "d",
+              "group": "G",
+              "description": "C",
+              "weight": 1e+308,
+              "status": "FAIL",
+              "cause": "NONE",
+              "execution": {
+                "host": "",
+                "address": "",
+                "user": "",
+                "transport": "inventory",
+                "command": [],
+                "started_at": "2026-10-02T10:00:00Z",
+                "duration_ms": 0,
+                "completed": true,
+                "exit_code": 0,
+                "overflow": false,
+                "stdout": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "stderr": {
+                  "text": "",
+                  "bytes": 0,
+                  "bytes_total": 0,
+                  "truncated": false
+                },
+                "connect_attempts": 0,
+                "command_attempts": 0,
+                "remote_process": "FINISHED"
+              },
+              "assertion": {
+                "kind": "equals",
+                "expected": "yes",
+                "found": "yes",
+                "matched": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+]
