@@ -23,15 +23,15 @@ function artifact(runId: string, startedAt: string, extra: Extra = {}): string {
     started_at: startedAt,
     finished_at: startedAt,
     score: {
-      obtained: 2,
-      evaluable: 2,
-      total: 2,
+      obtained: 6,
+      evaluable: 6,
+      total: 6,
       unevaluated: 0,
       provisional_score: 100,
       final_score: 100,
       status: 'COMPLETE'
     },
-    checks: []
+    checks: Array.from({length:5},(_,j)=>({check_id:`c${j}`,group:'G',description:'C',weight:j===0?2:1,status:'PASS',cause:'NONE',execution:null,assertion:null}))
   }))
   return JSON.stringify({
     schema_version: 1,
@@ -43,8 +43,9 @@ function artifact(runId: string, startedAt: string, extra: Extra = {}): string {
     exam: { path: 'aula/ra2/examen.yaml', sha256: 'a' },
     inventory: { path: 'aula/ra2/smx2a.yaml', sha256: 'b' },
     plan_hash: 'c',
-    plan: { check_count: 5, total_weight: 6, check_ids: [], concurrency: 8, host_concurrency: 4 },
+    plan: { check_count: 5, total_weight: 6, check_ids: ['c0','c1','c2','c3','c4'], concurrency: 8, host_concurrency: 4 },
     students,
+ warnings:[{scope:'run',code:'RESTORED_FROM_BACKUP',message:'Grades only fixture'}],
     ...(extra.retryOf
       ? {
           retry_of: {

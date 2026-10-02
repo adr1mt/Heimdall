@@ -168,3 +168,38 @@ func TestRunRejectsARetryWhosePreviousRunIsMissing(t *testing.T) {
 	}
 	assertEmptyDir(t, out)
 }
+
+func TestReadArtifactRejectsUnsupportedGrades(t *testing.T) {
+	for _, mutate := range []func(*model.RunResult){
+		func(r *model.RunResult) { r.Students[0].Checks = nil },
+		func(r *model.RunResult) { r.Students[0].Checks[0].Weight = 2 },
+		func(r *model.RunResult) { r.Students[0].Checks[0].CheckID = "unknown" },
+		func(r *model.RunResult) { r.Students[0].Score.Final = new(int) },
+		func(r *model.RunResult) { r.Students[0].Checks[0].Execution = nil },
+		func(r *model.RunResult) { r.Students[0].Checks[0].Cause = model.CauseTimeout },
+	} {
+		r := sessionRun("R1", 15, "fake", model.Pass, model.Pass)
+		mutate(r)
+		path := writeRun(t, t.TempDir(), "run.json", r)
+		if _, err := readArtifact(path); err == nil {
+			t.Fatal("corrupted artifact accepted")
+		}
+	}
+	r := sessionRun("R1", 15, "fake", model.Pass, model.Pass)
+	data, _ := model.MarshalCanonical(r)
+	data = bytes.Replace(data, []byte(`"weight": 6`), []byte(`"weight": null`), 1)
+	path := filepath.Join(t.TempDir(), "null-weight.json")
+	os.WriteFile(path, data, 0600)
+	if _, err := readArtifact(path); err == nil {
+		t.Fatal("null weight accepted")
+	}
+	r.Warnings = []model.Warning{{Code: "RESTORED_FROM_BACKUP"}}
+	for i := range r.Students[0].Checks {
+		r.Students[0].Checks[i].Execution = nil
+		r.Students[0].Checks[i].Assertion = nil
+	}
+	path = writeRun(t, t.TempDir(), "backup.json", r)
+	if _, err := readArtifact(path); err != nil {
+		t.Fatalf("valid backup refused: %v", err)
+	}
+}

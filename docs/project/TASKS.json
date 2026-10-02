@@ -2657,7 +2657,7 @@
       "id": "T139",
       "title": "A13 · Se acepta como resultado una nota sin comprobaciones que la sustenten",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
@@ -2668,7 +2668,10 @@
         "Rechazar artefactos incoherentes en CLI y GUI; aceptar excluidos, reintentos y copias legítimas.",
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
-      "tests": []
+      "tests": [
+        "make check; tipos GUI; Vitest: 395 pruebas; rechazo de notas sin evidencia, pesos/ids/estados alterados y copias/excluidos válidos"
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T140",

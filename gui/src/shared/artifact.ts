@@ -158,12 +158,101 @@ export function parseArtifact(text: string): RunResult {
   if (!Array.isArray(run.students) || !run.plan) {
     throw new Error('El fichero de resultados está incompleto.')
   }
+  validateArtifact(value)
   // A student nobody evaluated carries no checks, and that is written as
   // nothing at all. It is read as «ninguna comprobación», which is what it
   // means: an excluded student is the ordinary case since a round of an exam
   // session leaves out whoever already finished (T063).
   for (const student of run.students) {
-    if (!Array.isArray(student.checks)) student.checks = []
+    if (student.status==='EXCLUDED' && student.checks===null) student.checks = []
   }
   return run as RunResult
+}
+
+const CAUSES = ['CONNECT_FAILED','AUTH_FAILED','TIMEOUT','CONNECTION_LOST','NOT_RUN','CANCELLED','OUTPUT_OVERFLOW','ENGINE_ERROR']
+
+/** Verifies the published grade against its evidence without changing it. */
+function validateArtifact(value: unknown): void {
+ const bad=(at:string,why:string):never=> {throw new Error(`El resultado está incompleto o es incoherente (${at}): ${why}.`)}
+ const object=(v:unknown,at:string):Record<string,unknown>=> v && typeof v==='object' && !Array.isArray(v) ? v as Record<string,unknown> : bad(at,'se esperaba un objeto')
+ const text=(v:unknown,at:string,nonempty=false):string=> typeof v==='string' && (!nonempty || !!v.trim()) ? v : bad(at,'texto inválido')
+ const number=(v:unknown,at:string,integer=false):number=> typeof v==='number' && Number.isFinite(v) && v>=0 && (!integer || Number.isInteger(v)) ? v : bad(at,'número inválido')
+ const list=(v:unknown,at:string):unknown[]=> Array.isArray(v) ? v : bad(at,'se esperaba una lista')
+ const date=(v:unknown,at:string):number=> {const d=Date.parse(text(v,at,true));return Number.isFinite(d)?d:bad(at,'fecha inválida')}
+ const close=(a:number,b:number):boolean=> a===b || Math.abs(a-b)<=1e-12*Math.max(Math.abs(a),Math.abs(b))
+ const statusCause=(c:Record<string,unknown>,at:string):void=> {if((c.status==='PASS' || c.status==='FAIL') ? c.cause!=='NONE' : c.status!=='UNEVALUATED' || !CAUSES.includes(String(c.cause))) bad(at,'estado o causa inválidos')}
+ const run=object(value,'run'),p=object(run.plan,'plan')
+ text(run.run_id,'run_id',true);text(run.engine_version,'engine_version',true);text(run.plan_hash,'plan_hash',true)
+ if(date(run.finished_at,'finished_at')<date(run.started_at,'started_at')) bad('run','fechas invertidas')
+ for(const key of ['exam','inventory']) {const ref=object(run[key],key);text(ref.path,`${key}.path`,true);text(ref.sha256,`${key}.sha256`,true)}
+ const count=number(p.check_count,'check_count',true),total=number(p.total_weight,'total_weight'),ids=list(p.check_ids,'check_ids').map((id)=>text(id,'check_ids',true))
+ if(count<1 || total<=0 || ids.length!==count || new Set(ids).size!==count || number(p.concurrency,'concurrency',true)<1 || number(p.host_concurrency,'host_concurrency',true)<1) bad('plan','cantidades inválidas')
+ const warnings=run.warnings===undefined?[]:list(run.warnings,'warnings')
+ const restored=warnings.some(w=>object(w,'warnings').code==='RESTORED_FROM_BACKUP')
+ for(const w of warnings) {const warning=object(w,'warning');for(const key of ['scope','code','message']) text(warning[key],`warning.${key}`)}
+ const students=list(run.students,'students'),seen=new Set<string>(),weights=new Map<string,number>()
+ if(!students.length) bad('students','lista vacía')
+ let partial=false
+ for(const value of students) {
+  const s=object(value,'student'),id=text(s.student_id,'student_id',true),at=`student:${id}`
+  if(seen.has(id)) bad(at,'identificador repetido');seen.add(id);text(s.name,`${at}.name`)
+  if(date(s.finished_at,`${at}.finished_at`)<date(s.started_at,`${at}.started_at`)) bad(at,'fechas invertidas')
+  const score=object(s.score,`${at}.score`)
+  for(const key of ['obtained','evaluable','total','unevaluated']) number(score[key],`${at}.score.${key}`)
+  for(const key of ['provisional_score','final_score']) if(score[key]!==null && number(score[key],`${at}.${key}`,true)>100) bad(at,'nota fuera de escala')
+  if(!close(score.total as number,total)) bad(at,'denominador distinto al PLAN')
+  if(s.status==='EXCLUDED') {
+   if(s.checks!==null && list(s.checks,`${at}.checks`).length!==0) bad(at,'excluido con comprobaciones')
+   if(score.status!=='EXCLUDED' || score.final_score!==null || score.provisional_score!==null || score.obtained!==0 || score.evaluable!==0 || score.unevaluated!==0) bad(at,'excluido con nota')
+   continue
+  }
+  const checks=list(s.checks,`${at}.checks`)
+  if(checks.length!==count) bad(at,'faltan comprobaciones del PLAN')
+  let obtained=0,evaluable=0,pending=0,sum=0,weighted=0,unseen=0
+  for(const [i,v] of checks.entries()) {
+   const c=object(v,`${at}.checks`),where=`${at}/check:${String(c.check_id)}`,weight=number(c.weight,`${where}.weight`)
+   if(c.check_id!==ids[i]) bad(where,'id u orden distintos al PLAN')
+   text(c.group,`${where}.group`);text(c.description,`${where}.description`)
+   if(weights.has(ids[i]) && weights.get(ids[i])!==weight) bad(where,'pesos distintos entre alumnos');weights.set(ids[i],weight)
+   sum+=weight;statusCause(c,where)
+   if(weight>0) {weighted++;if(c.status==='UNEVALUATED') unseen++}
+   if(c.status==='PASS') obtained+=weight
+   if(c.status==='PASS' || c.status==='FAIL') evaluable+=weight
+   else pending+=weight
+   if(c.previous!==undefined) {const prev=object(c.previous,`${where}.previous`);text(prev.run_id,`${where}.previous.run_id`,true);statusCause(prev,where);date(prev.finished_at,`${where}.previous.finished_at`)}
+   if(c.execution!==null) {
+    const e=object(c.execution,`${where}.execution`)
+    for(const key of ['host','address','user','transport']) text(e[key],`${where}.${key}`)
+    if(e.command!==null) for(const arg of list(e.command,`${where}.command`)) text(arg,`${where}.command`)
+    date(e.started_at,`${where}.started_at`)
+    for(const key of ['duration_ms','connect_attempts','command_attempts']) number(e[key],`${where}.${key}`,true)
+    if(typeof e.completed!=='boolean' || typeof e.overflow!=='boolean' || !['FINISHED','KILLED_REMOTE','UNKNOWN'].includes(String(e.remote_process))) bad(where,'ejecución inválida')
+    if(e.exit_code!==null) {if(typeof e.exit_code!=='number' || !Number.isInteger(e.exit_code)) bad(where,'código inválido')}
+    if(e.completed ? e.exit_code===null || e.overflow || e.remote_process!=='FINISHED' : e.exit_code!==null) bad(where,'terminación incoherente')
+    for(const key of ['stdout','stderr']) {
+     const stream=object(e[key],`${where}.${key}`);text(stream.text,`${where}.${key}.text`)
+     const bytes=number(stream.bytes,`${where}.${key}.bytes`,true),all=number(stream.bytes_total,`${where}.${key}.bytes_total`,true)
+     if(bytes>65536 || all<bytes || typeof stream.truncated!=='boolean' || (all>bytes && !stream.truncated)) bad(where,'flujo inválido')
+    }
+   }
+   if(c.assertion!==null) {
+    const a=object(c.assertion,`${where}.assertion`)
+    for(const key of ['kind','expected','found']) text(a[key],`${where}.assertion.${key}`)
+    if(!['contains','not_contains','equals','exit_code','near'].includes(String(a.kind)) || typeof a.matched!=='boolean' || (c.status==='PASS')!==a.matched || c.status==='UNEVALUATED') bad(where,'aserción incoherente')
+   }
+   if(c.status!=='UNEVALUATED' && !restored && (c.execution===null || c.assertion===null || !object(c.execution,where).completed)) bad(where,'falta evidencia del resultado')
+  }
+  if(!close(sum,total)) bad(at,'los pesos no suman el PLAN')
+  const studentStatus=unseen===0?'OK':unseen===weighted?'NOT_EVALUATED':'PARTIAL'
+  const scoreStatus=evaluable===0?'NOT_EVALUATED':pending>0?'INCOMPLETE':'COMPLETE'
+  const provisional=evaluable===0?null:Math.round(100*(obtained/evaluable)),final=scoreStatus==='COMPLETE'?Math.round(100*(obtained/total)):null
+  if(s.status!==studentStatus || score.status!==scoreStatus || !close(score.obtained as number,obtained) || !close(score.evaluable as number,evaluable) || !close(score.unevaluated as number,pending) || score.provisional_score!==provisional || score.final_score!==final) bad(at,'la nota o el estado no coinciden con las comprobaciones')
+  if(studentStatus!=='OK') partial=true
+ }
+ if(run.status!=='CANCELLED' && run.status!==(partial?'PARTIAL':'COMPLETE')) bad('status','no coincide con los alumnos')
+ if(run.retry_of!==undefined) {
+  const retry=object(run.retry_of,'retry_of');text(retry.artifact,'retry_of.artifact',true);date(retry.run_at,'retry_of.run_at')
+  const id=text(retry.run_id,'retry_of.run_id',true),n=number(retry.students,'retry_of.students',true),checks=number(retry.checks,'retry_of.checks',true)
+  if(id===run.run_id || n<1 || n>students.length || checks<1 || checks>n*count) bad('retry_of','procedencia inválida')
+ }
 }

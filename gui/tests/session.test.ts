@@ -279,7 +279,7 @@ describe('una vuelta que deja fuera a quien ya terminó', () => {
     engine_version: '0.1.0',
     started_at: '2026-09-21T09:42:00Z',
     finished_at: '2026-09-21T09:42:10Z',
-    status: 'PARTIAL',
+    status: 'COMPLETE',
     exam: { path: '/aula/examen.yaml', sha256: 'x' },
     inventory: { path: '/aula/aula.yaml', sha256: 'y' },
     plan_hash: 'abc',
@@ -297,7 +297,7 @@ describe('una vuelta que deja fuera a quien ya terminó', () => {
         status: 'EXCLUDED',
         started_at: '2026-09-21T09:42:00Z',
         finished_at: '2026-09-21T09:42:00Z',
-        score: score({ status: 'EXCLUDED' }),
+        score: score({ obtained:0, evaluable:0,unevaluated:0,provisional_score:null,final_score:null, status: 'EXCLUDED' }),
         checks: null
       }
     ]

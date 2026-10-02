@@ -19,6 +19,7 @@ import {
   truncationNote,
   NO_FILTERS
 } from '../src/renderer/src/lib/results'
+import { validRun } from './fixtures/valid-run'
 import { SCALES } from '../src/renderer/src/lib/scale'
 import type { Score } from '../src/shared/events'
 
@@ -209,7 +210,7 @@ describe('truncationNote', () => {
 
 describe('parseArtifact', () => {
   it('lee un artefacto del esquema que conoce', () => {
-    expect(parseArtifact(JSON.stringify(RUN)).run_id).toBe('01M2Z')
+    expect(parseArtifact(JSON.stringify(validRun())).run_id).toBe('R1')
   })
 
   it('se planta ante un esquema que no conoce, en vez de adivinar', () => {

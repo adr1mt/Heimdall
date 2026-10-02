@@ -35,6 +35,12 @@ func readArtifact(path string) (*model.RunResult, error) {
 	if run.RunID == "" {
 		return nil, fmt.Errorf("%s no dice de qué ejecución es", path)
 	}
+	if err := model.ValidateArtifactJSON(data); err != nil {
+		return nil, fmt.Errorf("%s: %w", path, err)
+	}
+	if err := model.ValidateArtifact(&run); err != nil {
+		return nil, fmt.Errorf("%s: %w", path, err)
+	}
 	return &run, nil
 }
 

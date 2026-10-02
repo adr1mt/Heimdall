@@ -22,7 +22,7 @@ const PASSWORD = 'contrasena-de-la-clase'
  * what must never reach the copy.
  */
 function artifact(runId: string, startedAt: string, score = 80): string {
-  return JSON.stringify({
+  const run = {
     schema_version: 1,
     run_id: runId,
     engine_version: '0.1.0-dev',
@@ -95,7 +95,15 @@ function artifact(runId: string, startedAt: string, score = 80): string {
         ]
       }
     ]
-  })
+  }
+  // A published 80/73 needs failed weight as well as its successful check.
+  const total=100/score
+  run.plan.check_count=2;run.plan.total_weight=total;run.plan.check_ids.push('other')
+  run.students[0].score.evaluable=total;run.students[0].score.total=total
+  const first=run.students[0].checks[0]
+  run.students[0].checks.push({...first,check_id:'other',weight:total-1,status:'FAIL',assertion:{...first.assertion,expected:'1',matched:false}})
+  return JSON.stringify(run)
+
 }
 
 /** A project with its var/ and the data directory of the application. */

@@ -24,7 +24,13 @@ func chainCheckOf(id string, weight float64, status model.AcademicStatus) model.
 	if status == model.Unevaluated {
 		cause = model.CauseConnectFailed
 	}
-	return model.CheckResult{CheckID: id, Weight: weight, Status: status, Cause: cause}
+	check := model.CheckResult{CheckID: id, Weight: weight, Status: status, Cause: cause}
+	if status != model.Unevaluated {
+		zero := 0
+		check.Execution = &model.ExecutionResult{Completed: true, ExitCode: &zero, RemoteProcess: model.RemoteFinished, Transport: "inventory", StartedAt: chainDay(15)}
+		check.Assertion = &model.AssertionResult{Kind: "exit_code", Matched: status == model.Pass}
+	}
+	return check
 }
 
 func chainStudentOf(id string, day int, checks ...model.CheckResult) model.StudentResult {
@@ -43,12 +49,14 @@ func chainRunOf(id string, day int, students ...model.StudentResult) *model.RunR
 	return &model.RunResult{
 		SchemaVersion: model.SchemaVersion,
 		RunID:         id,
-		StartedAt:     chainDay(day),
-		FinishedAt:    chainDay(day),
-		Status:        model.RunStatusOf(students),
-		PlanHash:      "hash-del-plan",
-		Plan:          model.PlanSummary{CheckCount: 2, TotalWeight: 10, CheckIDs: []string{"c1", "c2"}},
-		Students:      students,
+		EngineVersion: "test",
+		Exam:          model.SourceRef{Path: "examen.yaml", SHA256: "hash"}, Inventory: model.SourceRef{Path: "aula.yaml", SHA256: "hash"},
+		StartedAt:  chainDay(day),
+		FinishedAt: chainDay(day),
+		Status:     model.RunStatusOf(students),
+		PlanHash:   "hash-del-plan",
+		Plan:       model.PlanSummary{CheckCount: 2, TotalWeight: 10, CheckIDs: []string{"c1", "c2"}, Concurrency: 16, HostConcurrency: 4},
+		Students:   students,
 	}
 }
 
