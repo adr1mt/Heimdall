@@ -17,14 +17,21 @@ import { canOpen, type View } from '@/lib/nav'
 export type { View }
 export type Theme = 'dark' | 'light'
 
-export interface EditorDraft { path: string; text: string; savedText: string; yamlView: boolean }
+export interface EditorDraft {
+  path: string
+  text: string
+  savedText: string
+  yamlView: boolean
+  /** In-progress form fields may not be valid YAML numbers yet. */
+  formExam?: import('../../../shared/exam').Exam
+}
 type Navigation = { view: View } | { project: OpenProject | null }
 
 interface AppState {
- editorDraft: EditorDraft | null
- pendingNavigation: Navigation | null
- setEditorDraft: (draft: EditorDraft | null) => void
- resolveNavigation: (discard: boolean) => void
+  editorDraft: EditorDraft | null
+  pendingNavigation: Navigation | null
+  setEditorDraft: (draft: EditorDraft | null) => void
+  resolveNavigation: (discard: boolean) => void
   theme: Theme
   view: View
   /** null while the engine has not been looked for yet. */
@@ -168,16 +175,16 @@ applyProjector(savedProjector)
 
 export const useApp = create<AppState>((set, get) => ({
   editorDraft: null,
- pendingNavigation: null,
- setEditorDraft: (editorDraft) => set({editorDraft}),
- resolveNavigation: (discard) => {
-  const next=get().pendingNavigation
-  set({pendingNavigation:null})
-  if (!discard || !next) return
-  set({editorDraft:null})
-  if ("view" in next) get().setView(next.view)
-  else get().setProject(next.project)
- },
+  pendingNavigation: null,
+  setEditorDraft: (editorDraft) => set({ editorDraft }),
+  resolveNavigation: (discard) => {
+    const next = get().pendingNavigation
+    set({ pendingNavigation: null })
+    if (!discard || !next) return
+    set({ editorDraft: null })
+    if ("view" in next) get().setView(next.view)
+    else get().setProject(next.project)
+  },
   theme: savedTheme,
   view: 'home',
   engine: null,
@@ -202,10 +209,10 @@ export const useApp = create<AppState>((set, get) => ({
   // cannot be opened whoever asks: the button is disabled, and this is the
   // second lock so no code path lands the teacher on an empty screen.
   setView: (view) => {
-    if (!canOpen(view,get().project!==null)) return
-    const draft=get().editorDraft
-    if (view!==get().view && draft && draft.text!==draft.savedText) { set({pendingNavigation:{view}}); return }
-    set({view})
+    if (!canOpen(view, get().project !== null)) return
+    const draft = get().editorDraft
+    if (view !== get().view && draft && draft.text !== draft.savedText) { set({ pendingNavigation: { view } }); return }
+    set({ view })
   },
   setEngine: (engine) => set({ engine }),
   // Changing project leaves nothing of the previous one behind: its rounds
@@ -213,17 +220,17 @@ export const useApp = create<AppState>((set, get) => ({
   // reading them together would grade the wrong exam. With an exam open the
   // next thing is correcting it; with none, Inicio is the only section left.
   setProject: (project) => {
- const draft=get().editorDraft
- if (draft && draft.text!==draft.savedText) { set({pendingNavigation:{project}}); return }
+    const draft = get().editorDraft
+    if (draft && draft.text !== draft.savedText) { set({ pendingNavigation: { project } }); return }
     set({
- editorDraft:null,
+      editorDraft: null,
       project,
       retry: null,
       examRounds: [],
       exam: EXAM_OFF,
       view: project ? 'correct' : 'home'
     })
- },
+  },
   setClassId: (classId) => {
     if (classId) localStorage.setItem('heimdall-class-id', classId)
     else localStorage.removeItem('heimdall-class-id')

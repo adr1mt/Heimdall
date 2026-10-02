@@ -57,13 +57,15 @@ export default function EditorView() {
   }, [classesLoaded, loadClasses])
   const group = groupById(groups, classId)
 
-  const draft=useApp(s=>s.editorDraft)
-  const setDraft=useApp(s=>s.setEditorDraft)
-  const parsed=draft ? readExam(draft.text) : null
-  const problem=parsed && 'problem' in parsed ? parsed.problem : null
-  const exam=parsed && 'exam' in parsed ? parsed.exam : project && draft ? emptyExam(project.name) : null
-  const yamlView=!!draft && (draft.yamlView || !!problem)
-  const setYamlView=(next:boolean):void=> {if(draft && !problem) setDraft({...draft,yamlView:next})}
+  const draft = useApp(s => s.editorDraft)
+  const setDraft = useApp(s => s.setEditorDraft)
+  const parsed = draft ? readExam(draft.text) : null
+  const problem = parsed && 'problem' in parsed ? parsed.problem : null
+  const exam = parsed && 'exam' in parsed ? parsed.exam : draft?.formExam ?? (project && draft ? emptyExam(project.name) : null)
+  const yamlView = !!draft && (draft.yamlView || (!!problem && !draft.formExam))
+  const setYamlView = (next: boolean): void => {
+    if (draft && (!problem || next)) setDraft({ ...draft, yamlView: next, formExam: undefined })
+  }
   const [editing, setEditing] = useState<{ group: number; check: number | null } | null>(null)
   const [removingGroup, setRemovingGroup] = useState<number | null>(null)
   const [verdict, setVerdict] = useState<{ ok: boolean; message: string } | null>(null)
@@ -71,14 +73,14 @@ export default function EditorView() {
 
   useEffect(() => {
     if (!project) return
-    if (useApp.getState().editorDraft?.path===project.examPath) return
+    if (useApp.getState().editorDraft?.path === project.examPath) return
     let current = true
     window.heimdall
       .readExam(project.examPath)
       .then((yaml) => {
         if (!current) return
         const read = readExam(yaml)
-        setDraft({path:project.examPath,text:yaml,savedText:yaml,yamlView:'problem' in read})
+        setDraft({ path: project.examPath, text: yaml, savedText: yaml, yamlView: 'problem' in read })
         // An exam the model cannot read is not replaced by an empty one
         // behind the teacher's back: the YAML is opened and it is said why.
         if ('problem' in read) {
@@ -93,7 +95,7 @@ export default function EditorView() {
 
   function change(next: Exam): void {
     if (!draft) return
-    setDraft({...draft,text:examYaml(next)})
+    setDraft({ ...draft, text: examYaml(next), formExam: next })
     // The engine's last word is about the exam that was checked, not this one.
     setVerdict(null)
   }
@@ -112,11 +114,11 @@ export default function EditorView() {
         classId: group.id,
         yaml
       })
-      if (useApp.getState().editorDraft?.text!==yaml || useApp.getState().project?.examPath!==project.examPath) return
+      if (useApp.getState().editorDraft?.text !== yaml || useApp.getState().project?.examPath !== project.examPath) return
       setVerdict(answer)
       if (!answer.ok) return
       await window.heimdall.writeExam(project.examPath, yaml)
-      setDraft({...draft,savedText:yaml})
+      setDraft({ ...draft, savedText: yaml })
       setNotice(t.editor.saved)
     } catch (error) {
       setNotice(noticeFrom(t.editor.saveFailed, error))
@@ -164,10 +166,10 @@ export default function EditorView() {
       <ViewHeader
         title={t.editor.titleOf(exam.examen.trim() || project?.name || '')}
         meta={
-          <Badge variant="secondary">{t.editor.summary(checkCount(exam), totalWeight(exam))}</Badge>
+          <Badge variant="secondary">{problem ? t.editor.draftInvalid : t.editor.summary(checkCount(exam), totalWeight(exam))}</Badge>
         }
         actions={
-          <Button variant="outline" size="sm" disabled={!!problem || checking} onClick={() => setYamlView(!yamlView)}>
+          <Button variant="outline" size="sm" disabled={(!!problem && yamlView) || checking} onClick={() => setYamlView(!yamlView)}>
             {yamlView ? <FileText className="h-4 w-4" /> : <Code2 className="h-4 w-4" />}
             {yamlView ? t.editor.formView : t.editor.yamlView}
           </Button>
@@ -176,7 +178,7 @@ export default function EditorView() {
 
       <fieldset disabled={checking} className="min-h-0 flex-1 space-y-5 overflow-auto p-6">
         {yamlView ? (
-          <YamlView text={draft?.text ?? ''} problem={problem} disabled={checking} onChange={(text)=> { if(draft) setDraft({...draft,text}); setVerdict(null); setNotice(null) }} />
+          <YamlView text={draft?.text ?? ''} problem={problem} disabled={checking} onChange={(text) => { if (draft) setDraft({ ...draft, text, formExam: undefined }); setVerdict(null); setNotice(null) }} />
         ) : (
           <>
             {/* Que la pantalla se llame «Exámenes» y enseñe uno solo no se
@@ -315,11 +317,11 @@ export default function EditorView() {
                               grupos: exam.grupos.map((g, i) =>
                                 i === index
                                   ? {
-                                      ...g,
-                                      comprobaciones: g.comprobaciones.filter(
-                                        (_, c) => c !== checkIndex
-                                      )
-                                    }
+                                    ...g,
+                                    comprobaciones: g.comprobaciones.filter(
+                                      (_, c) => c !== checkIndex
+                                    )
+                                  }
                                   : g
                               )
                             })
@@ -338,9 +340,9 @@ export default function EditorView() {
       </fieldset>
 
       <ConfirmDialog
-        open={removingGroup !== null}
+        open={removingGroup !== null && !!exam.grupos[removingGroup] && !problem}
         title={
-          removingGroup === null ? '' : t.editor.removeGroupTitle(exam.grupos[removingGroup].grupo)
+          removingGroup === null ? '' : t.editor.removeGroupTitle(exam.grupos[removingGroup]?.grupo ?? '')
         }
         confirmLabel={t.classes.remove}
         destructive
@@ -357,6 +359,7 @@ export default function EditorView() {
       {/* Lo que dice el motor, tal cual, con su fichero y su línea. El examen
           no se escribe hasta que lo acepta. */}
       <div className="shrink-0 space-y-2 border-t border-border p-4">
+        {problem && !yamlView && <p role="alert" className="text-xs text-warning-strong">{problem}</p>}
         <div className="flex flex-wrap items-center gap-3">
           <Button disabled={checking || !!problem} onClick={() => void save()}>
             {checking ? <Spinner className="h-4 w-4" /> : <CheckIcon className="h-4 w-4" />}

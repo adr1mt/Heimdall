@@ -139,7 +139,7 @@ it.each(['missing','permission','normal'])('finishes an engine exactly once: %s'
  if(kind!=='missing') {writeFileSync(path,'#!/bin/sh\nexit 0\n');chmodSync(path,kind==='normal'?0o755:0o644)}
  const calls:{code:number|null;stderr:string}[]=[]
  await new Promise<void>(resolve=> {
-  new RunSession(path,{dir}, {},{onEvent:()=>{},onClose:(code,stderr)=> {calls.push({code,stderr});setTimeout(resolve,30)}})
+  new RunSession(path,{dir,className:""}, {},{onEvent:()=>{},onClose:(code,stderr)=> {calls.push({code,stderr});setTimeout(resolve,30)}})
  })
  expect(calls).toHaveLength(1)
  if(kind==='normal') expect(calls[0].code).toBe(0)

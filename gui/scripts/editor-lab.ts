@@ -38,7 +38,7 @@ app.whenReady().then(async () => {
 
   const win = new BrowserWindow({
     width: 1280, height: 900, show: true, backgroundColor: '#0b0f19',
-    webPreferences: { preload: join(root, 'out/preload/index.cjs'), sandbox: false, contextIsolation: true, nodeIntegration: false }
+    webPreferences: { preload: join(root, 'out/preload/index.cjs'), sandbox: true, contextIsolation: true, nodeIntegration: false }
   })
   win.webContents.on('console-message', (_event, level, message)=>console.log('[renderer]',level,message))
   await win.loadFile(join(root, 'out/renderer/index.html'))
@@ -79,6 +79,15 @@ app.whenReady().then(async () => {
   // El nombre del grupo vive en un campo; lo que se lee en pantalla es la
   // comprobación con la que nace un examen nuevo.
   check('D-1', /responde/.test(await screen()), 'el examen del proyecto se abre en el formulario')
+
+  // Decimal fields must stay editable through incomplete numeric input.
+  await type('Por defecto: Peso', '.')
+  await wait(100)
+  check('A09-1', !await js(`!!document.querySelector('textarea')`) && /tipo incorrecto/.test(await screen()), 'un peso a medio escribir conserva el formulario')
+  await type('Por defecto: Peso', '.5')
+  await wait(100)
+  check('A09-2', await js(`[...document.querySelectorAll('label input')].some(e=>e.value==='0.5' || e.value==='.5')`), 'el peso decimal se puede terminar de escribir')
+  await type('Por defecto: Peso', '1')
 
   await click('Añadir grupo')
   await wait(300)
