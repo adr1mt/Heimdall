@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { LineSplitter, projectDirOf, runArgs, secretsLine } from '../src/main/run'
+import { chmodSync, mkdtempSync,writeFileSync } from 'node:fs'
+import {tmpdir} from 'node:os'
+import {join} from 'node:path'
+import { RunSession, LineSplitter, projectDirOf, runArgs, secretsLine } from '../src/main/run'
 import { secretRefsIn } from '../src/main/secrets'
 import { parseEvent } from '../src/shared/events'
 
@@ -128,4 +131,17 @@ describe('secretRefsIn', () => {
   it('asks for nothing when there is no reference', () => {
     expect(secretRefsIn('alumnos: []\n')).toEqual([])
   })
+})
+
+
+it.each(['missing','permission','normal'])('finishes an engine exactly once: %s',async kind=> {
+ const dir=mkdtempSync(join(tmpdir(),'heimdall-close-')),path=join(dir,'engine')
+ if(kind!=='missing') {writeFileSync(path,'#!/bin/sh\nexit 0\n');chmodSync(path,kind==='normal'?0o755:0o644)}
+ const calls:{code:number|null;stderr:string}[]=[]
+ await new Promise<void>(resolve=> {
+  new RunSession(path,{dir}, {},{onEvent:()=>{},onClose:(code,stderr)=> {calls.push({code,stderr});setTimeout(resolve,30)}})
+ })
+ expect(calls).toHaveLength(1)
+ if(kind==='normal') expect(calls[0].code).toBe(0)
+ else expect(calls[0].stderr).toMatch(kind==='missing'?/ENOENT/:/EACCES/)
 })

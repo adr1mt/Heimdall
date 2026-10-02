@@ -156,7 +156,10 @@ export class RunSession {
       if (this.stderr.length < MAX_STDERR) this.stderr += chunk
     })
 
+    let finished=false
     const finish = (code: number | null): void => {
+      if(finished) return
+      finished=true
       stream.flush((line) => {
         const event = parseEvent(line)
         if (event) cb.onEvent(event)

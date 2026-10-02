@@ -2748,7 +2748,7 @@
       "id": "T144",
       "title": "A18 · Un motor que no puede arrancar notifica el cierre dos veces",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
@@ -2759,7 +2759,10 @@
         "Regresión del caso de auditoría en verde.",
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
-      "tests": []
+      "tests": [
+        "Vitest run: 19 pruebas; una finalización con ENOENT, EACCES y cierre normal"
+      ],
+      "completed": "2026-10-02"
     }
   ]
 }
