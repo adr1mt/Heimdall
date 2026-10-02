@@ -2737,7 +2737,7 @@
       "id": "T143",
       "title": "A17 · Una descarga de actualización puede comenzar durante una corrección",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
@@ -2748,7 +2748,10 @@
         "Recomprobar actividad antes de descargar, cancelar al iniciar corrección y limitar tiempo y tamaño de descarga.",
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
-      "tests": []
+      "tests": [
+        "Feed y descargas se cancelan al empezar run/modo examen; carreras antes/durante/después y coalescencia verificadas. Límites 15 s para feed, 180 s/1 GiB para descarga, limpieza de parciales; 410 tests GUI y typecheck completos verdes."
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T144",

@@ -6,14 +6,12 @@
  * tests can drive it. This is only the wiring.
  */
 
-import { createWriteStream } from 'node:fs'
-import { rm } from 'node:fs/promises'
-import { Readable } from 'node:stream'
-import { pipeline } from 'node:stream/promises'
 import { app, type BrowserWindow } from 'electron'
 import { join } from 'node:path'
 import { IPC } from '../shared/ipc'
 import { isExamModeActive, isRunActive } from './ipc'
+import { downloadUpdate } from './update-download'
+import { onCorrectionStarting } from './activity'
 import { Updater } from './updater'
 
 /**
@@ -25,7 +23,7 @@ import { Updater } from './updater'
  */
 const CHECK_DELAY_MS = 60_000
 
-/** One minute is plenty for a small JSON; a hung feed must not linger. */
+/** Fifteen seconds is plenty for a small JSON; a hung feed must not linger. */
 const FEED_TIMEOUT_MS = 15_000
 
 let updater: Updater | null = null
@@ -34,29 +32,13 @@ function log(message: string): void {
   console.error(`[heimdall-gui] actualización: ${message}`)
 }
 
-async function fetchText(url: string): Promise<string> {
+async function fetchText(url: string, signal: AbortSignal): Promise<string> {
   const response = await fetch(url, {
     headers: { accept: 'application/vnd.github+json' },
-    signal: AbortSignal.timeout(FEED_TIMEOUT_MS)
+    signal: AbortSignal.any([signal, AbortSignal.timeout(FEED_TIMEOUT_MS)])
   })
   if (!response.ok) throw new Error(`${response.status} ${response.statusText}`)
   return await response.text()
-}
-
-/** Whole file or nothing: a half download never stays behind to be installed. */
-async function download(url: string, dest: string): Promise<void> {
-  const partial = `${dest}.part`
-  try {
-    const response = await fetch(url)
-    if (!response.ok) throw new Error(`${response.status} ${response.statusText}`)
-    if (!response.body) throw new Error('la descarga llegó vacía')
-    await pipeline(Readable.fromWeb(response.body as never), createWriteStream(partial))
-    const { rename } = await import('node:fs/promises')
-    await rename(partial, dest)
-  } catch (error) {
-    await rm(partial, { force: true }).catch(() => undefined)
-    throw error
-  }
 }
 
 /**
@@ -72,7 +54,8 @@ export function startUpdates(win: BrowserWindow): void {
     downloadDir: join(app.getPath('userData'), 'updates'),
     busy: () => isRunActive() || isExamModeActive(),
     fetchText,
-    download,
+    download: downloadUpdate,
+    onBusy: onCorrectionStarting,
     announce: (version) => {
       if (!win.isDestroyed()) win.webContents.send(IPC.updateReady, version)
     },

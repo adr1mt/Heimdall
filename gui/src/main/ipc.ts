@@ -15,6 +15,7 @@ import { readArtifact } from './artifact'
 import { consolidateChain } from './consolidate'
 import { readExamSession } from './session'
 import { listRuns, varDirOf } from './history'
+import { correctionStarting } from './activity'
 import { backupRuns, listBackups, restoreBackups } from './backup'
 import { RunSession, projectDirOf } from './run'
 import { describeExam } from './describe'
@@ -310,6 +311,7 @@ export function registerIpc(): void {
       if (typeof secret === 'string') examSecrets[name] = secret
     }
     examMode = true
+    correctionStarting()
     setKeepAwake(true)
   })
 
@@ -331,6 +333,7 @@ export function registerIpc(): void {
     const target = { dir, className, retryFrom, sessionRounds }
     const sender = event.sender
 
+    correctionStarting()
     session = new RunSession(engine, target, secrets, {
       onEvent: (engineEvent) => send(sender, IPC.runEvent, engineEvent),
       onClose: (exitCode, stderr) => {

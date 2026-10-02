@@ -100,9 +100,10 @@ export interface UpdaterDeps {
   downloadDir: string
   /** True while a correction is alive or exam mode is on. */
   busy: () => boolean
-  fetchText: (url: string) => Promise<string>
+  fetchText: (url: string, signal: AbortSignal) => Promise<string>
+  onBusy?: (listener: () => void) => () => void
   /** Downloads `url` into `dest`. Whole file or nothing. */
-  download: (url: string, dest: string) => Promise<void>
+  download: (url: string, dest: string, signal: AbortSignal) => Promise<void>
   /** Tells the teacher, without stopping them, that a version is waiting. */
   announce: (version: string) => void
   log: (message: string) => void
@@ -123,40 +124,65 @@ export type CheckOutcome =
 export class Updater {
   private pending: { version: string; file: string } | null = null
 
-  constructor(private readonly deps: UpdaterDeps) {}
+  constructor(private readonly deps: UpdaterDeps) { }
 
   /** The version waiting to be installed, if any. For the interface. */
   pendingVersion(): string | null {
     return this.pending?.version ?? null
   }
 
-  async check(): Promise<CheckOutcome> {
+  private inFlight: Promise<CheckOutcome> | null = null
+  check(): Promise<CheckOutcome> {
+    if (this.inFlight) return this.inFlight
+    this.inFlight = this.performCheck().finally(() => { this.inFlight = null })
+    return this.inFlight
+  }
+
+  private async performCheck(): Promise<CheckOutcome> {
     const { appImagePath, busy, log } = this.deps
     if (!appImagePath) return 'unsupported'
-    // The guard comes before the request and not after it: in the middle of an
-    // exam the network belongs to the correction.
     if (busy()) return 'busy'
     if (this.pending) return 'ready'
 
+    const controller = new AbortController()
+    const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(180_000)])
+    const offBusy = this.deps.onBusy?.(() => controller.abort())
+    let file: string | null = null
     try {
-      const release = parseRelease(await this.deps.fetchText(RELEASE_FEED))
+      const release = parseRelease(await this.deps.fetchText(RELEASE_FEED, signal))
+      if (busy() || controller.signal.aborted) return 'busy'
+      signal.throwIfAborted()
       if (!release) {
         log('no hay ninguna versión publicada que se pueda instalar')
         return 'current'
       }
       if (!isNewer(release.version, this.deps.currentVersion)) return 'current'
 
-      const file = join(this.deps.downloadDir, `Heimdall-${release.version}.AppImage`)
+      file = join(this.deps.downloadDir, `Heimdall-${release.version}.AppImage`)
       mkdirSync(this.deps.downloadDir, { recursive: true })
-      await this.deps.download(release.url, file)
+      if (busy() || controller.signal.aborted) return 'busy'
+      await this.deps.download(release.url, file, signal)
+      signal.throwIfAborted()
+      if (busy() || controller.signal.aborted) {
+        rmSync(file, { force: true })
+        return 'busy'
+      }
       this.pending = { version: release.version, file }
       this.deps.announce(release.version)
       return 'ready'
     } catch (error) {
-      // No network, no permission, a broken feed: all the same. The class
-      // never finds out.
+      if (file) {
+        try { rmSync(file, { force: true }) }
+        catch { /* An incomplete update is never installed. */ }
+      }
+      if (controller.signal.aborted || busy()) {
+        log('actualización aplazada al empezar una corrección')
+        return 'busy'
+      }
       log(`no se pudo comprobar la actualización: ${messageOf(error)}`)
       return 'failed'
+    } finally {
+      offBusy?.()
     }
   }
 

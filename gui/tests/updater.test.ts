@@ -193,3 +193,33 @@ describe('cuando algo falla', () => {
     expect(h.log.join(' ')).toContain('no se pudo instalar')
   })
 })
+
+it('does not download when a correction starts while the feed is pending', async () => {
+  let h: Harness
+  h = harness({ fetchText: async () => { h.busy = true; return feed('0.2.0') } })
+  expect(await h.updater.check()).toBe('busy'); expect(h.requests).toEqual([]); expect(h.announced).toEqual([])
+})
+it('aborts an in-flight download when the correction begins', async () => {
+  let startBusy: () => void = () => { }, h: Harness
+  h = harness({    
+onBusy: listener => { startBusy = listener; return () => { } }, download: async (_url, _dest, signal) => {
+      h.busy = true; startBusy(); signal.throwIfAborted()
+    }  
+})
+  expect(await h.updater.check()).toBe('busy'); expect(h.updater.pendingVersion()).toBeNull(); expect(h.announced).toEqual([])
+  expect(readFileSync(h.appImage, 'utf8')).toBe('la versión que hay instalada')
+})
+it('does not announce a download completed while correction starts', async () => {
+  let h: Harness
+  h = harness({ download: async (_url, dest) => { writeFileSync(dest, 'new'); h.busy = true } })
+  expect(await h.updater.check()).toBe('busy'); expect(h.announced).toEqual([]); expect(h.updater.pendingVersion()).toBeNull()
+})
+it('shares one pending check between concurrent callers', async () => {
+  let release: () => void = () => { }
+  const wait = new Promise<void>(resolve => { release = resolve })
+  const h = harness({ fetchText: async () => { await wait; return feed('0.2.0') } })
+  const first = h.updater.check(), second = h.updater.check()
+  expect(second).toBe(first)
+  release()
+  expect(await first).toBe('ready'); expect(h.announced).toEqual(['0.2.0'])
+})
