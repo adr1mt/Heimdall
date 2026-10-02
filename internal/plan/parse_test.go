@@ -2,6 +2,7 @@ package plan
 
 import (
 	"encoding/json"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -335,6 +336,21 @@ func TestYAMLRequiresExactlyOneDocument(t *testing.T) {
 		dir := project(t, validExam+"\n# trailing comment\n", validInventory+"\n# trailing comment\n")
 		if _, err := Load(dir); err != nil {
 			t.Fatal("trailing comments refused", err)
+		}
+	}
+}
+
+func TestStudentRejectsEveryDuplicateKeyWithBothLocations(t *testing.T) {
+	for _, entry := range []struct{ key, value string }{{"id", "fake"}, {"nombre", "Ficticio"}, {"moodle_id", "'123'"}, {"excluido", "false"}, {"hosts", "{}"}, {"respuesta", "yes"}} {
+		body := "aula: Ficticia\nversion: 1\nalumnos:\n  - " + entry.key + ": " + entry.value + "\n    " + entry.key + ": " + entry.value + "\n"
+		dir := project(t, validExam, body)
+		_, err := LoadInventory(filepath.Join(dir, InventoryFile))
+		if err == nil {
+			t.Fatalf("duplicated %s accepted", entry.key)
+		}
+		message := err.Error()
+		if !strings.Contains(message, "aula.yaml:5:") || !strings.Contains(message, "línea 4") || !strings.Contains(message, entry.key) {
+			t.Fatalf("missing duplicate locations: %v", err)
 		}
 	}
 }

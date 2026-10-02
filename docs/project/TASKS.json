@@ -2978,7 +2978,7 @@
       "id": "T155",
       "title": "R11 · Rechazar claves repetidas del alumno",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Resolver la incidencia confirmada de la segunda auditoría.",
@@ -2989,7 +2989,10 @@
         "Duplicados de id, nombre, exclusión, hosts y campos libres se rechazan con ambas líneas.",
         "Regresiones del área y suite rápida en verde."
       ],
-      "tests": []
+      "tests": [
+        "make check; duplicados id/nombre/moodle_id/excluido/hosts/campo libre rechazados con ambas líneas."
+      ],
+      "completed": "2026-10-02"
     }
   ]
 }

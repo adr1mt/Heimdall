@@ -166,16 +166,18 @@ func (s *Student) UnmarshalYAML(node *yaml.Node) error {
 	s.Fields = map[string]string{}
 
 	var errs []error
+	seen := map[string]int{}
 	for i := 0; i+1 < len(node.Content); i += 2 {
 		key, val := node.Content[i], node.Content[i+1]
+		if first, duplicate := seen[key.Value]; duplicate {
+			errs = append(errs, errf(key.Line, "campo %q repetido: ya aparece en la línea %d", key.Value, first))
+			continue
+		}
+		seen[key.Value] = key.Line
 		if !studentKnownKeys[key.Value] {
 			if val.Kind != yaml.ScalarNode {
 				errs = append(errs, errf(val.Line,
 					"el campo libre %q del alumno debe ser un valor simple", key.Value))
-				continue
-			}
-			if _, dup := s.Fields[key.Value]; dup {
-				errs = append(errs, errf(key.Line, "campo %q repetido", key.Value))
 				continue
 			}
 			s.Fields[key.Value] = val.Value
