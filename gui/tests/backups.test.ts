@@ -249,3 +249,19 @@ describe('listBackups', () => {
     expect(listBackups(dataDir, examPath)).toEqual([])
   })
 })
+
+it.each([51,100])('retains the latest grades over three passes and restore (%i originals)', (count) => {
+ const {dataDir,examPath,varDir}=workspace()
+ for(let i=1;i<=count;i++) writeRun(varDir,`R${String(i).padStart(3,'0')}`,new Date(Date.UTC(2026,9,2,0,i)).toISOString())
+ backupRuns(dataDir,examPath)
+ const expected=listBackups(dataDir,examPath).map(x=>x.runId)
+ expect(expected).toHaveLength(MAX_BACKUPS)
+ expect(expected[0]).toBe(`R${String(count).padStart(3,'0')}`)
+ for(let pass=0;pass<2;pass++) {
+  expect(backupRuns(dataDir,examPath)).toBe(0)
+  expect(listBackups(dataDir,examPath).map(x=>x.runId)).toEqual(expected)
+ }
+ rmSync(varDir,{recursive:true})
+ expect(restoreBackups(dataDir,examPath).restored).toBe(MAX_BACKUPS)
+ expect(listBackups(dataDir,examPath).every(x=>x.onDisk)).toBe(true)
+})

@@ -2497,7 +2497,7 @@
       "id": "T131",
       "title": "A05 · La rotación de copias elimina los resultados más recientes",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
@@ -2508,7 +2508,10 @@
         "51 y 100 originales, tres pasadas sucesivas, restauración tras eliminar los originales y comprobación de que siguen las últimas notas. ",
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
-      "tests": []
+      "tests": [
+        "Vitest backups: 18 pruebas; 51/100 originales, tres pasadas y restauración"
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T132",

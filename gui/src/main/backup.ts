@@ -58,20 +58,24 @@ export function backupRuns(dataDir: string, examPath: string): number {
   const varDir = varDirOf(examPath)
   const slot = slotFor(dataDir, examPath)
   let saved = 0
-  for (const name of runFilesIn(varDir)) {
-    const target = join(slot, name)
-    if (existsSync(target)) continue
+  // Select by the correction's own date before copying. A copy's mtime is
+  // unrelated to when its grades were obtained.
+  const candidates = runFilesIn(varDir).flatMap((name) => {
     try {
       const source = join(varDir, name)
-      if (statSync(source).size > MAX_ARTIFACT) continue
+      if (statSync(source).size > MAX_ARTIFACT) return []
       const run = parseArtifact(readFileSync(source, 'utf-8'))
-      mkdirSync(slot, { recursive: true })
-      writeAtomic(target, `${JSON.stringify(gradesOnly(run))}\n`)
-      saved += 1
-    } catch {
-      // An artifact that cannot be read is not copied. It is still on disk
-      // and the history screen already says why it cannot be opened.
-    }
+      return [{ name, run }]
+    } catch { return [] }
+  }).sort((a,b) => Date.parse(b.run.started_at)-Date.parse(a.run.started_at) || b.name.localeCompare(a.name))
+  for (const {name,run} of candidates.slice(0,MAX_BACKUPS)) {
+    const target=join(slot,name)
+    if (existsSync(target)) continue
+    try {
+      mkdirSync(slot,{recursive:true})
+      writeAtomic(target,`${JSON.stringify(gradesOnly(run))}\n`)
+      saved+=1
+    } catch { /* Reported separately by the backup service. */ }
   }
   prune(slot)
   return saved
@@ -81,16 +85,12 @@ export function backupRuns(dataDir: string, examPath: string): number {
 function prune(slot: string): void {
   const files = runFilesIn(slot)
   if (files.length <= MAX_BACKUPS) return
-  const dated = files
-    .map((name) => {
-      try {
-        return { name, mtimeMs: statSync(join(slot, name)).mtimeMs }
-      } catch {
-        return null
-      }
-    })
-    .filter((file): file is { name: string; mtimeMs: number } => file !== null)
-    .sort((a, b) => b.mtimeMs - a.mtimeMs)
+  const dated = files.flatMap((name) => {
+    try {
+      const run=parseArtifact(readFileSync(join(slot,name),'utf-8'))
+      return [{name,at:Date.parse(run.started_at)}]
+    } catch { return [] }
+  }).sort((a,b) => b.at-a.at || b.name.localeCompare(a.name))
   for (const file of dated.slice(MAX_BACKUPS)) {
     try {
       rmSync(join(slot, file.name))
