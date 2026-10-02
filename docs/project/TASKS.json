@@ -2469,7 +2469,8 @@
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
       "tests": [
-        "make check; integración SSH: TERM, escalada KILL, códigos legítimos 124/137"
+        "make check; integración SSH: TERM, escalada KILL, códigos legítimos 124/137",
+        "TestRemoteTimeoutRejectsExitCodeReturnedByTermHandler: reproducción roja con TERM→124 y reparación verde con TERM→124/137; códigos propios y SIGKILL pasan con -race."
       ],
       "completed": "2026-10-02"
     },

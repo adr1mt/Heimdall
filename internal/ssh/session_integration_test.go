@@ -299,6 +299,16 @@ func TestRemoteTimeoutEscalatesToKill(t *testing.T) {
 	}
 }
 
+func TestRemoteTimeoutRejectsExitCodeReturnedByTermHandler(t *testing.T) {
+	for _, code := range []string{"124", "137"} {
+		s := dialLab(t)
+		res := s.Run(context.Background(), []string{"sh", "-c", "trap 'exit " + code + "' TERM; while :; do sleep 0.01; done"}, 200*time.Millisecond)
+		if res.Completed || res.ExitCode != nil || res.RemoteProcess != model.RemoteKilledRemote {
+			t.Fatalf("TERM exit %s: %+v", code, res)
+		}
+	}
+}
+
 func TestCancellationDoesNotClaimRemoteKill(t *testing.T) {
 	s := dialLab(t)
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
