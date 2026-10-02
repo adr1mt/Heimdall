@@ -135,7 +135,18 @@ direcciones de las máquinas, para enseñar el progreso en clase.
 | No aparece nada en Resultados | la corrección no ha terminado | espera; ninguna comprobación puede colgarse para siempre |
 
 Un alumno roto nunca bloquea al resto, y detener una corrección conserva lo ya
-corregido.
+corregido. Al cerrar normalmente, la aplicación espera a que el motor guarde
+las notas y termine su copia automática. Si la copia falla, lo avisa antes de
+salir. Una terminación forzada del sistema puede interrumpir esta espera.
+
+Se admiten hasta 2000 comprobaciones por corrección (alumnos × comprobaciones)
+y 1 MiB de datos descriptivos resueltos. Una respuesta del inventario admite
+hasta 65536 bytes. Los avisos de tamaño aparecen antes de conectar. El examen
+necesita algún peso positivo; los diagnósticos con peso cero pueden acompañarlo.
+
+La evidencia guardada tiene un presupuesto uniforme para toda la clase. Si se
+recorta al guardar, se indica en el resultado; las comparaciones ya se hicieron
+y las notas permanecen iguales.
 
 ## 7. Dónde queda todo
 
@@ -150,7 +161,8 @@ corregido.
   abrir una corrección antigua no toca ninguna máquina.
 
 Las copias automáticas conservan las 50 correcciones más recientes por su fecha
-real. Se hacen en segundo plano; si fallan, un aviso indica que no se creó la
+real y todos los antecedentes que necesitan sus reintentos (hasta 50 eslabones
+por cadena). Se hacen en segundo plano; si fallan, un aviso indica que no se creó la
 copia aunque la corrección permanezca guardada en su carpeta.
 
 ## 8. Actualizaciones
@@ -159,7 +171,8 @@ La aplicación mira si hay una versión nueva publicada y, si la hay, la deja
 descargada y avisa sin interrumpir. Se instala al cerrar el programa. Solo
 funciona con el AppImage; el `.deb` se actualiza con `apt`. Si empieza una
 corrección o el modo examen, aplaza la actualización y cancela la descarga en
-curso. Las descargas tienen un límite de tiempo y tamaño.
+curso. Las descargas tienen un límite de tiempo y tamaño y se comprueba que
+su tamaño y huella coinciden con los publicados antes de instalarlas.
 
 ## 9. Desde la terminal
 

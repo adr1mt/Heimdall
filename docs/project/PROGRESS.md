@@ -6,49 +6,48 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**Segunda auditoría, posterior a T127–T144.** Solo documentación y evidencias:
-`docs/audits/2026-10-02/post/AUDITORIA.md`. Confirma 11 incidencias pendientes:
-2 P1, 8 P2 y 1 P3. R01: segundo reintento repite un FAIL y puede subir 50 → 100;
-R02: cerrar durante la corrección conserva original, pero no inicia su copia.
-Suites motor/SSH con carreras, 410 tests GUI, tipos, build y aceptación del
-editor/GUI verdes; secretos GUI comprobados en ejecución secuencial.
-Cada hallazgo incluye reproducción y aceptación. Código del producto sin cambios.
+**T145–T155 · Reparación de las 11 incidencias de la segunda auditoría.**
 
-**T127–T144 · Reparación de las 18 incidencias de la auditoría.**
+- R01: reintentos sobre la cadena completa, sin repetir PASS/FAIL anteriores;
+  tres reintentos SSH reales mantienen 50/100 y la cadena completa no se repite.
+  Se comprueban antecedentes y límite de 50 eslabones antes de SSH.
+- R02: el cierre espera motor, resultado y copia; fallo de copia avisado antes
+  de salir. Electron+SSH y recuperación sin originales comprobados.
+- R03: actualización exige tamaño/digest y verifica SHA-256 antes de ready
+  e instalación; descarga vacía rechazada.
+- R04: 50 correcciones recientes y sus antecedentes completos; ADR-0026.
+- R05: 64 MiB compartidos, admisión antes de SSH y evidencia acotada después
+  de comparar, sin modificar notas; copia sin JSON previo gigante. ADR-0027.
+- R06/R07: peso total positivo y valores resueltos hasta 65536 bytes.
+- R08/R09: histórico por fecha canónica y vuelta perfecta reconocida aunque
+  un peso muy pequeño desaparezca de la suma.
+- R10/R11: un solo documento YAML y claves del alumno sin duplicados.
+- Motor, SSH con carreras, aceptación completa secuencial y 427 tests GUI,
+  tipos, build, editor, secretos y recuperación correctos.
+- Paquetes AppImage/.deb reconstruidos, aceptación del paquete correcta.
+  Versión 0.9.0; cambios y evidencias en commits locales.
+- Informe: `docs/audits/2026-10-02/post/repair/REPARACION.md`.
 
-- A01–A18 reparadas, con commits separados y regresiones.
-- Notas: no se decide sin evidencia; ausencia exige exit 0; pesos finitos y
-  pendientes positivos sin tolerancia; mejor vuelta por peso sin redondear.
-- SSH: contexto en todas las fases, supervisor fijo y terminación confirmada;
-  cancelación local publica UNKNOWN. ADR-0024 y ADR-0025.
-- Editor: se valida y guarda el borrador visible, errores conservados,
-  aviso de cambios pendientes y pesos decimales/cero editables.
-- Datos: clases corruptas bloquean escritura; lectura de artefactos comprueba
-  coherencia; metadata textual redactada sin alterar referencias estructurales.
-- Copias: últimas 50 por fecha real, trabajo asíncrono y aviso de fallo.
-- GUI: contraste AA en los estados auditados y actualización cancelada al
-  empezar una corrección, con presupuesto de tiempo y tamaño.
-- Pruebas, paquetes y límites: `docs/audits/2026-10-02/REPARACION.md`.
-- AppImage y .deb locales reconstruidos. Versión sigue en 0.9.0; sin publicación.
+**T127–T144**: las 18 incidencias de la primera auditoría también reparadas;
+`docs/audits/2026-10-02/REPARACION.md` conserva su evidencia.
 
 ## Problemas conocidos y límites
 
-- Laboratorio en **127.1.2.3**, nunca 127.0.0.x.
-- Un reintento exige el mismo PLAN. Intervalo mínimo del modo examen: 5 min.
-- El proyector no tapa los nombres del alumnado: el profesor eligió la clase.
-- La copia guarda notas y comprobaciones, no las salidas de las máquinas;
-  una corrección recuperada explica esa falta de evidencia.
-- Paquete Linux x64; Windows y macOS quedan fuera.
-- Actualización automática solo para AppImage; el .deb lo lleva apt.
-  Sin release publicada para probar una actualización real.
-- Editar mediante el formulario vuelve a formatear el YAML y sus comentarios;
-  guardar el YAML directamente conserva su texto exacto.
-- Autenticación por clave SSH pendiente (T023).
+- Laboratorio en **127.1.2.3**. Arneses que cuentan conexiones o buscan
+  secretos globalmente se ejecutan de forma secuencial.
+- Un reintento exige el mismo PLAN y máximo 50 eslabones recuperables.
+  Intervalo mínimo del modo examen: 5 min.
+- Hasta 2000 celdas (alumnos × checks) y 1 MiB de metadatos resueltos;
+  valores de inventario hasta 65536 bytes. Se rechaza lo no admitido antes de SSH.
+- La evidencia guardada se acota tras comparar y se avisa si se recorta;
+  la copia conserva notas y comprobaciones, no las salidas.
+- Cierre normal espera resultado y copia; cierre forzado puede interrumpirlo.
+- Linux x64. Actualización automática solo AppImage; `.deb` mediante apt.
+  No se ha instalado una actualización desde una release real.
+- El formulario del editor reformatea YAML y comentarios; guardar YAML
+  directamente conserva su texto. Autenticación por clave SSH pendiente (T023).
 
 ## Siguiente tarea recomendada
-
-Resolver **R01 y R02** del informe nuevo, cada uno en una tarea crítica separada,
-antes de publicar notas reales. Los P2 preceden al cierre de la 1.0.
 
 **T070** (exámenes del curso en formato nativo) desbloquea **T084**:
 examen real de aula de principio a fin, que ejecuta Adrià antes de la 1.0.0.

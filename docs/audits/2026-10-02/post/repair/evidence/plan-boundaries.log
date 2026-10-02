@@ -1,0 +1,6 @@
+utf8 False bytes 65535 exit 0 readable
+utf8 False bytes 65536 exit 0 readable
+utf8 False bytes 65537 exit 2 no_result_written
+utf8 True bytes 65535 exit 0 readable
+utf8 True bytes 65536 exit 0 readable
+utf8 True bytes 65537 exit 2 no_result_written

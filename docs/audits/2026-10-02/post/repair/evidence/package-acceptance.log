@@ -1,0 +1,5 @@
+cd gui && ./scripts/paquete.sh
+OK     P-1   el paquete lleva el motor y es ejecutable
+OK     P-2   sin nada instalado, el motor del paquete corrige igual
+OK     P-3   la aplicacion arranca sin ningun motor en el PATH
+paquete: todo verde

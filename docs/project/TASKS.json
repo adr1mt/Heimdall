@@ -2790,7 +2790,8 @@
         "Regresiones del área y suite rápida en verde."
       ],
       "tests": [
-        "make check; tipos GUI; Vitest results/consolidate; tres reintentos y antecedente ausente."
+        "make check; tipos GUI; Vitest results/consolidate; tres reintentos y antecedente ausente.",
+        "Límite de 50 eslabones y antecedentes de otro PLAN o identidad incorrecta rechazados antes de selección."
       ],
       "completed": "2026-10-02"
     },
@@ -2870,7 +2871,8 @@
         "Regresiones del área y suite rápida en verde."
       ],
       "tests": [
-        "make check; límites JSON/UTF-8 y notas; 73 tests GUI; caso real 30×20: 6358272 bytes, exit 0, apertura GUI y copia correctas."
+        "make check; límites JSON/UTF-8 y notas; 73 tests GUI; caso real 30×20: 6358272 bytes, exit 0, apertura GUI y copia correctas.",
+        "Copia estructural sin JSON previo sin acotar; redacción antes del recorte, regresión de prefijo de secreto y carreras report/CLI."
       ],
       "completed": "2026-10-02"
     },

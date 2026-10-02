@@ -1,0 +1,6 @@
+round 1 checks [('academic', 'FAIL', 'NONE', True), ('technical', 'UNEVALUATED', 'TIMEOUT', True)]
+round 2 checks [('academic', 'UNEVALUATED', 'NOT_RUN', False), ('technical', 'UNEVALUATED', 'TIMEOUT', True)]
+round 3 checks [('academic', 'UNEVALUATED', 'NOT_RUN', False), ('technical', 'UNEVALUATED', 'TIMEOUT', True)]
+round 4 checks [('academic', 'UNEVALUATED', 'NOT_RUN', False), ('technical', 'PASS', 'NONE', True)]
+consolidated_exit 0 final_score 50
+closed_chain_retry_exit 2

@@ -1,0 +1,8 @@
+ok  	heimdall/cmd/heimdall	6.208s
+ok  	heimdall/internal/assert	1.010s
+ok  	heimdall/internal/engine	1.142s
+ok  	heimdall/internal/events	1.017s
+ok  	heimdall/internal/model	1.030s
+ok  	heimdall/internal/plan	1.223s
+ok  	heimdall/internal/report	38.046s
+ok  	heimdall/internal/ssh	1.014s

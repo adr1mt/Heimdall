@@ -1,0 +1,7 @@
+multiple-documents check_exit 2 run_exit 2 stderr heimdall check: la configuración no es válida
+
+/tmp/heimdall-repair/multiple-documents/examen.yaml:12: solo se admite un documento YAML; elimina el documento adicional
+duplicate-student-id check_exit 2 run_exit 2 stderr heimdall check: la configuración no es válida
+
+/tmp/heimdall-repair/duplicate-student-id/aula.yaml:5: campo "id" repetido: ya aparece en la línea 4
+student_used
