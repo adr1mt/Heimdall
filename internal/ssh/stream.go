@@ -1,7 +1,9 @@
 package ssh
 
 import (
+	"bytes"
 	"io"
+	"strconv"
 	"strings"
 	"unicode/utf8"
 
@@ -22,12 +24,17 @@ const (
 // memory use here must not depend on how much the student prints.
 type capWriter struct {
 	kept     []byte
+	tail     []byte
 	total    int64
 	overflow bool // the hard limit was hit and reading stopped
 }
 
 func (w *capWriter) Write(p []byte) (int, error) {
 	w.total += int64(len(p))
+	w.tail = append(w.tail, p...)
+	if len(w.tail) > 512 {
+		w.tail = append([]byte(nil), w.tail[len(w.tail)-512:]...)
+	}
 	if room := keepLimit - len(w.kept); room > 0 {
 		if len(p) < room {
 			room = len(p)
@@ -81,4 +88,25 @@ func drain(w *capWriter, r io.Reader) {
 			return
 		}
 	}
+}
+
+// completion consumes the private trailing control record without exposing it
+// as student evidence, including when stderr's evidence prefix was truncated.
+func (w *capWriter) completion(marker string) (int, bool) {
+	if marker == "" || len(w.tail) == 0 || w.tail[len(w.tail)-1] != 0x1f {
+		return 0, false
+	}
+	at := bytes.LastIndex(w.tail, []byte(marker))
+	if at < 0 {
+		return 0, false
+	}
+	code, err := strconv.Atoi(string(w.tail[at+len(marker) : len(w.tail)-1]))
+	if err != nil || code < 0 || code > 255 {
+		return 0, false
+	}
+	w.total -= int64(len(w.tail) - at)
+	if int64(len(w.kept)) > w.total {
+		w.kept = w.kept[:int(w.total)]
+	}
+	return code, true
 }

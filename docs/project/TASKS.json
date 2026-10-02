@@ -2417,7 +2417,7 @@
       "id": "T127",
       "title": "A01 · Se decide la nota usando una salida recortada",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
@@ -2428,13 +2428,16 @@
         "probar coincidencias y texto prohibido antes y después del límite, igualdad con un sufijo descartado y `cerca_de` fuera del prefijo. ",
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
-      "tests": []
+      "tests": [
+        "make check; salida recortada"
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T128",
       "title": "A02 · Una anticomprobación aprueba si el comando no existe",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
@@ -2445,13 +2448,16 @@
         "comando inexistente, lectura fallida y anticomprobación válida con stdout vacío. La prueba actual del exit 127 usa `exit_code`, por lo que no cubre este caso. ",
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
-      "tests": []
+      "tests": [
+        "make check; ausencia y códigos no cero"
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T129",
       "title": "A03 · Un timeout que necesita SIGKILL se trata como resultado académico",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "Resolver el hallazgo documentado sin alterar la política de evaluación.",
@@ -2462,7 +2468,10 @@
         "timeout con TERM, escalada a KILL, y comando que devuelva legítimamente 124 o 137 sin agotar el límite. ",
         "Pruebas de regresión pertinentes y suites del área en verde."
       ],
-      "tests": []
+      "tests": [
+        "make check; integración SSH: TERM, escalada KILL, códigos legítimos 124/137"
+      ],
+      "completed": "2026-10-02"
     },
     {
       "id": "T130",

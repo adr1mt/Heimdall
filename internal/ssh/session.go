@@ -7,6 +7,8 @@ package ssh
 
 import (
 	"context"
+	cryptorand "crypto/rand"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -202,7 +204,7 @@ func (s *Session) warn(code, message string) {
 func (s *Session) probeRemoteTimeout(ctx context.Context) {
 	probeCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	res := s.exec(probeCtx, []string{"command", "-v", "timeout"}, 0)
+	res := s.exec(probeCtx, []string{"command", "-v", "timeout"}, 0, "")
 	s.hasRemoteKill = res.Completed && res.ExitCode != nil && *res.ExitCode == 0
 	if !s.hasRemoteKill {
 		s.warn("REMOTE_TIMEOUT_UNAVAILABLE",
@@ -215,18 +217,26 @@ func (s *Session) probeRemoteTimeout(ctx context.Context) {
 func (s *Session) Run(ctx context.Context, argv []string, timeout time.Duration) *model.ExecutionResult {
 	sent := argv
 	local := timeout
+	marker := ""
 	if s.hasRemoteKill && timeout > 0 {
-		// Still an argument vector: no shell, nothing to interpolate.
-		secs := strconv.Itoa(int(timeout.Round(time.Second) / time.Second))
-		sent = append([]string{"timeout", "-k", "5s", secs + "s"}, argv...)
+		var nonce [16]byte
+		if _, err := cryptorand.Read(nonce[:]); err != nil {
+			panic(err)
+		}
+		marker = "\x1eHEIMDALL_" + hex.EncodeToString(nonce[:]) + ":"
+		// The fixed supervisor invokes only positional arguments. Its completion
+		// record distinguishes a command's own 124/137 from timeout's status.
+		script := `"$@"; code=$?; printf '\036HEIMDALL_` + hex.EncodeToString(nonce[:]) + `:%s\037' "$code" >&2; exit "$code"`
+		secs := strconv.FormatFloat(timeout.Seconds(), 'f', -1, 64)
+		sent = append([]string{"timeout", "-k", "5s", secs + "s", "sh", "-c", script, "heimdall-command"}, argv...)
 		local = timeout + remoteGrace
 	}
-	res := s.exec(ctx, sent, local)
+	res := s.exec(ctx, sent, local, marker)
 	res.Command = argv // the artifact shows what the exam asked for
 	return res
 }
 
-func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration) *model.ExecutionResult {
+func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration, marker string) *model.ExecutionResult {
 	res := &model.ExecutionResult{
 		Host:            s.cfg.Host,
 		Address:         s.cfg.addr(),
@@ -315,6 +325,7 @@ func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration
 		wg.Wait()
 	}
 
+	commandCode, commandFinished := stderr.completion(marker)
 	var sanitisedOut, sanitisedErr bool
 	res.Stdout, sanitisedOut = stdout.stream()
 	res.Stderr, sanitisedErr = stderr.stream()
@@ -347,7 +358,7 @@ func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration
 		res.ExitCode = &code
 	}
 
-	if s.hasRemoteKill && res.ExitCode != nil && *res.ExitCode == 124 {
+	if marker != "" && !commandFinished && res.ExitCode != nil && (*res.ExitCode == 124 || *res.ExitCode == 137) {
 		// coreutils timeout killed it: the check timed out, and the process is
 		// gone for sure.
 		res.ExitCode = nil
@@ -355,6 +366,11 @@ func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration
 		return res
 	}
 
+	if marker != "" {
+		if !commandFinished || res.ExitCode == nil || *res.ExitCode != commandCode {
+			return res
+		}
+	}
 	res.Completed = true
 	res.RemoteProcess = model.RemoteFinished
 	return res

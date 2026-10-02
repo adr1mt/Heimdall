@@ -73,3 +73,16 @@ func TestCapWriterSanitisesInvalidUTF8(t *testing.T) {
 		t.Errorf("text = %q, want the valid bytes kept around the replacement", s.Text)
 	}
 }
+
+func TestCompletionRecordBeyondEvidenceLimit(t *testing.T) {
+	for _, size := range []int{0, keepLimit - 10, keepLimit + 100} {
+		var w capWriter
+		w.Write([]byte(strings.Repeat("x", size)))
+		w.Write([]byte("\x1eHEIMDALL_nonce:137\x1f"))
+		code, ok := w.completion("\x1eHEIMDALL_nonce:")
+		stream, _ := w.stream()
+		if !ok || code != 137 || stream.BytesTotal != int64(size) || strings.Contains(stream.Text, "HEIMDALL") {
+			t.Fatalf("%d: %d %v %+v", size, code, ok, stream)
+		}
+	}
+}

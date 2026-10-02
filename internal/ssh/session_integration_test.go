@@ -278,3 +278,21 @@ func TestHostWithoutCoreutilsTimeout(t *testing.T) {
 		t.Errorf("duration_ms = %d, want between 3000 and 4000", res.DurationMS)
 	}
 }
+
+func TestRemoteTimeoutDistinguishesCommandExitStatuses(t *testing.T) {
+	for _, code := range []string{"124", "137"} {
+		s := dialLab(t)
+		res := s.Run(context.Background(), []string{"sh", "-c", "exit " + code}, time.Second)
+		if !res.Completed || res.ExitCode == nil || res.RemoteProcess != model.RemoteFinished {
+			t.Fatalf("exit %s: %+v", code, res)
+		}
+	}
+}
+
+func TestRemoteTimeoutEscalatesToKill(t *testing.T) {
+	s := dialLab(t)
+	res := s.Run(context.Background(), []string{"sh", "-c", "trap '' TERM; sleep 30"}, time.Second)
+	if res.Completed || res.ExitCode != nil || res.RemoteProcess != model.RemoteKilledRemote {
+		t.Fatalf("%+v", res)
+	}
+}
