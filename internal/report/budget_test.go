@@ -103,3 +103,27 @@ func TestRetryKeepsOriginalEvidenceAllowance(t *testing.T) {
 		t.Fatal("retry enlarged the evidence allowance")
 	}
 }
+
+func TestRedactionPrecedesEvidenceCutAndDoesNotMutateInput(t *testing.T) {
+	run := runWith("R1", student("fake", model.StudentOK))
+	run.Plan.EvidenceBytesPerField = 20
+	value := strings.Repeat("x", 12) + "SECRET_FICTITIOUS_BOUNDARY" + strings.Repeat("x", 100)
+	run.Students[0].Checks[0].Execution = &model.ExecutionResult{Stdout: model.Stream{Text: value, Bytes: int64(len(value)), BytesTotal: int64(len(value))}, Command: []string{"SECRET_FICTITIOUS_BOUNDARY"}}
+	w, _ := New(t.TempDir(), run.RunID, []string{"SECRET_FICTITIOUS_BOUNDARY"})
+	path, err := w.WriteFinal(run)
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, _ := os.ReadFile(path)
+	var saved model.RunResult
+	if err := json.Unmarshal(data, &saved); err != nil {
+		t.Fatal(err)
+	}
+	e := saved.Students[0].Checks[0].Execution
+	if strings.Contains(e.Stdout.Text, "SECRET") || strings.Contains(e.Command[0], "SECRET") {
+		t.Fatal("secret prefix exposed at evidence boundary")
+	}
+	if run.Students[0].Checks[0].Execution.Stdout.Text != value || run.Students[0].Checks[0].Execution.Command[0] != "SECRET_FICTITIOUS_BOUNDARY" {
+		t.Fatal("redaction mutated original")
+	}
+}

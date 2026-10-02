@@ -1,7 +1,6 @@
 package report
 
 import (
-	"encoding/json"
 	"fmt"
 	"sort"
 	"strings"
@@ -95,16 +94,51 @@ func Redact(run *model.RunResult, secrets []string) (*model.RunResult, error) {
 	return out, nil
 }
 
-// clone deep-copies the artifact through its own JSON encoding, which is the
-// contract this package writes anyway.
+// Detach mutable containers without serializing unbounded evidence first.
+// Strings are immutable and can share storage until redaction replaces them.
+// Redaction must precede evidence clipping so a cut cannot expose a secret's
+// prefix that no longer contains the entire value being scrubbed.
 func clone(run *model.RunResult) (*model.RunResult, error) {
-	data, err := json.Marshal(run)
-	if err != nil {
-		return nil, fmt.Errorf("report: no se pudo copiar el artefacto: %w", err)
+	if run == nil {
+		return nil, fmt.Errorf("report: no hay resultado que copiar")
 	}
-	var out model.RunResult
-	if err := json.Unmarshal(data, &out); err != nil {
-		return nil, fmt.Errorf("report: no se pudo copiar el artefacto: %w", err)
+	out := *run
+	copyInt := func(v *int) *int {
+		if v == nil {
+			return nil
+		}
+		n := *v
+		return &n
+	}
+	out.Plan.CheckIDs = append([]string(nil), run.Plan.CheckIDs...)
+	if run.RetryOf != nil {
+		ref := *run.RetryOf
+		out.RetryOf = &ref
+	}
+	out.Warnings = append([]model.Warning(nil), run.Warnings...)
+	out.Students = append([]model.StudentResult(nil), run.Students...)
+	for i := range out.Students {
+		s := &out.Students[i]
+		s.Score.Provisional = copyInt(s.Score.Provisional)
+		s.Score.Final = copyInt(s.Score.Final)
+		s.Checks = append([]model.CheckResult(nil), run.Students[i].Checks...)
+		for j := range s.Checks {
+			c := &s.Checks[j]
+			if c.Execution != nil {
+				e := *c.Execution
+				e.Command = append([]string(nil), e.Command...)
+				e.ExitCode = copyInt(e.ExitCode)
+				c.Execution = &e
+			}
+			if c.Assertion != nil {
+				a := *c.Assertion
+				c.Assertion = &a
+			}
+			if c.Previous != nil {
+				p := *c.Previous
+				c.Previous = &p
+			}
+		}
 	}
 	return &out, nil
 }

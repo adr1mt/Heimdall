@@ -66,8 +66,14 @@ func boundEvidence(run *model.RunResult) {
 	}
 	for i := range run.Warnings {
 		clip(&run.Warnings[i].Message, 1024)
+		clip(&run.Warnings[i].Scope, 1024)
 	}
 	if changed {
+		for _, warning := range run.Warnings {
+			if warning.Code == "EVIDENCE_TRUNCATED" {
+				return
+			}
+		}
 		run.Warnings = append(run.Warnings, model.Warning{Scope: "run", Code: "EVIDENCE_TRUNCATED", Message: "Se recortó evidencia al guardar para respetar el presupuesto del resultado. Las aserciones se comprobaron antes del recorte y las notas no han cambiado. El mismo límite se aplica a todas las comprobaciones."})
 	}
 }
