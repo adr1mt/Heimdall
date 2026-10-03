@@ -1,0 +1,39 @@
+OK deb GUI 0.9.1
+OK deb motor embebido 0.9.1 /tmp/heimdall-release-0.9.1/deb/opt/Heimdall/resources/heimdall
+OK deb renderer sandbox activo
+OK deb botón Prueba de paquete
+OK deb botón Corregir
+OK deb botón Corregir
+OK deb ambos alumnos aparecen en resultados
+OK deb corrección guardada
+NOTAS [{"id":"alumne01","status":"PARTIAL","score":null},{"id":"alumne02","status":"NOT_EVALUATED","score":null}]
+OK deb máquina apagada conserva ausencia de nota
+OK deb botón Histórico
+OK deb botón Abrir
+OK deb histórico conserva exactamente los resultados
+OK deb botón Exportar notas
+OK deb botón Guardar el fichero
+OK deb CSV sin contraseña
+OK deb botón Histórico
+OK deb botón Actualizar
+OK deb botón Restaurar las notas
+OK deb botón Abrir
+OK deb restauración conserva exactamente estados y notas
+OK deb resultados restaurados visibles
+OK deb botón Matriz
+OK deb botón Modo proyector
+OK deb proyector oculta menú del profesor
+OK deb proyector oculta direcciones
+OK deb botón Analíticas
+OK deb vista Analíticas funcional
+OK deb botón Clases
+OK deb vista Clases funcional
+OK deb botón El examen
+OK deb vista El examen funcional
+OK deb botón Ajustes
+OK deb vista Ajustes funcional
+OK deb botón Ayuda
+OK deb vista Ayuda funcional
+OK deb botón Resultados
+PERFIL /tmp/heimdall-package-Ku3Ik6
+OK deb cierre normal

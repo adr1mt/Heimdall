@@ -1,0 +1,47 @@
+Se han recuperado 1 correcciones. Ninguna nota guardada se ha tocado.
+Resultados
+2 alumnos · 5 comprobaciones · 6 de peso total
+Lista
+Matriz
+Exportar notas…
+Exportar a Moodle…
+0/0
+APROBADOS
+De los 0 que tienen nota; 2 se quedaron sin ella
+—
+NOTA MEDIA
+Todavía sin ninguna nota final
+2
+REQUIEREN ATENCIÓN
+Primero una máquina que falló, después quien no llega al aprobado
+
+Qué quieren decir «bien», «mal» y «sin evaluar»
+
+Bien: el alumno superó la comprobación.
+
+Mal: se comprobó y el alumno no la superó.
+
+Sin evaluar: no se pudo comprobar —la máquina no respondió, el comando no terminó a tiempo—. No es un fallo del alumno y no cuenta como un cero.
+
+Todo
+Bien
+Mal
+Sin evaluar
+Causa técnica: todo
+No se pudo conectar con la máquina
+El comando no terminó a tiempo
+Corrección del 03/10/2026, 07:43
+Alumna Uno
+El comando no terminó a tiempo
+3/5
+6,7
+Incompleto
+Alumne Dos
+No se pudo conectar con la máquina
+0/5
+—
+Sin evaluar
+Qué ha quedado sin comprobar: 2 alumnos con algo sin comprobar
+Ver
+2 avisos técnicos
+Ver

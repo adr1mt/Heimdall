@@ -8,7 +8,7 @@ El número es uno solo para todo el producto: lo dice el fichero `VERSION` de
 la raíz, el motor se sella con él al compilar y la aplicación lo lleva en su
 paquete. `test/version.sh` comprueba que no se separan.
 
-## 0.9.1 — 03-10-2026 (preparada para publicar)
+## 0.9.1 — 03-10-2026
 
 Reparaciones de las dos auditorías y mejoras de la revisión de arquitectura:
 
@@ -24,7 +24,10 @@ Reparaciones de las dos auditorías y mejoras de la revisión de arquitectura:
 - Mejor contraste en ambos temas y actualizaciones aplazadas durante la corrección.
 - La actualización comprueba tamaño y SHA-256 antes de instalar el AppImage.
 
-AppImage y .deb reconstruidos con T156–T159. La revisión de arquitectura está
+AppImage y .deb reconstruidos con T156–T159 y
+[publicados en GitHub](https://github.com/adr1mt/Heimdall/releases/tag/v0.9.1)
+en el repositorio privado actual. La actualización automática necesita un canal
+accesible sin iniciar sesión; entretanto la descarga es manual. La revisión de arquitectura está
 terminada. La prueba de aula con alumnado real sigue pendiente.
 [Primera reparación](audits/2026-10-02/REPARACION.md),
 [segunda reparación](audits/2026-10-02/post/repair/REPARACION.md) y

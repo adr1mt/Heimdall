@@ -1,0 +1,179 @@
+
+  ../../../../../../tmp/heimdall-examen-lab.mjs  176.5kb
+
+⚡ Done in 10ms
+OK     S-0   escala 0-100 elegida para contrastar la nota del motor
+OK     E-1   el botón de empezar el examen existe
+OK     E-2   motores a la vez durante la vuelta: 1
+OK     E-3   la primera vuelta terminó sola
+OK     E-4   vueltas lanzadas hasta aquí: 1
+OK     E-5   la cuenta atrás de la siguiente vuelta está en pantalla
+OK     E-6   la segunda vuelta salió sola
+OK     E-7   motores a la vez en toda la cadena: 1
+OK     S-1   vueltas guardadas: 2
+----- panel de la sesión -----
+Corregir
+
+El examen abierto se corrige con la clase que elijas. No hace falta ningún fichero más.
+
+EXAMEN
+
+Sesión de examen
+
+2 comprobaciones
+
+CLASE
+
+Laboratorio · 2 alumnos
+
+Sin clase elegida
+Laboratorio
+
+CONTRASEÑA DEL AULA
+
+La contraseña de las máquinas del aula. Se guarda cifrada en este ordenador, así que solo hay que escribirla una vez. No aparece en la clase, ni en las notas, ni en ningún informe.
+
+Contraseña de las máquinas
+Acción
+Corregir otra vez
+Terminar el examen
+
+Corrige la clase una y otra vez mientras dura la práctica. Nunca hay dos correcciones a la vez: cada vuelta empieza cuando termina la anterior.
+
+2
+VUELTA
+cada 5 min
+5 min
+SIGUIENTE
+1
+ACTIVOS
+1
+FINALIZADOS
+100%
+PROGRESO
+Mientras dure el examen
+
+Cada alumno se queda con su mejor vuelta entera. Una vuelta peor no le baja la nota.
+
+Debajo, junto a cada nota, se dice de qué vuelta sale.
+
+Se vuelve a corregir cada 5 min hasta que termines el examen.
+
+La nota del examen
+
+Cada alumno se queda con su mejor vuelta entera. Una vuelta que no llegó a evaluarlo del todo no le baja la nota, y quien ya lo tiene todo bien deja de ser corregido. La nota la cierra el motor leyendo las vueltas; aquí solo se enseña.
+
+2 vueltas del mismo examen, de la del 03/10/2026, 07:52 a la del 03/10/2026, 07:57
+
+1 alumnos con nota · 1 han terminado · 1 todavía sin nota
+
+Exportar las notas del examen…
+Exportar a Moodle…
+Alumna Uno
+Terminado
+100
+Sale de la vuelta 1
+
+Terminado: en la vuelta 1 ya tenía el examen entero bien, así que las vueltas siguientes no lo corrigen.
+
+Lo que dijo cada vuelta
+Alumne Dos
+En curso
+sin nota
+ninguna vuelta de la sesión llegó a evaluarlo entero, así que todavía no tiene nota de la sesión
+Lo que dijo cada vuelta
+2 de 2 comprobaciones
+100%
+
+Corrección terminada con alumnos sin evaluar del todo.
+
+Resultado guardado en /tmp/heimdall-release-0.9.1/exam-final/project/var/run-01M405DFC6GHGWNC9944S01877.json
+
+Las notas, alumno a alumno, llegan con la siguiente entrega.
+
+La clase
+Alumna Uno
+Excluido
+Alumne Dos
+Sin evaluar
+
+0 bien · 0 mal · 2 sin evaluar
+------------------------------
+OK     S-2   alumnos con nota de sesión en pantalla: 1
+OK     S-3   alumnos sin nota, con su motivo en pantalla: 1
+OK     S-4   terminados dejados fuera de la última vuelta: 1
+----- pantalla proyectada -----
+Salir del proyector
+Resultados
+2 alumnos · 2 comprobaciones · 3 de peso total
+Lista
+Matriz
+Exportar notas…
+Exportar a Moodle…
+0/0
+APROBADOS
+De los 0 que tienen nota; 1 se quedaron sin ella
+—
+NOTA MEDIA
+Todavía sin ninguna nota final
+1
+REQUIEREN ATENCIÓN
+Primero una máquina que falló, después quien no llega al aprobado
+
+Qué quieren decir «bien», «mal» y «sin evaluar»
+
+Bien: el alumno superó la comprobación.
+
+Mal: se comprobó y el alumno no la superó.
+
+Sin evaluar: no se pudo comprobar —la máquina no respondió, el comando no terminó a tiempo—. No es un fallo del alumno y no cuenta como un cero.
+
+Todo
+Bien
+Mal
+Sin evaluar
+Causa técnica: todo
+No se pudo conectar con la máquina
+Corrección del 03/10/2026, 07:57
+OK
+superada
+✕
+fallada
+?
+sin evaluar
+COMPROBACIÓN	Alumna	Alumne
+El host responde y se identifica ×1	·	?
+Existe /etc/os-release ×2	·	?
+Nota	—	—
+La comprobación
+
+s2-fichero · Alumne Dos
+
+Existe /etc/os-release
+
+Sin evaluar
+No se pudo conectar con la máquina
+Peso: 2
+Base
+
+no se ha podido conectar con •••.•••.•••.••• tras 3 intentos: dial tcp •••.•••.•••.•••: connect: connection refused
+
+No hubo ejecución completa que comparar.
+
+El comando no llegó a ejecutarse.
+
+Qué ha quedado sin comprobar: 1 alumno con algo sin comprobar
+Ver
+-------------------------------
+OK     P-0   el detalle técnico de una comprobación se abre
+OK     P-1   ninguna dirección IP en pantalla
+OK     P-2   la máquina aparece tapada
+OK     P-3   tamaño de letra proyectada: 20px
+OK     P-4   barras laterales en pantalla: 0
+OK     P-5   Esc devuelve la barra lateral
+OK     C-1   preguntó 1 vez y la ventana sigue abierta
+OK     C-2   lo que dijo: «El modo examen está activo.»
+OK     C-3   volvió a preguntar
+OK     S-5   ninguna contraseña en lo escrito
+
+RESULTADO: OK

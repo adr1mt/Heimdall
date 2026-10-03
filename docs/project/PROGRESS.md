@@ -5,50 +5,43 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T159 · Recuperación de copias con escrituras concurrentes.**
+**0.9.1 · Reconstrucción, comprobación y publicación.**
 
-- Los dos defectos preexistentes se reprodujeron con archivos ficticios en
-  /tmp y dos procesos reales, con controles y pausas coordinadas sin retardos.
-- Recuperación conserva una instantánea de toda la cadena: lectura acotada
-  única, texto exacto preparado en un directorio privado del destino.
-- Todas las cadenas se validan antes de publicar; antecedentes primero.
-  No se vuelve a leer una copia que pudo cambiar tras validar la cadena.
-- Publicación atómica mediante enlace duro: un original aparecido entre
-  comprobación y publicación se conserva byte a byte y se cuenta como kept.
-- Temporales eliminados ante éxito, conflicto y error; errores de escritura
-  o publicación visibles. Sin fallback que pueda sobrescribir destinos.
-- 9 regresiones nuevas, 525 tests GUI correctos; tipos y build GUI correctos;
-  make check correcto con caché Go temporal escribible. GUI fuera del
-  aislamiento porque localhost no resuelve dentro.
-- Evidencia: docs/audits/2026-10-03/RECUPERACION.md.
-- Base inicial 1d1f3fe, árbol limpio. Commit local; sin publicación ni nueva
-  tarea encadenada. Implementa ADR-0026 sin cambiar su política.
-
-## Estado anterior
-
-- T156–T158 terminadas: lectores acotados, corpus común de 72 artefactos y
-  recorrido compartido de cadenas. La revisión de arquitectura ya terminó.
-- T127–T155: 18 incidencias iniciales y 11 posteriores reparadas.
-  Evidencia en docs/audits/2026-10-02/ y su subdirectorio post/repair/.
-- AppImage/.deb 0.9.0 anteriores: pendientes de reconstruir con T156–T159.
+- Revisión de arquitectura terminada; registro cerrado como T160.
+  T156–T159 incorporadas a los nuevos paquetes, además de T127–T155.
+- T161 terminada: AppImage/.deb y motor embebido 0.9.1 reconstruidos.
+- Suite Go completa con SSH, aceptación, secretos, sesiones, RA2 y 100 alumnos;
+  tipos GUI y 525 tests en 33 archivos correctos.
+- Editor, corrección, histórico, CSV y recuperación correctos. AppImage final
+  y contenido del .deb comprobados con perfiles temporales y sandbox renderer.
+- Modo examen: dos vueltas reales cada 5 min, un solo motor, nota/procedencia
+  correctas, alumno terminado excluido, proyector y cierre correctos.
+- T162 terminada: release privada v0.9.1 publicada como latest en GitHub.
+  Código de release: 022f2e7. AppImage, .deb y SHA256SUMS con tamaño/digest
+  GitHub idénticos a los paquetes comprobados. Descarga autenticada verificada.
+- T164 terminada: actualización manual real de AppImage 0.9.0 a la descarga
+  privada 0.9.1; GUI y motor correctos y clase guardada conservada.
+  Intento automático real: HTTP 404; binario anterior intacto al cerrar.
+- Evidencia y reproducción: docs/releases/0.9.1/VERIFICACION.md.
 
 ## Problemas conocidos y límites
 
-- Laboratorio en **127.1.2.3**. Arneses que cuentan conexiones o buscan
-  secretos globalmente se ejecutan de forma secuencial.
+- GitHub `adr1mt/Heimdall` es privado. El actualizador consulta sin iniciar
+  sesión; publicar allí no permite la actualización automática (T163).
+  Pendiente decidir canal público de paquetes o privacidad del código.
+- El .deb se ejecutó extraído; no se instaló en el sistema: sudo requiere
+  contraseña de administrador. No se tocó el perfil del profesor.
+- Laboratorio en 127.1.2.3. Arneses SSH y de secretos se ejecutan secuencialmente.
 - Reintentos: mismo PLAN y máximo 50 eslabones. Modo examen: mínimo 5 min.
 - Hasta 2000 celdas y 1 MiB de metadatos resueltos;
   inventario hasta 65536 bytes. PLAN no admitido se rechaza antes de SSH.
-- Evidencia recortada tras comparar, con aviso; copias conservan notas,
-  comprobaciones y procedencia, no salidas.
+- Copias conservan notas y procedencia, sin salidas. Recuperación no sobrescribe.
 - Cierre normal espera resultado y copia; cierre forzado puede interrumpirlo.
 - Linux x64. Actualización automática solo AppImage; .deb mediante apt.
-  No se ha instalado una actualización desde una release real.
 - Editor formulario reformatea YAML; edición directa conserva texto.
   Autenticación por clave SSH pendiente (T023), sin caso de uso aún.
 
 ## Siguiente trabajo
 
-Desde casa: reconstruir paquetes y comprobar la aplicación completa con las
-últimas mejoras; publicación y actualización real después.
+Resolver el acceso del actualizador a las releases y cerrar T163.
 **T070** sigue desbloqueando **T084**, examen real de aula que ejecuta Adrià.

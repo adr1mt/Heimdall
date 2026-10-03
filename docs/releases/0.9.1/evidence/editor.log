@@ -1,0 +1,29 @@
+cd gui && HEIMDALL_ENGINE=/mnt/datos/Applications/Claude/Heimdall/bin/heimdall LAB_SECRET=HEIMDALL_SECRET_TEST_12345 npm run --silent editor-lab
+
+  ../../../../../../tmp/heimdall-editor-lab.mjs  173.6kb
+
+⚡ Done in 8ms
+OK     D-1   el examen del proyecto se abre en el formulario
+OK     A09-1 un peso a medio escribir conserva el formulario
+OK     A09-2 el peso decimal se puede terminar de escribir
+[editor] ok
+[editor] ok
+[editor] ok
+[editor] ok
+OK     D-2   lo del formulario está en el YAML
+[editor] ok
+OK     D-3   lo del YAML está en el formulario
+[editor] ok
+OK     D-4   el motor señala el error con fichero y línea
+OK     D-5   un examen inválido no se ha escrito
+[editor] ok
+OK     D-6   el examen del formulario está guardado en su carpeta
+OK     A06-1 el borrador inválido bloquea Guardar
+OK     A06-2 alternar vistas conserva el borrador inválido
+OK     A06-3 no se guarda la última versión válida por error
+OK     A06-4 salir advierte de los cambios pendientes
+OK     A06-5 cancelar la salida conserva el borrador
+OK     A06-6 se guarda exactamente el YAML validado, incluidos comentarios
+OK     A06-7 abrir un fichero roto conserva su texto original
+OK     D-7   corregido:   alumne01     OK             nota 100/100aviso HOST_KEY_ACCEPTED (student:alumne01/host:host1): la identidad de 127.1.2.3:2201 se ha aceptado y anotado para esta ejecución: SHA256:/DxxbPXIZMZCj3OENjp4LQ9BaQ8XLSYmXnQd4PgO+XE
+El editor escribe exámenes que el motor corrige.

@@ -1,0 +1,30 @@
+cd gui && npm run typecheck && npm test
+
+> heimdall-gui@0.9.1 typecheck
+> npm run typecheck:node && npm run typecheck:web && npm run typecheck:test
+
+
+> heimdall-gui@0.9.1 typecheck:node
+> tsc --noEmit -p tsconfig.node.json --composite false
+
+
+> heimdall-gui@0.9.1 typecheck:web
+> tsc --noEmit -p tsconfig.web.json --composite false
+
+
+> heimdall-gui@0.9.1 typecheck:test
+> tsc --noEmit -p tsconfig.test.json
+
+
+> heimdall-gui@0.9.1 test
+> vitest run
+
+
+ RUN  v4.1.11 /mnt/datos/Applications/Claude/Heimdall/gui
+
+
+ Test Files  33 passed (33)
+      Tests  525 passed (525)
+   Start at  07:35:29
+   Duration  1.37s (transform 4.15s, setup 0ms, import 5.09s, tests 3.21s, environment 3ms)
+

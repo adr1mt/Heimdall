@@ -1,0 +1,39 @@
+OK appimage GUI 0.9.1
+OK appimage motor embebido 0.9.1 /tmp/appimage_extracted_082e37085ecfed299c699df51b8911ef/resources/heimdall
+OK appimage renderer sandbox activo
+OK appimage botón Prueba de paquete
+OK appimage botón Corregir
+OK appimage botón Corregir
+OK appimage ambos alumnos aparecen en resultados
+OK appimage corrección guardada
+NOTAS [{"id":"alumne01","status":"PARTIAL","score":null},{"id":"alumne02","status":"NOT_EVALUATED","score":null}]
+OK appimage máquina apagada conserva ausencia de nota
+OK appimage botón Histórico
+OK appimage botón Abrir
+OK appimage histórico conserva exactamente los resultados
+OK appimage botón Exportar notas
+OK appimage botón Guardar el fichero
+OK appimage CSV sin contraseña
+OK appimage botón Histórico
+OK appimage botón Actualizar
+OK appimage botón Restaurar las notas
+OK appimage botón Abrir
+OK appimage restauración conserva exactamente estados y notas
+OK appimage resultados restaurados visibles
+OK appimage botón Matriz
+OK appimage botón Modo proyector
+OK appimage proyector oculta menú del profesor
+OK appimage proyector oculta direcciones
+OK appimage botón Analíticas
+OK appimage vista Analíticas funcional
+OK appimage botón Clases
+OK appimage vista Clases funcional
+OK appimage botón El examen
+OK appimage vista El examen funcional
+OK appimage botón Ajustes
+OK appimage vista Ajustes funcional
+OK appimage botón Ayuda
+OK appimage vista Ayuda funcional
+OK appimage botón Resultados
+PERFIL /tmp/heimdall-package-9UlnpX
+OK appimage cierre normal

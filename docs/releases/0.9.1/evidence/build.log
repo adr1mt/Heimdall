@@ -1,0 +1,60 @@
+go build -ldflags "-X main.version=0.9.1" -o bin/heimdall ./cmd/heimdall
+cd gui && npm run dist
+
+> heimdall-gui@0.9.1 dist
+> electron-vite build && npm run verify:preload && electron-builder --linux
+
+vite v7.3.6 building ssr environment for production...
+transforming...
+✓ 30 modules transformed.
+rendering chunks...
+out/main/index.js  74.74 kB
+✓ built in 466ms
+vite v7.3.6 building ssr environment for production...
+transforming...
+✓ 2 modules transformed.
+rendering chunks...
+out/preload/index.cjs  4.35 kB
+✓ built in 21ms
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 1570 modules transformed.
+rendering chunks...
+../../out/renderer/index.html                         1.21 kB
+../../out/renderer/assets/logo-BBd1nwCm.png         271.22 kB
+../../out/renderer/assets/index-D7nZKwWJ.css         35.52 kB
+../../out/renderer/assets/plus-D31NWkyE.js            0.22 kB
+../../out/renderer/assets/file-text-BuV3WJBq.js       0.43 kB
+../../out/renderer/assets/classes-BY3Dc23G.js         0.73 kB
+../../out/renderer/assets/trash-2-BIBVqIpX.js         0.77 kB
+../../out/renderer/assets/Help-DNfx8RM1.js            1.12 kB
+../../out/renderer/assets/classes-DHeErVMv.js         2.59 kB
+../../out/renderer/assets/results-BOujSZUp.js         5.76 kB
+../../out/renderer/assets/Settings-DL-2uS4D.js        7.40 kB
+../../out/renderer/assets/Home-h3bX3J2j.js            7.98 kB
+../../out/renderer/assets/Analytics-EvfNG9hF.js       8.64 kB
+../../out/renderer/assets/History-qDMr6qpo.js        10.53 kB
+../../out/renderer/assets/MoodleExport-BSPCjalh.js   10.81 kB
+../../out/renderer/assets/Correct-Dgn5BWSJ.js        28.52 kB
+../../out/renderer/assets/Classes-C4OxXt1e.js        31.35 kB
+../../out/renderer/assets/Results-CqCnkMqq.js        49.94 kB
+../../out/renderer/assets/Editor-Dw6A7SZk.js        138.44 kB
+../../out/renderer/assets/index-CDKz6eCA.js         388.62 kB
+✓ built in 1.58s
+
+> heimdall-gui@0.9.1 verify:preload
+> node scripts/verify-preload.mjs
+
+Preload sandboxed verificado: CommonJS único y ruta correcta.
+  • electron-builder  version=26.15.3 os=7.0.0-34-generic
+  • loaded configuration  file=package.json ("build" field)
+  • executing @electron/rebuild  electronVersion=43.7.3 arch=x64 buildFromSource=false workspaceRoot=/mnt/datos/Applications/Claude/Heimdall/gui projectDir=./ appDir=./
+  • installing native dependencies  arch=x64
+  • completed installing native dependencies
+  • packaging       platform=linux arch=x64 electron=43.7.3 appOutDir=dist/linux-unpacked
+  • downloaded      label=electron progress=100%
+  • downloaded electron zip extracted successfully  output=/mnt/datos/Applications/Claude/Heimdall/gui/dist/linux-unpacked
+  • searching for node modules  pm=npm searchDir=/mnt/datos/Applications/Claude/Heimdall/gui
+  • building        target=AppImage arch=x64 file=dist/Heimdall-0.9.1.AppImage
+  • building embedded block map  file=dist/Heimdall-0.9.1.AppImage
+  • building        target=deb arch=x64 file=dist/Heimdall-0.9.1.deb

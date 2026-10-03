@@ -3125,7 +3125,7 @@
       "id": "T161",
       "title": "Reconstruir y comprobar paquetes 0.9.1 con las últimas mejoras",
       "phase": 9,
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T160"
@@ -3137,13 +3137,21 @@
         "Editor, corrección, histórico, exportación, copias, modo examen y paquetes comprobados.",
         "Hashes de paquetes y evidencia reproducible registrados."
       ],
-      "tests": []
+      "tests": [
+        "make test completo: Go, integración SSH, versión, secretos, aceptación, eventos, sesiones, RA2 y 100 alumnos.",
+        "make gui-check: tipos y 525 pruebas GUI en 33 archivos.",
+        "Editor, secretos, histórico, exportación y restauración: arneses completos correctos.",
+        "AppImage final y contenido del .deb: GUI y motor embebido 0.9.1, sandbox del renderer, corrección, histórico, CSV, recuperación, proyector y pantallas correctos. .deb extraído, no instalado con dpkg.",
+        "Dos vueltas automáticas con testdata/sesion y escala 0–100, nunca dos motores; nota/procedencia, exclusión del terminado, proyector y cierre correctos.",
+        "Hashes SHA-256 de paquetes y recursos iguales entre linux-unpacked y .deb. Evidencia: docs/releases/0.9.1/VERIFICACION.md."
+      ],
+      "completed": "2026-10-03"
     },
     {
       "id": "T162",
       "title": "Publicar los paquetes y el código de 0.9.1",
       "phase": 9,
-      "status": "BLOCKED",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T161"
@@ -3153,11 +3161,17 @@
         "Release publicada con AppImage, .deb, notas y sumas SHA-256 correspondientes al código publicado.",
         "Metadatos GitHub de tamaño y digest de ambos paquetes contrastados con los archivos comprobados."
       ],
-      "tests": []
+      "tests": [
+        "Código publicado en main; etiqueta v0.9.1 apunta a 022f2e7ad3a53a38c2397490bf636cd1210b41e4.",
+        "Release privada publicada como latest: https://github.com/adr1mt/Heimdall/releases/tag/v0.9.1.",
+        "AppImage, .deb y SHA256SUMS: tamaños y SHA-256 de GitHub idénticos a los archivos locales comprobados.",
+        "AppImage descargado realmente con gh desde GitHub; SHA-256 idéntico. Metadatos: docs/releases/0.9.1/evidence/github-release.json."
+      ],
+      "completed": "2026-10-03"
     },
     {
       "id": "T163",
-      "title": "Comprobar una actualización real desde el AppImage anterior",
+      "title": "Comprobar una actualización automática real desde el AppImage anterior",
       "phase": 9,
       "status": "BLOCKED",
       "priority": "P1",
@@ -3170,8 +3184,34 @@
         "Al cerrar sustituye su propia copia y al reabrir se ejecutan GUI y motor 0.9.1.",
         "Resultado y límites documentados; T084 sigue pendiente del aula real."
       ],
-      "tests": [],
-      "notes": "Bloqueo descubierto antes de publicar: adr1mt/Heimdall es privado; el feed instalado consulta sin autenticación. Pendiente elección del propietario sobre distribución pública de paquetes o privacidad del código. No cambiar visibilidad por defecto."
+      "tests": [
+        "AppImage 0.9.0 real ejecutado con perfil temporal contra la release publicada: GitHub sin autenticación HTTP 404.",
+        "Tras el minuto de espera real, el actualizador registra 404 Not Found; el AppImage conserva el SHA-256 inicial mientras está abierto y después del cierre normal.",
+        "Sin proveedores ficticios, metadatos inyectados ni credenciales añadidas al actualizador. Registro: docs/releases/0.9.1/evidence/real-update.log."
+      ],
+      "notes": "Bloqueo confirmado después de publicar: repositorio privado y actualizador sin autenticación. Actualización manual real verificada en T164. Pendiente elección del propietario sobre canal público de paquetes o privacidad del código. No modificar visibilidad sin autorización."
+    },
+    {
+      "id": "T164",
+      "title": "Probar la actualización manual real desde la descarga privada",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T162"
+      ],
+      "goal": "Comprobar el salto de AppImage 0.9.0 a la descarga real 0.9.1 conservando datos del perfil.",
+      "acceptance": [
+        "AppImage descargado desde GitHub con la sesión del propietario y digest igual al paquete verificado.",
+        "Aplicación anterior cerrada antes de sustituir exclusivamente una copia temporal.",
+        "Reapertura con GUI y motor 0.9.1 y clase previamente guardada conservada."
+      ],
+      "tests": [
+        "Descarga auténtica por gh; SHA-256 9a5fbe4eec77119b627c6f9f294f77b4b880382f4906946a3dc30eb0ae8f101d.",
+        "AppImage anterior 0.9.0 conserva sus bytes ante el fallo automático; tras el cierre se sustituye por la descarga real. GUI y motor 0.9.1; clase update-fixture conservada.",
+        "docs/releases/0.9.1/evidence/real-update.log registra por separado el bloqueo automático y el éxito manual; exit 3 expresa únicamente el bloqueo automático."
+      ],
+      "completed": "2026-10-03"
     }
   ]
 }

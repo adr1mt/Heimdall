@@ -1,0 +1,14 @@
+[
+  {
+    "resource": "heimdall",
+    "linux_unpacked_sha256": "640726816613f0d0a468756d7eb07cbbf2a29e2282a6906e56482e6a2aa11bcf",
+    "deb_sha256": "640726816613f0d0a468756d7eb07cbbf2a29e2282a6906e56482e6a2aa11bcf",
+    "equal": true
+  },
+  {
+    "resource": "app.asar",
+    "linux_unpacked_sha256": "f43e15f3459c7bcb8b4929f0513e2a23d24b3d6be7d9a9e7e9a2068cf9e0017d",
+    "deb_sha256": "f43e15f3459c7bcb8b4929f0513e2a23d24b3d6be7d9a9e7e9a2068cf9e0017d",
+    "equal": true
+  }
+]

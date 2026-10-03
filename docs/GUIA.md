@@ -174,7 +174,7 @@ corrección o el modo examen, aplaza la actualización y cancela la descarga en
 curso. Las descargas tienen un límite de tiempo y tamaño y se comprueba que
 su tamaño y huella coinciden con los publicados antes de instalarlas.
 
-La publicación 0.9.1 está preparada para el repositorio privado de Heimdall.
+La publicación 0.9.1 está publicada en el repositorio privado de Heimdall.
 Su actualizador no inicia sesión en GitHub: mientras la distribución siga
 siendo privada, descarga manualmente la versión nueva y sustituye el AppImage
 con la aplicación cerrada. El canal público de actualización está pendiente.

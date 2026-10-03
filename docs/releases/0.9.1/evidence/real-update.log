@@ -1,0 +1,6 @@
+FEED sin autenticación HTTP 404
+VERSION ANTERIOR 0.9.0
+OK programa anterior conservado mientras está abierto c349ad17dee1f0e57336d0d6d84e1f550e789dcc5765c8281b3bd37ae736a90f
+[heimdall-gui] actualización: no se pudo comprobar la actualización: 404 Not Found
+BLOQUEADA_PRIVACIDAD: la aplicación anterior no puede acceder a la release privada; copia intacta después del cierre
+OK ACTUALIZACION MANUAL REAL desde descarga privada de GitHub: GUI y motor 0.9.1; clase guardada conservada; SHA256 9a5fbe4eec77119b627c6f9f294f77b4b880382f4906946a3dc30eb0ae8f101d

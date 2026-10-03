@@ -1,0 +1,12 @@
+FEED sin autenticación HTTP 404
+VERSION ANTERIOR 0.9.0
+file:///mnt/datos/Applications/Claude/Heimdall/docs/releases/0.9.1/evidence/real-update.mjs:28
+  const ev=async expression=>{const n=++id;const p=new Promise((r,j)=>{const timer=setTimeout(()=>j(Error('Inspector timed out')),20000);pending.set(n,m=>{clearTimeout(timer);r(m)})});ws.send(JSON.stringify({id:n,method:'Runtime.evaluate',params:{expression,returnByValue:true,awaitPromise:true}}));const m=await p;if(m.error||m.result?.exceptionDetails)throw Error(JSON.stringify(m));return m.result.result.value}
+                                                                                                                                                                                                                                                                                                                                                                        ^
+
+Error: {"id":6,"result":{"result":{"type":"object","value":{}},"exceptionDetails":{"exceptionId":1,"text":"Uncaught (in promise) Error: An object could not be cloned.","lineNumber":0,"columnNumber":0,"exception":{"type":"object","subtype":"error","className":"Error","description":"Error: An object could not be cloned.\n    at IpcRendererInternal.send (node:electron/js2c/sandbox_bundle:2:99016)\n    at IpcRendererInternal.<anonymous> (node:electron/js2c/sandbox_bundle:2:98621)","objectId":"245175406900622413.1.1"}}}}
+    at ev (file:///mnt/datos/Applications/Claude/Heimdall/docs/releases/0.9.1/evidence/real-update.mjs:28:361)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async file:///mnt/datos/Applications/Claude/Heimdall/docs/releases/0.9.1/evidence/real-update.mjs:43:2
+
+Node.js v24.20.0

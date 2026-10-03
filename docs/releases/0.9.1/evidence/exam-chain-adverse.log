@@ -1,0 +1,27 @@
+
+  ../../../../../../tmp/heimdall-examen-lab.mjs  176.1kb
+
+⚡ Done in 9ms
+OK     E-1   el botón de empezar el examen existe
+OK     E-2   motores a la vez durante la vuelta: 1
+OK     E-3   la primera vuelta terminó sola
+OK     E-4   vueltas lanzadas hasta aquí: 1
+OK     E-5   la cuenta atrás de la siguiente vuelta está en pantalla
+OK     E-6   la segunda vuelta salió sola
+OK     E-7   motores a la vez en toda la cadena: 1
+OK     S-1   vueltas guardadas: 2
+FALLO  S-2   alumnos con nota de sesión en pantalla: 0
+OK     S-3   alumnos sin nota, con su motivo en pantalla: 2
+PEND  S-4    ningún alumno terminó el examen entero en el laboratorio
+OK     P-0   el detalle técnico de una comprobación se abre
+OK     P-1   ninguna dirección IP en pantalla
+OK     P-2   la máquina aparece tapada
+OK     P-3   tamaño de letra proyectada: 20px
+OK     P-4   barras laterales en pantalla: 0
+OK     P-5   Esc devuelve la barra lateral
+OK     C-1   preguntó 1 vez y la ventana sigue abierta
+OK     C-2   lo que dijo: «El modo examen está activo.»
+OK     C-3   volvió a preguntar
+OK     S-5   ninguna contraseña en lo escrito
+
+RESULTADO: FALLO

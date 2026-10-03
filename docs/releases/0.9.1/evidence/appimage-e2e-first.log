@@ -1,0 +1,24 @@
+OK appimage GUI 0.9.1
+OK appimage motor embebido 0.9.1 /tmp/appimage_extracted_082e37085ecfed299c699df51b8911ef/resources/heimdall
+OK appimage renderer sandbox activo
+OK appimage botón Prueba de paquete
+OK appimage botón Corregir
+OK appimage botón Corregir
+OK appimage ambos alumnos aparecen en resultados
+OK appimage corrección guardada
+NOTAS [{"id":"alumne01","status":"PARTIAL","score":null},{"id":"alumne02","status":"NOT_EVALUATED","score":null}]
+OK appimage máquina apagada conserva ausencia de nota
+OK appimage botón Histórico
+OK appimage botón Abrir
+OK appimage histórico conserva exactamente los resultados
+OK appimage botón Exportar notas
+OK appimage botón Guardar el fichero
+file:///mnt/datos/Applications/Claude/Heimdall/docs/releases/0.9.1/evidence/package-e2e.mjs:43
+ const until = async (fn, label, timeout=30000)=>{const end=Date.now()+timeout;while(Date.now()<end){if(await fn())return;await wait(250)}throw Error('Timed out: '+label)}
+                                                                                                                                                ^
+
+Error: Timed out: export CSV
+    at until (file:///mnt/datos/Applications/Claude/Heimdall/docs/releases/0.9.1/evidence/package-e2e.mjs:43:145)
+    at async file:///mnt/datos/Applications/Claude/Heimdall/docs/releases/0.9.1/evidence/package-e2e.mjs:76:2
+
+Node.js v24.20.0

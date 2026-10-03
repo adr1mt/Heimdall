@@ -1,0 +1,30 @@
+OK appimage GUI 0.9.1
+OK appimage motor embebido 0.9.1 /tmp/appimage_extracted_082e37085ecfed299c699df51b8911ef/resources/heimdall
+OK appimage renderer sandbox activo
+OK appimage botón Prueba de paquete
+OK appimage botón Corregir
+OK appimage botón Corregir
+OK appimage ambos alumnos aparecen en resultados
+OK appimage corrección guardada
+NOTAS [{"id":"alumne01","status":"PARTIAL","score":null},{"id":"alumne02","status":"NOT_EVALUATED","score":null}]
+OK appimage máquina apagada conserva ausencia de nota
+OK appimage botón Histórico
+OK appimage botón Abrir
+OK appimage histórico conserva exactamente los resultados
+OK appimage botón Exportar notas
+OK appimage botón Guardar el fichero
+OK appimage CSV sin contraseña
+OK appimage botón Histórico
+OK appimage botón Actualizar
+OK appimage botón Restaurar las notas
+OK appimage botón Abrir
+file:///mnt/datos/Applications/Claude/Heimdall/docs/releases/0.9.1/evidence/package-e2e.mjs:44
+ const check=(value,label)=>{if(!value)throw Error(label);console.log('OK '+kind+' '+label)}
+                                             ^
+
+Error: restauración desde copias conserva resultados
+    at check (file:///mnt/datos/Applications/Claude/Heimdall/docs/releases/0.9.1/evidence/package-e2e.mjs:44:46)
+    at file:///mnt/datos/Applications/Claude/Heimdall/docs/releases/0.9.1/evidence/package-e2e.mjs:82:2
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+Node.js v24.20.0
