@@ -753,3 +753,14 @@ por celda, contando expansión JSON y con aviso. Se admiten hasta 2000 celdas y
 - Los temporales se limpian en finally. El destino y los temporales comparten
   sistema de archivos; si no admite enlaces duros, se informa del error.
 - Se cumple ADR-0026; sin nuevo ADR ni cambios de notas, retención o sesión.
+
+## 2026-10-03 · Distribución pública en el repositorio actual
+
+- El propietario autoriza hacer público `adr1mt/Heimdall`: el producto es
+  software libre y código y releases se distribuyen en el mismo repositorio.
+- No se crea un repositorio separado de paquetes ni se añaden credenciales
+  al actualizador. La URL ya instalada permanece válida.
+- GitHub confirma visibilidad PUBLIC y la consulta de latest sin autenticación
+  devuelve HTTP 200 con v0.9.1 y sus tres assets originales.
+- T163 comprobada con AppImage 0.9.0 real: descarga, sustitución al cerrar y
+  reapertura con GUI y motor 0.9.1; perfil y clase ficticia conservados.

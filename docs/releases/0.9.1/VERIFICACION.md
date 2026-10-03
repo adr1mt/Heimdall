@@ -90,7 +90,8 @@ renderer conserva su sandbox y aislamiento de contexto.
 
 ## Publicación y límites
 
-GitHub confirma que `adr1mt/Heimdall` es **privado** y no tenía releases.
+En la publicación inicial GitHub confirmó que `adr1mt/Heimdall` era **privado**
+y no tenía releases.
 [Release privada publicada](https://github.com/adr1mt/Heimdall/releases/tag/v0.9.1),
 como última versión, con tres assets y etiqueta sobre `022f2e7`.
 [Metadatos de GitHub](evidence/github-release.json): tamaños y SHA-256 exactos
@@ -99,16 +100,16 @@ se ha descargado de GitHub con la sesión del propietario; su hash coincide.
 El actualizador instalado consulta sin autenticación
 `https://api.github.com/repos/adr1mt/Heimdall/releases/latest`.
 Una publicación privada por sí sola no permite la actualización automática.
-La elección de distribución está pendiente: repositorio público de paquetes,
-cambiar la visibilidad del código o mantener descargas privadas/manuales.
-No se cambia la privacidad del repositorio sin esa decisión del propietario.
+El bloqueo inicial quedó pendiente de una decisión del propietario. Después,
+el propietario autorizó hacer público el repositorio actual; el canal automático
+queda comprobado en la sección final de este documento.
 
 El .deb se extrae y ejecuta desde su contenido real; **no se instala con dpkg**,
 porque `sudo -n` requiere la contraseña del administrador. El examen real de
 aula T084 continúa pendiente de T070 y de Adrià. No se prueba apagón físico ni
 se certifican otros sistemas operativos.
 
-## Actualización real: manual correcta, automática bloqueada
+## Prueba inicial: manual correcta, automática bloqueada
 
 [Registro real](evidence/real-update.log) y [arnés](evidence/real-update.mjs).
 Se ejecutó el AppImage 0.9.0 anterior, con la clase ficticia `update-fixture`
@@ -117,7 +118,8 @@ consulta GitHub al minuto: HTTP 404 sin autenticación, incluso con la release
 publicada. No se inyectaron feed, bytes, credenciales ni proveedores de red.
 El SHA-256 inicial `c349ad17dee1f0e57336d0d6d84e1f550e789dcc5765c8281b3bd37ae736a90f`
 se conserva mientras la ventana está abierta y después del cierre normal.
-La actualización automática **no se ha instalado ni se da por superada** (T163).
+En esta primera prueba la actualización automática **no se instaló ni se dio
+por superada** (T163).
 
 A continuación, con la aplicación cerrada, se sustituyó solo esa copia temporal
 por el AppImage descargado auténticamente desde GitHub con `gh`, cuyo hash
@@ -139,3 +141,33 @@ node docs/releases/0.9.1/evidence/real-update.mjs /tmp/heimdall-release-0.9.1/He
 
 La sesión de `gh` autentica la descarga manual; nunca llega al proceso del
 actualizador. Los laboratorios creados para esta sesión se eliminan al finalizar.
+
+## Canal público y actualización automática comprobada
+
+El 2026-10-03, con autorización expresa del propietario, `adr1mt/Heimdall`
+pasó a PUBLIC. Código y releases se distribuyen en el repositorio actual.
+No se cambia el feed ni se reconstruyen los paquetes: las instalaciones
+anteriores ya consultan esa misma URL. La release v0.9.1 y sus tres assets
+son accesibles sin iniciar sesión.
+
+[Registro de la prueba pública](evidence/public-update.log). Una copia temporal
+auténtica de AppImage 0.9.0 consultó el feed sin autenticación (HTTP 200),
+descargó 0.9.1 mediante su temporizador real y anunció la versión disponible.
+El SHA-256 anterior permaneció intacto con la ventana abierta. El cierre normal
+sustituyó el archivo por los bytes publicados, con SHA-256
+`9a5fbe4eec77119b627c6f9f294f77b4b880382f4906946a3dc30eb0ae8f101d`.
+La reapertura confirmó GUI y motor 0.9.1; la clase ficticia `update-fixture`
+permanece en el perfil temporal. El arnés terminó con código 0. No se inyectaron
+metadatos, bytes, credenciales ni dependencias del actualizador.
+
+**T163 terminada.** `make check` correcto
+([registro](evidence/public-check.log)). T084 continúa pendiente de T070 y del
+examen real de aula. La actualización automática cubre AppImage; el .deb
+continúa instalándose o actualizándose mediante apt.
+
+Reproducción del canal público con los paquetes locales anteriores:
+
+```bash
+cp gui/dist/Heimdall-0.9.0.AppImage /tmp/heimdall-release-0.9.1/public-test.AppImage
+node docs/releases/0.9.1/evidence/real-update.mjs /tmp/heimdall-release-0.9.1/public-test.AppImage
+```

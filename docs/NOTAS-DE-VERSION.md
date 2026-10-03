@@ -26,9 +26,9 @@ Reparaciones de las dos auditorías y mejoras de la revisión de arquitectura:
 
 AppImage y .deb reconstruidos con T156–T159 y
 [publicados en GitHub](https://github.com/adr1mt/Heimdall/releases/tag/v0.9.1)
-en el repositorio privado actual. La actualización automática necesita un canal
-accesible sin iniciar sesión; entretanto la descarga es manual. La revisión de arquitectura está
-terminada. La prueba de aula con alumnado real sigue pendiente.
+en el repositorio público de Heimdall. Las descargas y el actualizador son
+accesibles sin iniciar sesión. La revisión de arquitectura está terminada.
+La prueba de aula con alumnado real sigue pendiente.
 [Primera reparación](audits/2026-10-02/REPARACION.md),
 [segunda reparación](audits/2026-10-02/post/repair/REPARACION.md) y
 [recuperación de copias](audits/2026-10-03/RECUPERACION.md).

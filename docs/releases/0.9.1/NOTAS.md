@@ -14,9 +14,8 @@ Linux de 64 bits. El motor va incluido en ambos paquetes. El AppImage incorpora
 el actualizador; el .deb se instala o actualiza con apt. Las sumas de los dos
 paquetes están en SHA256SUMS.
 
-Esta release se publica en el repositorio privado actual. La actualización
-automática necesita un canal de distribución accesible sin iniciar sesión;
-hasta decidir ese canal, las descargas son manuales desde GitHub.
+Esta release está disponible en el repositorio público de Heimdall. Las
+descargas y la consulta del actualizador son accesibles sin iniciar sesión.
 
 Comprobados motor, interfaz, editor, corrección SSH, histórico, CSV, restauración
 y pantallas de ambos paquetes con datos ficticios. La prueba final de aula

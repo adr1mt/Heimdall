@@ -5,7 +5,7 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**0.9.1 · Reconstrucción, comprobación y publicación.**
+**0.9.1 · Distribución pública y actualización automática comprobada.**
 
 - Revisión de arquitectura terminada; registro cerrado como T160.
   T156–T159 incorporadas a los nuevos paquetes, además de T127–T155.
@@ -16,19 +16,21 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
   y contenido del .deb comprobados con perfiles temporales y sandbox renderer.
 - Modo examen: dos vueltas reales cada 5 min, un solo motor, nota/procedencia
   correctas, alumno terminado excluido, proyector y cierre correctos.
-- T162 terminada: release privada v0.9.1 publicada como latest en GitHub.
+- T162 terminada: release v0.9.1 publicada como latest en GitHub.
   Código de release: 022f2e7. AppImage, .deb y SHA256SUMS con tamaño/digest
   GitHub idénticos a los paquetes comprobados. Descarga autenticada verificada.
 - T164 terminada: actualización manual real de AppImage 0.9.0 a la descarga
   privada 0.9.1; GUI y motor correctos y clase guardada conservada.
-  Intento automático real: HTTP 404; binario anterior intacto al cerrar.
+- El propietario autorizó hacer público `adr1mt/Heimdall`; código y releases
+  permanecen en el mismo repositorio. GitHub confirma PUBLIC, feed HTTP 200.
+- T163 terminada: AppImage 0.9.0 descarga 0.9.1 sin autenticación, conserva
+  el binario mientras está abierto y lo sustituye al cerrar con SHA-256 exacto.
+  Reapertura GUI/motor 0.9.1 y clase guardada conservada; arnés exit 0.
+- `make check` correcto. Notas de la release actualizadas en GitHub.
 - Evidencia y reproducción: docs/releases/0.9.1/VERIFICACION.md.
 
 ## Problemas conocidos y límites
 
-- GitHub `adr1mt/Heimdall` es privado. El actualizador consulta sin iniciar
-  sesión; publicar allí no permite la actualización automática (T163).
-  Pendiente decidir canal público de paquetes o privacidad del código.
 - El .deb se ejecutó extraído; no se instaló en el sistema: sudo requiere
   contraseña de administrador. No se tocó el perfil del profesor.
 - Laboratorio en 127.1.2.3. Arneses SSH y de secretos se ejecutan secuencialmente.
@@ -43,5 +45,4 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Siguiente trabajo
 
-Resolver el acceso del actualizador a las releases y cerrar T163.
 **T070** sigue desbloqueando **T084**, examen real de aula que ejecuta Adrià.

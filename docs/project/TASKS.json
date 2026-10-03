@@ -3173,7 +3173,7 @@
       "id": "T163",
       "title": "Comprobar una actualización automática real desde el AppImage anterior",
       "phase": 9,
-      "status": "BLOCKED",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T162"
@@ -3187,9 +3187,14 @@
       "tests": [
         "AppImage 0.9.0 real ejecutado con perfil temporal contra la release publicada: GitHub sin autenticación HTTP 404.",
         "Tras el minuto de espera real, el actualizador registra 404 Not Found; el AppImage conserva el SHA-256 inicial mientras está abierto y después del cierre normal.",
-        "Sin proveedores ficticios, metadatos inyectados ni credenciales añadidas al actualizador. Registro: docs/releases/0.9.1/evidence/real-update.log."
+        "Sin proveedores ficticios, metadatos inyectados ni credenciales añadidas al actualizador. Registro: docs/releases/0.9.1/evidence/real-update.log.",
+        "Con autorización expresa del propietario, adr1mt/Heimdall pasa a PUBLIC; latest sin autenticación HTTP 200 y release v0.9.1 con sus tres assets originales.",
+        "AppImage 0.9.0 real descarga 0.9.1 con su temporizador y red reales, conserva el SHA-256 anterior mientras está abierto y sustituye su copia al cerrar.",
+        "Reapertura con GUI y motor 0.9.1; SHA-256 publicado exacto y clase update-fixture conservada en el perfil temporal. Arnés exit 0: docs/releases/0.9.1/evidence/public-update.log.",
+        "make check correcto: docs/releases/0.9.1/evidence/public-check.log."
       ],
-      "notes": "Bloqueo confirmado después de publicar: repositorio privado y actualizador sin autenticación. Actualización manual real verificada en T164. Pendiente elección del propietario sobre canal público de paquetes o privacidad del código. No modificar visibilidad sin autorización."
+      "notes": "Bloqueo inicial HTTP 404 resuelto al hacer público el repositorio actual por autorización expresa del propietario. Código y releases comparten repositorio; no cambia el feed ni se añaden credenciales. Prueba automática real correcta; T084 sigue pendiente del aula real.",
+      "completed": "2026-10-03"
     },
     {
       "id": "T164",
