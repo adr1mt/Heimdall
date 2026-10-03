@@ -1,6 +1,6 @@
 {
   "name": "heimdall-gui",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Heimdall GUI: interfaz de escritorio del motor de evaluacion Heimdall",
   "desktopName": "heimdall-gui",
   "main": "./out/main/index.js",

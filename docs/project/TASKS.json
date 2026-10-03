@@ -3099,6 +3099,79 @@
         "make check correcto con GOCACHE temporal; npm run typecheck y npm run build correctos. Evidencia: docs/audits/2026-10-03/RECUPERACION.md."
       ],
       "completed": "2026-10-03"
+    },
+    {
+      "id": "T160",
+      "title": "Cerrar registro de la revisión de arquitectura",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P2",
+      "depends_on": [
+        "T156",
+        "T157",
+        "T158",
+        "T159"
+      ],
+      "goal": "Registrar la revisión ya terminada y sus reparaciones sin mantenerla como pendiente.",
+      "acceptance": [
+        "Revisión y reparaciones T156–T159 registradas como terminadas, con evidencia."
+      ],
+      "tests": [
+        "docs/audits/2026-10-03/RECUPERACION.md y evidencia de T156–T158; PROGRESS.md ya confirma revisión terminada."
+      ],
+      "completed": "2026-10-03"
+    },
+    {
+      "id": "T161",
+      "title": "Reconstruir y comprobar paquetes 0.9.1 con las últimas mejoras",
+      "phase": 9,
+      "status": "IN_PROGRESS",
+      "priority": "P1",
+      "depends_on": [
+        "T160"
+      ],
+      "goal": "Distribuir motor y GUI coherentes y verificar la aplicación completa con datos ficticios.",
+      "acceptance": [
+        "Motor, GUI, AppImage y .deb identificados como 0.9.1.",
+        "Suite Go, integración SSH, aceptación, tipos y tests GUI correctos.",
+        "Editor, corrección, histórico, exportación, copias, modo examen y paquetes comprobados.",
+        "Hashes de paquetes y evidencia reproducible registrados."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T162",
+      "title": "Publicar los paquetes y el código de 0.9.1",
+      "phase": 9,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T161"
+      ],
+      "goal": "Publicar la versión comprobada en el repositorio actual, conservando su privacidad.",
+      "acceptance": [
+        "Release publicada con AppImage, .deb, notas y sumas SHA-256 correspondientes al código publicado.",
+        "Metadatos GitHub de tamaño y digest de ambos paquetes contrastados con los archivos comprobados."
+      ],
+      "tests": []
+    },
+    {
+      "id": "T163",
+      "title": "Comprobar una actualización real desde el AppImage anterior",
+      "phase": 9,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T162"
+      ],
+      "goal": "Comprobar la descarga, sustitución al cerrar y reapertura mediante el actualizador instalado.",
+      "acceptance": [
+        "AppImage 0.9.0 real consulta GitHub, descarga 0.9.1 y conserva el binario anterior mientras sigue abierta.",
+        "Al cerrar sustituye su propia copia y al reabrir se ejecutan GUI y motor 0.9.1.",
+        "Resultado y límites documentados; T084 sigue pendiente del aula real."
+      ],
+      "tests": [],
+      "notes": "Bloqueo descubierto antes de publicar: adr1mt/Heimdall es privado; el feed instalado consulta sin autenticación. Pendiente elección del propietario sobre distribución pública de paquetes o privacidad del código. No cambiar visibilidad por defecto."
     }
   ]
 }

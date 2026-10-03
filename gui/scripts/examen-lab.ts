@@ -142,6 +142,15 @@ app.whenReady().then(async () => {
       return !!b
     })()`) as Promise<boolean>
 
+  // S-2 compares the engine's 0-100 grade with the displayed grade. Choose
+  // that scale through the real settings view before starting the session.
+  await js(`[...document.querySelectorAll('aside button')].find(b => b.textContent.trim() === 'Ajustes').click()`)
+  await wait(400)
+  check('S-0', await click('0 a 100'), 'escala 0-100 elegida para contrastar la nota del motor')
+  await wait(400)
+  await js(`[...document.querySelectorAll('aside button')].find(b => b.textContent.trim() === 'Inicio').click()`)
+  await wait(400)
+
   // Count the passes the way the screen does: one run.start per pass.
   await js(`(() => {
     window.__passes = 0

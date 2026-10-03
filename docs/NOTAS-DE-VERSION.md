@@ -8,20 +8,27 @@ El número es uno solo para todo el producto: lo dice el fichero `VERSION` de
 la raíz, el motor se sella con él al compilar y la aplicación lo lleva en su
 paquete. `test/version.sh` comprueba que no se separan.
 
-## Pendiente de publicación — reparaciones del 02-10-2026
+## 0.9.1 — 03-10-2026 (preparada para publicar)
 
-Resueltas las 18 incidencias de la auditoría, con regresiones y aceptación:
+Reparaciones de las dos auditorías y mejoras de la revisión de arquitectura:
 
 - Las salidas recortadas y los comandos fallidos no producen aprobados sin
   prueba; los límites SSH y la cancelación dejan estados técnicos correctos.
 - Guardar valida el borrador visible y conserva los errores y cambios pendientes.
-- Las copias retienen las notas recientes y avisan si no pudieron guardarlas.
+- Reintentos e histórico conservan la cadena completa y sus notas.
+- Las copias retienen las correcciones recientes y sus antecedentes, avisan
+  si no pudieron guardarse y recuperan los datos sin sobrescribir originales.
 - Pesos decimales, vueltas perfectas, clases corruptas y resultados incompletos
-  se tratan de forma coherente; se ocultan credenciales en la metadata textual.
+  se tratan de forma coherente; los lectores del motor y la aplicación usan
+  los mismos criterios para aceptar resultados.
 - Mejor contraste en ambos temas y actualizaciones aplazadas durante la corrección.
+- La actualización comprueba tamaño y SHA-256 antes de instalar el AppImage.
 
-Paquetes locales reconstruidos; no se ha publicado una nueva versión.
-[Detalle y pruebas](audits/2026-10-02/REPARACION.md).
+AppImage y .deb reconstruidos con T156–T159. La revisión de arquitectura está
+terminada. La prueba de aula con alumnado real sigue pendiente.
+[Primera reparación](audits/2026-10-02/REPARACION.md),
+[segunda reparación](audits/2026-10-02/post/repair/REPARACION.md) y
+[recuperación de copias](audits/2026-10-03/RECUPERACION.md).
 
 ## 0.9.0 — 22-09-2026
 

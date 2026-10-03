@@ -11,7 +11,7 @@
 
 <p align="center">
   <img alt="Go 1.26+" src="https://img.shields.io/badge/Go-1.26%2B-00ADD8?logo=go&logoColor=white">
-  <img alt="Versión 0.9.0" src="https://img.shields.io/badge/versi%C3%B3n-0.9.0-blue">
+  <img alt="Versión 0.9.1" src="https://img.shields.io/badge/versi%C3%B3n-0.9.1-blue">
   <img alt="Dos dependencias" src="https://img.shields.io/badge/dependencias-2-brightgreen">
 </p>
 
@@ -63,7 +63,7 @@ las columnas salgan iguales.</sub>
 
 ## Estado
 
-**Versión 0.9.0**: la aplicación está completa y empaquetada en `.deb` y
+**Versión 0.9.1**: la aplicación está completa y empaquetada en `.deb` y
 AppImage con el motor dentro. Falta la prueba de fuego —un examen real
 corregido de principio a fin— y esa será la 1.0.0.
 
