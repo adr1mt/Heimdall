@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, linkSync, mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { readdir, mkdir, rename, rm, stat, writeFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 import type { RunResult } from '../shared/artifact'
@@ -60,13 +60,6 @@ function runFilesIn(dir: string): string[] {
   } catch {
     return []
   }
-}
-
-/** Atomic: a power cut never leaves a half-written copy of a class's grades. */
-function writeAtomic(path: string, text: string): void {
-  const tmp = `${path}.tmp`
-  writeFileSync(tmp, text, 'utf-8')
-  renameSync(tmp, path)
 }
 
 /**
@@ -203,23 +196,49 @@ export function restoreBackups(dataDir: string, examPath: string): RestoreReport
   const slot = slotFor(dataDir, examPath)
   const varDir = varDirOf(examPath)
   const report: RestoreReport = { restored: 0, kept: 0 }
-  const copies = readBackupRuns(slot)
-  const names = [...copies.keys()]
-  for (const name of names) backupChain(name, copies)
-  if (names.length === 0) throw new Error('No hay ninguna copia de seguridad de este examen.')
-  for (const name of names) {
-    const target = join(varDir, name)
-    if (existsSync(target)) {
-      report.kept += 1
-      continue
+  const candidates = runFilesIn(slot)
+  if (candidates.length === 0) throw new Error('No hay ninguna copia de seguridad de este examen.')
+  mkdirSync(varDir, { recursive: true })
+  // Stage on the destination filesystem, one bounded snapshot at a time.
+  // Keep exact bytes without retaining every artifact's text in memory or
+  // reopening copies after validating their relationships.
+  const staged = mkdtempSync(join(varDir, '.heimdall-restore-'))
+  try {
+    const copies = new Map<string, RunResult>()
+    for (const name of candidates) {
+      let snapshot: ReturnType<typeof readArtifactSnapshot>
+      try { snapshot = readArtifactSnapshot(join(slot, name)) }
+      catch { continue /* Invalid copies are never offered for recovery. */ }
+      writeFileSync(join(staged, name), snapshot.text, { encoding: 'utf8', flag: 'wx', mode: 0o600 })
+      copies.set(name, snapshot.run)
     }
-    // Preserve the exact text validated from this open file.
-    const { text } = readArtifactSnapshot(join(slot, name))
-    mkdirSync(varDir, { recursive: true })
-    writeAtomic(target, text)
-    report.restored += 1
+    if (copies.size === 0) throw new Error('No hay ninguna copia de seguridad de este examen.')
+    const ordered = new Set<string>()
+    // Validate every chain before publishing any member. Ancestors first,
+    // including dependencies shared by multiple heads.
+    for (const name of copies.keys()) {
+      for (const member of backupChain(name, copies).reverse()) ordered.add(member)
+    }
+    for (const name of ordered) {
+      const target = join(varDir, name)
+      if (existsSync(target)) {
+        report.kept += 1
+        continue
+      }
+      try {
+        // A hard link publishes the complete staged file atomically and
+        // fails with EEXIST if another writer created the destination.
+        linkSync(join(staged, name), target)
+        report.restored += 1
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error
+        report.kept += 1
+      }
+    }
+    return report
+  } finally {
+    rmSync(staged, { recursive: true, force: true })
   }
-  return report
 }
 
 function readBackupRuns(slot: string): Map<string, RunResult> {

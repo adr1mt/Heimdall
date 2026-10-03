@@ -739,3 +739,17 @@ por celda, contando expansión JSON y con aviso. Se admiten hasta 2000 celdas y
   consumidores, incluyendo frontera 49/50/51 y originales byte a byte.
 - Base inicial: `2d16110e1b63506d86a1e1694270d129a4010161`, árbol limpio;
   `make check`, ambos builds, tipos y 516 tests GUI correctos.
+
+## T159 · Recuperación coherente y publicación sin sobrescritura
+
+- Las ventanas entre validar y releer y entre existsSync y renameSync se
+  confirmaron con dos procesos reales. Son preexistentes a T156–T158.
+- El texto exacto de cada lectura acotada se prepara en un directorio privado
+  del destino. Las relaciones se validan sobre esas mismas instantáneas;
+  no se retienen todos los textos adicionales en memoria ni se releen copias.
+- Se publica de antecedentes a reintentos mediante linkSync, que añade un
+  nombre completo sin reemplazarlo. EEXIST se cuenta como conservado; los
+  demás errores se propagan. No hay fallback a renombrado o copia parcial.
+- Los temporales se limpian en finally. El destino y los temporales comparten
+  sistema de archivos; si no admite enlaces duros, se informa del error.
+- Se cumple ADR-0026; sin nuevo ADR ni cambios de notas, retención o sesión.

@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated": "2026-10-02",
+  "updated": "2026-10-03",
   "status_values": [
     "BLOCKED",
     "READY",
@@ -3066,6 +3066,39 @@
         "Regresiones de retención y recuperación conservadas; originales comparados byte a byte y fichero corrupto conservado durante rotación.",
         "make check y make build correctos; tipos y build GUI correctos; 516 tests GUI fuera del aislamiento (localhost no resuelve dentro). Base inicial: 2d16110e1b63506d86a1e1694270d129a4010161."
       ]
+    },
+    {
+      "id": "T159",
+      "title": "Recuperación con instantánea de cadena y publicación sin sobrescritura",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T158"
+      ],
+      "goal": "Reparar los dos defectos preexistentes de recuperación con escrituras concurrentes de otro proceso.",
+      "scope": [
+        "gui/src/main/backup.ts: recuperación y temporales privados",
+        "Regresiones con dos procesos reales y archivos ficticios bajo /tmp"
+      ],
+      "out_of_scope": [
+        "Empaquetado, publicación, SSH y exámenes reales",
+        "Cambiar notas o reglas de cadenas de reintento y sesiones"
+      ],
+      "acceptance": [
+        "Sustituir una copia tras validar la cadena no cambia los bytes que se recuperan.",
+        "Un original creado entre comprobar su ausencia y publicar se conserva byte a byte y se cuenta como conservado.",
+        "Todas las cadenas se validan antes de publicar resultados; los antecedentes se publican primero.",
+        "Temporales privados y limpieza ante éxito, conflicto o error; errores de escritura y publicación visibles.",
+        "Reproducciones deterministas con dos procesos reales, controles y límites de espera; regresiones, tipos, build GUI y make check correctos."
+      ],
+      "tests": [
+        "Antes de reparar: los dos controles pasan y tres regresiones fallan (sustitución de copia, sobrescritura de original y orden de publicación).",
+        "Dos procesos reales y archivos bajo /tmp: copia sustituida después de validar la cadena y original creado justo antes de publicar; texto, relaciones y evidencia comprobados.",
+        "9 regresiones nuevas; 525 tests GUI en 33 archivos correctos fuera del aislamiento que impide resolver localhost.",
+        "make check correcto con GOCACHE temporal; npm run typecheck y npm run build correctos. Evidencia: docs/audits/2026-10-03/RECUPERACION.md."
+      ],
+      "completed": "2026-10-03"
     }
   ]
 }

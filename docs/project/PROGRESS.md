@@ -1,33 +1,36 @@
 # Estado del proyecto
 
 Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
-**Actualizado**: 2026-10-02 · **Fase**: 9 — Endurecimiento y publicación
+**Actualizado**: 2026-10-03 · **Fase**: 9 — Endurecimiento y publicación
 
 ## Última sesión
 
-**T158 · Recorrido común de cadenas de copias.**
+**T159 · Recuperación de copias con escrituras concurrentes.**
 
-- Copia, retención, listado y recuperación comparten ciclo, identidad,
-  PLAN y máximo de 50 eslabones; solo `retry_of` declara un antecedente.
-- Se conserva la búsqueda por nombre: original primero, copia si falta.
-  Validación completa antes de escribir y escritura del antiguo al reciente.
-- Retención de 50 correcciones recientes y todos sus antecedentes conservada;
-  recuperación sin sobrescribir originales ni eliminar ficheros corruptos.
-- Go sigue calculando notas; sesiones y reintentos conservan reglas distintas.
-  Lectores, corpus común de 72 artefactos y defensas de corrupción intactos.
-- 10 nuevas regresiones: ciclo/identidad/PLAN, ausente/corrupto, 49/50/51,
-  prioridad de búsqueda y ejecuciones independientes; originales byte a byte.
-- `make check`, ambos builds y tipos correctos; 516 tests GUI pasan fuera
-  del aislamiento (localhost no resuelve dentro). Caché Go temporal escribible.
-- Base inicial: 2d16110e1b63506d86a1e1694270d129a4010161; árbol limpio.
-  Commit local de T158, sin publicación ni tarea encadenada. Sin nuevo ADR.
+- Los dos defectos preexistentes se reprodujeron con archivos ficticios en
+  /tmp y dos procesos reales, con controles y pausas coordinadas sin retardos.
+- Recuperación conserva una instantánea de toda la cadena: lectura acotada
+  única, texto exacto preparado en un directorio privado del destino.
+- Todas las cadenas se validan antes de publicar; antecedentes primero.
+  No se vuelve a leer una copia que pudo cambiar tras validar la cadena.
+- Publicación atómica mediante enlace duro: un original aparecido entre
+  comprobación y publicación se conserva byte a byte y se cuenta como kept.
+- Temporales eliminados ante éxito, conflicto y error; errores de escritura
+  o publicación visibles. Sin fallback que pueda sobrescribir destinos.
+- 9 regresiones nuevas, 525 tests GUI correctos; tipos y build GUI correctos;
+  make check correcto con caché Go temporal escribible. GUI fuera del
+  aislamiento porque localhost no resuelve dentro.
+- Evidencia: docs/audits/2026-10-03/RECUPERACION.md.
+- Base inicial 1d1f3fe, árbol limpio. Commit local; sin publicación ni nueva
+  tarea encadenada. Implementa ADR-0026 sin cambiar su política.
 
-**T127–T155 · Auditorías reparadas.**
-- 18 incidencias iniciales y 11 posteriores reparadas, incluyendo cadenas
-  completas, cierre, actualizaciones, presupuestos de evidencia y YAML.
-- Evidencias: `docs/audits/2026-10-02/REPARACION.md` y
-  `docs/audits/2026-10-02/post/repair/REPARACION.md`.
-- AppImage/.deb 0.9.0 de la sesión anterior; no se reempaquetaron en T156.
+## Estado anterior
+
+- T156–T158 terminadas: lectores acotados, corpus común de 72 artefactos y
+  recorrido compartido de cadenas. La revisión de arquitectura ya terminó.
+- T127–T155: 18 incidencias iniciales y 11 posteriores reparadas.
+  Evidencia en docs/audits/2026-10-02/ y su subdirectorio post/repair/.
+- AppImage/.deb 0.9.0 anteriores: pendientes de reconstruir con T156–T159.
 
 ## Problemas conocidos y límites
 
@@ -39,22 +42,13 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 - Evidencia recortada tras comparar, con aviso; copias conservan notas,
   comprobaciones y procedencia, no salidas.
 - Cierre normal espera resultado y copia; cierre forzado puede interrumpirlo.
-- Linux x64. Actualización automática solo AppImage; `.deb` mediante apt.
+- Linux x64. Actualización automática solo AppImage; .deb mediante apt.
   No se ha instalado una actualización desde una release real.
 - Editor formulario reformatea YAML; edición directa conserva texto.
-  Autenticación por clave SSH pendiente (T023).
+  Autenticación por clave SSH pendiente (T023), sin caso de uso aún.
 
-## Siguiente tarea recomendada
+## Siguiente trabajo
 
-Revisión pendiente de improve-codebase-architecture, descrita debajo.
+Desde casa: reconstruir paquetes y comprobar la aplicación completa con las
+últimas mejoras; publicación y actualización real después.
 **T070** sigue desbloqueando **T084**, examen real de aula que ejecuta Adrià.
-
-## Revisión pendiente solicitada
-Usar la skill code-review para revisar improve-codebase-architecture sin
-modificar archivos: fijar el commit anterior a aquella mejora e incluir todo
-lo posterior y sin commit; preguntar si la base no se identifica con certeza.
-La base de T158 no identifica por sí sola la base de esa revisión.
-Separar normas/ADR y especificación aprobada; comprobar contratos, notas,
-estados, reintentos, cancelación, secretos, simplicidad y REPARACION.md.
-Informar prioridad, archivo/línea, impacto y evidencia; defectos frente a dudas,
-aptitud para integración, bloqueos y validaciones pendientes.
