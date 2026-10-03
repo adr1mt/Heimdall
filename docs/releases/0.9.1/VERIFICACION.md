@@ -12,7 +12,7 @@ T156–T159 además de las reparaciones T127–T155. Arquitectura revisada y cer
 - `gui/dist/Heimdall-0.9.1.deb` (heimdall-gui, amd64, 0.9.1)
 
 [SHA256SUMS](SHA256SUMS) identifica exactamente los paquetes comprobados.
-El AppImage 0.9.0 local anterior se conserva para probar la actualización en
+Para probar la actualización se creó una copia del AppImage 0.9.0 anterior en
 `/tmp/heimdall-release-0.9.1/Heimdall.AppImage`; su hash inicial se registra en
 [evidence/baseline.sha256](evidence/baseline.sha256). No se sustituye ninguna
 instalación o perfil del profesor.
