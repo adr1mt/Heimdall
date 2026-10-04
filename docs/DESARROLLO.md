@@ -61,12 +61,20 @@ salió. Un suspenso siempre se puede enseñar; una avería también.
 Los códigos de salida discriminan: `0` todo evaluado · `2` configuración
 inválida · `3` ejecución parcial · `4` cancelado.
 
+## Herramientas
+
+La versión mínima de Go está en `go.mod`; Node 24 y Python 3 completan el
+entorno de desarrollo. Desde `gui/`, `npm ci` instala las dependencias fijadas
+por `package-lock.json`. Si Go está instalado fuera del PATH, se puede indicar
+su ejecutable con `make GO=/ruta/a/go check`.
+
 ## Ponerlo en marcha
 
 ```bash
 make build          # binario en bin/heimdall
 make check          # suite rápida del motor: lógica pura, sin red (segundos)
 make lab            # laboratorio SSH en podman
+make lab-ra2        # laboratorio KEA + BIND necesario para make test
 make test           # + integración y criterios de aceptación
 make rendimiento    # mide escalado y memoria (no es un test)
 ```
@@ -93,7 +101,7 @@ heimdall run --secrets=stdin ./examen-ra2        # corrige
 
 Dependencias del módulo: `x/crypto/ssh` y `yaml.v3`. Ninguna más —los
 identificadores de ejecución los genera el propio motor—, y cualquier añadido
-necesita un [ADR](docs/adr/).
+necesita un [ADR](adr/).
 
 ## Estructura
 
@@ -113,6 +121,51 @@ gui/               Heimdall GUI (Electron, TypeScript)
 
 `gui/` es un árbol Node independiente: `make check` no depende de él y su
 suite se ejecuta aparte.
+
+## Entradas por trabajo
+
+| Trabajo | Código de entrada | Pruebas y decisiones |
+|---|---|---|
+| Leer resultados | [CLI](../cmd/heimdall/artifact.go), [lector GUI](../gui/src/main/artifact.ts) | [lector](../gui/tests/artifact-reader.test.ts), ADR-0027 |
+| Validar resultados | [JSON Go](../internal/model/validate_json.go), [modelo Go](../internal/model/validate.go), [GUI](../gui/src/shared/artifact.ts) | [corpus compartido](../testdata/artifacts/corpus.json), [Go](../cmd/heimdall/artifact_corpus_test.go), [GUI](../gui/tests/artifact-corpus.test.ts) |
+| Copiar, retener, recuperar | [backup.ts](../gui/src/main/backup.ts), incluye `BackupChain` | [copias](../gui/tests/backups.test.ts), [recuperación](../gui/tests/backup-recovery.test.ts), ADR-0026 |
+| Reintentar y consolidar | [reintentos](../cmd/heimdall/retry.go), [consolidación](../cmd/heimdall/consolidate.go) | ADR-0018 y ADR-0019 |
+| Sesión de examen | [CLI](../cmd/heimdall/session.go), [GUI](../gui/src/main/session.ts) | ADR-0020; arnés `gui/scripts/examen-lab.ts` |
+| Credenciales del aula | [vault.ts](../gui/src/main/vault.ts) | ADR-0009 y ADR-0023 |
+| Actualizar y distribuir | [feed](../gui/src/main/updater.ts), [servicio](../gui/src/main/update-service.ts), [descarga](../gui/src/main/update-download.ts) | [verificación 0.9.1](releases/0.9.1/VERIFICACION.md); `make gui-dist` |
+| Pantallas y estado visual | [routes/](../gui/src/renderer/src/routes/), [stores/](../gui/src/renderer/src/stores/) | [tests GUI](../gui/tests/) |
+
+La nota se calcula en Go. La GUI valida la coherencia de los resultados;
+el corpus compartido comprueba la aceptación en ambos árboles. El recorrido de
+copias vive dentro de `backup.ts`: la consolidación de notas y la sesión tienen
+sus propios límites en el motor.
+
+## Navegación y comprobaciones del repositorio
+
+```bash
+python3 scripts/tasks.py          # pendientes, prioridad y dependencias
+python3 scripts/tasks.py T160     # tarea completa y alcance de revisión
+python3 scripts/tasks.py --json   # pendientes para otras herramientas
+make docs-check                  # enlaces locales de documentación mantenida
+make tools-check                 # regresiones de las herramientas de navegación
+```
+
+La consulta lee directamente [TASKS.json](project/TASKS.json); no mantiene otra
+lista. El relevo y las revisiones se registran según
+[AGENT-WORKFLOW.md](project/AGENT-WORKFLOW.md).
+
+[CI](../.github/workflows/check.yml) ejecuta las suites rápidas Go y GUI, versión,
+build/preload, enlaces y herramientas en cada push y pull request. Los
+laboratorios SSH y las pruebas de paquetes se ejecutan por separado; sus
+requisitos y el diagnóstico del aislamiento están en [test/README.md](../test/README.md).
+El workflow se activa cuando estos cambios llegan a GitHub.
+
+El comprobador cubre los Markdown de la raíz, reglas, docs de primer nivel,
+design, ADR, informes de revisión, README de GUI/tests/corpus y los Markdown de
+proyecto excepto DECISIONS.
+Comprueba destinos de enlaces inline, referencias e imágenes HTML; no anclas
+ni sitios externos. Excluye research, audits, releases, retrospectives y
+DECISIONS porque conservan evidencia histórica y rutas de otras máquinas.
 
 ## Más
 

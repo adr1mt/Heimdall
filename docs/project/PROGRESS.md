@@ -1,9 +1,17 @@
 # Estado del proyecto
 
 Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
-**Actualizado**: 2026-10-03 · **Fase**: 9 — Endurecimiento y publicación
+**Actualizado**: 2026-10-04 · **Fase**: 9 — Endurecimiento y publicación
 
 ## Última sesión
+
+**T165 · Navegación de agentes y comprobaciones automáticas terminadas.**
+
+- Entrada AGENTS, mapa de código/pruebas y consulta selectiva de tareas.
+- README GUI corregido; relevo y alcance de revisión T160 documentados.
+- CI preparado con suites existentes y enlaces; se activará tras el push.
+- Go/versión, tipos, 525 tests GUI, build/preload y 5 tests de herramientas correctos.
+- Evidencia: [T165](../reviews/T165-NAVEGACION.md).
 
 **0.9.1 · Distribución pública y actualización automática comprobada.**
 

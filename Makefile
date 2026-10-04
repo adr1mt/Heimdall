@@ -1,6 +1,7 @@
-# Heimdall. Go toolchain lives outside PATH on the development machine; see
-# docs/project/PROGRESS.md for how it was installed.
+# Heimdall. See docs/DESARROLLO.md for toolchain prerequisites and GO override.
 GO ?= go
+PYTHON ?= python3
+.DEFAULT_GOAL := check
 BIN := bin/heimdall
 
 # One version for the whole product: the engine is stamped with it at build
@@ -9,7 +10,15 @@ BIN := bin/heimdall
 VERSION := $(shell cat VERSION)
 
 # Test SSH lab. See test/lab.sh.
-.PHONY: check test build version lab lab-down lab-status lab-ra2 lab-ra2-down rendimiento gui-check gui-build gui-dist gui-paquete gui-lab gui-editor clean
+.PHONY: docs-check tools-check check test build version lab lab-down lab-status lab-ra2 lab-ra2-down rendimiento gui-check gui-build gui-dist gui-paquete gui-lab gui-editor clean
+
+## docs-check: maintained local documentation links, without network access.
+docs-check:
+	$(PYTHON) scripts/check_doc_links.py
+
+## tools-check: navigation command and link-checker regressions.
+tools-check:
+	$(PYTHON) -B -m unittest discover -s test/tools -p 'test_*.py'
 
 ## check: fast suite. No network, no disk. Must stay under 10 s.
 check:

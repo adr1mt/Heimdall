@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated": "2026-10-03",
+  "updated": "2026-10-04",
   "status_values": [
     "BLOCKED",
     "READY",
@@ -3119,7 +3119,22 @@
       "tests": [
         "docs/audits/2026-10-03/RECUPERACION.md y evidencia de T156–T158; PROGRESS.md ya confirma revisión terminada."
       ],
-      "completed": "2026-10-03"
+      "completed": "2026-10-03",
+      "review": {
+        "base": "3a8ab73c64a46c9e61f5512a1bb988ba00e0b3ac",
+        "head": "1d1f3fe58a5e261500528cbb096b2f4c777507f0",
+        "includes_uncommitted": false,
+        "task_ids": [
+          "T156",
+          "T157",
+          "T158"
+        ],
+        "report": "docs/reviews/T160-ARQUITECTURA.md",
+        "status": "COMPLETE",
+        "follow_up": [
+          "T159"
+        ]
+      }
     },
     {
       "id": "T161",
@@ -3217,6 +3232,37 @@
         "docs/releases/0.9.1/evidence/real-update.log registra por separado el bloqueo automático y el éxito manual; exit 3 expresa únicamente el bloqueo automático."
       ],
       "completed": "2026-10-03"
+    },
+    {
+      "id": "T165",
+      "title": "Mejorar navegación de agentes y comprobaciones automáticas",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P2",
+      "depends_on": [
+        "T160"
+      ],
+      "goal": "Localizar código, pruebas, estado y revisiones sin reconstruir chats ni cargar el backlog completo.",
+      "scope": [
+        "Entrada AGENTS, mapa de código y corrección de documentación vigente.",
+        "Consulta selectiva de TASKS, alcance persistente de revisiones y guía de relevo.",
+        "CI con suites existentes y comprobador de enlaces locales mantenidos."
+      ],
+      "acceptance": [
+        "AGENTS dirige a instrucciones, estado y consulta de tareas con rutas existentes.",
+        "Consulta de pendientes excluye DONE/DROPPED, muestra dependencias y consulta individual conserva criterios completos; ID desconocido falla.",
+        "README GUI respeta ADR-0023; desarrollo localiza código/pruebas y documenta ambos laboratorios y diagnóstico de aislamiento.",
+        "T160 registra base, final, tareas revisadas e informe; próximos relevos usan rutas completas y alcance explícito.",
+        "CI ejecuta Go, versión, tipos/tests GUI, build/preload y comprobación de enlaces; enlaces rotos hacen fallar el comando.",
+        "Pruebas de herramientas, enlaces, make check, make gui-check y make gui-build correctos, con límites registrados."
+      ],
+      "tests": [
+        "make tools-check: 5 regresiones correctas; make docs-check sin enlaces locales rotos.",
+        "Consulta de pendientes JSON y tarea individual correctas; ID desconocido termina con código 2.",
+        "make check version correcto; make gui-check gui-build fuera del aislamiento: tipos, 525 tests GUI, build y preload correctos.",
+        "Workflow YAML comprobado localmente; primera ejecución GitHub pendiente de push. Evidencia: docs/reviews/T165-NAVEGACION.md."
+      ],
+      "completed": "2026-10-04"
     }
   ]
 }

@@ -21,6 +21,8 @@ descanso.
 
 | Necesitas… | Lee |
 |---|---|
+| Código y pruebas por trabajo | [docs/DESARROLLO.md](docs/DESARROLLO.md#entradas-por-trabajo) |
+| Relevo o revisión entre sesiones | [docs/project/AGENT-WORKFLOW.md](docs/project/AGENT-WORKFLOW.md) |
 | Arquitectura vigente | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | Decisiones cerradas | [docs/adr/](docs/adr/) |
 | Fases del producto | [docs/ROADMAP.md](docs/ROADMAP.md) |
@@ -57,9 +59,10 @@ Prioridad ante contradicciones: **ADR aceptado > `docs/design/` > `docs/research
 ## Empezar una sesión
 
 1. `pwd` y `git status`; `git log --oneline -5`.
-2. Lee este fichero, `docs/project/PROGRESS.md` y `docs/project/TASKS.json`.
+2. Lee este fichero y `docs/project/PROGRESS.md`. Consulta pendientes con
+   `python3 scripts/tasks.py`, o una tarea completa con `python3 scripts/tasks.py T165`.
 3. Lee los ADR y las reglas que cite la tarea elegida. Nada más.
-4. Smoke test mínimo: `make check` cuando exista el módulo Go.
+4. Smoke test mínimo: `make check`.
 
 ## Seleccionar la tarea
 

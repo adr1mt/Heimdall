@@ -72,3 +72,26 @@ credenciales reales.
 Los ficheros que entrega cada alumno están en `test/ra2/configs/<variante>/`.
 Editarlos y volver a levantar el laboratorio es la forma de probar una
 comprobación nueva.
+
+## Suites y diagnóstico del entorno
+
+`make check` solo ejecuta el motor; `make gui-check` ejecuta tipos y Vitest.
+`make gui-build` incluye la verificación del preload. Para `make test`, levanta
+primero **ambos** laboratorios: `make lab` y `make lab-ra2`.
+
+Los arneses SSH, editor, modo examen y secretos comparten laboratorio y pueden
+alterar sus procesos/archivos. Ejecútalos secuencialmente, incluidas las
+comprobaciones de paquetes, con exámenes y perfiles temporales.
+
+Si `make gui-check` falla con `getaddrinfo EAI_AGAIN localhost`, comprueba la
+resolución con `node -e "require('node:dns').lookup('localhost', console.log)"`.
+En sesiones anteriores Vitest falló al resolver localhost dentro del
+aislamiento; las mismas pruebas pasaron fuera de él. Las pruebas de cierre
+también agotaron su espera dentro del aislamiento con el código anterior.
+Contrasta el fallo con la base antes de modificar configuración o pruebas.
+Cuando el entorno lo permita, repite el comando con los permisos necesarios;
+registra comando, síntoma y resultado de ambas ejecuciones.
+
+La [verificación de recuperación](../docs/audits/2026-10-03/RECUPERACION.md)
+registra el caso y su evidencia. Los límites del entorno no justifican debilitar
+pruebas ni afirmar que una suite pasó sin ejecutarla.

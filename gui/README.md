@@ -7,48 +7,28 @@ secretos por `stdin`, eventos NDJSON y artefacto canónico
 ([docs/design/09-CONTRATO-GUI.md](../docs/design/09-CONTRATO-GUI.md)). No lee
 ningún fichero de Teutón y no conoce `internal/legacy`.
 
-## Qué hay hoy (T054)
+## Referencias
 
-La aplicación corrige. Se eligen el examen y el aula, se escriben las
-contraseñas que el aula nombra, y la corrección avanza en pantalla comprobación
-a comprobación, alumno a alumno, con un botón para detenerla. Al terminar dice
-qué ha pasado y dónde ha quedado el resultado.
+| Necesitas… | Lee |
+|---|---|
+| Uso y flujo de clases, editor, resultados y copias | [Guía](../docs/GUIA.md) |
+| Estado y tareas pendientes | [PROGRESS](../docs/project/PROGRESS.md); `python3 ../scripts/tasks.py` |
+| Código y pruebas por trabajo | [Desarrollo](../docs/DESARROLLO.md#entradas-por-trabajo) |
+| Persistencia de la contraseña del aula | [ADR-0023](../docs/adr/0023-la-contrasena-del-aula-se-recuerda-cifrada.md) |
+| Pruebas de la GUI antigua retiradas | [Registro histórico](docs/TESTS-RETIRADOS.md) |
 
-En Resultados sale cada alumno con su estado y su nota, la matriz de
-comprobaciones y el detalle de cualquiera: causa técnica, comando ejecutado,
-qué se esperaba, qué se encontró y las salidas con su corte. Un alumno al que
-no se pudo llegar sale **sin nota**, nunca con un 0, y un examen incompleto no
-enseña nota final en ningún sitio (principio 3, ADR-0006).
+La contraseña del aula se recuerda cifrada con `safeStorage` en un fichero
+propio de datos de usuario. Sin cifrado disponible se teclea en cada ejecución;
+no hay respaldo en claro. Hacia el motor viaja por `stdin` (ADR-0009).
 
-Cuando queda algo sin comprobar, Resultados lo dice —en comprobaciones y en
-peso— y ofrece dos salidas: dejarlo pendiente o repetir solo lo que no se pudo
-evaluar. Nada de eso convierte un «sin evaluar» en suspenso (ADR-0018).
-
-En Histórico están las correcciones ya guardadas del examen elegido, de la más
-reciente a la más antigua. Abrirlas no toca ninguna máquina: enseña el mismo
-artefacto en la misma pantalla. Una corrección cuyo fichero no se puede leer
-conserva su fila, con el motivo.
-
-- **T056**: exportación de notas y escala del profesor.
-- **T058**: modo examen y modo proyector.
-
-Las contraseñas viven en memoria y solo en memoria: viajan por `stdin` al
-motor, nunca en `argv`, nunca al disco y nunca a un fichero de ajustes
-(ADR-0009). Elegir otro aula las borra; terminar una corrección también.
-
-El examen tiene que llamarse `examen.yaml` y el aula estar en su misma carpeta:
-el motor recibe un directorio, no dos rutas. El artefacto se escribe en `var/`
-dentro de esa carpeta.
-
-De `teuton-gui` se conservan la base técnica (Electron, Vite, CSP, preload
-aislado), el sistema visual (`components/ui`, `styles/globals.css`,
-`tailwind.config.js`) y el flujo de trabajo. Nada de su contrato. Los tests que
-no han pasado están listados en [docs/TESTS-RETIRADOS.md](docs/TESTS-RETIRADOS.md).
+El motor recibe el directorio del examen. La GUI genera el aula a partir de la
+clase elegida ([ADR-0022](../docs/adr/0022-aula-generada-derivada-de-la-clase.md));
+los resultados quedan en `var/` junto al examen.
 
 ## Comandos
 
 ```bash
-npm install
+npm ci
 npm run dev          # aplicación en desarrollo
 npm test             # suite rápida (vitest)
 npm run typecheck    # main, renderer y tests
@@ -57,13 +37,13 @@ npm run screenshot   # captura visual de la ventana ya compilada
 npm run icon         # regenera build/icon.png y build/icons/
 ```
 
-Aceptación de T052, contra el laboratorio (`make lab`, `make build`,
+Arnés de corrección e histórico, contra el laboratorio (`make lab`, `make build`,
 `npm run build`):
 
 ```bash
 PROJECT=/ruta/al/examen HEIMDALL_ENGINE=../bin/heimdall \
   LAB_SECRET_FILE=/ruta/al/fichero/con/la/clave npm run lab-run
-./scripts/secretos.sh   # corrección entera + ninguna contraseña fuera de memoria
+./scripts/secretos.sh   # corrección y comprobación de secretos
 ```
 
 `lab-run` corrige a través de la aplicación construida —preload, IPC y vistas
@@ -73,7 +53,7 @@ diálogo de ficheros del sistema, que no se puede pulsar desde un script.
 comprobación en Resultados. Al terminar reabre esa misma corrección desde el
 histórico y compara las dos pantallas (H-1). Desde la raíz: `make gui-lab`.
 
-Aceptación de T058, con el mismo laboratorio:
+Arnés de modo examen, con el mismo laboratorio:
 
 ```bash
 PROJECT=/ruta/al/examen HEIMDALL_ENGINE=../bin/heimdall \
