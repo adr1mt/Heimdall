@@ -158,6 +158,23 @@ describe('backupRuns', () => {
     expect((await backupRuns(dataDir, examPath)).saved).toBe(0)
   })
 
+  it('keeps the exact grades and provenance on a second pass', async () => {
+    const { dataDir, examPath, varDir } = workspace()
+    const run = parseArtifact(artifact('R1', '2026-09-21T09:00:00Z', 73))
+    run.warnings = [{ scope: 'run', code: 'SOURCE_WARNING', message: 'Aviso original' }]
+    const original = JSON.stringify(run)
+    const source = join(varDir, 'run-R1.json')
+    const target = join(slotFor(dataDir, examPath), 'run-R1.json')
+    writeFileSync(source, original)
+
+    expect((await backupRuns(dataDir, examPath)).saved).toBe(1)
+    const expected = `${JSON.stringify(gradesOnly(run))}\n`
+    expect(readFileSync(target, 'utf8')).toBe(expected)
+    expect((await backupRuns(dataDir, examPath)).saved).toBe(0)
+    expect(readFileSync(target, 'utf8')).toBe(expected)
+    expect(readFileSync(source, 'utf8')).toBe(original)
+  })
+
   it('copies again the correction whose copy was deleted', async () => {
     const { dataDir, examPath } = workspace()
     writeRun(varDirOf(examPath), 'R1', '2026-09-21T09:00:00Z')

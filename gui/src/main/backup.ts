@@ -106,18 +106,24 @@ async function copyRuns(dataDir:string,examPath:string):Promise<BackupReport> {
   }
   return entries.sort((a,b)=>b.at-a.at || b.name.localeCompare(a.name))
  }
- // Load the whole dependency chain before writing any of its members.
+ // Validate the whole dependency chain before writing any of its members.
+ // Retain only grades: the full machine output of each source is discarded
+ // after its individual read, including when its copy already exists.
  // A broken chain is reported, never offered as a recoverable correction.
  const cache = new Map<string, RunResult>()
  async function load(name:string):Promise<RunResult> {
   const cached=cache.get(name); if(cached) return cached
   if(!RUN_FILE.test(name)) throw new Error('nombre de antecedente inválido')
-  let path=join(sourceDir,name)
+  let path=join(sourceDir,name),fromSource=true
   try {await stat(path)} catch(error) {
    if((error as NodeJS.ErrnoException).code!=='ENOENT') throw error
    path=join(slot,name)
+   fromSource=false
   }
-  const run=await readArtifactAsync(path); cache.set(name,run); return run
+  const run=await readArtifactAsync(path)
+  const retained=fromSource?gradesOnly(run):run
+  cache.set(name,retained)
+  return retained
  }
  async function chainOf(name:string):Promise<string[]> {
   const chain = new BackupChain()
@@ -134,7 +140,7 @@ async function copyRuns(dataDir:string,examPath:string):Promise<BackupReport> {
     try {await stat(target);continue} catch(error) {if((error as NodeJS.ErrnoException).code!=='ENOENT') throw error}
     await mkdir(slot,{recursive:true})
     const tmp=`${target}.tmp`
-    try {await writeFile(tmp,`${JSON.stringify(gradesOnly(cache.get(member)!))}\n`,'utf8');await rename(tmp,target)} finally {await rm(tmp,{force:true}).catch(()=>undefined)}
+    try {await writeFile(tmp,`${JSON.stringify(cache.get(member)!)}\n`,'utf8');await rename(tmp,target)} finally {await rm(tmp,{force:true}).catch(()=>undefined)}
     report.saved++
    }
   } catch(error) {failure(join(sourceDir,name),error)}

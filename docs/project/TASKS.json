@@ -3340,7 +3340,7 @@
       "id": "T168",
       "title": "Reducir la memoria de las copias automáticas",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "Conservar notas y relaciones de procedencia sin retener las salidas completas de todos los originales.",
@@ -3355,8 +3355,19 @@
         "Una segunda pasada sin nuevas correcciones conserva copias y notas; su memoria no crece con la suma de salidas de los originales.",
         "Repetir la medición de 50 resultados voluminosos y comprobar copias, rotación, restauración y cierre con copia pendiente."
       ],
-      "tests": [],
-      "notes": "Hallazgo F2 de T166, preexistente en 572d9eb. Evidencia y reproducción: docs/reviews/T166-AUDITORIA.md. Implementar como tarea crítica separada."
+      "tests": [
+        "node --expose-gc /tmp/heimdall-t168-backup.cjs <n30-s65536/run-*.json> 50",
+        "node --expose-gc --max-old-space-size=128 /tmp/heimdall-t168-verify.cjs <n30-s65536/run-*.json>",
+        "npm test -- tests/backups.test.ts tests/backup-recovery.test.ts tests/shutdown.test.ts",
+        "GOCACHE=/tmp/heimdall-t168-go-cache make check",
+        "GOCACHE=/tmp/heimdall-t168-go-cache go test -race ./...",
+        "make test",
+        "make gui-check gui-build",
+        "make gui-lab",
+        "make docs-check tools-check"
+      ],
+      "notes": "F2 de T166 reproducido antes del cambio con 50 originales de 6,36 MB: segunda pasada sin nuevas copias, 341.604.264 B de heap ocupado tras la llamada. Después: 57.867.168 B (83 % menos), también completó con heap V8 de 128 MB. Se conservan notas, procedencia, validación y precedencia del original; 50 copias comparadas y restauradas, rotación/cadenas y cierre pendiente verificados. Sigue leyendo originales para detectar cambios o corrupción, pero no conserva sus salidas en el cache. Evidencia y límites en docs/reviews/evidence/T168/RESULTADOS.md. F3 queda para T169.",
+      "completed": "2026-10-04"
     },
     {
       "id": "T169",
