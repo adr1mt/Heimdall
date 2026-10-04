@@ -1,0 +1,4 @@
+{"all_grades":100,"artifact":"/tmp/heimdall-audit-writer-443416708/run-SYNTHETIC.json","bytes_written":421394967,"mode":"full","partials":100,"seconds":12.580415993999999}
+elapsed=13.08 max_rss_kib=809404
+{"all_grades":100,"artifact":"/tmp/heimdall-audit-writer-1228077446/run-SYNTHETIC.json","bytes_written":8143687,"mode":"final","partials":0,"seconds":0.232509119}
+elapsed=0.83 max_rss_kib=929108

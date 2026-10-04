@@ -3263,6 +3263,157 @@
         "Workflow YAML comprobado localmente; primera ejecución GitHub pendiente de push. Evidencia: docs/reviews/T165-NAVEGACION.md."
       ],
       "completed": "2026-10-04"
+    },
+    {
+      "id": "T166",
+      "title": "Auditar simplicidad, robustez, fiabilidad y rendimiento del programa",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Evaluar el estado actual con evidencia reproducible y priorizar mejoras pequeñas, sin ampliar funciones ni reescribir el producto.",
+      "acceptance": [
+        "Revisar motor, ejecución/cancelación, persistencia, contrato y flujos principales de GUI.",
+        "Ejecutar las suites disponibles y registrar resultados y límites reales.",
+        "Documentar hallazgos verificables con impacto, reproducción y solución mínima; distinguirlos de oportunidades de simplificación.",
+        "Registrar tareas de reparación priorizadas sin modificar el comportamiento del producto en esta auditoría."
+      ],
+      "tests": [
+        "make check y go test -race ./... correctos con caché temporal.",
+        "make gui-check gui-build: tipos, 525 pruebas/33 archivos y build/preload correctos fuera del sandbox; EAI_AGAIN dentro.",
+        "make test con ambos laboratorios: SSH, secretos, aceptación, eventos, sesiones, RA2 y 100 alumnos correctos.",
+        "make gui-lab gui-editor: corrección, histórico, CSV, recuperación y editor correctos con perfiles temporales.",
+        "Arneses de auditoría reproducen bloqueo por stdout sin lector, consumo de copias, errores ocultos y coste de PLAN/parciales. Evidencia: docs/reviews/T166-AUDITORIA.md.",
+        "make docs-check tools-check y git diff --check correctos; informe y tareas T167–T171 registrados."
+      ],
+      "review": {
+        "base": "572d9ebb07d564f7399b1cc5d94d44911f6c1fc3",
+        "head": "572d9ebb07d564f7399b1cc5d94d44911f6c1fc3",
+        "includes_uncommitted": false,
+        "task_ids": [
+          "T166"
+        ],
+        "report": "docs/reviews/T166-AUDITORIA.md",
+        "status": "COMPLETE",
+        "follow_up": [
+          "T167",
+          "T168",
+          "T169",
+          "T170",
+          "T171"
+        ]
+      },
+      "completed": "2026-10-04"
+    },
+    {
+      "id": "T167",
+      "title": "Evitar que el canal de progreso bloquee la corrección o la cancelación",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Acotar la entrega de eventos sin impedir el resultado canónico cuando stdout deja de consumirse.",
+      "scope": [
+        "internal/events/events.go",
+        "cmd/heimdall/run.go",
+        "internal/engine/engine.go"
+      ],
+      "acceptance": [
+        "Un consumidor que mantiene stdout abierto y nunca lee no impide terminar o cancelar y guardar un resultado coherente.",
+        "La entrega usa memoria y espera acotadas; ninguna goroutine o cola por evento puede crecer indefinidamente.",
+        "La pérdida o fallo de progreso se informa de forma visible sin cambiar estados, pesos ni notas.",
+        "Regresión con proceso real, tubería saturada y SIGINT, además de contrato NDJSON, cancelación y suite rápida correctos."
+      ],
+      "tests": [],
+      "notes": "Hallazgo F1 de T166, preexistente en 572d9eb. Evidencia y reproducción: docs/reviews/T166-AUDITORIA.md. Implementar como tarea crítica separada."
+    },
+    {
+      "id": "T168",
+      "title": "Reducir la memoria de las copias automáticas",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Conservar notas y relaciones de procedencia sin retener las salidas completas de todos los originales.",
+      "scope": [
+        "gui/src/main/backup.ts",
+        "gui/tests/backups.test.ts",
+        "gui/tests/backup-recovery.test.ts"
+      ],
+      "acceptance": [
+        "El recorrido no acumula evidencia de las máquinas en el cache de 50 cabeceras y sus antecedentes.",
+        "Se mantienen validación, identidad, PLAN, límites, precedencia del original, orden de publicación y protección de antecedentes.",
+        "Una segunda pasada sin nuevas correcciones conserva copias y notas; su memoria no crece con la suma de salidas de los originales.",
+        "Repetir la medición de 50 resultados voluminosos y comprobar copias, rotación, restauración y cierre con copia pendiente."
+      ],
+      "tests": [],
+      "notes": "Hallazgo F2 de T166, preexistente en 572d9eb. Evidencia y reproducción: docs/reviews/T166-AUDITORIA.md. Implementar como tarea crítica separada."
+    },
+    {
+      "id": "T169",
+      "title": "Distinguir ausencia de resultados de errores de lectura",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Mostrar problemas de acceso o corrupción en histórico y copias sin ocultar los resultados válidos.",
+      "scope": [
+        "gui/src/main/history.ts",
+        "gui/src/main/backup.ts",
+        "gui/src/renderer/src/routes/History.tsx"
+      ],
+      "acceptance": [
+        "Carpeta inexistente sigue siendo un caso vacío; EACCES y otros errores de E/S muestran ruta y motivo.",
+        "Una copia corrupta o cadena inválida se informa sin presentarla como recuperable ni borrarla.",
+        "Los resultados o copias válidos siguen disponibles junto con las incidencias; restaurar no afirma ausencia si existen archivos inválidos.",
+        "Pruebas con permisos denegados, una copia corrupta y mezcla de archivos válidos/inválidos; suite GUI correcta."
+      ],
+      "tests": [],
+      "notes": "Hallazgo F3 de T166, preexistente en 572d9eb. Evidencia y reproducción: docs/reviews/T166-AUDITORIA.md. Implementar como tarea crítica separada."
+    },
+    {
+      "id": "T170",
+      "title": "Reducir trabajo repetido al guardar resultados parciales",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Evitar reprocesar la evidencia de todos los alumnos terminados después de cada alumno, preservando los parciales.",
+      "scope": [
+        "internal/engine/engine.go",
+        "internal/report/report.go",
+        "internal/report/budget.go",
+        "internal/report/redact.go"
+      ],
+      "acceptance": [
+        "Se conserva la garantía de material útil publicado atómicamente después de cada alumno; no se eliminan parciales para acelerar.",
+        "Redacción de secretos y recorte de evidencia siguen siendo correctos y no modifican las aserciones, notas o el PLAN.",
+        "La preparación de evidencia terminada evita trabajo redundante proporcional al número de parciales; no introduce colas ilimitadas ni una segunda fuente de verdad.",
+        "Repetir comparación de 30/100 alumnos y respuestas largas, registrar tiempos y bytes; pruebas de muerte del proceso, secretos, presupuesto y suite Go correctas."
+      ],
+      "tests": [],
+      "notes": "Hallazgo F4 de T166, preexistente en 572d9eb. Evidencia y reproducción: docs/reviews/T166-AUDITORIA.md. Implementar como tarea crítica separada."
+    },
+    {
+      "id": "T171",
+      "title": "Acotar memoria al calcular la huella del PLAN",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Calcular la identidad del PLAN sin amplificar en un gran buffer las respuestas repetidas por comprobación.",
+      "scope": [
+        "internal/plan/resolve.go",
+        "internal/plan/resolve_test.go"
+      ],
+      "acceptance": [
+        "Perfilar las asignaciones de PLAN y reducir el materializado de respuestas del caso 100 alumnos por 20 comprobaciones de 65536 bytes.",
+        "La huella mantiene el mismo significado y bytes para planes existentes; no invalida reintentos ni sesiones previas.",
+        "Se conservan límites de 2000 celdas, metadatos y respuestas, validación anterior a SSH y tratamiento de errores.",
+        "Medición de memoria antes/después y regresiones de huella, PLAN, reintentos y sesiones; suite rápida correcta."
+      ],
+      "tests": [],
+      "notes": "Hallazgo F4 de T166, preexistente en 572d9eb. Evidencia y reproducción: docs/reviews/T166-AUDITORIA.md. Implementar como tarea crítica separada."
     }
   ]
 }

@@ -5,14 +5,16 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T165 · Navegación de agentes y comprobaciones automáticas terminadas.**
+**T166 · Auditoría de simplicidad, robustez, fiabilidad y rendimiento terminada.**
 
-- Entrada AGENTS, mapa de código/pruebas y consulta selectiva de tareas.
-- README GUI corregido; relevo y alcance de revisión T160 documentados.
-- CI preparado con suites existentes y enlaces; se activará tras el push.
-- Go/versión, tipos, 525 tests GUI, build/preload y 5 tests de herramientas correctos.
-- Evidencia: [T165](../reviews/T165-NAVEGACION.md).
-
+- Base auditada: 572d9eb; producto sin modificar. Informe y reproducciones:
+  [T166](../reviews/T166-AUDITORIA.md).
+- Go, detector de carreras, 525 tests GUI, build/preload, suite SSH completa,
+  RA2, 100 alumnos, GUI/editor, histórico, CSV y recuperación correctos.
+- Hallazgos: canal de progreso bloquea cancelación si no se consume;
+  copias retienen evidencia; lecturas fallidas aparentan listas vacías;
+  PLAN/parciales amplifican memoria y trabajo en casos grandes admitidos.
+- Reparaciones pendientes T167–T171, críticas y separadas. Sin reescritura.
 **0.9.1 · Distribución pública y actualización automática comprobada.**
 
 - Revisión de arquitectura terminada; registro cerrado como T160.
@@ -53,4 +55,6 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Siguiente trabajo
 
+Auditoría: priorizar T167 (cancelación) y T168 (memoria de copias), después
+T169 (errores visibles) y T170/T171 (parciales/PLAN). Evidencia en T166.
 **T070** sigue desbloqueando **T084**, examen real de aula que ejecuta Adrià.

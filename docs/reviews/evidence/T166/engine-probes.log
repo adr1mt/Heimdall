@@ -1,0 +1,5 @@
+{"case": "n30-s32", "exit": 0, "seconds_rss_kib": "0.28 19236", "artifact_bytes": 784215, "stderr": ""}
+{"case": "n30-s65536", "exit": 0, "seconds_rss_kib": "2.81 240040", "artifact_bytes": 6358523, "stderr": ""}
+{"case": "n100-s65536", "exit": 0, "seconds_rss_kib": "16.48 809932", "artifact_bytes": 8143698, "stderr": ""}
+{"case": "unread-progress", "still_alive_3s_after_sigint": true, "exit_after_draining": 4, "events_bytes": 568334, "final_artifacts": 1, "stderr": ""}
+{"temporary_work": "/tmp/heimdall-audit-engine-kbmbprrl"}

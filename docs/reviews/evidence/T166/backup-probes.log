@@ -1,0 +1,6 @@
+{"case":"backup","pass":1,"count":50,"sourceBytes":6358523,"seconds":0.6541954470000001,"before":{"rss":76578816,"heapTotal":34873344,"heapUsed":16858944,"external":2202869,"arrayBuffers":143611},"after":{"rss":538152960,"heapTotal":456425472,"heapUsed":339878096,"external":43184677,"arrayBuffers":29119701},"maxRssKiB":525540,"saved":50,"failures":[]}
+{"case":"backup","pass":2,"count":50,"sourceBytes":6358523,"seconds":0.4521889840000001,"before":{"rss":538697728,"heapTotal":151552000,"heapUsed":10287248,"external":31181600,"arrayBuffers":14563282},"after":{"rss":643063808,"heapTotal":443056128,"heapUsed":341438920,"external":91302161,"arrayBuffers":53227726},"maxRssKiB":627992,"saved":0,"failures":[]}
+{"case":"unreadable-history","rows":[]}
+{"case":"unreadable-backups","rows":[]}
+{"case":"corrupt-backup","listed":[],"restoration":"Error: No hay ninguna copia de seguridad de este examen."}
+{"temporary_work":"/tmp/heimdall-audit-backup-OwTXPr","temporary_corrupt":"/tmp/heimdall-audit-corrupt-9fvSVG"}
