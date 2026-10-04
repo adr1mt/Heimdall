@@ -33,6 +33,7 @@ test: check build
 	test/secrets.sh
 	test/acceptance.sh
 	test/eventos.sh
+	$(PYTHON) test/progress_pipe.py
 	test/sesion.sh
 	test/ra2.sh
 	test/carga.sh

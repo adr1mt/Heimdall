@@ -7,6 +7,7 @@ import (
 	"io"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"heimdall/internal/engine"
 	"heimdall/internal/events"
@@ -120,7 +121,7 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 	// middle of it would break the only channel the GUI has.
 	var stream *events.Emitter
 	if *eventStream == "ndjson" {
-		stream = events.New(stdout, values(secrets))
+		stream = events.NewBuffered(stdout, values(secrets))
 		stream.RunStart(runStartOf(runID, p, retry))
 	}
 
@@ -141,12 +142,21 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 			return nil
 		},
 	})
+	if stream != nil {
+		if err := stream.Err(); err != nil {
+			result.Warnings = append(result.Warnings, model.Warning{
+				Scope: "run", Code: "PROGRESS_LOST",
+				Message: "se perdió parte del progreso; consulte el resultado guardado",
+			})
+		}
+	}
 
 	path, err := writer.WriteFinal(result)
 	if err != nil {
 		fmt.Fprintf(stderr, "heimdall run: no se pudo escribir el artefacto: %s\n", err)
 		if stream != nil {
 			stream.RunEnd(runEndOf(result, "", exitFailure))
+			stream.Finish(500 * time.Millisecond)
 		}
 		return exitFailure
 	}
@@ -158,6 +168,7 @@ func runCmd(args []string, stdout, stderr io.Writer) int {
 
 	if stream != nil {
 		stream.RunEnd(runEndOf(result, path, code))
+		stream.Finish(500 * time.Millisecond)
 		if err := stream.Err(); err != nil {
 			fmt.Fprintf(stderr, "heimdall run: aviso: %s\n", err)
 		}

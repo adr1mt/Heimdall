@@ -78,6 +78,9 @@ comprobación nueva.
 `make check` solo ejecuta el motor; `make gui-check` ejecuta tipos y Vitest.
 `make gui-build` incluye la verificación del preload. Para `make test`, levanta
 primero **ambos** laboratorios: `make lab` y `make lab-ra2`.
+`test/progress_pipe.py` también se ejecuta en `make test`: usa un proceso real
+con alumnado ficticio, satura la tubería de eventos sin leerla y comprueba el
+resultado guardado tanto al terminar como al cancelar. No necesita SSH.
 
 Los arneses SSH, editor, modo examen y secretos comparten laboratorio y pueden
 alterar sus procesos/archivos. Ejecútalos secuencialmente, incluidas las

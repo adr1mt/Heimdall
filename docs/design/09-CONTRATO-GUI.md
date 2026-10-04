@@ -68,6 +68,14 @@ Los alumnos se evalúan en paralelo, así que **los eventos de alumnos distintos
 se entrelazan**. Dentro de un alumno el orden sí es el del PLAN. Cada evento
 dice de quién habla con `student_id`.
 
+La entrega de progreso tiene una reserva fija y una espera de cierre acotada.
+Si el consumidor deja de leer, pueden faltar eventos: el motor informa del
+problema por `stderr` y, cuando lo detecta antes del guardado final, añade el
+aviso `PROGRESS_LOST` al resultado. El artefacto se guarda igualmente, con las
+mismas notas y estados. Un `run.end` que no llegue sigue significando que la
+GUI no puede dar por cerrado el flujo; debe mostrar el problema y no inferir
+notas a partir de los eventos recibidos.
+
 ## 4. Los cinco eventos
 
 ### `run.start`

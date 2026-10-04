@@ -211,6 +211,42 @@ func TestAWriteFailureIsRemembered(t *testing.T) {
 	}
 }
 
+func TestBufferedStreamKeepsTheNormalContract(t *testing.T) {
+	var buf bytes.Buffer
+	e := NewBuffered(&buf, nil)
+	e.RunStart(RunStart{RunID: "R"})
+	e.CheckEnd(CheckEnd{StudentID: "a", CheckID: "c"})
+	e.RunEnd(RunEnd{Status: model.RunComplete})
+	e.Finish(time.Second)
+	if err := e.Err(); err != nil {
+		t.Fatal(err)
+	}
+	got := lines(t, &buf)
+	if len(got) != 3 || got[0]["event"] != "run.start" || got[1]["event"] != "check.end" || got[2]["event"] != "run.end" {
+		t.Fatalf("unexpected buffered stream: %s", buf.String())
+	}
+}
+
+func TestBufferedStreamDoesNotWaitForBlockedWriter(t *testing.T) {
+	release := make(chan struct{})
+	defer close(release)
+	e := NewBuffered(waitingWriter{release}, nil)
+	for i := 0; i < maxQueuedLines+10; i++ {
+		e.CheckEnd(CheckEnd{StudentID: "a", CheckID: "c"})
+	}
+	e.Finish(10 * time.Millisecond)
+	if err := e.Err(); err == nil || !strings.Contains(err.Error(), "progreso") {
+		t.Fatalf("blocked progress was not reported: %v", err)
+	}
+}
+
+type waitingWriter struct{ release <-chan struct{} }
+
+func (w waitingWriter) Write(p []byte) (int, error) {
+	<-w.release
+	return len(p), nil
+}
+
 type failingWriter struct{}
 
 func (failingWriter) Write([]byte) (int, error) { return 0, errors.New("tubería rota") }

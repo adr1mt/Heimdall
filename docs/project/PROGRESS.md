@@ -5,48 +5,42 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T166 · Auditoría de simplicidad, robustez, fiabilidad y rendimiento terminada.**
+**T167 · El progreso atascado ya no bloquea el motor ni la cancelación.**
 
-- Base auditada: 572d9eb; producto sin modificar. Informe y reproducciones:
-  [T166](../reviews/T166-AUDITORIA.md).
-- Go, detector de carreras, 525 tests GUI, build/preload, suite SSH completa,
-  RA2, 100 alumnos, GUI/editor, histórico, CSV y recuperación correctos.
-- Hallazgos: canal de progreso bloquea cancelación si no se consume;
-  copias retienen evidencia; lecturas fallidas aparentan listas vacías;
-  PLAN/parciales amplifican memoria y trabajo en casos grandes admitidos.
-- Reparaciones pendientes T167–T171, críticas y separadas. Sin reescritura.
-**0.9.1 · Distribución pública y actualización automática comprobada.**
+- Base: 8853b90, árbol limpio. El arnés T166 documentó el fallo; la regresión
+  nueva lo reprodujo antes del cambio: SIGINT no terminó en 10 s.
+- Un único escritor entrega eventos con 256 líneas y 2 MiB en espera como
+  máximo; el cierre espera hasta 500 ms. El resultado canónico se guarda sin
+  depender del consumidor. La pérdida se avisa por stderr y, si se conoce antes
+  del guardado final, también en el resultado (`PROGRESS_LOST`).
+- `test/progress_pipe.py`: proceso real, tubería saturada sin leer ni drenar;
+  cancelación exit 4 y terminación normal exit 0, ambas con resultado guardado.
+  El caso normal conserva 100 notas finales de 100. Integrado en `make test`.
+- Reproducción T166 repetida: ya no se bloquea; acabó antes de recibir SIGINT,
+  por lo que la cancelación la acredita la regresión nueva. Caso voluminoso
+  100×20: 16,46 s y 824056 KiB RSS; quedan T170/T171.
+- `make check`, `go test -race ./...`, `make test` completo, `make gui-check
+  gui-build` (525 pruebas), `make docs-check tools-check` correctos. La GUI
+  pasó fuera del aislamiento por el fallo conocido `EAI_AGAIN localhost`.
+- Contrato NDJSON y protecciones de secretos correctos. Sin cambios en notas,
+  pesos ni estados. No se ha publicado ni hecho push.
 
-- Revisión de arquitectura terminada; registro cerrado como T160.
-  T156–T159 incorporadas a los nuevos paquetes, además de T127–T155.
-- T161 terminada: AppImage/.deb y motor embebido 0.9.1 reconstruidos.
-- Suite Go completa con SSH, aceptación, secretos, sesiones, RA2 y 100 alumnos;
-  tipos GUI y 525 tests en 33 archivos correctos.
-- Editor, corrección, histórico, CSV y recuperación correctos. AppImage final
-  y contenido del .deb comprobados con perfiles temporales y sandbox renderer.
-- Modo examen: dos vueltas reales cada 5 min, un solo motor, nota/procedencia
-  correctas, alumno terminado excluido, proyector y cierre correctos.
-- T162 terminada: release v0.9.1 publicada como latest en GitHub.
-  Código de release: 022f2e7. AppImage, .deb y SHA256SUMS con tamaño/digest
-  GitHub idénticos a los paquetes comprobados. Descarga autenticada verificada.
-- T164 terminada: actualización manual real de AppImage 0.9.0 a la descarga
-  privada 0.9.1; GUI y motor correctos y clase guardada conservada.
-- El propietario autorizó hacer público `adr1mt/Heimdall`; código y releases
-  permanecen en el mismo repositorio. GitHub confirma PUBLIC, feed HTTP 200.
-- T163 terminada: AppImage 0.9.0 descarga 0.9.1 sin autenticación, conserva
-  el binario mientras está abierto y lo sustituye al cerrar con SHA-256 exacto.
-  Reapertura GUI/motor 0.9.1 y clase guardada conservada; arnés exit 0.
-- `make check` correcto. Notas de la release actualizadas en GitHub.
-- Evidencia y reproducción: docs/releases/0.9.1/VERIFICACION.md.
+**Contexto anterior:** T166 auditó la base 572d9eb; informe y arneses en
+[T166](../reviews/T166-AUDITORIA.md). La distribución pública 0.9.1, AppImage,
+.deb y actualización automática estaban verificadas en
+[VERIFICACION](../releases/0.9.1/VERIFICACION.md). T160–T164 cerradas.
 
 ## Problemas conocidos y límites
 
-- El .deb se ejecutó extraído; no se instaló en el sistema: sudo requiere
-  contraseña de administrador. No se tocó el perfil del profesor.
-- Laboratorio en 127.1.2.3. Arneses SSH y de secretos se ejecutan secuencialmente.
+- Si un consumidor no lee, puede faltar progreso y `run.end`; el resultado
+  guardado mantiene la nota. La GUI trata un flujo sin cierre como incompleto.
+- Siguen F2 (memoria de copias, T168), F3 (errores de lectura, T169) y F4
+  (parciales/PLAN, T170/T171). No se encadenaron en esta sesión.
+- El .deb se ejecutó extraído, sin instalarlo: sudo requiere contraseña.
+- Laboratorio en 127.1.2.3; arneses SSH y secretos se ejecutan secuencialmente.
 - Reintentos: mismo PLAN y máximo 50 eslabones. Modo examen: mínimo 5 min.
-- Hasta 2000 celdas y 1 MiB de metadatos resueltos;
-  inventario hasta 65536 bytes. PLAN no admitido se rechaza antes de SSH.
+- Hasta 2000 celdas y 1 MiB de metadatos resueltos; inventario hasta
+  65536 bytes. PLAN no admitido se rechaza antes de SSH.
 - Copias conservan notas y procedencia, sin salidas. Recuperación no sobrescribe.
 - Cierre normal espera resultado y copia; cierre forzado puede interrumpirlo.
 - Linux x64. Actualización automática solo AppImage; .deb mediante apt.
@@ -55,6 +49,9 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Siguiente trabajo
 
-Auditoría: priorizar T167 (cancelación) y T168 (memoria de copias), después
-T169 (errores visibles) y T170/T171 (parciales/PLAN). Evidencia en T166.
+**T168**: reducir memoria de copias. Partir de este commit limpio, leer criterios
+con `python3 scripts/tasks.py T168` y reproducir F2 mediante
+`docs/reviews/evidence/T166/reproduce_backup.ts`; comprobar la segunda pasada
+de 50 resultados y restauración sin cambiar notas ni precedencias.
+Después quedan T169, T170 y T171, cada una en sesión crítica separada.
 **T070** sigue desbloqueando **T084**, examen real de aula que ejecuta Adrià.

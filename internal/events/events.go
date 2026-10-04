@@ -147,6 +147,7 @@ type Emitter struct {
 	mu      sync.Mutex
 	w       io.Writer
 	enc     *json.Encoder
+	buffer  *boundedOutput
 	seq     int
 	secrets []string
 	now     func() time.Time
@@ -167,12 +168,34 @@ func New(w io.Writer, secrets []string) *Emitter {
 	return &Emitter{w: w, enc: enc, secrets: kept, now: time.Now}
 }
 
-// Err reports the first write that failed. The caller says so on stderr: a
-// consumer that stopped reading must not turn into a run that stopped
-// reporting.
+// NewBuffered keeps the engine off a stalled progress pipe. One writer owns
+// the pipe; queued lines have fixed count and byte limits. New remains useful
+// for synchronous writers and contract tests.
+func NewBuffered(w io.Writer, secrets []string) *Emitter {
+	output := newBoundedOutput(w)
+	e := New(output, secrets)
+	e.buffer = output
+	return e
+}
+
+// Finish gives a responsive consumer time to receive the remaining events.
+// A blocked consumer can keep only the writer goroutine until process exit.
+func (e *Emitter) Finish(timeout time.Duration) {
+	if e.buffer != nil {
+		e.buffer.finish(timeout)
+	}
+}
+
+// Err reports a failed write, dropped lines or an expired flush. The caller
+// says so on stderr; missing progress must never be silent.
 func (e *Emitter) Err() error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
+	if e.buffer != nil {
+		if err := e.buffer.err(); err != nil {
+			return err
+		}
+	}
 	return e.err
 }
 

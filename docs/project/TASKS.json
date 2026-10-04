@@ -3309,7 +3309,7 @@
       "id": "T167",
       "title": "Evitar que el canal de progreso bloquee la corrección o la cancelación",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "Acotar la entrega de eventos sin impedir el resultado canónico cuando stdout deja de consumirse.",
@@ -3324,8 +3324,17 @@
         "La pérdida o fallo de progreso se informa de forma visible sin cambiar estados, pesos ni notas.",
         "Regresión con proceso real, tubería saturada y SIGINT, además de contrato NDJSON, cancelación y suite rápida correctos."
       ],
-      "tests": [],
-      "notes": "Hallazgo F1 de T166, preexistente en 572d9eb. Evidencia y reproducción: docs/reviews/T166-AUDITORIA.md. Implementar como tarea crítica separada."
+      "tests": [
+        "python3 test/progress_pipe.py",
+        "python3 docs/reviews/evidence/T166/reproduce_engine.py",
+        "GOCACHE=/tmp/heimdall-t167-go-cache make check",
+        "GOCACHE=/tmp/heimdall-t167-go-cache go test -race ./...",
+        "GOCACHE=/tmp/heimdall-t167-go-cache make test",
+        "make gui-check gui-build",
+        "make docs-check tools-check"
+      ],
+      "notes": "F1 de T166, preexistente en 572d9eb y reproducido antes del cambio: SIGINT con tubería saturada no terminó en 10 s. La regresión con proceso real y consumidor que nunca lee termina con exit 4 o 0 y guarda un resultado canónico coherente; avisa por stderr y en el artefacto cuando la pérdida se conoce antes del guardado final. Un único escritor, 256 líneas/2 MiB en espera y 500 ms máximos al cerrar. El arnés T166 terminó antes del SIGINT en esta ejecución; la nueva regresión sí prueba cancelación. Suite SSH, contrato NDJSON, secretos, RA2, carga, detector de carreras y 525 pruebas GUI correctos. Sin cambiar notas, pesos ni estados. El límite de rendimiento del PLAN/parciales sigue en T170/T171.",
+      "completed": "2026-10-04"
     },
     {
       "id": "T168",
