@@ -43,11 +43,13 @@ export interface BackupEntry {
   /** The copy itself. */
   path: string
   /** The run it holds, so a copy is recognised by its correction. */
-  runId: string
-  at: string
-  students: number
+  runId: string | null
+  at: string | null
+  students: number | null
   /** Whether the run this copy stands for is still in the exam's folder. */
-  onDisk: boolean
+  onDisk: boolean | null
+  /** Why this file cannot be offered for recovery. It remains on disk. */
+  problem?: string
 }
 
 /** What a restore did. Nothing is ever overwritten, so both numbers matter. */
@@ -56,4 +58,6 @@ export interface RestoreReport {
   restored: number
   /** Copies left alone because the correction was already there. */
   kept: number
+  /** Invalid files left untouched while valid, independent copies were restored. */
+  problems?: string[]
 }

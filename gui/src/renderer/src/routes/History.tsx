@@ -27,33 +27,37 @@ export default function HistoryView() {
   const busy = phase === 'starting' || phase === 'running'
 
   const [runs, setRuns] = useState<RunSummary[] | null>(null)
+  const [runError, setRunError] = useState<string | null>(null)
   const [opening, setOpening] = useState<string | null>(null)
   const [backups, setBackups] = useState<BackupEntry[] | null>(null)
+  const [backupError, setBackupError] = useState<string | null>(null)
   const [restoring, setRestoring] = useState(false)
 
   const load = useCallback(() => {
     if (!examPath) {
       setRuns([])
       setBackups([])
+      setRunError(null)
+      setBackupError(null)
       return
     }
     setRuns(null)
+    setRunError(null)
     window.heimdall
       .listRuns(examPath)
       .then(setRuns)
       .catch((error) => {
-        setRuns([])
-        setNotice(noticeFrom('No se pudo leer el histórico', error))
+        setRunError(noticeFrom('No se pudo leer el histórico', error))
       })
     setBackups(null)
+    setBackupError(null)
     window.heimdall
       .listBackups(examPath)
       .then(setBackups)
       .catch((error) => {
-        setBackups([])
-        setNotice(noticeFrom('No se pudieron leer las copias de seguridad', error))
+        setBackupError(noticeFrom('No se pudieron leer las copias de seguridad', error))
       })
-  }, [examPath, setNotice])
+  }, [examPath])
 
   useEffect(load, [load])
 
@@ -80,7 +84,10 @@ export default function HistoryView() {
     setRestoring(true)
     try {
       const report = await window.heimdall.restoreBackups(examPath)
-      setNotice(t.backups.done(report.restored, report.kept))
+      const done = t.backups.done(report.restored, report.kept)
+      setNotice(report.problems?.length
+        ? `${done} Se omitieron ${report.problems.length} copias con problemas. ${report.problems[0]}`
+        : done)
       load()
     } catch (error) {
       setNotice(noticeFrom('No se pudieron restaurar las notas', error))
@@ -121,6 +128,10 @@ export default function HistoryView() {
 
         {!examPath ? (
           <p className="text-sm text-muted-foreground">{t.history.needExam}</p>
+        ) : runError ? (
+          <p className="flex items-start gap-1.5 break-all text-sm text-destructive-strong">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> {runError}
+          </p>
         ) : runs === null ? (
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
             <Spinner /> {t.history.loading}
@@ -147,6 +158,7 @@ export default function HistoryView() {
         {examPath && (
           <Backups
             backups={backups}
+            error={backupError}
             restoring={restoring}
             disabled={busy}
             onRestore={() => void restore()}
@@ -164,16 +176,18 @@ export default function HistoryView() {
  */
 function Backups({
   backups,
+  error,
   restoring,
   disabled,
   onRestore
 }: {
   backups: BackupEntry[] | null
+  error: string | null
   restoring: boolean
   disabled: boolean
   onRestore: () => void
 }) {
-  const recoverable = backups?.filter((backup) => !backup.onDisk).length ?? 0
+  const recoverable = backups?.filter((backup) => !backup.problem && !backup.onDisk).length ?? 0
   return (
     <div className="space-y-3 rounded-md border border-border p-4">
       <div className="flex items-center gap-2">
@@ -182,7 +196,11 @@ function Backups({
       </div>
       <p className="max-w-3xl text-xs text-muted-foreground">{t.backups.hint}</p>
 
-      {backups === null ? (
+      {error ? (
+        <p className="flex items-start gap-1.5 break-all text-sm text-destructive-strong">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> {error}
+        </p>
+      ) : backups === null ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
           <Spinner /> {t.backups.loading}
         </p>
@@ -196,12 +214,21 @@ function Backups({
                 key={backup.path}
                 className="flex flex-wrap items-center justify-between gap-2 text-xs"
               >
-                <span className="text-muted-foreground">
-                  {dateText(backup.at)} · {t.backups.counts(backup.students)}
-                </span>
-                <Badge variant={backup.onDisk ? 'success' : 'warning'}>
-                  {backup.onDisk ? t.backups.onDisk : t.backups.missing}
-                </Badge>
+                {backup.problem ? (
+                  <span className="flex items-start gap-1.5 break-all text-destructive-strong">
+                    <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                    {backup.problem}
+                  </span>
+                ) : (
+                  <>
+                    <span className="text-muted-foreground">
+                      {dateText(backup.at ?? '')} · {t.backups.counts(backup.students ?? 0)}
+                    </span>
+                    <Badge variant={backup.onDisk ? 'success' : 'warning'}>
+                      {backup.onDisk ? t.backups.onDisk : t.backups.missing}
+                    </Badge>
+                  </>
+                )}
               </div>
             ))}
           </div>

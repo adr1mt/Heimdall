@@ -24,6 +24,7 @@ class BackupChain {
 
   /** Accept one link and return the basename to load next, or finish. */
   add(name: string, run: RunResult): string | undefined {
+    if (name !== `run-${run.run_id}.json`) throw new Error('identidad del fichero de copia incorrecta')
     if (this.seen.has(run.run_id)) throw new Error('ciclo en la cadena de copias')
     if (this.expectedId && run.run_id !== this.expectedId) throw new Error('identidad de antecedente incorrecta')
     if (this.planHash && run.plan_hash !== this.planHash) throw new Error('antecedente de otro PLAN')
@@ -57,9 +58,18 @@ export function slotFor(dataDir: string, examPath: string): string {
 function runFilesIn(dir: string): string[] {
   try {
     return readdirSync(dir).filter((name) => RUN_FILE.test(name))
-  } catch {
-    return []
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return []
+    throw new Error(`No se pudo leer la carpeta de copias «${dir}»: ${error instanceof Error ? error.message : String(error)}`)
   }
+}
+
+function copyProblem(path: string, error: unknown): string {
+  return `${path}: ${error instanceof Error ? error.message : String(error)}`
+}
+
+function problemEntry(path: string, problem: string): BackupEntry {
+  return { path, runId: null, at: null, students: null, onDisk: null, problem }
 }
 
 /**
@@ -171,7 +181,7 @@ export function listBackups(dataDir: string, examPath: string): BackupEntry[] {
   const slot = slotFor(dataDir, examPath)
   const varDir = varDirOf(examPath)
   const entries: BackupEntry[] = []
-  const copies = readBackupRuns(slot)
+  const { runs: copies, problems } = readBackupRuns(slot)
   for (const [name, run] of copies) {
     const path = join(slot, name)
     try {
@@ -183,13 +193,15 @@ export function listBackups(dataDir: string, examPath: string): BackupEntry[] {
         students: run.students.length,
         onDisk: existsSync(join(varDir, name))
       })
-    } catch {
-      // A copy that cannot be read is not a copy. It is skipped instead of
-      // offering the teacher a restore that would write nothing.
+    } catch (error) {
+      problems.push(problemEntry(path, copyProblem(path, error)))
     }
   }
-  entries.sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0))
-  return entries
+  entries.sort((a, b) => {
+    const left = a.at ?? '', right = b.at ?? ''
+    return left < right ? 1 : left > right ? -1 : 0
+  })
+  return [...entries, ...problems]
 }
 
 /**
@@ -211,20 +223,28 @@ export function restoreBackups(dataDir: string, examPath: string): RestoreReport
   const staged = mkdtempSync(join(varDir, '.heimdall-restore-'))
   try {
     const copies = new Map<string, RunResult>()
+    const problems: string[] = []
     for (const name of candidates) {
       let snapshot: ReturnType<typeof readArtifactSnapshot>
       try { snapshot = readArtifactSnapshot(join(slot, name)) }
-      catch { continue /* Invalid copies are never offered for recovery. */ }
+      catch (error) {
+        problems.push(copyProblem(join(slot, name), error))
+        continue // Invalid copies are never offered for recovery.
+      }
       writeFileSync(join(staged, name), snapshot.text, { encoding: 'utf8', flag: 'wx', mode: 0o600 })
       copies.set(name, snapshot.run)
     }
-    if (copies.size === 0) throw new Error('No hay ninguna copia de seguridad de este examen.')
     const ordered = new Set<string>()
-    // Validate every chain before publishing any member. Ancestors first,
-    // including dependencies shared by multiple heads.
+    // Validate each chain before publishing any of its members. A broken
+    // chain cannot hide unrelated valid corrections. Ancestors go first.
     for (const name of copies.keys()) {
-      for (const member of backupChain(name, copies).reverse()) ordered.add(member)
+      try {
+        for (const member of backupChain(name, copies).reverse()) ordered.add(member)
+      } catch (error) {
+        problems.push(copyProblem(join(slot, name), error))
+      }
     }
+    if (ordered.size === 0) throw new Error(`No hay ninguna copia válida de este examen. ${problems[0]}`)
     for (const name of ordered) {
       const target = join(varDir, name)
       if (existsSync(target)) {
@@ -241,20 +261,23 @@ export function restoreBackups(dataDir: string, examPath: string): RestoreReport
         report.kept += 1
       }
     }
+    if (problems.length) report.problems = problems
     return report
   } finally {
     rmSync(staged, { recursive: true, force: true })
   }
 }
 
-function readBackupRuns(slot: string): Map<string, RunResult> {
+function readBackupRuns(slot: string): { runs: Map<string, RunResult>; problems: BackupEntry[] } {
   const runs = new Map<string, RunResult>()
+  const problems: BackupEntry[] = []
   for (const name of runFilesIn(slot)) {
+    const path = join(slot, name)
     try {
-      runs.set(name, readArtifact(join(slot, name)))
-    } catch { /* Invalid copies are never offered for recovery. */ }
+      runs.set(name, readArtifact(path))
+    } catch (error) { problems.push(problemEntry(path, copyProblem(path, error))) }
   }
-  return runs
+  return { runs, problems }
 }
 
 function backupChain(name: string, copies: Map<string, RunResult>): string[] {

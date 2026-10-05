@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import {
@@ -273,6 +273,52 @@ describe('listBackups', () => {
     const { dataDir, examPath } = workspace()
     expect(listBackups(dataDir, examPath)).toEqual([])
   })
+
+  it.skipIf(process.getuid?.() === 0)('reports an unreadable copy directory instead of claiming it is empty', () => {
+    const { dataDir, examPath } = workspace()
+    const slot = slotFor(dataDir, examPath)
+    mkdirSync(slot, { recursive: true })
+    chmodSync(slot, 0o000)
+    try {
+      expect(() => listBackups(dataDir, examPath)).toThrow(slot)
+      expect(() => listBackups(dataDir, examPath)).toThrow(/EACCES/)
+      expect(() => restoreBackups(dataDir, examPath)).toThrow(slot)
+    } finally {
+      chmodSync(slot, 0o700)
+    }
+  })
+
+  it('shows valid copies beside a corrupt one and restores only valid grades', () => {
+    const { dataDir, examPath, varDir } = workspace()
+    const slot = slotFor(dataDir, examPath)
+    mkdirSync(slot, { recursive: true })
+    const good = JSON.stringify(gradesOnly(parseArtifact(artifact('GOOD', '2026-09-21T09:00:00Z'))))
+    writeFileSync(join(slot, 'run-GOOD.json'), good)
+    writeFileSync(join(slot, 'run-BROKEN.json'), '{broken')
+
+    const rows = listBackups(dataDir, examPath)
+    expect(rows.some(row => row.runId === 'GOOD' && !row.problem)).toBe(true)
+    const broken = rows.find(row => row.path === join(slot, 'run-BROKEN.json'))
+    expect(broken?.problem).toContain(join(slot, 'run-BROKEN.json'))
+    expect(broken?.problem).toMatch(/resultado|JSON/i)
+    expect(broken?.runId).toBeNull()
+
+    const report = restoreBackups(dataDir, examPath)
+    expect(report).toMatchObject({ restored: 1, kept: 0 })
+    expect(report.problems?.[0]).toContain('run-BROKEN.json')
+    expect(readFileSync(join(varDir, 'run-GOOD.json'), 'utf8')).toBe(good)
+    expect(() => readFileSync(join(varDir, 'run-BROKEN.json'))).toThrow()
+    expect(readFileSync(join(slot, 'run-BROKEN.json'), 'utf8')).toBe('{broken')
+  })
+
+  it('names the bad file when no copy can be restored', () => {
+    const { dataDir, examPath } = workspace()
+    const slot = slotFor(dataDir, examPath)
+    mkdirSync(slot, { recursive: true })
+    writeFileSync(join(slot, 'run-BROKEN.json'), '{broken')
+    expect(() => restoreBackups(dataDir, examPath)).toThrow(/run-BROKEN\.json/)
+    expect(listBackups(dataDir, examPath).some(row => row.problem?.includes('run-BROKEN.json'))).toBe(true)
+  })
 })
 
 it.each([51,100])('retains the latest grades over three passes and restore (%i originals)', async (count) => {
@@ -360,7 +406,7 @@ describe('copy chain invariants across writing and recovery', () => {
     { reason: 'missing ancestor', runs: [linkedRun('HEAD', 'ROOT')] }
   ]
 
-  it.each(brokenChains)('rejects $reason before copying or restoring the head', async ({ runs }) => {
+  it.each(brokenChains)('rejects $reason before copying or restoring the head', async ({ runs, reason }) => {
     const { dataDir, examPath, varDir } = workspace()
     const slot = slotFor(dataDir, examPath)
     mkdirSync(slot, { recursive: true })
@@ -379,10 +425,17 @@ describe('copy chain invariants across writing and recovery', () => {
     // Also exercise copies already on disk, without going through copying.
     runs.forEach((run, i) => writeFileSync(join(slot, i === 0 ? 'run-HEAD.json' : 'run-ROOT.json'), JSON.stringify(gradesOnly(run))))
     expect(listBackups(dataDir, examPath).some(entry => entry.runId === 'HEAD')).toBe(false)
-    expect(() => restoreBackups(dataDir, examPath)).toThrow()
+    if (reason === 'PLAN') {
+      const report = restoreBackups(dataDir, examPath)
+      expect(report.problems?.[0]).toContain('run-HEAD.json')
+    } else expect(() => restoreBackups(dataDir, examPath)).toThrow()
     originals.forEach((text, i) => expect(readFileSync(join(varDir, i === 0 ? 'run-HEAD.json' : 'run-ROOT.json'), 'utf8')).toBe(text))
     rmSync(varDir, { recursive: true })
-    expect(() => restoreBackups(dataDir, examPath)).toThrow()
+    if (reason === 'PLAN') {
+      const report = restoreBackups(dataDir, examPath)
+      expect(report).toMatchObject({ restored: 1, kept: 0 })
+      expect(report.problems?.[0]).toContain('run-HEAD.json')
+    } else expect(() => restoreBackups(dataDir, examPath)).toThrow()
     expect(() => readFileSync(join(varDir, 'run-HEAD.json'))).toThrow()
   })
 
@@ -401,8 +454,11 @@ describe('copy chain invariants across writing and recovery', () => {
     expect(listBackups(dataDir, examPath).some(entry => entry.runId === headId)).toBe(count <= 50)
     rmSync(varDir, { recursive: true })
     if (count > 50) {
-      expect(() => restoreBackups(dataDir, examPath)).toThrow(/50/)
-      expect(() => readFileSync(join(varDir, 'run-R0.json'))).toThrow()
+      const restored = restoreBackups(dataDir, examPath)
+      expect(restored).toMatchObject({ restored: 50, kept: 0 })
+      expect(restored.problems?.some(problem => problem.includes('run-R50.json') && problem.includes('50'))).toBe(true)
+      expect(() => readFileSync(join(varDir, 'run-R50.json'))).toThrow()
+      expect(parseArtifact(readFileSync(join(varDir, 'run-R0.json'), 'utf8')).run_id).toBe('R0')
     } else {
       expect(restoreBackups(dataDir, examPath)).toEqual({ restored: count, kept: 0 })
       expect((await backupRuns(dataDir, examPath)).failures).toEqual([])
@@ -418,7 +474,10 @@ describe('copy chain invariants across writing and recovery', () => {
     const corrupt = JSON.stringify(root)
     writeFileSync(join(slot, 'run-ROOT.json'), corrupt)
     writeFileSync(join(slot, 'run-HEAD.json'), JSON.stringify(gradesOnly(linkedRun('HEAD', 'ROOT'))))
-    expect(listBackups(dataDir, examPath)).toEqual([])
+    const listed = listBackups(dataDir, examPath)
+    expect(listed.some(entry => !entry.problem)).toBe(false)
+    expect(listed.some(entry => entry.problem?.includes('run-ROOT.json'))).toBe(true)
+    expect(listed.some(entry => entry.problem?.includes('run-HEAD.json'))).toBe(true)
     expect(() => restoreBackups(dataDir, examPath)).toThrow()
     expect(() => readFileSync(join(varDir, 'run-HEAD.json'))).toThrow()
     const report = await backupRuns(dataDir, examPath)

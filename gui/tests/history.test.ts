@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { mkdtempSync, writeFileSync } from 'node:fs'
+import { chmodSync, mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { MAX_RUNS, listRuns, varDirOf } from '../src/main/history'
@@ -74,6 +74,35 @@ describe('listRuns', () => {
   it('is empty and not an error when the project was never corrected', async () => {
     expect(await listRuns(join(emptyDir(), 'var'))).toEqual([])
     expect(await listRuns(emptyDir())).toEqual([])
+  })
+
+  it.skipIf(process.getuid?.() === 0)('reports a directory that exists but cannot be read', async () => {
+    const dir = emptyDir()
+    chmodSync(dir, 0o000)
+    try {
+      await expect(listRuns(dir)).rejects.toThrow(dir)
+      await expect(listRuns(dir)).rejects.toThrow(/EACCES/)
+    } finally {
+      chmodSync(dir, 0o700)
+    }
+  })
+
+  it.skipIf(process.getuid?.() === 0)('keeps valid runs beside a stat error with its path and reason', async () => {
+    const dir = emptyDir(), blocked = join(dir, 'blocked')
+    write(dir, 'run-GOOD.json', artifact('GOOD', '2026-09-01T10:00:00Z'))
+    mkdirSync(blocked)
+    write(blocked, 'target.json', artifact('HIDDEN', '2026-09-01T10:00:00Z'))
+    symlinkSync(join(blocked, 'target.json'), join(dir, 'run-BLOCKED.json'))
+    chmodSync(blocked, 0o000)
+    try {
+      const rows = await listRuns(dir)
+      expect(rows.some(row => row.runId === 'GOOD')).toBe(true)
+      const problem = rows.find(row => row.path === join(dir, 'run-BLOCKED.json'))
+      expect(problem?.problem).toContain('EACCES')
+      expect(problem?.problem).toContain(join(dir, 'run-BLOCKED.json'))
+    } finally {
+      chmodSync(blocked, 0o700)
+    }
   })
 
   it('lists the finished runs, newest correction first', async () => {

@@ -28,14 +28,15 @@ export function varDirOf(examPath: string): string {
 /**
  * The runs of one project, newest first. A directory that does not exist, or
  * holds nothing, is an empty history and not a failure: a project that has
- * never been corrected is an ordinary state.
+ * never been corrected is an ordinary state. Other disk errors are reported.
  */
 export async function listRuns(varDir: string, classes: ClassGroup[] = []): Promise<RunSummary[]> {
   let names: string[]
   try {
     names = await readdir(varDir)
-  } catch {
-    return []
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return []
+    throw new Error(`No se pudo leer la carpeta de resultados «${varDir}»: ${error instanceof Error ? error.message : String(error)}`)
   }
 
   const files: { path: string; mtimeMs: number; at: number; problem?: string }[] = []
@@ -48,9 +49,9 @@ export async function listRuns(varDir: string, classes: ClassGroup[] = []): Prom
         try { files.push({ path, mtimeMs: info.mtimeMs, at: await readRunDate(path) }) }
         catch (error) { files.push({ path, mtimeMs: info.mtimeMs, at: NaN, problem: error instanceof Error ? error.message : String(error) }) }
       }
-    } catch {
-      // It was there a moment ago and is not now. Nothing to report about a
-      // file that no longer exists.
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') continue
+      files.push({path,mtimeMs:Date.now(),at:NaN,problem:`${path}: ${error instanceof Error ? error.message : String(error)}`})
     }
   }
 

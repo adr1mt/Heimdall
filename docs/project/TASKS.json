@@ -3373,7 +3373,7 @@
       "id": "T169",
       "title": "Distinguir ausencia de resultados de errores de lectura",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Mostrar problemas de acceso o corrupción en histórico y copias sin ocultar los resultados válidos.",
@@ -3388,8 +3388,19 @@
         "Los resultados o copias válidos siguen disponibles junto con las incidencias; restaurar no afirma ausencia si existen archivos inválidos.",
         "Pruebas con permisos denegados, una copia corrupta y mezcla de archivos válidos/inválidos; suite GUI correcta."
       ],
-      "tests": [],
-      "notes": "Hallazgo F3 de T166, preexistente en 572d9eb. Evidencia y reproducción: docs/reviews/T166-AUDITORIA.md. Implementar como tarea crítica separada."
+      "tests": [
+        "node /tmp/heimdall-t169-repro.cjs <n30-s65536/run-*.json> 1",
+        "node /tmp/heimdall-t169-verify.cjs <n30-s65536/run-*.json>",
+        "npm test -- tests/history.test.ts tests/backups.test.ts tests/backup-recovery.test.ts",
+        "GOCACHE=/tmp/heimdall-t169-go-cache make check",
+        "GOCACHE=/tmp/heimdall-t169-go-cache go test -race ./...",
+        "make test",
+        "make gui-check gui-build",
+        "make gui-lab",
+        "make docs-check tools-check"
+      ],
+      "notes": "F3 de T166 reproducido antes del cambio: EACCES en histórico/copias devolvía listas vacías y una copia corrupta se describía como ausencia. ENOENT sigue siendo vacío; los demás fallos muestran ruta y causa. Las copias válidas aparecen junto a incidencias y se restauran aunque haya archivos o cadenas independientes dañados; los inválidos se omiten y conservan. La restauración con solo archivos inválidos identifica el fichero. Se protege la identidad de cada archivo y el orden de antecedentes. Evidencia y límites: docs/reviews/evidence/T169/RESULTADOS.md. T170/T171 no se abordaron.",
+      "completed": "2026-10-05"
     },
     {
       "id": "T170",

@@ -152,15 +152,16 @@ describe('recovery with a concurrent external writer', () => {
     expect(readdirSync(f.varDir).sort()).toEqual([f.name, 'run-ROOT.json'].sort())
   })
 
-  it('cleans staging and publishes nothing when any chain is invalid', () => {
+  it('restores independent valid grades and skips a broken chain', () => {
     const f = fixture(true)
-    // Independent valid run must not be published before discovering a
-    // broken chain elsewhere in the slot.
-    writeFileSync(join(f.slot, 'run-A.json'), JSON.stringify(gradesOnly(validRun())))
+    const independent = validRun(); independent.run_id = 'A'
+    writeFileSync(join(f.slot, 'run-A.json'), JSON.stringify(gradesOnly(independent)))
     rmSync(join(f.slot, 'run-ROOT.json'))
-    expect(() => restoreBackups(f.dataDir, f.examPath)).toThrow(/antecedente/)
-    expect(hooks.published).toEqual([])
-    expect(readdirSync(f.varDir)).toEqual([])
+    const report = restoreBackups(f.dataDir, f.examPath)
+    expect(report).toMatchObject({ restored: 1, kept: 0 })
+    expect(report.problems?.[0]).toMatch(/run-HEAD\.json.*antecedente/)
+    expect(hooks.published).toEqual(['run-A.json'])
+    expect(readdirSync(f.varDir)).toEqual(['run-A.json'])
     expect(readFileSync(join(f.slot, f.name), 'utf8')).toBe(f.copy)
   })
 
