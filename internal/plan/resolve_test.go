@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 // project writes a two-file project in a temporary directory. The YAML starts
@@ -384,6 +385,45 @@ func TestPlanHashChangesWithTheQuestionsAndNotWithTheRun(t *testing.T) {
 	}
 	if changed.Hash == first.Hash {
 		t.Error("cambiar lo que se comprueba no cambió el hash del plan")
+	}
+}
+
+func TestPlanHashPreservesExistingBytes(t *testing.T) {
+	p, err := Load(project(t, validExam, validInventory))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p.Hash != "fe3096e5ebd136f025a7800080ac16fadab5886b89fdec44656c3294ee8033a9" {
+		t.Fatalf("existing project hash changed: %s", p.Hash)
+	}
+	expected := "a<&\n"
+	other := &Plan{Exam: model.SourceRef{SHA256: "exam"}, Inventory: model.SourceRef{SHA256: "inventory"}, Summary: model.PlanSummary{TotalWeight: 1}, Students: []StudentPlan{
+		{ID: "z", Excluded: true},
+		{ID: "a", Checks: []ResolvedCheck{{ID: "c", Group: "G", Weight: 1, Timeout: time.Second, Value: "a<&\n", Contains: &expected}}},
+	}}
+	if got := hashPlan(other); got != "a1f6a06ea54206d028a033c958df93583ca0ac05475c9db4491c45f7123607d7" {
+		t.Fatalf("sorted, excluded, escaped plan hash changed: %s", got)
+	}
+}
+
+func BenchmarkHashPlanLarge(b *testing.B) {
+	const students, checks = 100, 20
+	value := strings.Repeat("x", 65536)
+	p := &Plan{Exam: model.SourceRef{SHA256: "exam"}, Inventory: model.SourceRef{SHA256: "inventory"}, Summary: model.PlanSummary{TotalWeight: checks}}
+	expected := "x"
+	for i := 0; i < students; i++ {
+		student := StudentPlan{ID: fmt.Sprintf("fake%d", i)}
+		for j := 0; j < checks; j++ {
+			student.Checks = append(student.Checks, ResolvedCheck{ID: fmt.Sprintf("c%d", j), Group: "G", Weight: 1, Timeout: time.Second, Value: value, Contains: &expected})
+		}
+		p.Students = append(p.Students, student)
+	}
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		if hashPlan(p) == "" {
+			b.Fatal("empty hash")
+		}
 	}
 }
 

@@ -563,28 +563,65 @@ func hashPlan(p *Plan) string {
 		Assert   string   `json:"assert"`
 		Expected string   `json:"expected"`
 	}
-	type hashedStudent struct {
-		ID       string        `json:"id"`
-		Excluded bool          `json:"excluded"`
-		Checks   []hashedCheck `json:"checks"`
-	}
-	type hashedPlan struct {
-		Exam      string          `json:"exam"`
-		Inventory string          `json:"inventory"`
-		Total     float64         `json:"total_weight"`
-		Students  []hashedStudent `json:"students"`
-	}
-
-	doc := hashedPlan{
+	header := struct {
+		Exam      string  `json:"exam"`
+		Inventory string  `json:"inventory"`
+		Total     float64 `json:"total_weight"`
+	}{
 		Exam:      p.Exam.SHA256,
 		Inventory: p.Inventory.SHA256,
 		Total:     p.Summary.TotalWeight,
 	}
-	for _, s := range p.Students {
-		hs := hashedStudent{ID: s.ID, Excluded: s.Excluded}
-		for _, c := range s.Checks {
+	h := sha256.New()
+	write := func(data []byte) { _, _ = h.Write(data) }
+	writeJSON := func(value any) bool {
+		data, err := json.Marshal(value)
+		if err != nil {
+			return false
+		}
+		write(data)
+		return true
+	}
+	data, err := json.Marshal(header)
+	if err != nil {
+		return ""
+	}
+	write(data[:len(data)-1]) // Replace the closing brace with students.
+	if len(p.Students) == 0 {
+		write([]byte(`,"students":null}`))
+		return hex.EncodeToString(h.Sum(nil))
+	}
+	write([]byte(`,"students":[`))
+	order := make([]int, len(p.Students))
+	for i := range order {
+		order[i] = i
+	}
+	sort.Slice(order, func(i, j int) bool { return p.Students[order[i]].ID < p.Students[order[j]].ID })
+	for i, index := range order {
+		if i > 0 {
+			write([]byte{','})
+		}
+		s := &p.Students[index]
+		studentHeader := struct {
+			ID       string `json:"id"`
+			Excluded bool   `json:"excluded"`
+		}{ID: s.ID, Excluded: s.Excluded}
+		data, err := json.Marshal(studentHeader)
+		if err != nil {
+			return ""
+		}
+		write(data[:len(data)-1])
+		if len(s.Checks) == 0 {
+			write([]byte(`,"checks":null}`))
+			continue
+		}
+		write([]byte(`,"checks":[`))
+		for j, c := range s.Checks {
+			if j > 0 {
+				write([]byte{','})
+			}
 			kind, expected := assertionOf(c)
-			hs.Checks = append(hs.Checks, hashedCheck{
+			if !writeJSON(hashedCheck{
 				ID: c.ID, Group: c.Group, Weight: c.Weight,
 				Timeout: c.Timeout.String(),
 				Host:    c.Host,
@@ -592,18 +629,14 @@ func hashPlan(p *Plan) string {
 				User:    c.Target.User,
 				Cmd:     c.Cmd, Value: c.Value,
 				Assert: kind, Expected: expected,
-			})
+			}) {
+				return ""
+			}
 		}
-		doc.Students = append(doc.Students, hs)
+		write([]byte(`]}`))
 	}
-	sort.Slice(doc.Students, func(i, j int) bool { return doc.Students[i].ID < doc.Students[j].ID })
-
-	data, err := json.Marshal(doc)
-	if err != nil { // the document is made of strings and numbers only
-		return ""
-	}
-	sum := sha256.Sum256(data)
-	return hex.EncodeToString(sum[:])
+	write([]byte(`]}`))
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 // assertionOf names the single assertion of a check and its expected value.

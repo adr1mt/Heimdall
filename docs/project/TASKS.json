@@ -3436,7 +3436,7 @@
       "id": "T171",
       "title": "Acotar memoria al calcular la huella del PLAN",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Calcular la identidad del PLAN sin amplificar en un gran buffer las respuestas repetidas por comprobación.",
@@ -3450,8 +3450,17 @@
         "Se conservan límites de 2000 celdas, metadatos y respuestas, validación anterior a SSH y tratamiento de errores.",
         "Medición de memoria antes/después y regresiones de huella, PLAN, reintentos y sesiones; suite rápida correcta."
       ],
-      "tests": [],
-      "notes": "Hallazgo F4 de T166, preexistente en 572d9eb. Evidencia y reproducción: docs/reviews/T166-AUDITORIA.md. Implementar como tarea crítica separada."
+      "tests": [
+        "BenchmarkHashPlanLarge",
+        "TestPlanHashPreservesExistingBytes",
+        "TestPlanHashChangesWithTheQuestionsAndNotWithTheRun",
+        "TestResultBudgetRejectsUnsupportedConfiguration",
+        "TestResolvedInventoryValuesRespectByteLimit",
+        "TestRetry* y TestSession*",
+        "make check"
+      ],
+      "notes": "F4 de T166: la huella se calcula con JSON por comprobación y conserva los bytes anteriores. Caso 100x20x65536: asignaciones de la huella 793,7 a 151,6 MB; heap tras PLAN 541,7 a 220,1 MB, sin GC forzado; RSS máximo 786 a 291 MiB. Perfil, mediciones, compatibilidad y límites en docs/reviews/evidence/T171/RESULTADOS.md. Reintentos, sesiones y suite rápida correctos.",
+      "completed": "2026-10-05"
     }
   ]
 }

@@ -5,31 +5,32 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T169 · Los errores de lectura ya no parecen ausencia de resultados.**
+**T170 y T171 · Corregido F4, rendimiento de parciales y memoria del PLAN.**
 
-- Base: `36e869d`, árbol limpio. El arnés T166 reprodujo F3: carpetas sin
-  permiso aparecían vacías y una copia corrupta parecía inexistente.
-- ENOENT sigue siendo ausencia; otros errores muestran ruta y causa en el
-  histórico o en copias. Los archivos sanos siguen visibles junto a los malos.
-- Restaurar recupera copias independientes válidas y avisa de las dañadas;
-  nunca ofrece ni publica una cadena incompleta. No sobrescribe originales.
-- [Evidencia T169](../reviews/evidence/T169/RESULTADOS.md): permisos EACCES,
-  copia corrupta, mezcla válida/inválida y restauración con archivo inválido.
-- `make check`, `go test -race ./...`, `make test`, `make gui-check gui-build`
-  (531 pruebas), `make gui-lab` y `make docs-check tools-check` correctos. GUI
-  fuera del aislamiento por `EAI_AGAIN localhost`; sin cambios en notas,
-  publicación ni push.
+- Base limpia `424bac4`. T170 en `3f0ce82`: el resultado terminado de cada
+  alumno se redacta y recorta una sola vez. Siguen publicándose parciales
+  atómicos tras cada alumno; el final se prepara desde el resultado original.
+  En el caso sintético de 100 alumnos, 12,90 → 2,43 s de ejecución y guardado,
+  con ~421 MB publicados en ambos casos.
+- T171: la huella del PLAN se calcula sin reunir todas las respuestas en un
+  gran JSON. En 100 × 20 × 65536 bytes: 793,7 → 151,6 MB de asignaciones
+  durante la huella; heap tras PLAN 541,7 → 220,1 MB sin forzar GC; RSS máximo
+  786 → 291 MiB. Dos huellas anteriores permanecen idénticas.
+- [Evidencia T170](../reviews/evidence/T170/RESULTADOS.md) y
+  [T171](../reviews/evidence/T171/RESULTADOS.md). Pasaron `make check`,
+  regresiones de parciales, SIGKILL, secretos, presupuesto, huella, límites,
+  reintentos y sesiones; también `go test -race ./...` y
+  `make docs-check tools-check`. Sin cambios en notas ni PLAN válido.
 
-**Contexto anterior:** T168 redujo la memoria de copias en `36e869d`; T167
-resolvió F1 en `7fd7948`. T166 auditó la base 572d9eb; informe y arneses en
-[T166](../reviews/T166-AUDITORIA.md). La distribución pública 0.9.1 está
+**Contexto anterior:** T169 resolvió F3 en `424bac4`; T168 redujo la memoria de
+copias en `36e869d`; T167 resolvió F1 en `7fd7948`. La auditoría T166 está en
+[su informe](../reviews/T166-AUDITORIA.md). La distribución pública 0.9.1 está
 verificada en [VERIFICACION](../releases/0.9.1/VERIFICACION.md).
 
 ## Problemas conocidos y límites
 
 - Si un consumidor no lee, puede faltar progreso y `run.end`; el resultado
   guardado mantiene la nota. La GUI trata un flujo sin cierre como incompleto.
-- Sigue F4 (parciales/PLAN, T170/T171). No se encadenó en esta sesión.
 - La copia sigue leyendo cada original para validar cambios y corrupción; el
   límite de 128 MB probado es del heap V8, no del RSS ni de cualquier examen.
 - El .deb se ejecutó extraído, sin instalarlo: sudo requiere contraseña.
@@ -45,8 +46,6 @@ verificada en [VERIFICACION](../releases/0.9.1/VERIFICACION.md).
 
 ## Siguiente trabajo
 
-**T170**: reducir trabajo repetido al guardar parciales, sin perder su
-protección ante la muerte del proceso. Partir de este commit limpio, leer
-`python3 scripts/tasks.py T170` y el hallazgo F4 de
-`docs/reviews/T166-AUDITORIA.md`. Después queda T171, en otra sesión crítica.
-**T070** sigue desbloqueando **T084**, examen real de aula que ejecuta Adrià.
+**T070**: rehacer exámenes del curso en formato nativo; desbloquea **T084**,
+examen real de aula que ejecuta Adrià. Consultar
+`python3 scripts/tasks.py T070` antes de empezar. **T023** sigue READY.
