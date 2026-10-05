@@ -89,7 +89,6 @@ type ResolvedCheck struct {
 	Host   string // logical host, empty for a check without a command
 	Target Host   // where to connect, empty for a check without a command
 
-	File  string `json:",omitempty"` // resolved literal path, empty for existing sources
 	Cmd   []string
 	Value string
 
@@ -237,18 +236,6 @@ func validateExam(exam *Exam, errs *[]error) []Check {
 			// 3. logical host used but not declared. A check without a
 			// command runs nowhere and needs no host.
 			hasCmd := len(check.Cmd) > 0
-			if check.File != nil {
-				if check.commandPresent || hasCmd || check.valuePresent || check.Value != "" {
-					*errs = append(*errs, errf(check.Line, "la comprobación %q debe elegir solo una fuente: fichero, cmd o valor", check.ID))
-				}
-				if *check.File == "" || strings.ContainsRune(*check.File, 0) {
-					*errs = append(*errs, errf(check.Line, "fichero de %q debe ser una ruta absoluta no vacía y sin caracteres nulos", check.ID))
-				}
-				if check.ExitCode != nil {
-					*errs = append(*errs, errf(check.Line, "fichero de %q solo admite aserciones de contenido; exit_code requiere cmd", check.ID))
-				}
-				hasCmd = true
-			}
 			switch {
 			case hasCmd && check.Value != "":
 				*errs = append(*errs, errf(check.Line,
@@ -418,22 +405,12 @@ func resolveStudents(exam *Exam, inv *Inventory, checks []Check, examPath, inven
 			}
 		}
 
-		fileTimeouts := map[[2]string]ResolvedCheck{}
 		sc := scope{studentID: student.ID, fields: studentFields(student), hosts: student.Hosts}
 		for _, check := range checks {
 			resolved, err := resolveCheck(check, sc, exam)
 			if err != nil {
 				errs = append(errs, withFile(examPath, errf(check.Line, "%s", err)))
 				continue
-			}
-			if resolved.File != "" {
-				key := [2]string{resolved.Host, resolved.File}
-				if first, ok := fileTimeouts[key]; ok && first.Timeout != resolved.Timeout {
-					errs = append(errs, withFile(examPath, errf(check.Line,
-						"fichero %q en %q del alumno %q tiene timeout %s en %q y %s en %q: la lectura compartida necesita el mismo tiempo límite",
-						resolved.File, resolved.Host, student.ID, first.Timeout, first.ID, resolved.Timeout, resolved.ID)))
-				}
-				fileTimeouts[key] = resolved
 			}
 			sp.Checks = append(sp.Checks, resolved)
 		}
@@ -479,18 +456,6 @@ func resolveCheck(check Check, sc scope, exam *Exam) (ResolvedCheck, error) {
 			return ResolvedCheck{}, err
 		}
 		out.Cmd = append(out.Cmd, value)
-	}
-
-	if check.File != nil {
-		file, err := substitute(*check.File, sc)
-		if err != nil {
-			return ResolvedCheck{}, err
-		}
-		if !strings.HasPrefix(file, "/") || strings.ContainsRune(file, 0) {
-			return ResolvedCheck{}, fmt.Errorf("fichero de %q debe ser una ruta absoluta no vacía y sin caracteres nulos", check.ID)
-		}
-		out.File = file
-		out.Cmd = []string{"cat", "--", file}
 	}
 
 	var err error
@@ -593,7 +558,6 @@ func hashPlan(p *Plan) string {
 		Host     string   `json:"host"`
 		Address  string   `json:"address"`
 		User     string   `json:"user"`
-		File     string   `json:"file,omitempty"`
 		Cmd      []string `json:"cmd"`
 		Value    string   `json:"value"`
 		Assert   string   `json:"assert"`
@@ -663,7 +627,7 @@ func hashPlan(p *Plan) string {
 				Host:    c.Host,
 				Address: fmt.Sprintf("%s:%d", c.Target.IP, c.Target.Port),
 				User:    c.Target.User,
-				File:    c.File, Cmd: c.Cmd, Value: c.Value,
+				Cmd:     c.Cmd, Value: c.Value,
 				Assert: kind, Expected: expected,
 			}) {
 				return ""

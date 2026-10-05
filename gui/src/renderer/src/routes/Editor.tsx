@@ -467,10 +467,10 @@ function CheckEditor({
   onCancel: () => void
 }) {
   const [draft, setDraft] = useState<Check>(check)
-  // Keep the selected source stable while its input is still empty.
-  const [source, setSource] = useState<'command' | 'file' | 'value'>(
-    check.fichero !== undefined ? 'file' : check.valor.trim() === '' ? 'command' : 'value'
-  )
+  // Which of the two shapes this check has. It is kept here and not deduced
+  // from the draft, because a check that is being written is empty in both
+  // and the form would flip under the teacher's hands.
+  const [byCommand, setByCommand] = useState(check.valor.trim() === '')
   const others = allChecks(exam).filter((other) => other !== check)
   const problem = checkProblem(draft, exam, others)
 
@@ -493,45 +493,31 @@ function CheckEditor({
 
         <fieldset className="max-w-3xl space-y-2">
           <legend className="text-xs text-muted-foreground">{t.editor.where}</legend>
-          <label className="flex min-h-8 items-center gap-2 text-sm">
+          <label className="flex items-center gap-2 text-sm">
             <input
               type="radio"
-              name="check-source"
-              checked={source === 'command'}
+              checked={byCommand}
               onChange={() => {
-                setSource('command')
-                setDraft({ ...draft, fichero: undefined, valor: '', en: draft.en || (exam.hosts[0] ?? '') })
+                setByCommand(true)
+                setDraft({ ...draft, valor: '', en: draft.en || (exam.hosts[0] ?? '') })
               }}
             />
             {t.editor.onHost}
           </label>
-          <label className="flex min-h-8 items-center gap-2 text-sm">
+          <label className="flex items-center gap-2 text-sm">
             <input
               type="radio"
-              name="check-source"
-              checked={source === 'file'}
+              checked={!byCommand}
               onChange={() => {
-                setSource('file')
-                setDraft({ ...draft, cmd: [], valor: '', fichero: '', en: draft.en || (exam.hosts[0] ?? '') })
-              }}
-            />
-            {t.editor.onFile}
-          </label>
-          <label className="flex min-h-8 items-center gap-2 text-sm">
-            <input
-              type="radio"
-              name="check-source"
-              checked={source === 'value'}
-              onChange={() => {
-                setSource('value')
-                setDraft({ ...draft, fichero: undefined, cmd: [], en: '' })
+                setByCommand(false)
+                setDraft({ ...draft, cmd: [], en: '' })
               }}
             />
             {t.editor.onValue}
           </label>
         </fieldset>
 
-        {source !== 'value' ? (
+        {byCommand ? (
           <div className="grid max-w-3xl gap-3 md:grid-cols-[10rem_1fr]">
             <Field label={t.editor.host}>
               <select
@@ -547,25 +533,14 @@ function CheckEditor({
                 ))}
               </select>
             </Field>
-            {source === 'file' ? (
-              <Field label={t.editor.file} hint={t.editor.fileHint}>
-                <Input
-                  value={draft.fichero ?? ''}
-                  placeholder="/etc/kea/kea-dhcp4.conf"
-                  className="font-mono"
-                  onChange={(e) => setDraft({ ...draft, fichero: e.target.value })}
-                />
-              </Field>
-            ) : (
-              <Field label={t.editor.command} hint={t.editor.commandHint}>
-                <Input
-                  value={commandLine(draft.cmd)}
-                  placeholder={t.editor.commandPlaceholder}
-                  className="font-mono"
-                  onChange={(e) => setDraft({ ...draft, cmd: readCommandLine(e.target.value) })}
-                />
-              </Field>
-            )}
+            <Field label={t.editor.command} hint={t.editor.commandHint}>
+              <Input
+                value={commandLine(draft.cmd)}
+                placeholder={t.editor.commandPlaceholder}
+                className="font-mono"
+                onChange={(e) => setDraft({ ...draft, cmd: readCommandLine(e.target.value) })}
+              />
+            </Field>
           </div>
         ) : (
           <div className="max-w-3xl">
@@ -593,7 +568,7 @@ function CheckEditor({
               className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {ASSERTIONS.map((kind) => (
-                <option key={kind} value={kind} disabled={source === 'file' && kind === 'exit_code'}>
+                <option key={kind} value={kind}>
                   {t.editor.assertionName[kind]}
                 </option>
               ))}
@@ -637,7 +612,7 @@ function CheckEditor({
               onChange={(e) => setDraft({ ...draft, peso: e.target.value })}
             />
           </Field>
-          {source !== 'value' && (
+          {byCommand && (
             <Field label={t.editor.timeout} hint={t.editor.timeoutHint}>
               <Input
                 value={draft.timeout}

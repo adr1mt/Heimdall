@@ -5,25 +5,21 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T173 · Lecturas compartidas de fichero.**
+**T176 · Retirada de lecturas compartidas por petición de Adrià.**
 
-- `fichero` declara una captura por alumno, host y corrección. Cada requisito
-  conserva nota y evidencia; comandos actuales y huellas antiguas se mantienen.
-- Validación antes de SSH: fuentes excluyentes, ruta segura y timeout común.
-  Reintentos y vueltas renuevan la captura; cancelación y presupuesto prevalecen.
-- [Evidencia T173](../reviews/evidence/T173/RESULTADOS.md), ADR-0028.
-  Suite rápida, race, enlaces y herramientas correctos.
-- T174 terminado: formulario y YAML conservan fichero; 534 pruebas GUI y build
-  correctos. [Evidencia T174](../reviews/evidence/T174/RESULTADOS.md).
-- T175 terminado: 450 a 30 lecturas SSH; 390.150 a 26.010 bytes de contenido.
-  Diez pares: tiempo mediano 0,770 a 0,705 s; RSS 24,54 a 23,56 MiB.
-  Informe +4,9 %; copias sin mejora clara. Las 450 conclusiones se conservan.
-  [Evidencia T175](../reviews/evidence/T175/RESULTADOS.md). `make test`,
-  534 pruebas GUI, build, race, enlaces y herramientas correctos.
-- Laboratorios apagados al cerrar; no se publican paquetes ni cambios remotos.
+- La opción `fichero` y el selector adicional del formulario se retiran.
+  Motor, parser y editor recuperan exactamente el estado anterior a T173.
+- Se retiran arneses y fixtures de esa función. La medición T175 permanece
+  como evidencia histórica: 65 ms y ~1 MiB de ahorro local no compensan
+  la complejidad de preparar el examen; el informe crecía un 4,9 %.
+- ADR-0029 sustituye ADR-0028. Suite rápida Go, 531 pruebas GUI y ambas
+  compilaciones correctas; enlaces y herramientas correctos.
+- Examen RA2 anterior aceptado; `fichero` se rechaza con exit 2 sin artefactos.
+  [Evidencia T176](../reviews/evidence/T176/RESULTADOS.md).
 
-**Contexto anterior:** T172 retiró residuos obsoletos tras reparar F1–F4 de
-T166 en T167–T171. Pasada visual GUI en `fb3206b`; paquetes 0.9.1 conservados.
+**Contexto anterior:** T173–T175 implementaron y midieron lecturas compartidas,
+retiradas en T176. T172 cerró higiene tras reparar F1–F4 de T166 en T167–T171.
+Pasada visual GUI en `fb3206b`; paquetes 0.9.1 conservados.
 [Auditoría T166](../reviews/T166-AUDITORIA.md).
 
 ## Problemas conocidos y límites

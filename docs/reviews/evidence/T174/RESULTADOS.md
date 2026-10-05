@@ -1,5 +1,9 @@
 # T174 · Fichero en el editor
 
+> Evidencia histórica: funcionalidad retirada en T176 por petición de Adrià.
+> Los arneses y ejemplos citados ya no están activos; véase
+> [ADR-0029](../../../adr/0029-retirar-lecturas-compartidas.md).
+
 - `make gui-check gui-build`: correcto, 534 pruebas y preload verificado.
   Vitest necesitó ejecución fuera del aislamiento por `EAI_AGAIN localhost`.
 - Pruebas: lectura, serialización, duplicación y reapertura conservan ruta,

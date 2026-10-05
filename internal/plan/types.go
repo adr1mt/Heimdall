@@ -77,9 +77,8 @@ type Check struct {
 	Weight      *float64  `yaml:"peso"`
 	Timeout     *Duration `yaml:"timeout"`
 
-	File  *string  `yaml:"fichero"` // explicit shared content source
-	Cmd   []string `yaml:"cmd"`     // argument vector, never a shell string
-	Value string   `yaml:"valor"`   // check without a command (M-11)
+	Cmd   []string `yaml:"cmd"`   // argument vector, never a shell string
+	Value string   `yaml:"valor"` // check without a command (M-11)
 
 	// Assertions. A pointer distinguishes "absent" from "expects the empty
 	// string"; a check with none or with two incompatible ones is a PLAN
@@ -91,9 +90,7 @@ type Check struct {
 	Near        *NearSpec `yaml:"cerca_de"`
 
 	// Line of the check in examen.yaml, for the PLAN error messages.
-	Line           int `yaml:"-"`
-	commandPresent bool
-	valuePresent   bool
+	Line int `yaml:"-"`
 }
 
 // NearSpec is cerca_de: what grep -A N used to do (M-10).

@@ -96,13 +96,6 @@ func (r *runner) runChecks(runCtx, studentCtx context.Context, sp plan.StudentPl
 	}()
 
 	retry := r.opts.Retry
-	files := map[fileKey]fileSnapshot{}
-	lastUse := map[fileKey]int{}
-	for i, c := range sp.Checks {
-		if c.File != "" {
-			lastUse[fileKey{c.Host, c.File}] = i
-		}
-	}
 	for i, c := range sp.Checks {
 		switch {
 		case retry != nil && !retry.Repeat(sp.ID, c.ID):
@@ -117,10 +110,7 @@ func (r *runner) runChecks(runCtx, studentCtx context.Context, sp plan.StudentPl
 				"el alumno %s agotó su presupuesto de %s antes de llegar a esta comprobación",
 				sp.ID, r.plan.StudentBudget))
 		default:
-			checks[i] = r.runCheck(runCtx, studentCtx, sp, hosts, c, files)
-		}
-		if key := (fileKey{c.Host, c.File}); c.File != "" && lastUse[key] == i {
-			delete(files, key)
+			checks[i] = r.runCheck(runCtx, studentCtx, sp, hosts, c)
 		}
 		checks[i].Previous = retry.at(sp.ID, c.ID)
 		done = i + 1
@@ -148,7 +138,7 @@ func notRepeated(previous *model.PreviousAttempt) string {
 // runCheck executes one check and classifies it. Everything technical stays
 // on the technical side: the only way out of here with PASS or FAIL is a
 // complete execution with an assertion that was actually evaluated.
-func (r *runner) runCheck(runCtx, studentCtx context.Context, sp plan.StudentPlan, hosts *hostPool, c plan.ResolvedCheck, files map[fileKey]fileSnapshot) model.CheckResult {
+func (r *runner) runCheck(runCtx, studentCtx context.Context, sp plan.StudentPlan, hosts *hostPool, c plan.ResolvedCheck) model.CheckResult {
 	spec, err := specOf(c)
 	if err != nil {
 		return skeleton(c, model.CauseEngineError, err.Error())
@@ -158,39 +148,26 @@ func (r *runner) runCheck(runCtx, studentCtx context.Context, sp plan.StudentPla
 		return inventoryCheck(c, spec)
 	}
 
-	key := fileKey{c.Host, c.File}
-	capture, shared := files[key]
-	if c.File == "" || !shared {
-		capture = r.readCheck(runCtx, studentCtx, sp, hosts, c)
-		capture.origin = c.ID
-		if c.File != "" {
-			files[key] = capture
+	sess, dialErr := hosts.get(studentCtx, c.Host)
+	if dialErr != nil {
+		return skeleton(c, dialErr.Cause, dialErr.Detail)
+	}
+
+	timeout := c.Timeout
+	if deadline, ok := studentCtx.Deadline(); ok {
+		if left := time.Until(deadline); left > 0 && left < timeout {
+			timeout = left
 		}
 	}
-	exec, cause, detail := cloneExecution(capture.execution), capture.cause, capture.detail
-	if c.File != "" {
-		sharedDetail := fmt.Sprintf("Lectura compartida de %q en %q, obtenida para %q.", c.File, c.Host, capture.origin)
-		if detail == "" {
-			detail = sharedDetail
-		} else {
-			detail += " " + sharedDetail
-		}
-	}
+
+	exec := sess.Run(studentCtx, c.Cmd, timeout)
+	cause, detail := causeOf(runCtx, studentCtx, sp, r.plan.StudentBudget, exec, c)
 
 	out := skeleton(c, model.CauseNone, "")
 	out.Execution = exec
 	if cause == model.CauseNone {
 		assertion, err := assert.Eval(*exec, spec)
-		if c.File != "" && exec.Completed && exec.ExitCode != nil && *exec.ExitCode != 0 {
-			// A failed read cannot prove any content requirement, even when a
-			// partial stdout happens to contain the expected text.
-			assertion = model.AssertionResult{Kind: string(spec.Kind), Expected: spec.Expected,
-				Where: fmt.Sprintf("no se pudo leer el fichero: el comando terminó con código %d", *exec.ExitCode)}
-			err = nil
-			detail = assertion.Where + ". " + detail
-		}
 		if err != nil {
-			out.Detail = detail
 			return failedAssertion(out, err)
 		}
 		out.Assertion = &assertion
@@ -199,51 +176,10 @@ func (r *runner) runCheck(runCtx, studentCtx context.Context, sp plan.StudentPla
 	status, finalCause, fallback := model.Classify(out.Execution, out.Assertion, cause)
 	out.Status, out.Cause = status, finalCause
 	out.Detail = detail
-	if c.File != "" && cause != model.CauseNone && capture.detail == "" {
-		out.Detail = strings.TrimSpace(fallback + " " + detail)
-	}
 	if out.Detail == "" {
 		out.Detail = fallback
 	}
 	return out
-}
-
-// fileSnapshot contains transport evidence only; assertions are never shared.
-type fileKey struct{ host, path string }
-type fileSnapshot struct {
-	execution      *model.ExecutionResult
-	cause          model.Cause
-	detail, origin string
-}
-
-func (r *runner) readCheck(runCtx, studentCtx context.Context, sp plan.StudentPlan, hosts *hostPool, c plan.ResolvedCheck) fileSnapshot {
-	sess, dialErr := hosts.get(studentCtx, c.Host)
-	if dialErr != nil {
-		return fileSnapshot{cause: dialErr.Cause, detail: dialErr.Detail}
-	}
-	timeout := c.Timeout
-	if deadline, ok := studentCtx.Deadline(); ok {
-		if left := time.Until(deadline); left > 0 && left < timeout {
-			timeout = left
-		}
-	}
-	exec := sess.Run(studentCtx, c.Cmd, timeout)
-	cause, detail := causeOf(runCtx, studentCtx, sp, r.plan.StudentBudget, exec, c)
-	return fileSnapshot{execution: exec, cause: cause, detail: detail}
-}
-
-// Strings may share backing storage, but mutable result containers may not.
-func cloneExecution(exec *model.ExecutionResult) *model.ExecutionResult {
-	if exec == nil {
-		return nil
-	}
-	out := *exec
-	out.Command = append([]string(nil), exec.Command...)
-	if exec.ExitCode != nil {
-		code := *exec.ExitCode
-		out.ExitCode = &code
-	}
-	return &out
 }
 
 // inventoryTransport is what the artifact records for a check that read its
@@ -298,7 +234,7 @@ func failedAssertion(out model.CheckResult, err error) model.CheckResult {
 	if errors.Is(err, assert.ErrIncompleteOutput) {
 		out.Cause = model.CauseOutputOverflow
 	}
-	out.Detail = strings.TrimSpace(oneLine(err) + " " + out.Detail)
+	out.Detail = oneLine(err)
 	return out
 }
 

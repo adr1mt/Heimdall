@@ -126,7 +126,6 @@ suite se ejecuta aparte.
 
 | Trabajo | Código de entrada | Pruebas y decisiones |
 |---|---|---|
-| Lecturas compartidas | [PLAN](../internal/plan/resolve.go), [motor](../internal/engine/student.go), [editor](../gui/src/shared/exam.ts) | [SSH instrumentado](../internal/engine/file_integration_test.go), [medición](../test/shared-files-performance.py), ADR-0028 |
 | Leer resultados | [CLI](../cmd/heimdall/artifact.go), [lector GUI](../gui/src/main/artifact.ts) | [lector](../gui/tests/artifact-reader.test.ts), ADR-0027 |
 | Validar resultados | [JSON Go](../internal/model/validate_json.go), [modelo Go](../internal/model/validate.go), [GUI](../gui/src/shared/artifact.ts) | [corpus compartido](../testdata/artifacts/corpus.json), [Go](../cmd/heimdall/artifact_corpus_test.go), [GUI](../gui/tests/artifact-corpus.test.ts) |
 | Copiar, retener, recuperar | [backup.ts](../gui/src/main/backup.ts), incluye `BackupChain` | [copias](../gui/tests/backups.test.ts), [recuperación](../gui/tests/backup-recovery.test.ts), ADR-0026 |
@@ -181,13 +180,3 @@ DECISIONS porque conservan evidencia histórica y rutas de otras máquinas.
 | Los 16 modos de fallo del sistema viejo | [MODOS-DE-FALLO-HEIMDALL.md](MODOS-DE-FALLO-HEIMDALL.md) |
 | Estado actual del trabajo | [project/PROGRESS.md](project/PROGRESS.md) |
 | Investigación previa y mediciones | [research/](research/) |
-
-Para compartir una lectura, sustituye `cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]`
-por `fichero: "/etc/kea/kea-dhcp4.conf"` en las comprobaciones de contenido.
-La misma ruta y host usan una captura por alumno y corrección; todos sus
-timeouts deben coincidir. Los comandos actuales conservan su comportamiento.
-Véase [ADR-0028](adr/0028-lecturas-compartidas.md).
-
-`make rendimiento-ficheros` compara 30 alumnos y 15 requisitos Kea, incluyendo
-las operaciones de lectura y copias de la GUI. Requiere `make lab-ra2` y las
-dependencias GUI. Deja medidas en `var/performance/shared-files`.

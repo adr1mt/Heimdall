@@ -781,3 +781,11 @@ mediano -8,4 %, RSS mediano -0,98 MiB. El informe crece 4,9 % por explicaciones
 de captura; las copias no mejoran claramente. Se conserva el contrato actual.
 No se abre optimización de almacenamiento sin un nuevo caso y diseño.
 Evidencia: docs/reviews/evidence/T175/RESULTADOS.md.
+
+## T176 · Retirada de la opción fichero (2026-10-05)
+
+Adrià pide retirar la función por complicar la autoría del examen para un
+ahorro local modesto. ADR-0029 sustituye ADR-0028. Motor, parser y formulario
+vuelven al estado previo a T173; se retiran arneses y fixtures exclusivos.
+La medición se conserva como evidencia histórica, sin instrucciones activas
+para una función que ya no existe. No se añade optimización automática.

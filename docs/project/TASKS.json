@@ -3526,7 +3526,7 @@
         "go test -race ./...",
         "make docs-check tools-check"
       ],
-      "notes": "ADR-0028 y evidencia docs/reviews/evidence/T173/RESULTADOS.md. Suite rápida, race y compatibilidad de huellas correctas. Transporte real y medición se cubren en T175.",
+      "notes": "ADR-0028 y evidencia docs/reviews/evidence/T173/RESULTADOS.md. Suite rápida, race y compatibilidad de huellas correctas. Transporte real y medición se cubren en T175. Funcionalidad retirada por petición de Adrià en T176; la evidencia es histórica.",
       "completed": "2026-10-05"
     },
     {
@@ -3553,7 +3553,7 @@
         "gui/scripts/shared-files-editor.ts",
         "impeccable detect Editor.tsx"
       ],
-      "notes": "Formulario, YAML y serialización conservan fichero. 534 pruebas GUI, build y arnés Electron correctos. Evidencia docs/reviews/evidence/T174/RESULTADOS.md.",
+      "notes": "Formulario, YAML y serialización conservan fichero. 534 pruebas GUI, build y arnés Electron correctos. Evidencia docs/reviews/evidence/T174/RESULTADOS.md. Funcionalidad retirada por petición de Adrià en T176; la evidencia es histórica.",
       "completed": "2026-10-05"
     },
     {
@@ -3585,7 +3585,40 @@
         "make docs-check tools-check",
         "git diff --check"
       ],
-      "notes": "Evidencia docs/reviews/evidence/T175/RESULTADOS.md y medidas crudas. SSH real: 450 a 30 lecturas y 390150 a 26010 bytes de contenido. Diez pares: mediana 0,770 a 0,705 s; RSS 24,54 a 23,56 MiB; informe +4,9 %. Todas las notas y conclusiones iguales; copias conservan notas. No se mide toda la memoria Electron ni 30 máquinas de aula.",
+      "notes": "Evidencia docs/reviews/evidence/T175/RESULTADOS.md y medidas crudas. SSH real: 450 a 30 lecturas y 390150 a 26010 bytes de contenido. Diez pares: mediana 0,770 a 0,705 s; RSS 24,54 a 23,56 MiB; informe +4,9 %. Todas las notas y conclusiones iguales; copias conservan notas. No se mide toda la memoria Electron ni 30 máquinas de aula. Funcionalidad retirada por petición de Adrià en T176; la evidencia es histórica.",
+      "completed": "2026-10-05"
+    },
+    {
+      "id": "T176",
+      "title": "Retirar lecturas compartidas y restaurar el editor anterior",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T175"
+      ],
+      "goal": "Eliminar la opción fichero por petición expresa de Adrià: el ahorro local no compensa la complejidad de autoría.",
+      "scope": [
+        "internal/plan/",
+        "internal/engine/",
+        "gui/src/",
+        "gui/tests/editor.test.ts",
+        "docs/",
+        "test/",
+        "testdata/shared-files/"
+      ],
+      "acceptance": [
+        "Motor, parser y formulario vuelven exactamente a la versión previa a T173; no queda soporte para fichero ni caché de lecturas.",
+        "Se retiran arneses, fixtures y pruebas exclusivos de la funcionalidad; Makefile y documentación activa dejan de ofrecerla.",
+        "Evidencia T173–T175 conservada como histórica; ADR-0029 sustituye ADR-0028 y registra la retirada.",
+        "Suite rápida, GUI, build de motor/GUI, enlaces y herramientas correctos; diff revisado y commit local."
+      ],
+      "tests": [
+        "make check build",
+        "make gui-check gui-build",
+        "make docs-check tools-check"
+      ],
+      "notes": "ADR-0029 y evidencia docs/reviews/evidence/T176/RESULTADOS.md. Trece archivos restaurados byte a byte a fb3206b; fuentes fichero y caché retiradas. Suites Go, 531 pruebas GUI, builds, enlaces y herramientas correctos; examen RA2 aceptado y clave fichero rechazada con exit 2 sin artefactos.",
       "completed": "2026-10-05"
     }
   ]

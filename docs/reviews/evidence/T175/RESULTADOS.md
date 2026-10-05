@@ -1,5 +1,9 @@
 # T175 · Comparación Kea con lecturas compartidas
 
+> Evidencia histórica: funcionalidad retirada en T176 por petición de Adrià.
+> Los arneses y ejemplos citados ya no están activos; véase
+> [ADR-0029](../../../adr/0029-retirar-lecturas-compartidas.md).
+
 ## Método
 
 30 alumnos ficticios alternados entre `ra2-bien` y `ra2-parcial`, dos

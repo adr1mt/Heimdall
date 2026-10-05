@@ -1,5 +1,9 @@
 # T173 · Lecturas compartidas
 
+> Evidencia histórica: funcionalidad retirada en T176 por petición de Adrià.
+> Los arneses y ejemplos citados ya no están activos; véase
+> [ADR-0029](../../../adr/0029-retirar-lecturas-compartidas.md).
+
 Caso y decisiones: [ADR-0028](../../../adr/0028-lecturas-compartidas.md).
 
 ## Verificación

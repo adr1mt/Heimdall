@@ -30,4 +30,5 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 | [0023](0023-la-contrasena-del-aula-se-recuerda-cifrada.md) | La contraseña del aula se recuerda cifrada; sustituye el punto 4 de ADR-0021 |
 | [0024](0024-evidencia-de-terminacion-remota.md) | Supervisor remoto fijo que distingue timeout y códigos propios 124/137 |
 | [0025](0025-integridad-en-los-limites-de-evidencia-y-peso.md) | Prueba suficiente para evaluar, pesos finitos y elección sin redondear |
-| [0028](0028-lecturas-compartidas.md) | Captura de fichero compartida por alumno, host y corrección |
+| [0028](0028-lecturas-compartidas.md) | Captura compartida (sustituida por ADR-0029) |
+| [0029](0029-retirar-lecturas-compartidas.md) | Retirada de lecturas compartidas para simplificar la autoría |

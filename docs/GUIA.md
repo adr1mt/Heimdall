@@ -83,15 +83,6 @@ que le tocó—, añade una columna tuya y rellénala. El examen la lee con
 la pantalla donde se escribe cada comprobación en un formulario: qué comando
 se ejecuta en qué máquina, qué se espera y cuánto pesa.
 
-Para varios requisitos sobre un mismo fichero, elige **Fichero de una máquina**
-y escribe su ruta absoluta, por ejemplo `/etc/kea/kea-dhcp4.conf`. Heimdall lo
-lee una vez por alumno y corrección y conserva una nota por requisito. Usa el
-mismo tiempo máximo en todas las comprobaciones de esa ruta y máquina.
-Los comandos intermedios no actualizan el contenido obtenido; una nueva
-corrección sí lo vuelve a leer. Los comandos existentes siguen ejecutándose
-individualmente. Si la máquina responde que no puede leer el fichero, los
-requisitos de contenido fallan con explicación; una avería SSH los deja sin evaluar.
-
 Si ya tienes el examen escrito, **Inicio → Abrir…** y elige su carpeta.
 
 **Guardar el examen** valida y guarda el borrador visible. Si el YAML contiene

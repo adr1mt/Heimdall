@@ -1,6 +1,6 @@
 # ADR-0028 · Lecturas compartidas por alumno y corrección
 
-- Estado: **aceptada** · 2026-10-05
+- Estado: **sustituida por ADR-0029** · 2026-10-05
 - Caso: 30 alumnos, 15 comprobaciones sobre la configuración de Kea.
 - Amplía ADR-0003; mantiene ADR-0018 y ADR-0025.
 

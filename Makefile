@@ -10,7 +10,7 @@ BIN := bin/heimdall
 VERSION := $(shell cat VERSION)
 
 # Test SSH lab. See test/lab.sh.
-.PHONY: docs-check tools-check check test build version lab lab-down lab-status lab-ra2 lab-ra2-down rendimiento rendimiento-ficheros gui-check gui-build gui-dist gui-paquete gui-lab gui-editor clean
+.PHONY: docs-check tools-check check test build version lab lab-down lab-status lab-ra2 lab-ra2-down rendimiento gui-check gui-build gui-dist gui-paquete gui-lab gui-editor clean
 
 ## docs-check: maintained local documentation links, without network access.
 docs-check:
@@ -42,10 +42,6 @@ test: check build
 ## Not part of make test: it is slow and it must not fail for being slow.
 rendimiento: build
 	test/rendimiento.sh
-
-## rendimiento-ficheros: paired Kea file reads, needs make lab-ra2 and GUI dependencies.
-rendimiento-ficheros: build
-	$(PYTHON) test/shared-files-performance.py --out var/performance/shared-files
 
 ## build: single binary in bin/heimdall, stamped with VERSION.
 build:
