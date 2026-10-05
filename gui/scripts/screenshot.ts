@@ -7,12 +7,14 @@ import { registerIpc } from '../src/main/ipc'
 
 const OUT = process.env.SHOT_OUT || '/tmp/heimdall-shot.png'
 const root = process.cwd()
+const width = Number(process.env.SHOT_WIDTH || 1280)
+const height = Number(process.env.SHOT_HEIGHT || 820)
 
 app.whenReady().then(async () => {
   registerIpc()
   const win = new BrowserWindow({
-    width: 1280,
-    height: 820,
+    width,
+    height,
     show: true,
     backgroundColor: '#0b0f19',
     webPreferences: {
@@ -27,13 +29,15 @@ app.whenReady().then(async () => {
   })
   await win.loadFile(join(root, 'out/renderer/index.html'))
   await new Promise((r) => setTimeout(r, 2500))
+  await win.webContents.executeJavaScript("document.documentElement.classList.add('dark')")
+  await new Promise((r) => setTimeout(r, 100))
   writeFileSync(OUT, (await win.webContents.capturePage()).toPNG())
   console.log('[shot] saved to', OUT)
 
-  // Second capture in the light theme, to check both modes.
+  // Check both themes independently of the saved preference on this machine.
   if (process.env.SHOT_OUT2) {
     await win.webContents.executeJavaScript(
-      "document.documentElement.classList.remove('dark'); localStorage.setItem('heimdall-theme','light');"
+      "document.documentElement.classList.remove('dark')"
     )
     await new Promise((r) => setTimeout(r, 500))
     writeFileSync(process.env.SHOT_OUT2, (await win.webContents.capturePage()).toPNG())

@@ -188,7 +188,7 @@ function AppBody() {
           <div className="text-sm font-semibold tracking-tight">{t.app.name}</div>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-0.5 px-3">
+        <nav aria-label="Secciones principales" className="flex flex-1 flex-col gap-0.5 px-3">
           {NAV_MAIN.map((entry) => (
             <NavButton
               key={entry.id}
@@ -217,7 +217,7 @@ function AppBody() {
           <ProjectorToggle />
           <button
             onClick={toggleTheme}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs text-sidebar-foreground/60 transition-colors hover:bg-white/5 hover:text-white"
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs text-sidebar-foreground/70 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
           >
             {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             {theme === 'dark' ? t.theme.toLight : t.theme.toDark}
@@ -299,12 +299,13 @@ function NavButton({
     <button
       disabled={!open}
       aria-disabled={!open}
+      aria-current={active ? 'page' : undefined}
       title={
         entry.ready ? (waiting ? t.nav.needProject(entry.label) : undefined) : comingSoon(entry.id)
       }
       onClick={() => onPick(entry.id)}
       className={cn(
-        'group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+        'group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary',
         active
           ? 'bg-primary/20 text-white'
           : 'text-sidebar-foreground/70 hover:bg-white/5 hover:text-white',
@@ -314,7 +315,7 @@ function NavButton({
       {active && (
         <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-primary" />
       )}
-      <Icon className="h-[18px] w-[18px]" />
+      <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
       {entry.label}
       {!entry.ready && (
         <span className="ml-auto text-glyph uppercase tracking-[0.09em] text-sidebar-foreground/40">
@@ -339,7 +340,7 @@ function ProjectorToggle() {
       aria-pressed={projector}
       title={projector ? t.projector.hintOn : t.projector.hintOff}
       className={cn(
-        'flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs transition-colors',
+        'flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary',
         projector
           ? 'bg-primary/20 text-white'
           : 'text-sidebar-foreground/60 hover:bg-white/5 hover:text-white'

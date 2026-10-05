@@ -5,6 +5,13 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
+**Pasada visual de Heimdall GUI (Impeccable).**
+
+- Inicio muestra siempre las acciones de cada examen; la navegación lateral
+  indica mejor el foco de teclado y la sección actual.
+- Capturas comprobadas a 1280 y 960 px, en temas claro y oscuro. Pasaron
+  `make check`, `make gui-check` (531 pruebas), `make gui-build` y el detector.
+
 **T172 · Higiene tras la auditoría T166.**
 
 - [Evidencia T172](../reviews/evidence/T172/RESULTADOS.md): F1–F4 tienen
