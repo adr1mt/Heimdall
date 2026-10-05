@@ -280,7 +280,16 @@ func (e *Exam) markLines(node *yaml.Node) {
 			continue
 		}
 		for c := 0; c < len(checks.Content) && c < len(e.Groups[g].Checks); c++ {
-			e.Groups[g].Checks[c].Line = checks.Content[c].Line
+			check := &e.Groups[g].Checks[c]
+			check.Line = checks.Content[c].Line
+			if childValue(checks.Content[c], "fichero") != nil {
+				if check.File == nil {
+					empty := ""
+					check.File = &empty
+				}
+				check.commandPresent = childValue(checks.Content[c], "cmd") != nil
+				check.valuePresent = childValue(checks.Content[c], "valor") != nil
+			}
 		}
 	}
 }

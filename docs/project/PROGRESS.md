@@ -5,35 +5,18 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**Pasada visual de Heimdall GUI (Impeccable).**
+**T173 · Lecturas compartidas de fichero.**
 
-- Inicio muestra siempre las acciones de cada examen; la navegación lateral
-  indica mejor el foco de teclado y la sección actual.
-- Capturas comprobadas a 1280 y 960 px, en temas claro y oscuro. Pasaron
-  `make check`, `make gui-check` (531 pruebas), `make gui-build` y el detector.
+- `fichero` declara una captura por alumno, host y corrección. Cada requisito
+  conserva nota y evidencia; comandos actuales y huellas antiguas se mantienen.
+- Validación antes de SSH: fuentes excluyentes, ruta segura y timeout común.
+  Reintentos y vueltas renuevan la captura; cancelación y presupuesto prevalecen.
+- [Evidencia T173](../reviews/evidence/T173/RESULTADOS.md), ADR-0028.
+  Suite rápida, race, enlaces y herramientas correctos.
+- T174 (formulario) y T175 (medición Kea) en curso por petición expresa de Adrià.
 
-**T172 · Higiene tras la auditoría T166.**
-
-- [Evidencia T172](../reviews/evidence/T172/RESULTADOS.md): F1–F4 tienen
-  reparación cerrada en T167–T171. Persisten límites de certificación, no
-  fallos nuevos: recuperación de parciales desde la GUI, pérdida de
-  alimentación y examen real de aula sin probar.
-- Se borraron seis archivos del formato antiguo sin usuarios activos, una
-  función y un import sin uso. La GUI detecta ahora declaraciones y parámetros
-  sin uso en sus tres comprobaciones TypeScript.
-- El arnés de aceptación ya no anuncia A-10 como pendiente: se retiró con la
-  compatibilidad antigua. Pasaron sus 13 criterios vigentes contra el
-  laboratorio SSH. La evidencia histórica se conservó y se aclaró su carácter
-  histórico.
-- `make check`, `make gui-check gui-build` (531 pruebas),
-  `make docs-check tools-check`, aceptación y `git diff --check` correctos.
-  Vitest necesitó salir del aislamiento por `EAI_AGAIN localhost`.
-- Se retiraron ~786 MiB de instaladores locales antiguos y salidas de
-  empaquetado, ignorados por Git. Los paquetes publicados 0.9.1 permanecen.
-  Laboratorio apagado al terminar.
-
-**Contexto anterior:** T170/T171 corrigieron F4 en `3f0ce82` y `ffc8dec`.
-T169 resolvió F3 en `424bac4`; T168, F2 en `36e869d`; T167, F1 en `7fd7948`.
+**Contexto anterior:** T172 retiró residuos obsoletos tras reparar F1–F4 de
+T166 en T167–T171. Pasada visual GUI en `fb3206b`; paquetes 0.9.1 conservados.
 [Auditoría T166](../reviews/T166-AUDITORIA.md).
 
 ## Problemas conocidos y límites

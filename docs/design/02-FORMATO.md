@@ -257,3 +257,25 @@ inválida** (F-02, F-06, C-14):
 Cuando todo pasa, el PLAN publica: número de comprobaciones, peso total, hash
 del examen, hash del inventario y lista de alumnos. Ese número es el que la GUI
 ya no tendrá que adivinar (`c14-check`).
+
+## 6. Lecturas compartidas de ficheros
+
+Desde ADR-0028, `fichero: "/etc/kea/kea-dhcp4.conf"` es una alternativa a
+`cmd` y `valor`: se elige exactamente una fuente. Requiere `en` y una ruta
+absoluta resuelta, no vacía ni con caracteres nulos. Admite sustitución de
+campos del alumno con las mismas restricciones de secretos que `cmd`.
+
+Las comprobaciones del mismo alumno, host lógico y ruta literal comparten
+una captura obtenida con `cat -- ruta` al primer uso. Deben tener el mismo
+timeout efectivo; las diferencias se rechazan con fichero y línea antes de
+SSH. No se agrupan hosts con nombres distintos ni se normalizan rutas.
+Los comandos intermedios no renuevan la captura. Las correcciones, reintentos
+y vueltas del modo examen obtienen capturas nuevas.
+
+Se admiten `contiene`, `no_contiene`, `igual_a` y `cerca_de`; `exit_code` queda
+para `cmd`. Una lectura completa que termina con exit no cero hace fallar
+los requisitos de contenido con explicación y stderr. Los problemas técnicos
+y los prefijos recortados conservan las políticas actuales. Cada requisito
+mantiene su peso, aserción y evidencia; el detalle identifica la captura.
+Los tiempos y contadores de una ejecución compartida describen esa captura:
+no deben sumarse para contar operaciones remotas.

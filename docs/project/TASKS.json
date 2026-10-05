@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated": "2026-10-04",
+  "updated": "2026-10-05",
   "status_values": [
     "BLOCKED",
     "READY",
@@ -3501,6 +3501,79 @@
       ],
       "notes": "F1–F4 cerrados en T167–T171. Retirados seis archivos legacy sin referencias activas, una función y un import sin uso; la aceptación ya no muestra A-10 retirado. TypeScript detecta código sin uso en CI. Paquetes locales antiguos ignorados eliminados; evidencia histórica y release 0.9.1 conservados. Evidencia en docs/reviews/evidence/T172/RESULTADOS.md.",
       "completed": "2026-10-05"
+    },
+    {
+      "id": "T173",
+      "title": "Lecturas compartidas de ficheros por alumno y corrección",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Lecturas compartidas de ficheros por alumno y corrección",
+      "scope": [
+        "internal/plan/",
+        "internal/engine/",
+        "docs/adr/0028-lecturas-compartidas.md"
+      ],
+      "acceptance": [
+        "fichero excluye cmd y valor; host, ruta absoluta, sustitución segura y timeout común se validan antes de SSH.",
+        "Una lectura por alumno, host lógico y ruta, incluso con comandos intermedios; resultados y evidencia independientes.",
+        "Errores de lectura completos con exit no cero son FAIL; causas técnicas, recortes, cancelación, presupuesto y reintentos conservan su política.",
+        "Hashes anteriores se conservan sin fichero; nueva modalidad altera la huella. Suite rápida y regresiones correctas."
+      ],
+      "tests": [
+        "make check",
+        "go test -race ./...",
+        "make docs-check tools-check"
+      ],
+      "notes": "ADR-0028 y evidencia docs/reviews/evidence/T173/RESULTADOS.md. Suite rápida, race y compatibilidad de huellas correctas. Transporte real y medición se cubren en T175.",
+      "completed": "2026-10-05"
+    },
+    {
+      "id": "T174",
+      "title": "Lecturas de fichero en el formulario de exámenes",
+      "phase": 9,
+      "status": "IN_PROGRESS",
+      "priority": "P1",
+      "depends_on": [
+        "T173"
+      ],
+      "goal": "Lecturas de fichero en el formulario de exámenes",
+      "scope": [
+        "gui/src/shared/exam.ts",
+        "gui/src/renderer/src/routes/Editor.tsx"
+      ],
+      "acceptance": [
+        "Formulario ofrece comando, fichero y valor; explica captura compartida.",
+        "Leer, guardar, duplicar y reabrir conserva fichero; valida fuentes excluyentes y exit_code solo con comandos.",
+        "Suite GUI y build correctos; revisión de accesibilidad del formulario."
+      ],
+      "tests": [],
+      "notes": "Implementación completa solicitada expresamente por Adrià en esta sesión; commits separados por tarea."
+    },
+    {
+      "id": "T175",
+      "title": "Medir lecturas compartidas con 30 alumnos y Kea",
+      "phase": 9,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T173",
+        "T174"
+      ],
+      "goal": "Medir lecturas compartidas con 30 alumnos y Kea",
+      "scope": [
+        "test/",
+        "gui/scripts/",
+        "docs/reviews/evidence/T175/"
+      ],
+      "acceptance": [
+        "Prueba SSH instrumentada confirma 450 frente a 30 lecturas y conclusiones académicas equivalentes para 30 alumnos y 15 requisitos.",
+        "Dos calentamientos y diez pares alternados: tiempo, RSS motor, bytes recibidos y tamaño; medir lectura y copias GUI.",
+        "Integración SSH, suites Go/GUI, build, documentación y herramientas; registrar evidencia y límites."
+      ],
+      "tests": [],
+      "notes": "Implementación completa solicitada expresamente por Adrià en esta sesión; commits separados por tarea."
     }
   ]
 }

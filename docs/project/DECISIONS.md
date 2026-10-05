@@ -764,3 +764,12 @@ por celda, contando expansión JSON y con aviso. Se admiten hasta 2000 celdas y
   devuelve HTTP 200 con v0.9.1 y sus tres assets originales.
 - T163 comprobada con AppImage 0.9.0 real: descarga, sustitución al cerrar y
   reapertura con GUI y motor 0.9.1; perfil y clase ficticia conservados.
+
+## T173 · Lecturas compartidas (2026-10-05)
+
+ADR-0028: fuente `fichero` explícita, captura al primer uso por alumno y host,
+timeout común validado antes de SSH. Mantiene notas y evidencia por requisito;
+los comandos antiguos no se cachean. Lectura fallida completa es fallo de
+contenido; problemas técnicos y recortes mantienen su clasificación.
+Adrià solicita motor, formulario y medición completos en esta sesión; se
+registran T173–T175 y se mantienen commits separados por tarea.
