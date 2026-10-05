@@ -49,8 +49,6 @@ demás no se ven afectados.
 nombres ficticios. Todas las máquinas del laboratorio son la misma, de ahí que
 las columnas salgan iguales.</sub>
 
-## Lo que no se negocia
-
 1. **Un error técnico nunca es un suspenso.** Una máquina apagada sale *sin
    evaluar*, con el motivo escrito. Nunca un 0.
 2. **Si queda algo sin evaluar, no hay nota final**, solo una provisional
@@ -79,10 +77,3 @@ corregido de principio a fin— y esa será la 1.0.0.
 ## Licencia
 
 El código de este repositorio está bajo la [Mozilla Public License 2.0](LICENSE).
-
-## Contexto
-
-Lo escribe [Adrià Muñoz](https://github.com/adr1mt), profesor de informática en
-el Institut El Puig, para corregir los exámenes de servicios en red de SMX. Las
-credenciales que aparecen en los tests son ficticias y solo valen dentro de los
-contenedores del laboratorio.
