@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Acceptance criteria A-1 to A-14 of the vertical slice
+# The 13 active acceptance criteria of the vertical slice (A-10 was retired)
 # (docs/design/07-PROTOTIPO.md §6), checked with jq over real artifacts and
 # with /usr/bin/time. Nothing here is judged by eye.
 #
-# One line per criterion, OK or FALLO, and a non-zero exit if any fails.
+# One line per check, OK or FALLO, and a non-zero exit if any fails.
 # A-1, A-2, A-3, A-8 and A-14 are the ones that protect the integrity of the
 # grade: if one of those fails, the milestone is not met.
 #
@@ -34,7 +34,6 @@ bad()  {
   failed="$failed $1"
   case " $BLOCKING " in *" $1 "*) blocking_failed="$blocking_failed $1";; esac
 }
-skip() { printf 'PEND   %-5s %s\n' "$1" "$2"; }
 die()  { echo "acceptance: $*" >&2; exit 1; }
 
 # check <id> <description> <condition-output> compares a computed value.
@@ -183,9 +182,6 @@ else
     "$(jq '[.students[] | select(.status != "")] | length >= 1' "$PART")" 'true'
 fi
 
-# --- A-10 legacy artifacts: withdrawn with the compatibility layer (T060) --
-skip A-10 "artefactos del formato viejo: retirados con la capa de compatibilidad (T060)"
-
 # --- A-12 the grade does not depend on the locale -------------------------
 VAR12="$WORK/var12"
 printf '%s' "$SECRETS_LINE" | LC_ALL=C "$BIN" run --secrets=stdin --var="$VAR12" "$PROTO" >/dev/null 2>&1
@@ -228,4 +224,4 @@ if [ -n "$failed" ]; then
   echo "acceptance: fallan criterios:$failed"
   exit 1
 fi
-echo "acceptance: los 13 criterios de la fase 1 en verde (A-10 retirado en T060)"
+echo "acceptance: los 13 criterios vigentes de la fase 1 en verde"

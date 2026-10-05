@@ -325,15 +325,6 @@ function NavButton({
   )
 }
 
-/** A section that is still to be built, if anything ever routes to it. */
-function ComingSoon({ view }: { view: View }) {
-  return (
-    <div className="flex h-full items-center justify-center p-8">
-      <p className="text-sm text-muted-foreground">{comingSoon(view)}</p>
-    </div>
-  )
-}
-
 /**
  * Projector mode. It is a switch and not a setting buried in Ajustes because
  * it gets pressed with the class already looking at the screen.

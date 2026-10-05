@@ -1,4 +1,4 @@
-import type { RunResult, StudentResult } from '../../../shared/artifact'
+import type { RunResult } from '../../../shared/artifact'
 import type { AcademicStatus, Score, StudentStatus } from '../../../shared/events'
 import type { Consolidation } from '../../../shared/consolidation'
 import type { Session } from '../../../shared/session'

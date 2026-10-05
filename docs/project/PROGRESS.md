@@ -5,27 +5,29 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T170 y T171 · Corregido F4, rendimiento de parciales y memoria del PLAN.**
+**T172 · Higiene tras la auditoría T166.**
 
-- Base limpia `424bac4`. T170 en `3f0ce82`: el resultado terminado de cada
-  alumno se redacta y recorta una sola vez. Siguen publicándose parciales
-  atómicos tras cada alumno; el final se prepara desde el resultado original.
-  En el caso sintético de 100 alumnos, 12,90 → 2,43 s de ejecución y guardado,
-  con ~421 MB publicados en ambos casos.
-- T171: la huella del PLAN se calcula sin reunir todas las respuestas en un
-  gran JSON. En 100 × 20 × 65536 bytes: 793,7 → 151,6 MB de asignaciones
-  durante la huella; heap tras PLAN 541,7 → 220,1 MB sin forzar GC; RSS máximo
-  786 → 291 MiB. Dos huellas anteriores permanecen idénticas.
-- [Evidencia T170](../reviews/evidence/T170/RESULTADOS.md) y
-  [T171](../reviews/evidence/T171/RESULTADOS.md). Pasaron `make check`,
-  regresiones de parciales, SIGKILL, secretos, presupuesto, huella, límites,
-  reintentos y sesiones; también `go test -race ./...` y
-  `make docs-check tools-check`. Sin cambios en notas ni PLAN válido.
+- [Evidencia T172](../reviews/evidence/T172/RESULTADOS.md): F1–F4 tienen
+  reparación cerrada en T167–T171. Persisten límites de certificación, no
+  fallos nuevos: recuperación de parciales desde la GUI, pérdida de
+  alimentación y examen real de aula sin probar.
+- Se borraron seis archivos del formato antiguo sin usuarios activos, una
+  función y un import sin uso. La GUI detecta ahora declaraciones y parámetros
+  sin uso en sus tres comprobaciones TypeScript.
+- El arnés de aceptación ya no anuncia A-10 como pendiente: se retiró con la
+  compatibilidad antigua. Pasaron sus 13 criterios vigentes contra el
+  laboratorio SSH. La evidencia histórica se conservó y se aclaró su carácter
+  histórico.
+- `make check`, `make gui-check gui-build` (531 pruebas),
+  `make docs-check tools-check`, aceptación y `git diff --check` correctos.
+  Vitest necesitó salir del aislamiento por `EAI_AGAIN localhost`.
+- Se retiraron ~786 MiB de instaladores locales antiguos y salidas de
+  empaquetado, ignorados por Git. Los paquetes publicados 0.9.1 permanecen.
+  Laboratorio apagado al terminar.
 
-**Contexto anterior:** T169 resolvió F3 en `424bac4`; T168 redujo la memoria de
-copias en `36e869d`; T167 resolvió F1 en `7fd7948`. La auditoría T166 está en
-[su informe](../reviews/T166-AUDITORIA.md). La distribución pública 0.9.1 está
-verificada en [VERIFICACION](../releases/0.9.1/VERIFICACION.md).
+**Contexto anterior:** T170/T171 corrigieron F4 en `3f0ce82` y `ffc8dec`.
+T169 resolvió F3 en `424bac4`; T168, F2 en `36e869d`; T167, F1 en `7fd7948`.
+[Auditoría T166](../reviews/T166-AUDITORIA.md).
 
 ## Problemas conocidos y límites
 

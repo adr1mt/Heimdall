@@ -1,10 +1,12 @@
 # Aceptación de la fase 1 — salida real
 
-Evidencia del cierre de la rebanada vertical (T012). Los criterios están
-especificados en [07-PROTOTIPO.md](07-PROTOTIPO.md) §6; aquí solo va la salida
-literal de `test/acceptance.sh`, para no juzgar nada a ojo.
+Evidencia histórica del cierre de la rebanada vertical (T012). Los criterios
+originales están especificados en [07-PROTOTIPO.md](07-PROTOTIPO.md) §6. La
+salida literal de esta ejecución se conserva para no reescribir la evidencia;
+el arnés actual ya no imprime A-10, retirado en T060.
 
-Reproducible con el laboratorio levantado:
+El arnés vigente se puede ejecutar con el laboratorio levantado; conserva los
+13 criterios activos, aunque ya no reproduce literalmente esta salida histórica:
 
 ```bash
 make lab && make build && test/acceptance.sh
@@ -55,8 +57,8 @@ capa se borró entera en T060 (ADR-0016), así que el criterio ya no tiene objet
 y queda retirado, no pendiente. Nunca fue uno de los cinco que protegen la
 integridad de la nota (A-1, A-2, A-3, A-8, A-14): esos cinco están en verde.
 
-El script vuelve a dar A-10 en verde en cuanto T040 exista; hasta entonces
-`PEND` no rompe el exit code.
+La línea `PEND` anterior pertenece a esta ejecución histórica. El arnés actual
+no presenta A-10 como pendiente y verifica los 13 criterios vigentes.
 
 ## Mediciones
 
