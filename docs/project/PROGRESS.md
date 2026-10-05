@@ -13,7 +13,9 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
   Reintentos y vueltas renuevan la captura; cancelación y presupuesto prevalecen.
 - [Evidencia T173](../reviews/evidence/T173/RESULTADOS.md), ADR-0028.
   Suite rápida, race, enlaces y herramientas correctos.
-- T174 (formulario) y T175 (medición Kea) en curso por petición expresa de Adrià.
+- T174 terminado: formulario y YAML conservan fichero; 534 pruebas GUI y build
+  correctos. [Evidencia T174](../reviews/evidence/T174/RESULTADOS.md).
+- T175 (medición Kea) en curso por petición expresa de Adrià.
 
 **Contexto anterior:** T172 retiró residuos obsoletos tras reparar F1–F4 de
 T166 en T167–T171. Pasada visual GUI en `fb3206b`; paquetes 0.9.1 conservados.

@@ -3533,7 +3533,7 @@
       "id": "T174",
       "title": "Lecturas de fichero en el formulario de exámenes",
       "phase": 9,
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T173"
@@ -3548,14 +3548,19 @@
         "Leer, guardar, duplicar y reabrir conserva fichero; valida fuentes excluyentes y exit_code solo con comandos.",
         "Suite GUI y build correctos; revisión de accesibilidad del formulario."
       ],
-      "tests": [],
-      "notes": "Implementación completa solicitada expresamente por Adrià en esta sesión; commits separados por tarea."
+      "tests": [
+        "make gui-check gui-build",
+        "gui/scripts/shared-files-editor.ts",
+        "impeccable detect Editor.tsx"
+      ],
+      "notes": "Formulario, YAML y serialización conservan fichero. 534 pruebas GUI, build y arnés Electron correctos. Evidencia docs/reviews/evidence/T174/RESULTADOS.md.",
+      "completed": "2026-10-05"
     },
     {
       "id": "T175",
       "title": "Medir lecturas compartidas con 30 alumnos y Kea",
       "phase": 9,
-      "status": "BLOCKED",
+      "status": "IN_PROGRESS",
       "priority": "P1",
       "depends_on": [
         "T173",

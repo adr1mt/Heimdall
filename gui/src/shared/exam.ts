@@ -40,6 +40,8 @@ export interface Check {
   en: string
   /** The command, as a vector of arguments. There is no shell, ever. */
   cmd: string[]
+  /** Explicit shared file source. Undefined for commands and inventory values. */
+  fichero?: string
   /**
    * A check with no command: the expected value is compared against a field
    * of the inventory, e.g. `${alumno.p1}` (M-11). Empty when there is a cmd.
@@ -116,6 +118,7 @@ function readCheck(value: unknown): Check {
     descripcion: text(raw.descripcion),
     en: text(raw.en),
     cmd: Array.isArray(raw.cmd) ? raw.cmd.map(text) : [],
+    ...(raw.fichero !== undefined ? { fichero: text(raw.fichero) } : {}),
     valor: text(raw.valor),
     assertion: readAssertion(raw),
     peso: text(raw.peso),
@@ -150,12 +153,14 @@ function formatProblem(doc: unknown): string | null {
       const group=object(value,path,['grupo','comprobaciones']);field(group,'grupo',path,'string')
       for(const [j,value] of array(group.comprobaciones,`${path}.comprobaciones`).entries()) {
         const at=`${path}.comprobaciones[${j+1}]`
-        const c=object(value,at,['id','descripcion','en','cmd','valor','peso','timeout',...ASSERTIONS])
-        for(const key of ['id','descripcion','en','valor','timeout','contiene','igual_a','no_contiene']) field(c,key,at,'string')
+        const c=object(value,at,['id','descripcion','en','cmd','fichero','valor','peso','timeout',...ASSERTIONS])
+        for(const key of ['id','descripcion','en','fichero','valor','timeout','contiene','igual_a','no_contiene']) field(c,key,at,'string')
         field(c,'peso',at,'number');field(c,'exit_code',at,'integer')
         for(const arg of array(c.cmd,`${at}.cmd`)) if(typeof arg!=='string') throw new Error(`${at}.cmd: cada argumento debe ser texto.`)
         if(ASSERTIONS.filter(key=>c[key]!==undefined).length!==1) throw new Error(`${at}: debe tener exactamente una aserción.`)
         if(c.cmd!==undefined && c.valor!==undefined) throw new Error(`${at}: cmd y valor no pueden aparecer juntos.`)
+        if(c.fichero!==undefined && (c.cmd!==undefined || c.valor!==undefined)) throw new Error(`${at}: fichero, cmd y valor no pueden aparecer juntos.`)
+        if(c.fichero!==undefined && c.exit_code!==undefined) throw new Error(`${at}: exit_code requiere un comando.`)
         if(c.cerca_de!==undefined) {
           const near=object(c.cerca_de,`${at}.cerca_de`,['ancla','lineas','contiene'])
           field(near,'ancla',`${at}.cerca_de`,'string');field(near,'contiene',`${at}.cerca_de`,'string');field(near,'lineas',`${at}.cerca_de`,'integer')
@@ -222,7 +227,11 @@ function count(value: string): number | string {
 
 function writeCheck(check: Check): Record<string, unknown> {
   const out: Record<string, unknown> = { id: check.id, descripcion: check.descripcion }
-  if (check.cmd.length > 0) {
+  if (check.fichero !== undefined) {
+    if (check.en) out.en = check.en
+    if (check.peso.trim()) out.peso = weight(check.peso)
+    out.fichero = check.fichero
+  } else if (check.cmd.length > 0) {
     if (check.en) out.en = check.en
     if (check.peso.trim()) out.peso = weight(check.peso)
     if (check.timeout.trim()) out.timeout = check.timeout.trim()
@@ -302,10 +311,15 @@ export function checkProblem(check: Check, exam: Exam, others: Check[]): string 
     return `Ya hay una comprobación que se llama «${check.id.trim()}».`
   }
   if (!check.descripcion.trim()) return 'La comprobación necesita una descripción.'
-  if (check.cmd.length === 0 && !check.valor.trim()) {
-    return 'Pon un comando, o un valor del alumno que comparar.'
+  const hasFile = check.fichero !== undefined
+  if (hasFile && (check.cmd.length > 0 || check.valor !== '')) return 'Elige solo una fuente: comando, fichero o valor del inventario.'
+  if (!hasFile && check.cmd.length === 0 && !check.valor.trim()) {
+    return 'Pon un comando, un fichero o un valor del alumno que comparar.'
   }
-  if (check.cmd.length > 0) {
+  if (hasFile && (!check.fichero?.trim() || check.fichero.includes('\0') || (!check.fichero.startsWith('/') && !check.fichero.startsWith('${')))) {
+    return 'La ruta del fichero debe ser absoluta, no vacía y sin caracteres nulos.'
+  }
+  if (check.cmd.length > 0 || hasFile) {
     if (!check.en.trim()) return 'Di en qué máquina se ejecuta.'
     if (!exam.hosts.includes(check.en.trim())) {
       return `El examen no declara la máquina «${check.en.trim()}».`
@@ -313,6 +327,7 @@ export function checkProblem(check: Check, exam: Exam, others: Check[]): string 
   }
   const { kind, value, anchor, lines } = check.assertion
   if (kind === 'exit_code') {
+    if (hasFile) return 'El código de salida requiere un comando; el fichero comprueba contenido.'
     if (!/^\d+$/.test(value.trim())) return 'El código de salida es un número, por ejemplo 0.'
   } else if (!value.trim()) {
     return 'Di qué se espera encontrar.'

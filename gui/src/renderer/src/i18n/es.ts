@@ -109,8 +109,11 @@ export const t = {
     checkDescription: 'Qué se comprueba',
     checkDescriptionPlaceholder: 'El servicio kea-dhcp4 está activo',
     where: 'Dónde',
-    onHost: 'En una máquina, con un comando',
-    onValue: 'Sobre un dato del alumno, sin comando',
+    onHost: 'Comando en una máquina',
+    onFile: 'Fichero de una máquina',
+    file: 'Ruta del fichero',
+    fileHint: 'Ruta absoluta. Los requisitos del mismo fichero y máquina usan una sola lectura por alumno y corrección, con el mismo tiempo máximo.',
+    onValue: 'Valor del inventario del alumno',
     host: 'Máquina',
     command: 'Comando',
     commandHint:
