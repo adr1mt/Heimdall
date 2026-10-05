@@ -1,7 +1,9 @@
 package report
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -97,6 +99,46 @@ func TestPartialIsReplacedByFinal(t *testing.T) {
 		t.Errorf("el parcial sigue ahí: %v", err)
 	}
 	assertNoLeftovers(t, dir)
+}
+
+func TestCachedPartialsMatchFullPreparation(t *testing.T) {
+	const secret = "FAKE_SECRET_IN_EVIDENCE"
+	w, err := New(t.TempDir(), "R-CACHE", []string{secret})
+	if err != nil {
+		t.Fatal(err)
+	}
+	run := runWith(w.runID, model.StudentResult{}, model.StudentResult{}, model.StudentResult{})
+	run.Plan.EvidenceBytesPerField = 128
+	order := []int{2, 0, 1}
+	for _, i := range order {
+		s := student(fmt.Sprintf("fake%d", i), model.StudentOK)
+		s.Checks[0].Detail = strings.Repeat("x", 2000) + secret
+		s.Checks[0].Execution = &model.ExecutionResult{Command: []string{"echo", secret}, Stdout: model.Stream{Text: strings.Repeat("é", 1000) + secret, Bytes: 2000, BytesTotal: 2000}}
+		run.Students[i] = s
+		run.Warnings = append(run.Warnings, model.Warning{Scope: "run", Code: "TEST", Message: secret + strings.Repeat("w", 1200)})
+		if err := w.WritePartial(run); err != nil {
+			t.Fatal(err)
+		}
+		got, err := os.ReadFile(w.PartialPath())
+		if err != nil {
+			t.Fatal(err)
+		}
+		wantRun, err := Redact(run, w.secrets)
+		if err != nil {
+			t.Fatal(err)
+		}
+		boundEvidence(wantRun)
+		want, err := model.MarshalCanonical(wantRun)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Fatalf("partial after student %d differs from full preparation", i)
+		}
+	}
+	if !strings.Contains(run.Students[2].Checks[0].Detail, secret) {
+		t.Fatal("partial preparation modified the engine result")
+	}
 }
 
 // TestConcurrentRunsDoNotCollide covers F-13: two runs writing into the same

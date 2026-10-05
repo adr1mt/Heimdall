@@ -24,9 +24,13 @@ const WarnSecretRedacted = "SECRET_REDACTED"
 
 // Writer writes the artifact of one run into a directory, usually var/.
 type Writer struct {
-	dir     string
-	runID   string
-	secrets []string // values, never references
+	dir      string
+	runID    string
+	secrets  []string              // values, never references
+	prepared []model.StudentResult // derived evidence from completed students
+	ready    []bool
+	hits     int
+	clipped  bool
 }
 
 // New returns a writer for run runID under dir, creating dir if needed. The
@@ -61,7 +65,53 @@ func (w *Writer) PartialPath() string {
 
 // WritePartial rewrites the partial artifact with everything gathered so far.
 func (w *Writer) WritePartial(run *model.RunResult) error {
-	return w.write(run, w.PartialPath())
+	if run == nil {
+		return fmt.Errorf("report: no hay resultado que copiar")
+	}
+	if w.prepared == nil {
+		w.prepared = make([]model.StudentResult, len(run.Students))
+		w.ready = make([]bool, len(run.Students))
+	}
+	if len(w.prepared) != len(run.Students) {
+		return fmt.Errorf("report: cambió el número de alumnos del resultado parcial")
+	}
+	cells := len(run.Students) * run.Plan.CheckCount
+	limit := evidenceLimit(run.Plan, cells)
+	for i := range run.Students {
+		if w.ready[i] || run.Students[i].Status == "" {
+			continue
+		}
+		// A finished student is immutable in the engine. Prepare its evidence
+		// once, then keep the bounded copy until this run finishes.
+		single := &model.RunResult{Students: []model.StudentResult{run.Students[i]}}
+		clean, hits, err := redact(single, w.secrets)
+		if err != nil {
+			return err
+		}
+		w.hits += hits
+		w.clipped = boundStudent(&clean.Students[0], limit) || w.clipped
+		w.prepared[i] = clean.Students[0]
+		w.ready[i] = true
+	}
+	// Metadata and warnings can change between students, so take them from
+	// the engine's current artifact on every publication.
+	meta := *run
+	meta.Students = nil
+	clean, hits, err := redact(&meta, w.secrets)
+	if err != nil {
+		return err
+	}
+	if hits > 0 {
+		clean.Warnings = clean.Warnings[:len(clean.Warnings)-1]
+	}
+	if hits+w.hits > 0 {
+		clean.Warnings = append(clean.Warnings, secretWarning(hits+w.hits))
+	}
+	clean.Students = w.prepared
+	if boundWarnings(clean, cells) || w.clipped {
+		addEvidenceWarning(clean)
+	}
+	return writePrepared(clean, w.PartialPath())
 }
 
 // WriteFinal writes the finished artifact, points var/latest.json at it and
@@ -91,6 +141,10 @@ func (w *Writer) write(run *model.RunResult, path string) error {
 		return err
 	}
 	boundEvidence(clean)
+	return writePrepared(clean, path)
+}
+
+func writePrepared(clean *model.RunResult, path string) error {
 	data, err := model.MarshalCanonical(clean)
 	if err != nil {
 		return fmt.Errorf("report: no se pudo serializar el artefacto: %w", err)

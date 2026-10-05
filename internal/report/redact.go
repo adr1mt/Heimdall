@@ -17,12 +17,19 @@ import (
 // the authentication fields of the inventory. If this ever fires, something
 // upstream is broken and the teacher has to know.
 func Redact(run *model.RunResult, secrets []string) (*model.RunResult, error) {
+	out, _, err := redact(run, secrets)
+	return out, err
+}
+
+// redact also reports the number of replacements so the partial writer can
+// combine already prepared students with current run metadata and warnings.
+func redact(run *model.RunResult, secrets []string) (*model.RunResult, int, error) {
 	out, err := clone(run)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	if len(secrets) == 0 {
-		return out, nil
+		return out, 0, nil
 	}
 
 	// Longest first prevents one secret from exposing the suffix of another.
@@ -84,14 +91,14 @@ func Redact(run *model.RunResult, secrets []string) (*model.RunResult, error) {
 	}
 
 	if hits > 0 {
-		out.Warnings = append(out.Warnings, model.Warning{
-			Scope: "run",
-			Code:  WarnSecretRedacted,
-			Message: fmt.Sprintf(
-				"se ocultaron %d apariciones de una contraseña en el artefacto: revisa el examen, un secreto no debería llegar hasta aquí", hits),
-		})
+		out.Warnings = append(out.Warnings, secretWarning(hits))
 	}
-	return out, nil
+	return out, hits, nil
+}
+
+func secretWarning(hits int) model.Warning {
+	return model.Warning{Scope: "run", Code: WarnSecretRedacted,
+		Message: fmt.Sprintf("se ocultaron %d apariciones de una contraseña en el artefacto: revisa el examen, un secreto no debería llegar hasta aquí", hits)}
 }
 
 // Detach mutable containers without serializing unbounded evidence first.

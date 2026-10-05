@@ -12,16 +12,36 @@ import (
 // Comparisons already happened against the full captured SSH/inventory data.
 func boundEvidence(run *model.RunResult) {
 	cells := len(run.Students) * run.Plan.CheckCount
+	limit := evidenceLimit(run.Plan, cells)
+	changed := false
+	for i := range run.Students {
+		if boundStudent(&run.Students[i], limit) {
+			changed = true
+		}
+	}
+	if boundWarnings(run, cells) {
+		changed = true
+	}
+	if changed {
+		addEvidenceWarning(run)
+	}
+}
+
+func evidenceLimit(plan model.PlanSummary, cells int) int {
 	if cells < 1 {
 		cells = 1
 	}
 	limit := (16 << 20) / (3 * cells)
-	if original := run.Plan.EvidenceBytesPerField; original > 0 && original < limit {
+	if original := plan.EvidenceBytesPerField; original > 0 && original < limit {
 		limit = original
 	}
 	if limit > 65536 {
 		limit = 65536
 	}
+	return limit
+}
+
+func boundStudent(student *model.StudentResult, limit int) bool {
 	changed := false
 	clip := func(text *string, budget int) bool {
 		prefix, cut := jsonPrefix(*text, budget)
@@ -31,31 +51,43 @@ func boundEvidence(run *model.RunResult) {
 		}
 		return cut
 	}
-	for i := range run.Students {
-		for j := range run.Students[i].Checks {
-			c := &run.Students[i].Checks[j]
-			clip(&c.Detail, 1024)
-			if c.Previous != nil {
-				clip(&c.Previous.Detail, 1024)
-			}
-			if e := c.Execution; e != nil {
-				for _, stream := range []*model.Stream{&e.Stdout, &e.Stderr} {
-					if clip(&stream.Text, limit) {
-						if kept := int64(len(stream.Text)); kept < stream.Bytes {
-							stream.Bytes = kept
-						}
-						stream.Truncated = true
+	for j := range student.Checks {
+		c := &student.Checks[j]
+		clip(&c.Detail, 1024)
+		if c.Previous != nil {
+			clip(&c.Previous.Detail, 1024)
+		}
+		if e := c.Execution; e != nil {
+			for _, stream := range []*model.Stream{&e.Stdout, &e.Stderr} {
+				if clip(&stream.Text, limit) {
+					if kept := int64(len(stream.Text)); kept < stream.Bytes {
+						stream.Bytes = kept
 					}
+					stream.Truncated = true
 				}
 			}
-			if a := c.Assertion; a != nil {
-				if clip(&a.Found, limit) {
-					a.EvidenceTruncated = true
-				}
-				if clip(&a.Where, 1024) {
-					a.EvidenceTruncated = true
-				}
+		}
+		if a := c.Assertion; a != nil {
+			if clip(&a.Found, limit) {
+				a.EvidenceTruncated = true
 			}
+			if clip(&a.Where, 1024) {
+				a.EvidenceTruncated = true
+			}
+		}
+	}
+	return changed
+}
+
+func boundWarnings(run *model.RunResult, cells int) bool {
+	if cells < 1 {
+		cells = 1
+	}
+	changed := false
+	clip := func(text *string, budget int) {
+		if prefix, cut := jsonPrefix(*text, budget); cut {
+			*text = prefix
+			changed = true
 		}
 	}
 	// Warnings are explanatory runtime data, not grades or provenance links.
@@ -68,14 +100,16 @@ func boundEvidence(run *model.RunResult) {
 		clip(&run.Warnings[i].Message, 1024)
 		clip(&run.Warnings[i].Scope, 1024)
 	}
-	if changed {
-		for _, warning := range run.Warnings {
-			if warning.Code == "EVIDENCE_TRUNCATED" {
-				return
-			}
+	return changed
+}
+
+func addEvidenceWarning(run *model.RunResult) {
+	for _, warning := range run.Warnings {
+		if warning.Code == "EVIDENCE_TRUNCATED" {
+			return
 		}
-		run.Warnings = append(run.Warnings, model.Warning{Scope: "run", Code: "EVIDENCE_TRUNCATED", Message: "Se recortó evidencia al guardar para respetar el presupuesto del resultado. Las aserciones se comprobaron antes del recorte y las notas no han cambiado. El mismo límite se aplica a todas las comprobaciones."})
 	}
+	run.Warnings = append(run.Warnings, model.Warning{Scope: "run", Code: "EVIDENCE_TRUNCATED", Message: "Se recortó evidencia al guardar para respetar el presupuesto del resultado. Las aserciones se comprobaron antes del recorte y las notas no han cambiado. El mismo límite se aplica a todas las comprobaciones."})
 }
 
 // JSON control characters may take six bytes for each input byte. Cut on a
