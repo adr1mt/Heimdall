@@ -89,7 +89,7 @@ type ResolvedCheck struct {
 	Host   string // logical host, empty for a check without a command
 	Target Host   // where to connect, empty for a check without a command
 
-	File  string // resolved literal path, empty for existing sources
+	File  string `json:",omitempty"` // resolved literal path, empty for existing sources
 	Cmd   []string
 	Value string
 

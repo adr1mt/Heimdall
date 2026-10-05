@@ -244,3 +244,34 @@ func TestSharedFileConnectionErrorsKeepExplanation(t *testing.T) {
 		}
 	}
 }
+
+func TestSharedFileResultsConsolidateAfterSelectiveRetry(t *testing.T) {
+	sp := fileStudent("a", 2)
+	sp.Checks[1].Contains = str("missing")
+	p := filePlan(sp)
+	calls := 0
+	first := Run(context.Background(), p, Options{RunID: "FIRST", EngineVersion: "test", Secrets: secrets, Dial: fileDial(func(context.Context, []string, time.Duration) *model.ExecutionResult {
+		calls++
+		e := okExec("expected")
+		e.Stdout.Truncated = true
+		return e
+	})})
+	if first.Students[0].Checks[0].Status != model.Pass || first.Students[0].Checks[1].Status != model.Unevaluated {
+		t.Fatal("prefix classification changed")
+	}
+	retry := previous("FIRST", map[string]map[string]model.AcademicStatus{"a": {"f0": model.Pass, "f1": model.Unevaluated}})
+	second := Run(context.Background(), p, Options{RunID: "SECOND", EngineVersion: "test", Secrets: secrets, Retry: retry, Dial: fileDial(func(context.Context, []string, time.Duration) *model.ExecutionResult {
+		calls++
+		return okExec("expected missing")
+	})})
+	joined, err := model.Consolidate([]model.ChainLink{{Artifact: "run-SECOND.json", Run: second}, {Artifact: "run-FIRST.json", Run: first}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if calls != 2 || joined.Students[0].Score.Obtained != 2 || joined.Students[0].Score.Final == nil || *joined.Students[0].Score.Final != 100 {
+		t.Fatalf("consolidation: %+v", joined)
+	}
+	if joined.Students[0].Checks[0].FromRun != "FIRST" || joined.Students[0].Checks[1].FromRun != "SECOND" {
+		t.Fatal("consolidation lost evidence origin")
+	}
+}

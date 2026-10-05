@@ -12,12 +12,15 @@ Caso y decisiones: [ADR-0028](../../../adr/0028-lecturas-compartidas.md).
 - Motor: 15 notas independientes, separación por alumno/host/ruta, comandos
   intermedios, copia de contenedores mutables, fallos completos con salida
   parcial, problemas de conexión/autenticación/tiempo, recorte y corte duro,
-  cancelación/presupuesto, reintentos selectivos y capturas frescas entre vueltas.
+  cancelación/presupuesto, reintentos selectivos, capturas frescas entre vueltas
+  y consolidación de un PASS original con un requisito recuperado en el reintento.
 
 Una primera ejecución detectó que los indicadores internos de presencia YAML
 alteraban la comparación de estructuras de un examen antiguo. Se limitaron a
 la nueva fuente; la regresión original pasa sin debilitarla. La comprobación
-de huellas antiguas sigue pasando.
+de huellas antiguas sigue pasando. La revisión final añadió una regresión del
+presupuesto de metadatos: el campo de fichero ausente se omite, evitando que
+exámenes anteriores próximos al límite se rechacen por la nueva modalidad.
 
 ## Límites
 

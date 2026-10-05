@@ -1,6 +1,7 @@
 package plan
 
 import (
+	"encoding/json"
 	"strings"
 	"testing"
 )
@@ -71,5 +72,27 @@ func TestFileSourceChangesHashEvenWithIdenticalCommand(t *testing.T) {
 	}
 	if before == hashPlan(p) {
 		t.Fatal("file semantics omitted from hash")
+	}
+}
+
+func TestLegacyFileFieldDoesNotConsumeMetadataBudget(t *testing.T) {
+	p, err := Load(project(t, validExam, validInventory))
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, err := json.Marshal(p.Students[0].Checks[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(data), `"File":`) {
+		t.Fatal("absent file source consumed legacy metadata budget")
+	}
+	p.Students[0].Checks[0].File = "/etc/a"
+	data, err = json.Marshal(p.Students[0].Checks[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(data), `"File":"/etc/a"`) {
+		t.Fatal("explicit file omitted from metadata budget")
 	}
 }
