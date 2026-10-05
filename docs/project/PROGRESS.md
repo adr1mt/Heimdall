@@ -15,7 +15,12 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
   Suite rápida, race, enlaces y herramientas correctos.
 - T174 terminado: formulario y YAML conservan fichero; 534 pruebas GUI y build
   correctos. [Evidencia T174](../reviews/evidence/T174/RESULTADOS.md).
-- T175 (medición Kea) en curso por petición expresa de Adrià.
+- T175 terminado: 450 a 30 lecturas SSH; 390.150 a 26.010 bytes de contenido.
+  Diez pares: tiempo mediano 0,770 a 0,705 s; RSS 24,54 a 23,56 MiB.
+  Informe +4,9 %; copias sin mejora clara. Las 450 conclusiones se conservan.
+  [Evidencia T175](../reviews/evidence/T175/RESULTADOS.md). `make test`,
+  534 pruebas GUI, build, race, enlaces y herramientas correctos.
+- Laboratorios apagados al cerrar; no se publican paquetes ni cambios remotos.
 
 **Contexto anterior:** T172 retiró residuos obsoletos tras reparar F1–F4 de
 T166 en T167–T171. Pasada visual GUI en `fb3206b`; paquetes 0.9.1 conservados.

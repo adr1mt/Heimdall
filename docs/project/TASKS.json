@@ -3560,7 +3560,7 @@
       "id": "T175",
       "title": "Medir lecturas compartidas con 30 alumnos y Kea",
       "phase": 9,
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T173",
@@ -3577,8 +3577,16 @@
         "Dos calentamientos y diez pares alternados: tiempo, RSS motor, bytes recibidos y tamaño; medir lectura y copias GUI.",
         "Integración SSH, suites Go/GUI, build, documentación y herramientas; registrar evidencia y límites."
       ],
-      "tests": [],
-      "notes": "Implementación completa solicitada expresamente por Adrià en esta sesión; commits separados por tarea."
+      "tests": [
+        "make test",
+        "make gui-check gui-build",
+        "go test -race ./...",
+        "python3 test/shared-files-performance.py --out docs/reviews/evidence/T175",
+        "make docs-check tools-check",
+        "git diff --check"
+      ],
+      "notes": "Evidencia docs/reviews/evidence/T175/RESULTADOS.md y medidas crudas. SSH real: 450 a 30 lecturas y 390150 a 26010 bytes de contenido. Diez pares: mediana 0,770 a 0,705 s; RSS 24,54 a 23,56 MiB; informe +4,9 %. Todas las notas y conclusiones iguales; copias conservan notas. No se mide toda la memoria Electron ni 30 máquinas de aula.",
+      "completed": "2026-10-05"
     }
   ]
 }

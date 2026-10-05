@@ -1,0 +1,6 @@
+=== RUN   TestKeaSharedFileReadsAgainstSSH
+    file_integration_test.go:81: shared=false actual_reads=450 received_content_bytes=390150
+    file_integration_test.go:81: shared=true actual_reads=30 received_content_bytes=26010
+--- PASS: TestKeaSharedFileReadsAgainstSSH (1.07s)
+PASS
+ok  	heimdall/internal/engine	1.075s

@@ -773,3 +773,11 @@ los comandos antiguos no se cachean. Lectura fallida completa es fallo de
 contenido; problemas técnicos y recortes mantienen su clasificación.
 Adrià solicita motor, formulario y medición completos en esta sesión; se
 registran T173–T175 y se mantienen commits separados por tarea.
+
+## T175 · Medición de la captura compartida (2026-10-05)
+
+Diez pares en Kea local: 450 a 30 lecturas reales, contenido -93,3 %; tiempo
+mediano -8,4 %, RSS mediano -0,98 MiB. El informe crece 4,9 % por explicaciones
+de captura; las copias no mejoran claramente. Se conserva el contrato actual.
+No se abre optimización de almacenamiento sin un nuevo caso y diseño.
+Evidencia: docs/reviews/evidence/T175/RESULTADOS.md.

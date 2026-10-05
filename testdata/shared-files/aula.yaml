@@ -1,0 +1,131 @@
+aula: "30 alumnos ficticios, dos contenedores locales"
+version: 1
+comun:
+  hosts:
+    servidor:
+      ip: "127.1.2.3"
+      puerto: 2211
+      usuario: "usuario"
+      password_ref: "${AULA_PASSWORD}"
+  timeouts: { conexion: 10s, alumno: 10m }
+alumnos:
+  - id: ficticio01
+    nombre: "Alumno ficticio 01"
+    hosts:
+      servidor: { puerto: 2211 }
+  - id: ficticio02
+    nombre: "Alumno ficticio 02"
+    hosts:
+      servidor: { puerto: 2212 }
+  - id: ficticio03
+    nombre: "Alumno ficticio 03"
+    hosts:
+      servidor: { puerto: 2211 }
+  - id: ficticio04
+    nombre: "Alumno ficticio 04"
+    hosts:
+      servidor: { puerto: 2212 }
+  - id: ficticio05
+    nombre: "Alumno ficticio 05"
+    hosts:
+      servidor: { puerto: 2211 }
+  - id: ficticio06
+    nombre: "Alumno ficticio 06"
+    hosts:
+      servidor: { puerto: 2212 }
+  - id: ficticio07
+    nombre: "Alumno ficticio 07"
+    hosts:
+      servidor: { puerto: 2211 }
+  - id: ficticio08
+    nombre: "Alumno ficticio 08"
+    hosts:
+      servidor: { puerto: 2212 }
+  - id: ficticio09
+    nombre: "Alumno ficticio 09"
+    hosts:
+      servidor: { puerto: 2211 }
+  - id: ficticio10
+    nombre: "Alumno ficticio 10"
+    hosts:
+      servidor: { puerto: 2212 }
+  - id: ficticio11
+    nombre: "Alumno ficticio 11"
+    hosts:
+      servidor: { puerto: 2211 }
+  - id: ficticio12
+    nombre: "Alumno ficticio 12"
+    hosts:
+      servidor: { puerto: 2212 }
+  - id: ficticio13
+    nombre: "Alumno ficticio 13"
+    hosts:
+      servidor: { puerto: 2211 }
+  - id: ficticio14
+    nombre: "Alumno ficticio 14"
+    hosts:
+      servidor: { puerto: 2212 }
+  - id: ficticio15
+    nombre: "Alumno ficticio 15"
+    hosts:
+      servidor: { puerto: 2211 }
+  - id: ficticio16
+    nombre: "Alumno ficticio 16"
+    hosts:
+      servidor: { puerto: 2212 }
+  - id: ficticio17
+    nombre: "Alumno ficticio 17"
+    hosts:
+      servidor: { puerto: 2211 }
+  - id: ficticio18
+    nombre: "Alumno ficticio 18"
+    hosts:
+      servidor: { puerto: 2212 }
+  - id: ficticio19
+    nombre: "Alumno ficticio 19"
+    hosts:
+      servidor: { puerto: 2211 }
+  - id: ficticio20
+    nombre: "Alumno ficticio 20"
+    hosts:
+      servidor: { puerto: 2212 }
+  - id: ficticio21
+    nombre: "Alumno ficticio 21"
+    hosts:
+      servidor: { puerto: 2211 }
+  - id: ficticio22
+    nombre: "Alumno ficticio 22"
+    hosts:
+      servidor: { puerto: 2212 }
+  - id: ficticio23
+    nombre: "Alumno ficticio 23"
+    hosts:
+      servidor: { puerto: 2211 }
+  - id: ficticio24
+    nombre: "Alumno ficticio 24"
+    hosts:
+      servidor: { puerto: 2212 }
+  - id: ficticio25
+    nombre: "Alumno ficticio 25"
+    hosts:
+      servidor: { puerto: 2211 }
+  - id: ficticio26
+    nombre: "Alumno ficticio 26"
+    hosts:
+      servidor: { puerto: 2212 }
+  - id: ficticio27
+    nombre: "Alumno ficticio 27"
+    hosts:
+      servidor: { puerto: 2211 }
+  - id: ficticio28
+    nombre: "Alumno ficticio 28"
+    hosts:
+      servidor: { puerto: 2212 }
+  - id: ficticio29
+    nombre: "Alumno ficticio 29"
+    hosts:
+      servidor: { puerto: 2211 }
+  - id: ficticio30
+    nombre: "Alumno ficticio 30"
+    hosts:
+      servidor: { puerto: 2212 }

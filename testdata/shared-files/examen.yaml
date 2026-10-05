@@ -1,0 +1,82 @@
+examen: "Lecturas compartidas · Kea"
+version: 1
+hosts: [servidor]
+por_defecto: { peso: 1, timeout: 20s }
+grupos:
+  - grupo: "Configuración Kea (texto)"
+    comprobaciones:
+      - id: kea-01
+        descripcion: "La configuración contiene Dhcp4"
+        en: servidor
+        fichero: "/etc/kea/kea-dhcp4.conf"
+        contiene: "Dhcp4"
+      - id: kea-02
+        descripcion: "La configuración contiene interfaces-config"
+        en: servidor
+        fichero: "/etc/kea/kea-dhcp4.conf"
+        contiene: "interfaces-config"
+      - id: kea-03
+        descripcion: "La configuración contiene enp2s0"
+        en: servidor
+        fichero: "/etc/kea/kea-dhcp4.conf"
+        contiene: "enp2s0"
+      - id: kea-04
+        descripcion: "La configuración contiene lease-database"
+        en: servidor
+        fichero: "/etc/kea/kea-dhcp4.conf"
+        contiene: "lease-database"
+      - id: kea-05
+        descripcion: "La configuración contiene memfile"
+        en: servidor
+        fichero: "/etc/kea/kea-dhcp4.conf"
+        contiene: "memfile"
+      - id: kea-06
+        descripcion: "La configuración contiene lfc-interval"
+        en: servidor
+        fichero: "/etc/kea/kea-dhcp4.conf"
+        contiene: "lfc-interval"
+      - id: kea-07
+        descripcion: "La configuración contiene 3600"
+        en: servidor
+        fichero: "/etc/kea/kea-dhcp4.conf"
+        contiene: "3600"
+      - id: kea-08
+        descripcion: "La configuración contiene valid-lifetime"
+        en: servidor
+        fichero: "/etc/kea/kea-dhcp4.conf"
+        contiene: "valid-lifetime"
+      - id: kea-09
+        descripcion: "La configuración contiene 600"
+        en: servidor
+        fichero: "/etc/kea/kea-dhcp4.conf"
+        contiene: "600"
+      - id: kea-10
+        descripcion: "La configuración contiene subnet4"
+        en: servidor
+        fichero: "/etc/kea/kea-dhcp4.conf"
+        contiene: "subnet4"
+      - id: kea-11
+        descripcion: "La configuración contiene 10.0.0.0/8"
+        en: servidor
+        fichero: "/etc/kea/kea-dhcp4.conf"
+        contiene: "10.0.0.0/8"
+      - id: kea-12
+        descripcion: "La configuración contiene pools"
+        en: servidor
+        fichero: "/etc/kea/kea-dhcp4.conf"
+        contiene: "pools"
+      - id: kea-13
+        descripcion: "La configuración contiene 10.0.0.100 - 10.0.0.200"
+        en: servidor
+        fichero: "/etc/kea/kea-dhcp4.conf"
+        contiene: "10.0.0.100 - 10.0.0.200"
+      - id: kea-14
+        descripcion: "La configuración contiene routers"
+        en: servidor
+        fichero: "/etc/kea/kea-dhcp4.conf"
+        contiene: "routers"
+      - id: kea-15
+        descripcion: "La configuración contiene domain-name-servers"
+        en: servidor
+        fichero: "/etc/kea/kea-dhcp4.conf"
+        contiene: "domain-name-servers"

@@ -1,0 +1,290 @@
+{
+  "configuration": {
+    "students": 30,
+    "checks_per_student": 15,
+    "containers": 2,
+    "concurrency": 16,
+    "host_concurrency": 4,
+    "warmup_pairs": 2,
+    "measured_pairs": 10,
+    "transport_metrics_source": "separate instrumented SSH sample with the same stable fixture; content bytes exclude SSH overhead"
+  },
+  "transport": {
+    "commands": {
+      "actual_reads": 450,
+      "received_content_bytes": 390150
+    },
+    "shared": {
+      "actual_reads": 30,
+      "received_content_bytes": 26010
+    }
+  },
+  "samples": [
+    {
+      "variant": "commands",
+      "seconds": 0.66,
+      "rss_kib": 25164,
+      "artifact_bytes": 1064873,
+      "read_ms": 6.240884000000001,
+      "create_backup_ms": 9.026593000000002,
+      "rescan_backups_ms": 5.191735999999999,
+      "pair": 0
+    },
+    {
+      "variant": "shared",
+      "seconds": 0.48,
+      "rss_kib": 24328,
+      "artifact_bytes": 1117092,
+      "read_ms": 6.916195000000002,
+      "create_backup_ms": 9.071276000000005,
+      "rescan_backups_ms": 5.955764000000002,
+      "pair": 0
+    },
+    {
+      "variant": "shared",
+      "seconds": 0.54,
+      "rss_kib": 21476,
+      "artifact_bytes": 1117106,
+      "read_ms": 9.402379,
+      "create_backup_ms": 8.628961999999998,
+      "rescan_backups_ms": 5.832976000000002,
+      "pair": 1
+    },
+    {
+      "variant": "commands",
+      "seconds": 0.64,
+      "rss_kib": 23896,
+      "artifact_bytes": 1064907,
+      "read_ms": 6.224857,
+      "create_backup_ms": 8.511912000000002,
+      "rescan_backups_ms": 5.331878000000003,
+      "pair": 1
+    },
+    {
+      "variant": "commands",
+      "seconds": 0.79,
+      "rss_kib": 25096,
+      "artifact_bytes": 1064895,
+      "read_ms": 6.092077000000003,
+      "create_backup_ms": 8.382955000000003,
+      "rescan_backups_ms": 5.490105,
+      "pair": 2
+    },
+    {
+      "variant": "shared",
+      "seconds": 0.66,
+      "rss_kib": 24160,
+      "artifact_bytes": 1117141,
+      "read_ms": 6.306125999999999,
+      "create_backup_ms": 8.923428000000001,
+      "rescan_backups_ms": 5.8418980000000005,
+      "pair": 2
+    },
+    {
+      "variant": "shared",
+      "seconds": 0.68,
+      "rss_kib": 24096,
+      "artifact_bytes": 1117196,
+      "read_ms": 6.237473999999999,
+      "create_backup_ms": 9.091956,
+      "rescan_backups_ms": 5.269014000000006,
+      "pair": 3
+    },
+    {
+      "variant": "commands",
+      "seconds": 0.76,
+      "rss_kib": 25288,
+      "artifact_bytes": 1064923,
+      "read_ms": 6.120711,
+      "create_backup_ms": 11.629134999999998,
+      "rescan_backups_ms": 6.293748000000001,
+      "pair": 3
+    },
+    {
+      "variant": "commands",
+      "seconds": 0.8,
+      "rss_kib": 25340,
+      "artifact_bytes": 1064897,
+      "read_ms": 6.155864999999999,
+      "create_backup_ms": 8.975606000000003,
+      "rescan_backups_ms": 5.695924000000005,
+      "pair": 4
+    },
+    {
+      "variant": "shared",
+      "seconds": 0.71,
+      "rss_kib": 24528,
+      "artifact_bytes": 1117214,
+      "read_ms": 6.415334999999999,
+      "create_backup_ms": 8.902285999999997,
+      "rescan_backups_ms": 5.690202999999997,
+      "pair": 4
+    },
+    {
+      "variant": "shared",
+      "seconds": 0.73,
+      "rss_kib": 24204,
+      "artifact_bytes": 1117094,
+      "read_ms": 6.162365999999999,
+      "create_backup_ms": 8.777767999999998,
+      "rescan_backups_ms": 5.486325999999998,
+      "pair": 5
+    },
+    {
+      "variant": "commands",
+      "seconds": 0.8,
+      "rss_kib": 25160,
+      "artifact_bytes": 1064889,
+      "read_ms": 6.254262000000001,
+      "create_backup_ms": 8.561484999999998,
+      "rescan_backups_ms": 5.095431000000005,
+      "pair": 5
+    },
+    {
+      "variant": "commands",
+      "seconds": 0.78,
+      "rss_kib": 24816,
+      "artifact_bytes": 1064889,
+      "read_ms": 9.218429,
+      "create_backup_ms": 8.760690000000004,
+      "rescan_backups_ms": 5.450519999999997,
+      "pair": 6
+    },
+    {
+      "variant": "shared",
+      "seconds": 0.75,
+      "rss_kib": 23312,
+      "artifact_bytes": 1117233,
+      "read_ms": 6.670694000000005,
+      "create_backup_ms": 9.299964999999993,
+      "rescan_backups_ms": 6.082417999999997,
+      "pair": 6
+    },
+    {
+      "variant": "shared",
+      "seconds": 0.75,
+      "rss_kib": 24928,
+      "artifact_bytes": 1117113,
+      "read_ms": 6.409368999999998,
+      "create_backup_ms": 9.03669,
+      "rescan_backups_ms": 5.542383000000001,
+      "pair": 7
+    },
+    {
+      "variant": "commands",
+      "seconds": 0.8,
+      "rss_kib": 26268,
+      "artifact_bytes": 1064904,
+      "read_ms": 9.765238,
+      "create_backup_ms": 10.168947999999997,
+      "rescan_backups_ms": 6.460734000000002,
+      "pair": 7
+    },
+    {
+      "variant": "commands",
+      "seconds": 0.75,
+      "rss_kib": 24560,
+      "artifact_bytes": 1064908,
+      "read_ms": 10.845872,
+      "create_backup_ms": 14.822778,
+      "rescan_backups_ms": 5.636340000000004,
+      "pair": 8
+    },
+    {
+      "variant": "shared",
+      "seconds": 0.7,
+      "rss_kib": 22716,
+      "artifact_bytes": 1117229,
+      "read_ms": 6.278030000000001,
+      "create_backup_ms": 9.332214,
+      "rescan_backups_ms": 5.2720389999999995,
+      "pair": 8
+    },
+    {
+      "variant": "shared",
+      "seconds": 0.73,
+      "rss_kib": 23764,
+      "artifact_bytes": 1117171,
+      "read_ms": 6.435630999999997,
+      "create_backup_ms": 9.27194,
+      "rescan_backups_ms": 5.635454000000003,
+      "pair": 9
+    },
+    {
+      "variant": "commands",
+      "seconds": 0.69,
+      "rss_kib": 24496,
+      "artifact_bytes": 1064898,
+      "read_ms": 6.2907300000000035,
+      "create_backup_ms": 9.41536,
+      "rescan_backups_ms": 8.675362999999997,
+      "pair": 9
+    }
+  ],
+  "summary": {
+    "commands": {
+      "seconds": {
+        "median": 0.77,
+        "min": 0.64,
+        "max": 0.8
+      },
+      "rss_kib": {
+        "median": 25128.0,
+        "min": 23896,
+        "max": 26268
+      },
+      "artifact_bytes": {
+        "median": 1064897.5,
+        "min": 1064873,
+        "max": 1064923
+      },
+      "read_ms": {
+        "median": 6.247573000000001,
+        "min": 6.092077000000003,
+        "max": 10.845872
+      },
+      "create_backup_ms": {
+        "median": 9.001099500000002,
+        "min": 8.382955000000003,
+        "max": 14.822778
+      },
+      "rescan_backups_ms": {
+        "median": 5.563222500000002,
+        "min": 5.095431000000005,
+        "max": 8.675362999999997
+      }
+    },
+    "shared": {
+      "seconds": {
+        "median": 0.705,
+        "min": 0.48,
+        "max": 0.75
+      },
+      "rss_kib": {
+        "median": 24128.0,
+        "min": 21476,
+        "max": 24928
+      },
+      "artifact_bytes": {
+        "median": 1117156.0,
+        "min": 1117092,
+        "max": 1117233
+      },
+      "read_ms": {
+        "median": 6.4123519999999985,
+        "min": 6.162365999999999,
+        "max": 9.402379
+      },
+      "create_backup_ms": {
+        "median": 9.053983000000002,
+        "min": 8.628961999999998,
+        "max": 9.332214
+      },
+      "rescan_backups_ms": {
+        "median": 5.6628285,
+        "min": 5.269014000000006,
+        "max": 6.082417999999997
+      }
+    }
+  }
+}

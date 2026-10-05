@@ -98,3 +98,25 @@ registra comando, síntoma y resultado de ambas ejecuciones.
 La [verificación de recuperación](../docs/audits/2026-10-03/RECUPERACION.md)
 registra el caso y su evidencia. Los límites del entorno no justifican debilitar
 pruebas ni afirmar que una suite pasó sin ejecutarla.
+
+## Lecturas compartidas de Kea (T175)
+
+`make lab-ra2` y `make rendimiento-ficheros` ejecutan el caso de
+[testdata/shared-files](../testdata/shared-files/examen.yaml): 30 alumnos
+ficticios alternados entre dos contenedores, 15 requisitos de texto del mismo
+fichero. El script hace dos pares de calentamiento y diez pares alternados,
+con concurrencia 16 y tope por destino 4. Guarda medidas y recuentos SSH en
+`var/performance/shared-files`; `--out` permite otra ubicación.
+
+La prueba de integración `TestKeaSharedFileReadsAgainstSSH` cuenta llamadas
+reales al transporte y bytes de stdout/stderr una vez por llamada. El arnés
+compara tiempo y RSS del binario CLI y operaciones reales de lectura y copias
+GUI. Las métricas de transporte proceden de una muestra instrumentada separada
+con el mismo contenido estable; no cuentan cabeceras ni cifrado SSH.
+Los informes repiten evidencia por requisito y no se usan para sumar lecturas.
+
+Ejecutar secuencialmente respecto a otros arneses SSH/secretos. El laboratorio
+local no representa 30 máquinas independientes y el examen busca texto: no
+certifica la validez ni el funcionamiento del servicio Kea. La medición tampoco
+incluye toda la memoria de Electron. Los artefactos y copias de medición son
+temporales y se eliminan; la evidencia numérica permanece en `--out`.
