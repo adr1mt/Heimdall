@@ -3,7 +3,7 @@
 Para el profesor que va a corregir con Heimdall. No hace falta programar ni
 saber Go. Del cero a la primera nota, en unos veinte minutos.
 
-Versión de esta guía: **0.9.1**.
+Versión de esta guía: **0.9.2**.
 
 ---
 
@@ -43,14 +43,14 @@ make gui-dist
 Deja dos ficheros en `gui/dist/`. Elige uno:
 
 ```bash
-sudo apt install ./gui/dist/Heimdall-0.9.1.deb
+sudo apt install ./gui/dist/Heimdall-0.9.2.deb
 ```
 
 o, si prefieres no instalar nada:
 
 ```bash
-chmod +x gui/dist/Heimdall-0.9.1.AppImage
-./gui/dist/Heimdall-0.9.1.AppImage
+chmod +x gui/dist/Heimdall-0.9.2.AppImage
+./gui/dist/Heimdall-0.9.2.AppImage
 ```
 
 El `.deb` deja Heimdall en el menú de aplicaciones. Comprobado: el paquete
@@ -194,4 +194,4 @@ inválida · `3` ejecución parcial · `4` cancelado.
 ---
 
 ¿Algo no encaja con lo que ves en pantalla? Es un fallo de esta guía: está
-escrita sobre la versión 0.9.1.
+escrita sobre la versión 0.9.2.

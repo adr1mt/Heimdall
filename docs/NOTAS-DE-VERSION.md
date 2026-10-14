@@ -8,6 +8,18 @@ El número es uno solo para todo el producto: lo dice el fichero `VERSION` de
 la raíz, el motor se sella con él al compilar y la aplicación lo lleva en su
 paquete. `test/version.sh` comprueba que no se separan.
 
+## 0.9.2 — 14-10-2026
+
+Nuevo icono y arreglos de robustez:
+
+- El icono de la aplicación (menú, ventana y barra de tareas) es el guardián
+  que aparece dentro de la aplicación.
+- Si un resultado, el histórico o una copia no se pueden leer, se avisa con el
+  fichero afectado en lugar de darlos por inexistentes.
+- Las copias de seguridad gastan menos memoria con muchas correcciones.
+- El progreso de una corrección llega acotado y su final nunca se pierde.
+- Mejor foco de teclado en la navegación y en los exámenes recientes.
+
 ## 0.9.1 — 03-10-2026
 
 Reparaciones de las dos auditorías y mejoras de la revisión de arquitectura:
