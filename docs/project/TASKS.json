@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated": "2026-10-05",
+  "updated": "2026-10-14",
   "status_values": [
     "BLOCKED",
     "READY",
@@ -3620,6 +3620,36 @@
       ],
       "notes": "ADR-0029 y evidencia docs/reviews/evidence/T176/RESULTADOS.md. Trece archivos restaurados byte a byte a fb3206b; fuentes fichero y caché retiradas. Suites Go, 531 pruebas GUI, builds, enlaces y herramientas correctos; examen RA2 aceptado y clave fichero rechazada con exit 2 sin artefactos.",
       "completed": "2026-10-05"
+    },
+    {
+      "id": "T177",
+      "title": "Avisar al fallar la apertura de notas y verificar el uso básico",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T176"
+      ],
+      "goal": "Mostrar inmediatamente el error de lectura de resultados y verificar cierre, recuperación y proyección sin añadir funciones. Encargo explícito de Adrià.",
+      "scope": [
+        "gui/src/renderer/src/App.tsx",
+        "gui/src/renderer/src/i18n/es.ts",
+        "gui/scripts/results-notice.ts",
+        "docs/reviews/evidence/T177/"
+      ],
+      "acceptance": [
+        "Un fallo al abrir el resultado muestra un aviso visible en la pantalla actual, también en modo proyector.",
+        "Una lectura correcta sigue abriendo Resultados; se retira el mensaje obsoleto de próxima entrega.",
+        "Pruebas de cierre y recuperación ejecutadas con procesos hijos disponibles; registrar causa de los fallos del entorno restringido.",
+        "Suites rápidas y build GUI correctos; prueba visual local con datos ficticios y límites de validación de aula documentados."
+      ],
+      "tests": [
+        "make check gui-check gui-build",
+        "Arnés Electron gui/scripts/results-notice.ts",
+        "make docs-check tools-check"
+      ],
+      "notes": "Aviso global ante fallo de lectura; texto obsoleto retirado. Go, 531 pruebas GUI y build correctos. Los cuatro timeouts eran restricciones a procesos hijos (EPERM): 13/13 pruebas focalizadas pasan sin cambios. Arnés Electron rojo antes/verde después, capturas inspeccionadas. Evidencia docs/reviews/evidence/T177/RESULTADOS.md. Aula y proyector físico pendientes en T084.",
+      "completed": "2026-10-14"
     }
   ]
 }

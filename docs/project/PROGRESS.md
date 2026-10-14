@@ -1,25 +1,23 @@
 # Estado del proyecto
 
 Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
-**Actualizado**: 2026-10-05 · **Fase**: 9 — Endurecimiento y publicación
+**Actualizado**: 2026-10-14 · **Fase**: 9 — Endurecimiento y publicación
 
 ## Última sesión
 
-**T176 · Retirada de lecturas compartidas por petición de Adrià.**
+**T177 · Aviso visible al fallar la apertura de resultados.**
 
-- La opción `fichero` y el selector adicional del formulario se retiran.
-  Motor, parser y editor recuperan exactamente el estado anterior a T173.
-- Se retiran arneses y fixtures de esa función. La medición T175 permanece
-  como evidencia histórica: 65 ms y ~1 MiB de ahorro local no compensan
-  la complejidad de preparar el examen; el informe crecía un 4,9 %.
-- ADR-0029 sustituye ADR-0028. Suite rápida Go, 531 pruebas GUI y ambas
-  compilaciones correctas; enlaces y herramientas correctos.
-- Examen RA2 anterior aceptado; `fichero` se rechaza con exit 2 sin artefactos.
-  [Evidencia T176](../reviews/evidence/T176/RESULTADOS.md).
+- Si no se pueden abrir las notas, el motivo aparece en la pantalla actual,
+  también proyectando. Se retira el texto obsoleto de «siguiente entrega».
+- Go, 531 pruebas GUI y compilación correctos. Los cuatro timeouts de cierre
+  y recuperación eran restricciones del entorno a procesos hijos (EPERM):
+  las 13 pruebas focalizadas pasan con permiso, sin tocar guardado ni copias.
+- Arnés Electron reproduce el fallo antes y pasa después; capturas revisadas.
+  [Evidencia T177](../reviews/evidence/T177/RESULTADOS.md).
+- Aula GISAR y proyector físico no probados; se mantienen en T070/T084.
 
-**Contexto anterior:** T173–T175 implementaron y midieron lecturas compartidas,
-retiradas en T176. T172 cerró higiene tras reparar F1–F4 de T166 en T167–T171.
-Pasada visual GUI en `fb3206b`; paquetes 0.9.1 conservados.
+**Contexto anterior:** T176 retiró las lecturas compartidas a petición de Adrià;
+ADR-0029 sustituye ADR-0028. T172 cerró las reparaciones de T166.
 [Auditoría T166](../reviews/T166-AUDITORIA.md).
 
 ## Problemas conocidos y límites

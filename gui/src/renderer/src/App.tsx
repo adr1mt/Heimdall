@@ -115,9 +115,13 @@ function AppBody() {
           useRun.getState().setArtifact(artifact, event.artifact)
           useApp.getState().setView('results')
         })
-        .catch((error) =>
-          useRun.getState().artifactFailed(noticeFrom('No se pudo abrir el resultado', error))
-        )
+        .catch((error) => {
+          const problem = noticeFrom('No se pudo abrir el resultado', error)
+          useRun.getState().artifactFailed(problem)
+          // Reading failed before navigation: show the reason in the current
+          // view too, including when the sidebar is hidden by the projector.
+          useApp.getState().setNotice(problem)
+        })
     })
     const offClosed = window.heimdall.onRunClosed((closed) => {
       useRun.getState().closed(closed)

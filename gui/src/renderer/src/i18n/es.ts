@@ -288,7 +288,7 @@ export const t = {
     waiting: 'En espera',
     inProgress: 'Corrigiendo',
     artifact: 'Resultado guardado en',
-    resultsPending: 'Las notas, alumno a alumno, llegan con la siguiente entrega.',
+    resultsPending: 'Al abrir el resultado podrás consultar las notas de cada alumno.',
     status: {
       COMPLETE: 'Corregida la clase entera.',
       PARTIAL: 'Corrección terminada con alumnos sin evaluar del todo.',
