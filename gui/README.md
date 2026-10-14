@@ -34,7 +34,7 @@ npm test             # suite rápida (vitest)
 npm run typecheck    # main, renderer y tests
 npm run build        # compila a out/ y verifica el preload
 npm run screenshot   # captura visual de la ventana ya compilada
-npm run icon         # regenera build/icon.png y build/icons/
+npm run icon         # regenera build/icon.png y build/icons/ a partir del logo (necesita Pillow)
 ```
 
 Arnés de corrección e histórico, contra el laboratorio (`make lab`, `make build`,
