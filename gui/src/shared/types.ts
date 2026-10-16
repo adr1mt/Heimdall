@@ -160,6 +160,11 @@ export interface HeimdallApi {
    */
   saveCsv: (name: string, text: string) => Promise<string | null>
   /**
+   * Writes one report per student into a new folder inside the one the
+   * teacher picks. Returns that folder, or null if they cancelled the dialog.
+   */
+  saveReports: (folder: string, files: { name: string; html: string }[]) => Promise<string | null>
+  /**
    * The teacher's classes, as they were last saved. It throws when the file
    * cannot be read: an empty list would look like «you have no classes»
    * (ADR-0021 §5).

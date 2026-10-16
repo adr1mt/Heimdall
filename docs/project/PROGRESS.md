@@ -5,20 +5,22 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T184 · La contraseña de las máquinas va en cada clase (ADR-0030).**
+**T185 · Informe por alumno generado por la app.**
 
-- El creador de clases pide «Contraseña de las máquinas» y la guarda en claro
-  en `classes.json`; sin ella la clase no se guarda y Corregir no arranca.
-- Retirados la casilla de Corregir, el almacén cifrado y «Olvidar» de Ajustes.
-- El motor no cambia: la contraseña sigue entrando solo por stdin, nunca en
-  aula.yaml, argv, artefacto, copias ni exportaciones.
-- 530 pruebas GUI, Go, tipos y build. secretos.sh entero y ui-refresh por SSH
-  con cinco alumnos y modo examen. ui-refresh falló una vez por tiempos en el
-  paso del editor y pasó al repetir.
+- Resultados tiene «Informes por alumno…»: crea una carpeta nueva con una
+  página HTML autocontenida por alumno, imprimible a PDF, para Moodle o correo.
+- Cada página: alumno, examen, fecha, nota en la escala del profesor y cada
+  comprobación por grupo como correcta, fallada o «no se pudo comprobar»
+  (gris, trazo discontinuo, con su motivo y una nota que dice que no es fallo).
+- Se construye por lista blanca desde el artefacto: sin comandos, salidas,
+  contraseña, rutas ni otros alumnos. Excluidos sin informe. El título del
+  examen solo se toma si el YAML coincide con la huella de la corrección.
+- 537 pruebas GUI (valor envenenado), Go, tipos y build. `make gui-informes`
+  contra el laboratorio: cuatro alumnos, uno con la máquina apagada
+  ([evidencias](../reviews/evidence/T185/RESULTADOS.md)).
 
-**Antes:** T178–T183 simplificaron la GUI tomando Teuton GUI como referencia
-([galería](../reviews/evidence/T178-T183/RESULTADOS.md)). T177 avisa de errores
-al abrir resultados; T176 retiró las lecturas compartidas (ADR-0029).
+**Antes:** T184 guardó la contraseña de las máquinas en cada clase (ADR-0030).
+T178–T183 simplificaron la GUI tomando Teuton GUI como referencia.
 
 ## Problemas conocidos y límites
 
@@ -37,10 +39,11 @@ al abrir resultados; T176 retiró las lecturas compartidas (ADR-0029).
 - Editor YAML conserva texto; Monaco se empaqueta en un chunk diferido local.
 - Autenticación por clave SSH pendiente (T023), sin caso de uso aún.
 - examen-lab.ts está desfasado desde T178 (T186); ui-refresh cubre el modo examen.
+- La barra de avisos pinta en rojo también los guardados correctos (T187).
 
 ## Siguiente trabajo
 
-**T185**: informe por alumno generado por la app, pedido por Adrià.
 **T070**: rehacer exámenes del curso en formato nativo; desbloquea **T084**,
 examen real de aula que ejecuta Adrià. Consultar
-`python3 scripts/tasks.py T070` antes de empezar. **T023** sigue READY.
+`python3 scripts/tasks.py T070` antes de empezar. **T023**, **T186** y
+**T187** siguen READY.

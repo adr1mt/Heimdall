@@ -30,6 +30,7 @@ import {
   rememberProject
 } from './projects'
 import { validateExam } from './validate'
+import { writeReports } from './reports'
 import { writeGeneratedAula } from './aula'
 import { aulaYaml } from '../shared/aula'
 import { readGroup, type ClassGroup } from '../shared/classes'
@@ -407,6 +408,17 @@ export function registerIpc(): void {
     if (result.canceled || !result.filePath) return null
     writeFileSync(result.filePath, text, 'utf-8')
     return result.filePath
+  })
+
+  // The students' reports: pages the renderer built from the artifact, written
+  // into a new folder where the teacher points.
+  ipcMain.handle(IPC.saveReports, async (_e, folder: unknown, files: unknown): Promise<string | null> => {
+    const result = await dialog.showOpenDialog({
+      title: 'Carpeta donde guardar los informes',
+      properties: ['openDirectory', 'createDirectory']
+    })
+    if (result.canceled || !result.filePaths[0]) return null
+    return writeReports(result.filePaths[0], folder, files)
   })
 
   // The teacher's own classes. They touch no machine and no grade: this is

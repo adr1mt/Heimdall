@@ -26,6 +26,7 @@ export const IPC = {
   listBackups: 'backups:list',
   restoreBackups: 'backups:restore',
   saveCsv: 'export:saveCsv',
+  saveReports: 'export:saveReports',
   listClasses: 'classes:list',
   saveClasses: 'classes:save',
   // Pushed from the main process while a run is alive.

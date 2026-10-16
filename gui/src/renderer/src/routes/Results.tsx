@@ -4,6 +4,7 @@ import {
   Check,
   AlertTriangle,
   Download,
+  FileText,
   Grid3x3,
   Layers,
   List,
@@ -47,6 +48,7 @@ import {
   type Pending
 } from '@/lib/results'
 import { MoodleExportButton } from '@/components/MoodleExport'
+import { examTitleOf, reportFiles, reportsFolderName, reportsSummary } from '@/lib/report'
 import {
   chainCsv,
   chainCsvName,
@@ -200,6 +202,7 @@ export default function ResultsView() {
             </Segmented>
             {!projector && (
               <>
+                <ReportsButton />
                 <RunMoodleButton />
                 <details className="relative">
                   <summary
@@ -719,6 +722,59 @@ function ExportButton() {
         </span>
       </ConfirmDialog>
     </div>
+  )
+}
+
+/**
+ * One page per student, to hand back through Moodle or by mail (T185). It is
+ * built from the artifact on screen and carries no command, no output and no
+ * other student; what each page holds is said before anything is written.
+ */
+function ReportsButton() {
+  const artifact = useRun((s) => s.artifact)
+  const project = useApp((s) => s.project)
+  const scale = useScale()
+  const setNotice = useApp((s) => s.setNotice)
+  const [confirm, setConfirm] = useState(false)
+
+  if (!artifact) return null
+
+  async function save(): Promise<void> {
+    setConfirm(false)
+    if (!artifact) return
+    try {
+      const yaml = project ? await window.heimdall.readExam(project.examPath).catch(() => null) : null
+      const title = await examTitleOf(yaml, artifact.exam.sha256, project?.name ?? 'Examen')
+      const path = await window.heimdall.saveReports(
+        reportsFolderName(artifact, title),
+        reportFiles(artifact, scale, title)
+      )
+      setNotice(path ? t.reports.saved(path) : t.export.cancelled)
+    } catch (error) {
+      setNotice(noticeFrom(t.reports.failed, error))
+    }
+  }
+
+  return (
+    <>
+      <Button variant="outline" size="sm" onClick={() => setConfirm(true)}>
+        <FileText className="h-4 w-4" />
+        {t.reports.button}
+      </Button>
+      <ConfirmDialog
+        open={confirm}
+        title={t.reports.title}
+        confirmLabel={t.reports.yes}
+        onConfirm={() => void save()}
+        onCancel={() => setConfirm(false)}
+      >
+        <span className="block space-y-2">
+          <span className="block">{reportsSummary(artifact)}</span>
+          <span className="block">{t.reports.hint}</span>
+          <span className="block text-xs text-muted-foreground">{t.export.scale(scale.label)}</span>
+        </span>
+      </ConfirmDialog>
+    </>
   )
 }
 

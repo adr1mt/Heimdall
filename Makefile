@@ -10,7 +10,7 @@ BIN := bin/heimdall
 VERSION := $(shell cat VERSION)
 
 # Test SSH lab. See test/lab.sh.
-.PHONY: docs-check tools-check check test build version lab lab-down lab-status lab-ra2 lab-ra2-down rendimiento gui-check gui-build gui-dist gui-paquete gui-lab gui-editor clean
+.PHONY: docs-check tools-check check test build version lab lab-down lab-status lab-ra2 lab-ra2-down rendimiento gui-check gui-build gui-dist gui-paquete gui-lab gui-editor gui-informes clean
 
 ## docs-check: maintained local documentation links, without network access.
 docs-check:
@@ -100,6 +100,11 @@ gui-lab:
 ## with it (T178–T183). Needs `make build`, `make gui-build` and `make lab`.
 gui-editor:
 	cd gui && HEIMDALL_ENGINE=$(PWD)/bin/heimdall LAB_SECRET=HEIMDALL_SECRET_TEST_12345 npm run --silent editor-lab
+
+## gui-informes: correct the lab from the application and save one report per
+## student (T185). Needs `make build`, `make gui-build` and `make lab`.
+gui-informes:
+	cd gui && HEIMDALL_ENGINE=$(PWD)/bin/heimdall LAB_SECRET=HEIMDALL_SECRET_TEST_12345 npm run --silent report-lab
 
 clean:
 	rm -rf bin/

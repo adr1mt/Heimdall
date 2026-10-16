@@ -3859,7 +3859,7 @@
       "id": "T185",
       "title": "Informe por alumno generado por la app",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T184"
@@ -3880,7 +3880,8 @@
         "make gui-check gui-build",
         "Arnés con laboratorio y revisión de capturas"
       ],
-      "notes": "Copiar el informe a la máquina del alumno, como el send de Teuton, queda fuera: exigiría escribir por SSH y un ADR propio."
+      "completed": "2026-10-16",
+      "notes": "Copiar el informe a la máquina del alumno, como el send de Teuton, queda fuera: exigiría escribir por SSH y un ADR propio. Hecho: botón «Informes por alumno…», páginas construidas por lista blanca desde el artefacto, carpeta siempre nueva. 537 pruebas GUI (valor envenenado incluido), Go, tipos y build. make gui-informes contra el laboratorio con cuatro alumnos, uno con la máquina apagada; capturas y PDF en docs/reviews/evidence/T185."
     },
     {
       "id": "T186",
@@ -3899,6 +3900,26 @@
       "tests": [
         "HEIMDALL_ENGINE=../bin/heimdall PROJECT=<dir> LAB_SECRET_FILE=<file> npm run examen-lab"
       ]
+    },
+    {
+      "id": "T187",
+      "title": "Los avisos de éxito no se pintan como errores",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Que «Notas guardadas en…» o «Informes guardados en…» no aparezcan en rojo con icono de alerta, como un fallo.",
+      "scope": [
+        "gui/src/renderer/"
+      ],
+      "acceptance": [
+        "Un aviso de éxito y uno de error se distinguen por color, icono y rol accesible.",
+        "Pruebas GUI, tipos y build correctos; captura revisada."
+      ],
+      "tests": [
+        "make gui-check gui-build"
+      ],
+      "notes": "Visto en T185: la barra de avisos de App.tsx es siempre role=alert y destructive, también para guardados correctos."
     }
   ]
 }

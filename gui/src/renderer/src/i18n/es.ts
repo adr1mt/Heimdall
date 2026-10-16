@@ -382,6 +382,15 @@ export const t = {
     cancelled: 'No se ha guardado nada.',
     failed: 'No se pudieron guardar las notas'
   },
+  reports: {
+    button: 'Informes por alumno…',
+    title: '¿Guardar un informe por alumno?',
+    yes: 'Elegir carpeta y guardar',
+    hint:
+      'Se crea una carpeta con una página por alumno: su nota, y cada comprobación del examen como correcta, fallada o no comprobada. Se abre en el navegador y se imprime a PDF. No sale ningún comando, ni lo que escribieron las máquinas, ni la contraseña, ni datos de otros alumnos.',
+    saved: (path: string) => `Informes guardados en ${path}`,
+    failed: 'No se pudieron guardar los informes'
+  },
   moodle: {
     button: 'Exportar a Moodle…',
     title: '¿Exportar las notas a Moodle?',

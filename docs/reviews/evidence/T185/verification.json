@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "base": "/tmp/heimdall-report-uqz3Yu",
+  "folder": "informes-practica-3-servicios-de-red-20261016-093415",
+  "files": [
+    "ana-demo.html",
+    "bruno-demo.html",
+    "carla-demo.html",
+    "diego-demo.html"
+  ],
+  "consoleErrors": []
+}
