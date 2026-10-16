@@ -11,7 +11,7 @@
 
 <p align="center">
   <img alt="Go 1.26+" src="https://img.shields.io/badge/Go-1.26%2B-00ADD8?logo=go&logoColor=white">
-  <img alt="Versión 0.9.2" src="https://img.shields.io/badge/versi%C3%B3n-0.9.2-blue">
+  <img alt="Versión 1.0.0" src="https://img.shields.io/badge/versi%C3%B3n-1.0.0-blue">
   <img alt="Dos dependencias" src="https://img.shields.io/badge/dependencias-2-brightgreen">
 </p>
 
@@ -61,9 +61,10 @@ las columnas salgan iguales.</sub>
 
 ## Estado
 
-**Versión 0.9.2**: la aplicación está completa y empaquetada en `.deb` y
-AppImage con el motor dentro. Falta la prueba de fuego —un examen real
-corregido de principio a fin— y esa será la 1.0.0.
+**Versión 1.0.0**: la aplicación está completa y empaquetada en `.deb` y
+AppImage con el motor dentro. Corrige, guarda la nota, exporta y deja a cada
+alumno su informe en su máquina. Queda pendiente corregir con ella un examen
+real de aula de principio a fin.
 
 ## Documentación
 

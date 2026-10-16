@@ -8,6 +8,19 @@ El número es uno solo para todo el producto: lo dice el fichero `VERSION` de
 la raíz, el motor se sella con él al compilar y la aplicación lo lleva en su
 paquete. `test/version.sh` comprueba que no se separan.
 
+## 1.0.0 — 16-10-2026
+
+Primera versión estable:
+
+- Los exámenes se escriben en YAML con un editor que funciona sin conexión;
+  desaparece el formulario de exámenes.
+- Resultados en colores, detalle por alumno, analíticas y ayuda con índice.
+- Cada clase guarda la contraseña de sus máquinas: ya no se pide al corregir.
+- «Enviar informes…» deja a cada alumno su informe en su carpeta personal,
+  solo con lo suyo, y dice a quién le ha llegado y por qué no a los demás.
+
+Queda pendiente corregir con ella un examen real de aula de principio a fin.
+
 ## 0.9.2 — 14-10-2026
 
 Nuevo icono y arreglos de robustez:

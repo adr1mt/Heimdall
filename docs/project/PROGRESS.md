@@ -5,6 +5,9 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
+**Versión 1.0.0 publicada** (AppImage, .deb y SHA256SUMS en GitHub), por
+decisión de Adrià antes del examen real de aula (T084 sigue pendiente).
+
 **T188 · El informe se deja en la máquina de cada alumno (ADR-0031).**
 
 - Resultados tiene «Enviar informes…»: deja la página de T185 como

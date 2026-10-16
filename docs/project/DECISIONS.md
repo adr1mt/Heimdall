@@ -825,3 +825,9 @@ con un botón en Resultados. ADR-0031: escribe el motor (`heimdall deliver`),
 solo ese fichero, solo a la máquina corregida (mismo `plan_hash` e identidad
 anotada en la corrección), contraseña por stdin. Se retira el guardado local
 de informes de T185.
+
+## Versión 1.0.0 antes del examen real de aula (2026-10-16)
+
+Adrià decide publicar la 1.0.0 con T178–T188 terminadas, sin esperar a T084
+(corregir un examen real de aula), que era el requisito anotado desde la 0.9.0.
+T084 sigue pendiente y bloqueada por T070; las notas de versión lo dicen.
