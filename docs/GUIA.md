@@ -33,25 +33,22 @@ Nada más: el motor de corrección viaja dentro de la aplicación.
 
 ## 3. Instalar
 
-Hoy la aplicación se construye desde el repositorio; todavía no hay una
-descarga publicada. Con el repositorio clonado:
+Descarga uno de los dos paquetes de la
+[última versión](https://github.com/adr1mt/Heimdall/releases/latest):
 
 ```bash
-make gui-dist
-```
-
-Deja dos ficheros en `gui/dist/`. Elige uno:
-
-```bash
-sudo apt install ./gui/dist/Heimdall-1.0.0.deb
+sudo apt install ./Heimdall-1.0.0.deb
 ```
 
 o, si prefieres no instalar nada:
 
 ```bash
-chmod +x gui/dist/Heimdall-1.0.0.AppImage
-./gui/dist/Heimdall-1.0.0.AppImage
+chmod +x Heimdall-1.0.0.AppImage
+./Heimdall-1.0.0.AppImage
 ```
+
+Desde el repositorio clonado, `make gui-dist` construye los mismos dos
+paquetes en `gui/dist/`.
 
 El `.deb` deja Heimdall en el menú de aplicaciones. Comprobado: el paquete
 funciona en un equipo sin nada instalado.
