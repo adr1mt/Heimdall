@@ -21,7 +21,7 @@ import { chmodSync, copyFileSync, mkdirSync, renameSync, rmSync, createReadStrea
 import { join } from 'node:path'
 import { createHash } from 'node:crypto'
 import { stat } from 'node:fs/promises'
-import { MAX_UPDATE_BYTES } from './update-download'
+import { DOWNLOAD_LIMITS, MAX_UPDATE_BYTES } from './update-download'
 
 /** Where the released versions are published. */
 export const RELEASE_FEED = 'https://api.github.com/repos/adr1mt/Heimdall/releases/latest'
@@ -153,7 +153,9 @@ export class Updater {
     if (this.pending) return 'ready'
 
     const controller = new AbortController()
-    const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(180_000)])
+    // The download keeps its own limits; this one covers the feed and the
+    // verification on top of a download that used all of its time.
+    const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(DOWNLOAD_LIMITS.deadlineMs + 60_000)])
     const offBusy = this.deps.onBusy?.(() => controller.abort())
     let file: string | null = null
     try {
@@ -164,7 +166,10 @@ export class Updater {
         log('no hay ninguna versión publicada que se pueda instalar')
         return 'current'
       }
-      if (!isNewer(release.version, this.deps.currentVersion)) return 'current'
+      if (!isNewer(release.version, this.deps.currentVersion)) {
+        log(`al día: la última publicada es la ${release.version}`)
+        return 'current'
+      }
 
       file = join(this.deps.downloadDir, `Heimdall-${release.version}.AppImage`)
       mkdirSync(this.deps.downloadDir, { recursive: true })
@@ -177,6 +182,7 @@ export class Updater {
         return 'busy'
       }
       this.pending = { release, file }
+      log(`descargada la versión ${release.version}; se instalará al cerrar`)
       this.deps.announce(release.version)
       return 'ready'
     } catch (error) {

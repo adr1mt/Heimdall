@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Readable, Writable } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
-import { DownloadBudget, downloadUpdate, MAX_UPDATE_BYTES } from '../src/main/update-download'
+import { DOWNLOAD_LIMITS, DownloadBudget, downloadUpdate, MAX_UPDATE_BYTES } from '../src/main/update-download'
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks() })
 it('bounds actual bytes even without Content-Length', async () => {
   const sink = new Writable({ write(_chunk, _encoding, done) { done() } })
@@ -31,7 +31,7 @@ it('enforces the download deadline on a stream that never ends', async () => {
   const pending = downloadUpdate('https://example.invalid/file', dest, new AbortController().signal)
   setTimeout(() => deadline.abort(), 10)
   await expect(pending).rejects.toThrow()
-  expect(timeout).toHaveBeenCalledWith(180_000)
+  expect(timeout).toHaveBeenCalledWith(DOWNLOAD_LIMITS.deadlineMs)
   expect(existsSync(dest)).toBe(false); expect(existsSync(dest + '.part')).toBe(false)
 })
 
@@ -41,4 +41,24 @@ it('rejects a 200 response with a zero-byte body and removes the partial', async
   await expect(downloadUpdate('https://example.invalid/file', dest, new AbortController().signal)).rejects.toThrow(/vacía/)
   expect(existsSync(dest)).toBe(false)
   expect(existsSync(dest + '.part')).toBe(false)
+})
+
+it('gives up a download that stops moving and says so', async () => {
+  const dest = join(mkdtempSync(join(tmpdir(), 'heimdall-update-')), 'new.AppImage')
+  vi.stubGlobal('fetch', vi.fn(async () => new Response(new ReadableStream({ start(c) { c.enqueue(new Uint8Array([1])) } }))))
+  await expect(downloadUpdate('https://example.invalid/file', dest, new AbortController().signal, { stallMs: 20, deadlineMs: 60_000 })).rejects.toThrow(/parada/)
+  expect(existsSync(dest)).toBe(false); expect(existsSync(dest + '.part')).toBe(false)
+})
+it('lets a slow download finish as long as it keeps moving', async () => {
+  const dest = join(mkdtempSync(join(tmpdir(), 'heimdall-update-')), 'new.AppImage')
+  // Ten chunks, 10 ms apart: 100 ms in total against a 30 ms stall limit.
+  const body = new ReadableStream({
+    async start(c) {
+      for (let i = 0; i < 10; i += 1) { c.enqueue(new Uint8Array([i])); await new Promise(r => setTimeout(r, 10)) }
+      c.close()
+    }
+  })
+  vi.stubGlobal('fetch', vi.fn(async () => new Response(body)))
+  await downloadUpdate('https://example.invalid/file', dest, new AbortController().signal, { stallMs: 30, deadlineMs: 60_000 })
+  expect(existsSync(dest)).toBe(true)
 })

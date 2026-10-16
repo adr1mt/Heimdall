@@ -7,6 +7,7 @@
  */
 
 import { app, type BrowserWindow } from 'electron'
+import { appendFileSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { IPC } from '../shared/ipc'
 import { isExamModeActive, isRunActive } from './ipc'
@@ -17,19 +18,47 @@ import { Updater } from './updater'
 /**
  * How long after opening the check waits.
  *
- * Starting a class is the busiest minute of the hour: the first correction
- * goes out then, and this has to be behind it. It also gives exam mode time
- * to be switched on, which cancels the check outright.
+ * It was a minute, to stay behind the first correction of the class. Starting
+ * a correction or exam mode already cancels the check and its download on the
+ * spot, so the minute protected nothing and cost every short session its
+ * update: opening the program to look at something and closing it never
+ * checked at all. Ten seconds keeps the window free while it appears.
  */
-const CHECK_DELAY_MS = 60_000
+const CHECK_DELAY_MS = 10_000
 
 /** Fifteen seconds is plenty for a small JSON; a hung feed must not linger. */
 const FEED_TIMEOUT_MS = 15_000
 
 let updater: Updater | null = null
 
+/** Past this the log keeps only its newer half. */
+const LOG_MAX_BYTES = 256 * 1024
+
+/**
+ * The updater's log, also on disk.
+ *
+ * Launched from the menu, stderr goes nowhere: an update that failed left no
+ * trace of why. Nothing here is secret —versions, public URLs and errors— so
+ * it is written as it comes.
+ */
 function log(message: string): void {
   console.error(`[heimdall-gui] actualización: ${message}`)
+  try {
+    const dir = app.getPath('logs')
+    const file = join(dir, 'actualizacion.log')
+    mkdirSync(dir, { recursive: true })
+    try {
+      if (statSync(file).size > LOG_MAX_BYTES) {
+        const text = readFileSync(file, 'utf-8')
+        writeFileSync(file, text.slice(text.indexOf('\n', text.length / 2) + 1))
+      }
+    } catch {
+      // No log yet.
+    }
+    appendFileSync(file, `${new Date().toISOString()} ${message}\n`)
+  } catch {
+    // A log that cannot be written is not a reason to bother the class.
+  }
 }
 
 async function fetchText(url: string, signal: AbortSignal): Promise<string> {

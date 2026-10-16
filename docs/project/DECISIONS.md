@@ -831,3 +831,18 @@ de informes de T185.
 Adrià decide publicar la 1.0.0 con T178–T188 terminadas, sin esperar a T084
 (corregir un examen real de aula), que era el requisito anotado desde la 0.9.0.
 T084 sigue pendiente y bloqueada por T070; las notas de versión lo dicen.
+
+## El actualizador en sesiones cortas (2026-10-16)
+
+La 0.9.2 de Adrià no pasó sola a la 1.0.0: la abrió 18 segundos y la
+comprobación esperaba un minuto. Sustituye el punto 3 de T114.
+
+1. **Diez segundos después de abrir, no un minuto.** Empezar una corrección o
+   el modo examen ya cancela la comprobación y la descarga al instante; el
+   minuto no protegía nada y dejaba sin actualizar cada sesión corta.
+2. **La descarga se corta cuando se para, no a los tres minutos.** Un minuto
+   sin recibir datos la abandona; ninguna dura más de 30 minutos. El AppImage
+   de 155 MB no cabía en tres minutos por debajo de 0,9 MB/s.
+3. **El registro va también a disco**, en `~/.config/heimdall-gui/logs/actualizacion.log`
+   (último cuarto de MB). Abierta desde el menú, la salida de error se perdía
+   y un fallo no dejaba rastro. Solo contiene versiones, URLs públicas y errores.

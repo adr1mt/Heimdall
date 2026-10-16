@@ -198,6 +198,8 @@ funciona con el AppImage; el `.deb` se actualiza con `apt`. Si empieza una
 corrección o el modo examen, aplaza la actualización y cancela la descarga en
 curso. Las descargas tienen un límite de tiempo y tamaño y se comprueba que
 su tamaño y huella coinciden con los publicados antes de instalarlas.
+Lo que hace el actualizador queda anotado en
+`~/.config/heimdall-gui/logs/actualizacion.log`.
 
 Las versiones se publican en el
 [repositorio público de Heimdall](https://github.com/adr1mt/Heimdall/releases).
