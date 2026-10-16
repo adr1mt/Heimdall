@@ -63,7 +63,7 @@ for _ in $(seq 60); do
 done
 wait "$app"
 
-grep -q "de peso total" "$WORK/salida.txt" \
+grep -q " comprobaciones$" "$WORK/salida.txt" \
   && ok "S-0" "la corrección del laboratorio ha llegado hasta el final" \
   || fail "S-0" "la corrección no ha terminado; el resto de la prueba no vale"
 
@@ -72,10 +72,12 @@ grep -q "de peso total" "$WORK/salida.txt" \
 [ -z "$env_hit" ]  && ok "S-2" "ninguna contraseña en el entorno de ningún proceso" \
                    || fail "S-2" "contraseña en $env_hit"
 
-if grep -rqFf "$PATTERN" "$USERDATA" 2>/dev/null; then
-  fail "S-3" "contraseña en los ficheros de la aplicación: $(grep -rlFf "$PATTERN" "$USERDATA" | head -1)"
+# The class keeps the machines' password on purpose (ADR-0030); every other
+# file of the application must stay clean.
+if grep -rqFf "$PATTERN" --exclude=classes.json "$USERDATA" 2>/dev/null; then
+  fail "S-3" "contraseña en los ficheros de la aplicación: $(grep -rlFf "$PATTERN" --exclude=classes.json "$USERDATA" | head -1)"
 else
-  ok "S-3" "ninguna contraseña en los ficheros de la aplicación"
+  ok "S-3" "ninguna contraseña fuera de la clase"
 fi
 
 if grep -qFf "$PATTERN" "$WORK/salida.txt"; then
@@ -109,7 +111,7 @@ grep -q "^\[lab-run\] copias: [1-9]" "$WORK/salida.txt" \
 
 if grep -q "^\[lab-run\] restaurar: ok$" "$WORK/salida.txt" \
    && sed -n '/----- recuperado -----/,/----------------------/p' "$WORK/salida.txt" \
-      | grep -q "de peso total"; then
+      | grep -q " comprobaciones$"; then
   ok "B-2" "borrada la carpeta del examen, las notas se recuperan desde la aplicación"
 else
   fail "B-2" "las notas no se recuperan tras borrar la carpeta del examen"

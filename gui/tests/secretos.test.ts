@@ -22,6 +22,8 @@ function clase(): ClassGroup {
     id: 'c1',
     name: '2SMX A',
     columns: ['subdominio'],
+    // The class keeps it in clear (ADR-0030); the audit is what leaves it.
+    password: SECRETO,
     students: [
       {
         id: 'alu1',
@@ -113,7 +115,7 @@ describe('la contraseña del aula, de punta a punta', () => {
     expect(secretRefsIn(yaml)).toEqual(['AULA_PASSWORD'])
   })
 
-  it('una clase editada a mano con una contraseña dentro la pierde al leerla', () => {
+  it('una contraseña por alumno escrita a mano se pierde al leerla', () => {
     const group = readGroup({
       id: 'c1',
       name: '2SMX A',

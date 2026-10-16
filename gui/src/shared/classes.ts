@@ -2,10 +2,9 @@
  * A class: a fixed group the teacher writes down once and reuses in every
  * exam of the course (ADR-0021).
  *
- * It is an address book and nothing else. No grade is computed from it, no
- * password is ever part of it, and the engine never reads it: what reaches a
- * correction is still the exam, the classroom file and the credentials typed
- * for that run.
+ * It is an address book and nothing else. No grade is computed from it and
+ * the engine never reads it: what reaches a correction is still the exam, the
+ * classroom file and the credentials sent through stdin.
  */
 export interface ClassStudent {
   /** What the exam calls this student, e.g. «alu1». */
@@ -43,6 +42,12 @@ export interface ClassGroup {
    * fill it in.
    */
   columns: string[]
+  /**
+   * The password of the class's machines. It is the classroom's shared one,
+   * known to teacher and students, so it is kept in clear (ADR-0030). It
+   * still reaches the engine through stdin only, never the classroom file.
+   */
+  password: string
   students: ClassStudent[]
 }
 
@@ -54,9 +59,8 @@ export function emptyStudent(): ClassStudent {
 /**
  * Reads one student from anything, keeping only the fields of the model.
  *
- * Everything else is dropped on purpose: a hand-edited file that carried a
- * `password` would otherwise be read back, written again and end up on disk
- * forever (ADR-0009, ADR-0021 §4).
+ * Everything else is dropped on purpose. The password belongs to the class,
+ * not to each row: one carried by a student is never read (ADR-0030).
  */
 export function readStudent(value: unknown): ClassStudent | null {
   const raw = (value ?? {}) as Record<string, unknown>
@@ -85,7 +89,7 @@ export function readGroup(value: unknown): ClassGroup | null {
   const columns = Array.isArray(raw.columns)
     ? raw.columns.map(text).filter((column) => isColumnName(column))
     : []
-  return { id, name, columns, students }
+  return { id, name, columns, password: typeof raw.password === 'string' ? raw.password : '', students }
 }
 
 /** Only string values: a column holds what goes into a command, not a tree. */
@@ -139,6 +143,7 @@ export function problemWith(group: ClassGroup, others: ClassGroup[]): string | n
     (other) => other.id !== group.id && other.name.trim().toLowerCase() === group.name.trim().toLowerCase()
   )
   if (clash) return `Ya hay una clase que se llama «${clash.name}».`
+  if (!group.password) return 'La clase necesita la contraseña de las máquinas.'
   if (group.students.length === 0) return 'La clase no tiene ningún alumno.'
 
   const seen = new Set<string>()
@@ -172,6 +177,7 @@ export function duplicateOf(group: ClassGroup, others: ClassGroup[], id: string)
     id,
     name,
     columns: [...group.columns],
+    password: group.password,
     students: group.students.map((student) => ({ ...student, fields: { ...student.fields } }))
   }
 }

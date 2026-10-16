@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   ConfirmDialog,
-  Input,
   Meter,
   ProgressBar,
   SectionTitle,
@@ -94,12 +93,10 @@ export default function CorrectView() {
   /**
    * Credential names this class's classroom asks for. They are asked of the
    * main process, which reads them off the very text the correction will
-   * write, so the screen never asks for a password the engine will not use.
-   * The value goes to the engine and to the encrypted store, nowhere else
-   * (ADR-0009, ADR-0023).
+   * write. The value is the class's own password and goes to the engine
+   * through stdin, nowhere else (ADR-0009, ADR-0030).
    */
   const [refs, setRefs] = useState<string[]>([])
-  const [password, setPassword] = useState('')
   const [confirmStop, setConfirmStop] = useState(false)
 
   useEffect(() => {
@@ -119,44 +116,13 @@ export default function CorrectView() {
     }
   }, [group, setNotice])
 
-  // The password of the classroom machines, typed once and remembered
-  // encrypted (ADR-0023). It arrives filled in, so an exam starts without
-  // touching anything.
-  useEffect(() => {
-    let current = true
-    window.heimdall
-      .rememberedPassword()
-      .then((saved) => {
-        if (current && saved) setPassword(saved)
-      })
-      .catch(() => {
-        // Nothing remembered is the same as nothing saved: it is typed.
-      })
-    return () => {
-      current = false
-    }
-  }, [])
-
   /**
    * The envelope the engine reads: the same value for every credential the
-   * generated classroom asks for. In the real classroom the machines share
-   * one account all year (ADR-0023).
+   * generated classroom asks for: the password saved with the class
+   * (ADR-0030).
    */
   function envelope(): Record<string, string> {
-    return Object.fromEntries(refs.map((name) => [name, password]))
-  }
-
-  /**
-   * Keeps the password for the next time. It is saved on its own, with no
-   * question and no box to tick; a system without encryption keeps nothing
-   * and then the field is cleared, because it will be typed again.
-   */
-  async function remember(): Promise<void> {
-    try {
-      if (!(await window.heimdall.rememberPassword(password))) setPassword('')
-    } catch {
-      setPassword('')
-    }
+    return Object.fromEntries(refs.map((name) => [name, group?.password ?? '']))
   }
 
   const missing = !engine?.found
@@ -165,14 +131,13 @@ export default function CorrectView() {
       ? t.run.needExam
       : !group
         ? t.run.needClass
-        : refs.length > 0 && !password
+        : refs.length > 0 && !group.password
           ? t.run.needSecrets
           : null
 
   async function start(): Promise<void> {
     if (missing) return
     await startCorrection(envelope())
-    await remember()
   }
 
   /**
@@ -189,7 +154,6 @@ export default function CorrectView() {
       setNotice(noticeFrom('No se pudo activar el modo examen', error))
       return
     }
-    await remember()
     setRetry(null)
     useApp.getState().startExam(minutes)
   }
@@ -255,15 +219,6 @@ export default function CorrectView() {
             onGoToClasses={() => setView('classes')}
           />
         </div>
-
-        {group && (
-          <Credentials
-            asked={refs.length > 0}
-            password={password}
-            disabled={busy}
-            onPassword={setPassword}
-          />
-        )}
 
         {/* A retry is never silent: it says what it will repeat and it can be
             called off without leaving this screen. */}
@@ -417,40 +372,6 @@ function ClassCard({
         )}
       </CardContent>
     </Card>
-  )
-}
-
-/**
- * The password of the classroom machines. It is typed once —one account, the
- * same on every machine, the whole year— and it travels to the engine through
- * stdin: not into the class, not into the classroom, not into the artifact
- * (ADR-0009, ADR-0023).
- */
-function Credentials({
-  asked,
-  password,
-  disabled,
-  onPassword
-}: {
-  asked: boolean
-  password: string
-  disabled: boolean
-  onPassword: (value: string) => void
-}) {
-  if (!asked) return null
-  return (
-    <label className="flex max-w-xl items-center gap-3 text-sm">
-      <span className="shrink-0">Contraseña del aula</span>
-      <Input
-        type="password"
-        autoComplete="off"
-        disabled={disabled}
-        aria-label={t.credentials.label}
-        placeholder={t.credentials.placeholder}
-        value={password}
-        onChange={(e) => onPassword(e.target.value)}
-      />
-    </label>
   )
 }
 

@@ -48,7 +48,7 @@ export function readClasses(dir: string): ClassGroup[] {
  * read would be losing the teacher's work without saying so.
  *
  * Only the fields of the model are serialized, so nothing that was never part
- * of a class —a password above all— can travel in and back out again.
+ * of a class —a password per student above all— can travel in and back out.
  */
 export function writeClasses(dir: string, classes: ClassGroup[]): void {
   readClasses(dir)
@@ -59,6 +59,7 @@ export function writeClasses(dir: string, classes: ClassGroup[]): void {
       id: group.id,
       name: group.name,
       columns: group.columns,
+      password: group.password,
       students: group.students.map((student) => ({
         id: student.id,
         name: student.name,
@@ -83,7 +84,7 @@ function validateClasses(list: unknown[]): void {
  const groupIds=new Set<string>()
  for(const [i,value] of list.entries()) {
   const at=`classes[${i+1}]`,g=object(value,at)
-  string(g,'id',at,true);string(g,'name',at,true)
+  string(g,'id',at,true);string(g,'name',at,true);string(g,'password',at)
   if(groupIds.has(g.id as string)) throw new Error(`${at}.id: identificador repetido`)
   groupIds.add(g.id as string)
   if(g.columns!==undefined && (!Array.isArray(g.columns) || g.columns.some(c=>typeof c!=='string' || !isColumnName(c)) || new Set(g.columns).size!==g.columns.length)) throw new Error(`${at}.columns: columnas inválidas`)

@@ -12,7 +12,7 @@ import { join } from 'node:path'
  * student on the closed port. It is for the screenshot of the README: a
  * two-row matrix says nothing about what a class looks like.
  */
-export function writeLabClass(userData: string, id = 'clase-laboratorio'): string {
+export function writeLabClass(userData: string, password = '', id = 'clase-laboratorio'): string {
   const student = (
     studentId: string,
     name: string,
@@ -36,6 +36,8 @@ export function writeLabClass(userData: string, id = 'clase-laboratorio'): strin
             id,
             name: 'Laboratorio',
             columns: [],
+            // The class keeps the machines' password (ADR-0030).
+            password,
             students: classStudents(student)
           }
         ]
@@ -78,14 +80,15 @@ type Js = (code: string) => Promise<unknown>
 const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms))
 
 /**
- * Opens the project in Inicio, chooses the class in Corregir and types the
- * password, the way a teacher does it: the values go through real events, so
- * React sees exactly what it would see from a keyboard and a mouse.
+ * Opens the project in Inicio and chooses the class in Corregir, the way a
+ * teacher does it: the values go through real events, so React sees exactly
+ * what it would see from a keyboard and a mouse. The password comes with the
+ * class (ADR-0030).
  *
  * Opening the project lands on «Corregir» on its own; the click on the menu
  * is there so a change of that landing does not silently break the harness.
  */
-export async function openExamAndClass(js: Js, classId: string, secret: string): Promise<void> {
+export async function openExamAndClass(js: Js, classId: string): Promise<void> {
   await js(`[...document.querySelectorAll('header button')].find(b => b.textContent.includes('Abrir')).click()`)
   await wait(900)
   await js(`[...document.querySelectorAll('aside button')].find(b => b.textContent.trim() === 'Corregir').click()`)
@@ -99,13 +102,4 @@ export async function openExamAndClass(js: Js, classId: string, secret: string):
     return 'ok'
   })()`)
   await wait(800)
-  await js(`(() => {
-    const input = document.querySelector('input[type=password]')
-    if (!input) return 'sin campo de contraseña'
-    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set
-    setter.call(input, ${JSON.stringify(secret)})
-    input.dispatchEvent(new Event('input', { bubbles: true }))
-    return 'ok'
-  })()`)
-  await wait(300)
 }

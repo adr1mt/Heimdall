@@ -1,6 +1,6 @@
 # ADR-0023 · La contraseña del aula se recuerda cifrada en la aplicación
 
-- Estado: **aceptada** · 2026-09-22
+- Estado: **sustituida por ADR-0030** · 2026-09-22
 - Sustituye el punto 4 de [ADR-0021](0021-datos-propios-de-la-gui.md)
 - Contexto: ADR-0009, ADR-0021, principio 8
 

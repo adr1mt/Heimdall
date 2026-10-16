@@ -27,8 +27,9 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 | [0020](0020-sesion-de-examen.md) | La sesión de examen: la mejor nota completa y el estado `FINISHED`; cierra D-10 |
 | [0021](0021-datos-propios-de-la-gui.md) | Los datos propios de la aplicación: dónde viven, escritura atómica y ninguna contraseña |
 | [0022](0022-aula-generada-derivada-de-la-clase.md) | El aula que escribe la aplicación es un artefacto derivado de la clase, con nombre reservado |
-| [0023](0023-la-contrasena-del-aula-se-recuerda-cifrada.md) | La contraseña del aula se recuerda cifrada; sustituye el punto 4 de ADR-0021 |
+| [0023](0023-la-contrasena-del-aula-se-recuerda-cifrada.md) | La contraseña del aula se recuerda cifrada (sustituida por ADR-0030) |
 | [0024](0024-evidencia-de-terminacion-remota.md) | Supervisor remoto fijo que distingue timeout y códigos propios 124/137 |
 | [0025](0025-integridad-en-los-limites-de-evidencia-y-peso.md) | Prueba suficiente para evaluar, pesos finitos y elección sin redondear |
 | [0028](0028-lecturas-compartidas.md) | Captura compartida (sustituida por ADR-0029) |
 | [0029](0029-retirar-lecturas-compartidas.md) | Retirada de lecturas compartidas para simplificar la autoría |
+| [0030](0030-contrasena-por-clase.md) | La contraseña de las máquinas se guarda en cada clase |

@@ -808,3 +808,11 @@ El proyector oculta controles y el aviso informativo HOST_KEY_ACCEPTED; los
 avisos que requieren actuación siguen disponibles.
 
 [Evidencia y límites](../reviews/evidence/T178-T183/RESULTADOS.md).
+
+## T184 · La contraseña de las máquinas en cada clase (2026-10-16)
+
+Adrià pide quitar la casilla «Contraseña del aula» y guardar en cada clase la
+contraseña de sus máquinas, sin cifrar: es la credencial compartida que
+conocen profesor y alumnos. ADR-0030 sustituye ADR-0023 y el punto 4 de
+ADR-0021. El motor y su política de secretos no cambian: la contraseña viaja
+solo por stdin y una contraseña por alumno se sigue descartando.

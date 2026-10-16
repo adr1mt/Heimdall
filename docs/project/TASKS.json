@@ -3825,6 +3825,80 @@
       ],
       "completed": "2026-10-16",
       "notes": "Interfaz implementada y verificada con motor real, cinco alumnos ficticios, estados técnicos y edición YAML. 536 pruebas GUI, Go, tipos y build correctos. Evidencia docs/reviews/evidence/T178-T183/RESULTADOS.md."
+    },
+    {
+      "id": "T184",
+      "title": "Guardar la contraseña de las máquinas en cada clase",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T183"
+      ],
+      "goal": "Que cada clase guarde su contraseña compartida y Corregir no pida ninguna (ADR-0030).",
+      "scope": [
+        "gui/src/",
+        "gui/tests/",
+        "docs/"
+      ],
+      "acceptance": [
+        "El creador de clases tiene «Contraseña de las máquinas»; una clase sin ella no se guarda y la contraseña sobrevive a reiniciar la app.",
+        "Corregir y el modo examen usan la contraseña de la clase elegida; sin ella, Corregir avisa y no arranca.",
+        "Desaparecen la casilla de Corregir, el almacén cifrado y «Olvidar la contraseña guardada».",
+        "La contraseña sigue sin aparecer en aula.yaml, argv, artefacto ni exportaciones; un password por alumno se descarta.",
+        "make check, gui-check y gui-build correctos; verificado en la app."
+      ],
+      "tests": [
+        "make check gui-check gui-build",
+        "Prueba en la app con el laboratorio"
+      ],
+      "completed": "2026-10-16",
+      "notes": "ADR-0030. 530 pruebas GUI, Go, tipos y build correctos. secretos.sh completo (S-0…B-3) y ui-refresh con cinco alumnos por SSH y una vuelta de modo examen usando la contraseña de la clase. secretos.sh buscaba un texto retirado en T178; corregido."
+    },
+    {
+      "id": "T185",
+      "title": "Informe por alumno generado por la app",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [
+        "T184"
+      ],
+      "goal": "Desde Resultados, guardar una página clara por alumno (nota, grupos, comprobaciones correctas, falladas y no comprobadas) para repartirla por Moodle o correo.",
+      "scope": [
+        "gui/src/",
+        "gui/tests/",
+        "docs/"
+      ],
+      "acceptance": [
+        "Un botón en Resultados guarda una carpeta con un HTML autocontenido por alumno, imprimible a PDF.",
+        "Cada informe muestra nota en la escala del profesor, examen, fecha y cada comprobación por grupo con su descripción y estado; lo no comprobado se distingue de lo fallado.",
+        "Ningún informe lleva comandos, salidas de máquina, contraseña ni datos de otros alumnos; prueba con valor envenenado.",
+        "Pruebas GUI, tipos y build correctos; capturas revisadas."
+      ],
+      "tests": [
+        "make gui-check gui-build",
+        "Arnés con laboratorio y revisión de capturas"
+      ],
+      "notes": "Copiar el informe a la máquina del alumno, como el send de Teuton, queda fuera: exigiría escribir por SSH y un ADR propio."
+    },
+    {
+      "id": "T186",
+      "title": "Actualizar el arnés examen-lab a la interfaz de T178",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "examen-lab.ts busca botones retirados en T178 («Empezar el examen», «Cada 5 min») y se cuelga sin informar.",
+      "scope": [
+        "gui/scripts/examen-lab.ts"
+      ],
+      "acceptance": [
+        "El arnés recorre modo examen, proyector y cierre con la interfaz actual y termina con RESULTADO: OK contra el laboratorio."
+      ],
+      "tests": [
+        "HEIMDALL_ENGINE=../bin/heimdall PROJECT=<dir> LAB_SECRET_FILE=<file> npm run examen-lab"
+      ]
     }
   ]
 }

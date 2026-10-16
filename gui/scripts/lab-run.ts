@@ -52,7 +52,7 @@ const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms)
 
 app.whenReady().then(async () => {
   writeSettings(app.getPath('userData'), { enginePath })
-  const classId = writeLabClass(app.getPath('userData'))
+  const classId = writeLabClass(app.getPath('userData'), secret)
   registerIpc()
 
   const win = new BrowserWindow({
@@ -83,7 +83,7 @@ app.whenReady().then(async () => {
 
   // The exam in Inicio, the class in Corregir and the password typed: the
   // same three steps the teacher takes.
-  await openExamAndClass(js, classId, secret)
+  await openExamAndClass(js, classId)
 
   await js(`[...document.querySelectorAll('main button')].find(b => b.textContent.trim() === 'Corregir').click()`)
   console.log('[lab-run] corrigiendo…')

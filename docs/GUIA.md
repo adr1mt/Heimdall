@@ -75,8 +75,10 @@ El usuario inicial es `usuario`. Puedes cambiar **Usuario común** y pulsar
 El puerto habitual, 22, queda oculto: activa **Puertos SSH** para otro puerto.
 Los valores personalizados se conservan al ocultar la columna.
 
-Aquí **no se escribe ninguna contraseña**. Esta lista se reutiliza en todos
-los exámenes del curso.
+Escribe también la **contraseña de las máquinas** de la clase. Se guarda tal
+cual con la clase, porque es la que conocen profesor y alumnos, y no aparece
+en notas, resultados ni exportaciones. Esta lista se reutiliza en todos los
+exámenes del curso.
 
 Si el examen necesita un dato propio de cada alumno —su subdominio, el puerto
 que le tocó—, añade una columna tuya y rellénala. El examen la lee con
@@ -100,10 +102,8 @@ Los pesos admiten decimales y cero para comprobaciones diagnósticas.
 
 ### 4.3 Corrige
 
-**Corregir.** Elige la clase, escribe la contraseña de las máquinas y adelante.
-
-La contraseña se guarda cifrada en tu ordenador, así que solo se escribe la
-primera vez. Se olvida desde **Ajustes**.
+**Corregir.** Elige la clase y adelante: la contraseña ya va con la clase. Si
+la clase no la tiene, Corregir te lo dice y no arranca.
 
 Antes de ejecutar verás el examen, la clase y los alumnos que se evaluarán.
 Después verás cada alumno avanzar en tiempo real.
@@ -173,9 +173,8 @@ y las notas permanecen iguales.
 - Una **copia de seguridad de las notas**, fuera de esa carpeta: borrar la
   carpeta del examen no se lleva las notas por delante. Guarda notas, no la
   salida de las máquinas.
-- La **contraseña**, cifrada, en el directorio de datos de la aplicación, en
-  un fichero aparte. No está en la clase, ni en las notas, ni en ningún
-  informe.
+- La **contraseña de las máquinas**, dentro de cada clase, en el directorio
+  de datos de la aplicación. No está en las notas ni en ningún informe.
 - El **histórico** de un examen se consulta desde la propia aplicación, y
   abrir una corrección antigua no toca ninguna máquina.
 

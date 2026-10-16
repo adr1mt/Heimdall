@@ -74,8 +74,8 @@ export default function HelpView() {
                 En <strong>El examen</strong>, pega o edita el YAML. Valida y guarda.
               </li>
               <li>
-                Vuelve a <strong>Corregir</strong>, comprueba examen y clase, introduce la
-                contraseña y pulsa Corregir.
+                Vuelve a <strong>Corregir</strong>, comprueba examen y clase y pulsa
+                Corregir.
               </li>
               <li>
                 Consulta <strong>Resultados</strong> en lista o matriz y exporta las notas.
@@ -140,9 +140,9 @@ export default function HelpView() {
               guardar la clase.
             </p>
             <p>
-              La contraseña se introduce en Corregir y es común a las máquinas del aula. Se recuerda
-              cifrada cuando el sistema permite hacerlo; puedes olvidarla desde Ajustes. No se
-              escribe en la clase, en el YAML del examen ni en los informes.
+              La contraseña de las máquinas se escribe en la clase, junto al usuario común, y se
+              guarda tal cual. Corregir la usa sin preguntar. No se escribe en el YAML del examen
+              ni en los resultados.
             </p>
           </Block>
           <Block id="corregir" title="Corregir">

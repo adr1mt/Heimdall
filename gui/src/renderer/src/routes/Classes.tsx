@@ -69,6 +69,7 @@ export default function ClassesView() {
       id: crypto.randomUUID(),
       name: '',
       columns: [],
+      password: '',
       students: [{ ...emptyStudent(), user: 'usuario' }]
     })
   }
@@ -299,7 +300,14 @@ function ClassDetail({
         </div>
       )}
 
-      <p className="text-micro text-muted-foreground">{t.classes.noPasswords}</p>
+      <p className="text-xs text-muted-foreground">
+        {t.classes.passwordLabel}:{' '}
+        {group.password ? (
+          <span className="font-mono text-foreground">{group.password}</span>
+        ) : (
+          <span className="text-warning-strong">{t.classes.passwordMissing}</span>
+        )}
+      </p>
     </div>
   )
 }
@@ -360,6 +368,17 @@ function ClassEditor({
 
         <div className="flex flex-wrap items-end gap-3">
           <label className="space-y-1 text-xs text-muted-foreground">
+            {t.classes.passwordLabel}
+            <Input
+              className="w-44 font-mono"
+              autoComplete="off"
+              spellCheck={false}
+              aria-label={t.classes.passwordLabel}
+              value={draft.password}
+              onChange={(e) => onChange({ ...draft, password: e.target.value })}
+            />
+          </label>
+          <label className="space-y-1 text-xs text-muted-foreground">
             Usuario común
             <Input
               className="w-36"
@@ -408,7 +427,7 @@ function ClassEditor({
         </div>
 
         <SectionTitle
-          hint={t.classes.noPasswords}
+          hint={t.classes.passwordHint}
           actions={
             <div className="flex flex-wrap items-center gap-2">
               <Button variant="ghost" size="sm" onClick={() => setAddingColumn(true)}>

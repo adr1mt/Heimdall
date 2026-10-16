@@ -22,6 +22,7 @@ function group(over: Partial<ClassGroup> = {}): ClassGroup {
     id: 'g1',
     name: '2SMX A',
     columns: [],
+    password: 'usuario',
     students: [
       {
         id: 'alu1',
@@ -67,19 +68,20 @@ describe('el fichero de clases', () => {
     expect(() => readClasses(dir)).toThrow(/forma esperada/i)
   })
 
-  // ADR-0009 y ADR-0021 §4: la garantía es estructural, no un filtro.
-  it('no escribe ninguna contraseña, ni aunque se la manden', () => {
+  // ADR-0030: la contraseña es de la clase; una por alumno no se guarda.
+  it('guarda la contraseña de la clase y descarta la de cada alumno', () => {
     const dir = emptyDir()
     const contaminated = {
       ...group(),
-      password: 'secreta',
       students: [{ ...group().students[0], password: 'secreta' }]
     } as unknown as ClassGroup
     writeClasses(dir, [contaminated])
-    expect(readFileSync(classesFile(dir), 'utf-8')).not.toContain('secreta')
+    const written = readFileSync(classesFile(dir), 'utf-8')
+    expect(written).not.toContain('secreta')
+    expect(readClasses(dir)[0].password).toBe('usuario')
   })
 
-  it('descarta una contraseña que alguien escribiera a mano en el fichero', () => {
+  it('descarta una contraseña por alumno escrita a mano en el fichero', () => {
     const dir = emptyDir()
     writeFileSync(
       classesFile(dir),
@@ -89,6 +91,21 @@ describe('el fichero de clases', () => {
       'utf-8'
     )
     expect(JSON.stringify(readClasses(dir))).not.toContain('secreta')
+  })
+
+  it('una clase antigua sin contraseña se lee con ella vacía', () => {
+    const dir = emptyDir()
+    const { password: _omit, ...old } = group()
+    writeFileSync(classesFile(dir), JSON.stringify({ classes: [old] }), 'utf-8')
+    expect(readClasses(dir)[0].password).toBe('')
+  })
+
+  it('no guarda una clase sin contraseña de las máquinas', () => {
+    expect(problemWith(group({ password: '' }), [])).toMatch(/contraseña de las máquinas/)
+  })
+
+  it('una copia conserva la contraseña', () => {
+    expect(duplicateOf(group(), [group()], 'g2').password).toBe('usuario')
   })
 
   it('una clase sobrevive a cerrar la aplicación', () => {
@@ -235,8 +252,8 @@ describe('la línea que dice qué clase hay elegida', () => {
 // Ver una clase es elegirla, no abrir el editor: la pantalla enseña una sin
 // que nadie la elija, y la elegida para corregir es la que sale primero.
 describe('la clase que se ve', () => {
-  const a: ClassGroup = { id: 'a', name: '2SMX A', columns: [], students: [] }
-  const b: ClassGroup = { id: 'b', name: '2SMX B', columns: [], students: [] }
+  const a: ClassGroup = { id: 'a', name: '2SMX A', columns: [], password: '', students: [] }
+  const b: ClassGroup = { id: 'b', name: '2SMX B', columns: [], password: '', students: [] }
 
   it('enseña la primera cuando todavía no se ha elegido ninguna', () => {
     expect(shownGroup([a, b], null)?.id).toBe('a')

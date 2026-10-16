@@ -22,6 +22,7 @@ function group(over: Partial<ClassGroup> = {}): ClassGroup {
     id: 'c-2smxc',
     name: '2SMX C',
     columns: [],
+    password: 'usuario',
     students: [
       { id: 'alu1', name: 'Alumna Uno', contact: 'alu1@ficticio', host: '10.0.0.11', port: '', user: 'alumno', fields: {} },
       { id: 'alu2', name: 'Alumne Dos', contact: '', host: '10.0.0.12', port: '2222', user: 'profe', fields: {} }

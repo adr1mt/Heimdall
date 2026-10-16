@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { AlertTriangle, CheckCircle2 } from 'lucide-react'
 import {
   Button,
-  ConfirmDialog,
   Input,
   SectionTitle,
   Segmented,
@@ -23,34 +22,12 @@ export default function SettingsView() {
   const setNotice = useApp((s) => s.setNotice)
   const [path, setPath] = useState('')
   const [saving, setSaving] = useState(false)
-  // Whether this computer remembers the classroom password (ADR-0023). Only
-  // whether: the value has no business on this screen.
-  const [hasPassword, setHasPassword] = useState(false)
-  const [confirmForget, setConfirmForget] = useState(false)
-
   useEffect(() => {
     window.heimdall
       .getEnginePath()
       .then(setPath)
       .catch((error) => setNotice(noticeFrom('No se pudo leer la ruta del motor', error)))
   }, [setNotice])
-
-  useEffect(() => {
-    window.heimdall
-      .rememberedPassword()
-      .then((saved) => setHasPassword(saved !== ''))
-      .catch(() => setHasPassword(false))
-  }, [])
-
-  async function forget(): Promise<void> {
-    setConfirmForget(false)
-    try {
-      await window.heimdall.forgetPassword()
-      setHasPassword(false)
-    } catch (error) {
-      setNotice(noticeFrom('No se pudo olvidar la contraseña', error))
-    }
-  }
 
   async function save(): Promise<void> {
     setSaving(true)
@@ -184,23 +161,6 @@ export default function SettingsView() {
           </div>
         </section>
 
-        {/* La contraseña de las máquinas se escribe una vez y se guarda
-            cifrada. Aquí solo se puede olvidar (ADR-0023). */}
-        <section className="max-w-2xl">
-          <SectionTitle hint={t.settings.passwordHint}>{t.settings.passwordSection}</SectionTitle>
-          <p className="text-sm text-muted-foreground">
-            {hasPassword ? t.settings.passwordSaved : t.settings.passwordNone}
-          </p>
-          <Button
-            variant="outline"
-            className="mt-3"
-            disabled={!hasPassword}
-            onClick={() => setConfirmForget(true)}
-          >
-            {t.settings.passwordForget}
-          </Button>
-        </section>
-
         <section className="max-w-2xl">
           <SectionTitle>{t.settings.aboutSection}</SectionTitle>
           <p className="text-sm text-muted-foreground">{t.settings.about}</p>
@@ -208,16 +168,6 @@ export default function SettingsView() {
         </section>
       </div>
 
-      <ConfirmDialog
-        open={confirmForget}
-        title={t.settings.passwordConfirmTitle}
-        confirmLabel={t.settings.passwordConfirmYes}
-        destructive
-        onConfirm={() => void forget()}
-        onCancel={() => setConfirmForget(false)}
-      >
-        {t.settings.passwordConfirmBody}
-      </ConfirmDialog>
     </div>
   )
 }

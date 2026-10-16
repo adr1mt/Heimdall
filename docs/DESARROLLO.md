@@ -131,7 +131,7 @@ suite se ejecuta aparte.
 | Copiar, retener, recuperar | [backup.ts](../gui/src/main/backup.ts), incluye `BackupChain` | [copias](../gui/tests/backups.test.ts), [recuperación](../gui/tests/backup-recovery.test.ts), ADR-0026 |
 | Reintentar y consolidar | [reintentos](../cmd/heimdall/retry.go), [consolidación](../cmd/heimdall/consolidate.go) | ADR-0018 y ADR-0019 |
 | Sesión de examen | [CLI](../cmd/heimdall/session.go), [GUI](../gui/src/main/session.ts) | ADR-0020; arnés `gui/scripts/examen-lab.ts` |
-| Credenciales del aula | [vault.ts](../gui/src/main/vault.ts) | ADR-0009 y ADR-0023 |
+| Credenciales del aula | [clases](../gui/src/shared/classes.ts), [secretos](../gui/src/main/secrets.ts) | ADR-0009 y ADR-0030; [auditoría](../gui/tests/secretos.test.ts) |
 | Actualizar y distribuir | [feed](../gui/src/main/updater.ts), [servicio](../gui/src/main/update-service.ts), [descarga](../gui/src/main/update-download.ts) | [verificación 0.9.1](releases/0.9.1/VERIFICACION.md); `make gui-dist` |
 | Pantallas y estado visual | [routes/](../gui/src/renderer/src/routes/), [stores/](../gui/src/renderer/src/stores/) | [tests GUI](../gui/tests/) |
 

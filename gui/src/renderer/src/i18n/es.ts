@@ -204,8 +204,11 @@ export const t = {
     addStudent: 'Añadir alumno',
     removeStudent: 'Quitar este alumno',
     count: (students: number) => (students === 1 ? '1 alumno' : `${students} alumnos`),
-    // Nunca una contraseña: aquí se guarda a quién se conecta, no con qué.
-    noPasswords: 'Aquí no se guarda ninguna contraseña: se teclean al corregir y no se escriben en ningún sitio.',
+    // La contraseña compartida de las máquinas de la clase (ADR-0030).
+    passwordLabel: 'Contraseña de las máquinas',
+    passwordMissing: 'sin poner; edita la clase para corregir',
+    passwordHint:
+      'La contraseña de las máquinas se guarda tal cual en la clase y solo se usa para conectarse. No aparece en notas, resultados ni exportaciones.',
     col: {
       id: 'Identificador',
       name: 'Nombre y apellidos',
@@ -255,14 +258,6 @@ export const t = {
     saveFailed: 'No se pudo guardar la clase',
     blocked: 'Mientras el fichero de clases no se pueda leer, no se guarda nada.'
   },
-  credentials: {
-    title: 'Contraseña del aula',
-    hint:
-      'La contraseña de las máquinas del aula. Se guarda cifrada en este ordenador, así que solo hay que escribirla una vez. No aparece en la clase, ni en las notas, ni en ningún informe.',
-    none: 'Esta clase no pide ninguna contraseña.',
-    label: 'Contraseña de las máquinas',
-    placeholder: 'Contraseña'
-  },
   run: {
     start: 'Corregir',
     again: 'Corregir otra vez',
@@ -277,7 +272,7 @@ export const t = {
     needEngine: 'Primero hay que indicar dónde está el motor, en Ajustes.',
     needExam: 'Abre un examen en Inicio.',
     needClass: 'Elige la clase que vas a corregir.',
-    needSecrets: 'Faltan contraseñas por escribir.',
+    needSecrets: 'La clase no tiene la contraseña de las máquinas. Ponla en Clases.',
     retryTitle: 'Reintento preparado',
     retryBody: (checks: number, students: number) =>
       `Se van a repetir ${checks} comprobaciones de ${students} alumnos. El resto de la clase no se toca.`,
@@ -495,16 +490,6 @@ export const t = {
     passHint:
       'Desde qué puntuación, sobre las 100 que publica el motor, se cuenta a un alumno como aprobado. Es también donde cae el aprobado en la escala: lo que marques aquí es el 5. Ninguna nota del motor cambia.',
     passLabel: 'Aprobado a partir de',
-    passwordSection: 'Contraseña del aula',
-    passwordHint:
-      'La contraseña de las máquinas del alumnado se guarda cifrada en este ordenador para no tener que escribirla en cada examen. No se escribe en la clase, ni en las notas, ni en ningún informe.',
-    passwordSaved: 'Hay una contraseña guardada.',
-    passwordNone: 'No hay ninguna contraseña guardada. Se escribe al corregir.',
-    passwordForget: 'Olvidar la contraseña guardada',
-    passwordConfirmTitle: '¿Olvidar la contraseña guardada?',
-    passwordConfirmBody:
-      'La casilla de Corregir quedará vacía y habrá que escribir la contraseña la próxima vez.',
-    passwordConfirmYes: 'Olvidarla',
     aboutSection: 'Acerca de',
     about:
       'Heimdall corrige prácticas de sistemas y redes conectándose por SSH a las máquinas del alumnado.',

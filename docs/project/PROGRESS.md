@@ -5,23 +5,20 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T178–T183 · Interfaz simplificada según la comparación con Teuton GUI.**
+**T184 · La contraseña de las máquinas va en cada clase (ADR-0030).**
 
-- Editor solo YAML con Monaco local; colores, pegado, búsqueda y Ctrl+S.
-  Validación antes de guardar y conservación exacta del texto.
-- Corregir con recuadro de modo examen y lista previa; resultados coloreados,
-  detalle por alumno, cuatro secciones de analíticas y proyección simplificada.
-- Usuario común, puerto 22 oculto, ayuda con índice y vista previa de notas.
-- Go, 536 pruebas GUI, tipos y compilación correctos. Demo real por SSH con
-  cinco alumnos: 100/80/60/40/20; máquina inaccesible sin nota, nunca cero.
-- Editor, navegación, YAML inválido, primera ronda y parada verificados en
-  Electron. Capturas oscuro/claro/proyector inspeccionadas.
-  [Galería e informe](../reviews/evidence/T178-T183/RESULTADOS.md).
-- Aula GISAR y proyector físico siguen pendientes en T070/T084.
+- El creador de clases pide «Contraseña de las máquinas» y la guarda en claro
+  en `classes.json`; sin ella la clase no se guarda y Corregir no arranca.
+- Retirados la casilla de Corregir, el almacén cifrado y «Olvidar» de Ajustes.
+- El motor no cambia: la contraseña sigue entrando solo por stdin, nunca en
+  aula.yaml, argv, artefacto, copias ni exportaciones.
+- 530 pruebas GUI, Go, tipos y build. secretos.sh entero y ui-refresh por SSH
+  con cinco alumnos y modo examen. ui-refresh falló una vez por tiempos en el
+  paso del editor y pasó al repetir.
 
-**Contexto anterior:** T177 avisa de errores al abrir resultados; T176 retiró
-las lecturas compartidas (ADR-0029). T172 cerró las reparaciones de T166.
-[Auditoría T166](../reviews/T166-AUDITORIA.md).
+**Antes:** T178–T183 simplificaron la GUI tomando Teuton GUI como referencia
+([galería](../reviews/evidence/T178-T183/RESULTADOS.md)). T177 avisa de errores
+al abrir resultados; T176 retiró las lecturas compartidas (ADR-0029).
 
 ## Problemas conocidos y límites
 
@@ -39,9 +36,11 @@ las lecturas compartidas (ADR-0029). T172 cerró las reparaciones de T166.
 - Linux x64. Actualización automática solo AppImage; .deb mediante apt.
 - Editor YAML conserva texto; Monaco se empaqueta en un chunk diferido local.
 - Autenticación por clave SSH pendiente (T023), sin caso de uso aún.
+- examen-lab.ts está desfasado desde T178 (T186); ui-refresh cubre el modo examen.
 
 ## Siguiente trabajo
 
+**T185**: informe por alumno generado por la app, pedido por Adrià.
 **T070**: rehacer exámenes del curso en formato nativo; desbloquea **T084**,
 examen real de aula que ejecuta Adrià. Consultar
 `python3 scripts/tasks.py T070` antes de empezar. **T023** sigue READY.

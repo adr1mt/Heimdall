@@ -38,6 +38,7 @@ const classGroup = {
   id: 'demo',
   name: 'Clase demo',
   columns: ['p1', 'p2', 'p3', 'p4', 'p5'],
+  password: 'HEIMDALL_SECRET_TEST_12345',
   students
 }
 const offline = {
@@ -134,14 +135,7 @@ async function saveKey() {
   win.webContents.sendInputEvent({ type: 'keyUp', keyCode: 's', modifiers: ['control'] })
   await delay(700)
 }
-async function password() {
-  await js(
-    `(()=>{const e=document.querySelector('input[type=password]');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(e,'HEIMDALL_SECRET_TEST_12345');e.dispatchEvent(new Event('input',{bubbles:true}));})()`
-  )
-  await delay(100)
-}
 async function correct(label = 'Corregir') {
-  await password()
   await click(label, 'header button')
   await until(
     "document.querySelector('header h1')?.textContent === 'Resultados'",
@@ -177,9 +171,6 @@ app
     await click('Abrir…')
     await until("!!document.querySelector('select')", 'class chooser')
     await choose('demo')
-    await js(
-      `(()=>{const e=document.querySelector('input[type=password]');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(e,'HEIMDALL_SECRET_TEST_12345');e.dispatchEvent(new Event('input',{bubbles:true}));})()`
-    )
     await shot('02-corregir')
     assert.match(await text(), /Alumnos a evaluar/)
     assert.match(await text(), /Iniciar modo examen/)
@@ -306,7 +297,6 @@ app
     await click('Salir del proyector')
     await click('Corregir', 'aside button')
     await choose('demo')
-    await password()
     await click('Iniciar modo examen')
     await until(
       "document.querySelector('header h1')?.textContent === 'Resultados'",

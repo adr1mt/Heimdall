@@ -103,7 +103,7 @@ function grep(needle: string, dirs: string[]): boolean {
   const pattern = join(app.getPath('temp'), 'heimdall-patron')
   writeFileSync(pattern, `${needle}\n`)
   try {
-    execFileSync('grep', ['-rqFf', pattern, ...dirs])
+    execFileSync('grep', ['-rqFf', pattern, '--exclude=classes.json', ...dirs])
     return true
   } catch {
     return false
@@ -114,7 +114,7 @@ function grep(needle: string, dirs: string[]): boolean {
 
 app.whenReady().then(async () => {
   writeSettings(app.getPath('userData'), { enginePath })
-  const classId = writeLabClass(app.getPath('userData'))
+  const classId = writeLabClass(app.getPath('userData'), secret)
   registerIpc()
 
   const win = new BrowserWindow({
@@ -158,7 +158,7 @@ app.whenReady().then(async () => {
     return 'ok'
   })()`)
 
-  await openExamAndClass(js, classId, secret)
+  await openExamAndClass(js, classId)
 
   // E-1: the exam starts on its own, without pressing «Corregir».
   await click('Cada 5 min')
@@ -331,9 +331,9 @@ app.whenReady().then(async () => {
   await wait(800)
   check('C-3', closeAsked === 2, 'volvió a preguntar')
 
-  // S-5: exam mode is the only thing in the application that keeps a
-  // password from one pass to the next. It lives in the memory of the main
-  // process; nothing it wrote may carry it.
+  // S-5: exam mode keeps the password from one pass to the next in the
+  // memory of the main process. Only the class file holds it (ADR-0030);
+  // nothing else written may carry it.
   if (secret) {
     const written = grep(secret, [project, app.getPath('userData')])
     check('S-5', !written, written ? 'la contraseña aparece en algo escrito' : 'ninguna contraseña en lo escrito')

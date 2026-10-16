@@ -5,7 +5,6 @@ import {
   dialog,
   ipcMain,
   powerSaveBlocker,
-  safeStorage,
   shell,
   type WebContents
 } from 'electron'
@@ -20,7 +19,6 @@ import { backupRuns, listBackups, restoreBackups, waitForBackups } from './backu
 import { RunSession, projectDirOf } from './run'
 import { describeExam } from './describe'
 import { secretRefsIn } from './secrets'
-import { forgetPassword, rememberPassword, rememberedPassword, type Cipher } from './vault'
 import { readSettings, writeSettings } from './store'
 import { readClasses, writeClasses } from './classes'
 import {
@@ -55,16 +53,6 @@ const FILTERS: Record<'exam' | 'engine' | 'result', Electron.FileFilter[]> = {
 /** Where the settings file lives: the app's own data directory. */
 function settingsDir(): string {
   return app.getPath('userData')
-}
-
-/**
- * What the classroom password is kept with. A system that offers no
- * encryption keeps nothing: there is no plain-text fallback (ADR-0023).
- */
-const cipher: Cipher = {
-  available: () => safeStorage.isEncryptionAvailable(),
-  encrypt: (plain) => safeStorage.encryptString(plain),
-  decrypt: (sealed) => safeStorage.decryptString(sealed)
 }
 
 /**
@@ -291,17 +279,6 @@ export function registerIpc(): void {
     secretRefsIn(aulaYaml(groupOf(classId)))
   )
 
-  // The classroom password. It is the same on every machine and the same all
-  // year, so it is typed once and remembered encrypted; the value travels to
-  // the engine through stdin and nowhere else (ADR-0023).
-  ipcMain.handle(IPC.rememberedPassword, (): string => rememberedPassword(settingsDir(), cipher))
-
-  ipcMain.handle(IPC.rememberPassword, (_e, password: unknown): boolean =>
-    rememberPassword(settingsDir(), cipher, typeof password === 'string' ? password : '')
-  )
-
-  ipcMain.handle(IPC.forgetPassword, (): void => forgetPassword(settingsDir()))
-
   ipcMain.handle(IPC.describe, (_e, paths: unknown): Description => {
     const raw = (paths ?? {}) as { examPath?: unknown }
     return { exam: typeof raw.examPath === 'string' ? describeExam(raw.examPath) : null }
@@ -437,8 +414,8 @@ export function registerIpc(): void {
   ipcMain.handle(IPC.listClasses, (): ClassGroup[] => readClasses(settingsDir()))
 
   // Whatever the renderer sends is read back through the model before it is
-  // written, so a field that is not part of a class —a password above all—
-  // never reaches the disk (ADR-0009, ADR-0021 §4).
+  // written, so a field that is not part of a class —a password per student
+  // above all— never reaches the disk (ADR-0030).
   ipcMain.handle(IPC.saveClasses, (_e, classes: unknown): void => {
     if (!Array.isArray(classes)) throw new Error('No hay ninguna lista de clases que guardar.')
     const groups = classes.map(readGroup).filter((group): group is ClassGroup => group !== null)
