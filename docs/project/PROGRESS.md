@@ -5,10 +5,16 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**Versión 1.0.0 publicada** (AppImage, .deb y SHA256SUMS en GitHub), por
-decisión de Adrià antes del examen real de aula (T084 sigue pendiente).
-README reescrito como recorrido del profesor (clase, examen, corregir,
-resultados, informes) con el formato del examen y un prompt para IA.
+**El actualizador en sesiones cortas** (rama `fix/actualizador-sesiones-cortas`,
+sin publicar). La 0.9.2 de Adrià no pasó sola a la 1.0.0: la abrió 18 s y la
+comprobación esperaba un minuto. Ahora comprueba a los 10 s, la descarga solo
+se abandona tras un minuto parada (tope 30 min) y el registro va a
+`~/.config/heimdall-gui/logs/actualizacion.log`. Probado con un AppImage
+0.9.9 real que se actualizó solo a la 1.0.0 publicada
+([evidencia](../reviews/evidence/actualizador-sesiones-cortas/RESULTADOS.md)).
+Llega a las aulas con la próxima versión.
+
+**Versión 1.0.0 publicada** antes del examen real de aula (T084 pendiente).
 
 **T188 · El informe se deja en la máquina de cada alumno (ADR-0031).**
 
@@ -20,9 +26,7 @@ resultados, informes) con el formato del examen y un prompt para IA.
   y la máquina presenta la misma identidad; si no, dice por qué.
 - Tras enviar: a quién le ha llegado, a quién no y el motivo; «Volver a
   enviar». Una máquina apagada no retrasa a las demás.
-- Retirado el guardado de informes en carpeta local de T185.
-- Go (valor envenenado, nombres, PLAN cambiado), integración SSH, GUI y
-  `make gui-informes` con tres máquinas y una apagada
+- Retirado el guardado local de T185
   ([evidencias](../reviews/evidence/T188/RESULTADOS.md)).
 
 ## Problemas conocidos y límites
