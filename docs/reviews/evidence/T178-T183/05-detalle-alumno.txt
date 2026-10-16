@@ -1,0 +1,64 @@
+Heimdall
+Inicio
+Clases
+El examen
+Corregir
+Resultados
+Analíticas
+Histórico
+Ajustes
+Ayuda
+Motor listo · 0.9.1
+Modo proyector
+Tema claro
+Volver
+Carla Demo
+3/5 superadas
+4,3Suspenso
+Fundamentos de redes
+OK
+Puerto de HTTPS
+Bien · peso 1
+OK
+Puerto de SSH
+Bien · peso 1
+OK
+Puerto de DNS
+Bien · peso 1
+La comprobación
+
+p3 · Carla Demo
+
+Puerto de DNS
+
+Bien
+Peso: 1
+Fundamentos de redes
+
+QUÉ SE ESPERABA
+
+equals · Esperado: 53
+
+Encontrado: 53
+
+COMANDO EJECUTADO
+
+echo 53
+
+Máquina: alumno@127.1.2.3:2201 · Código de salida: 0 · Duración: 2 ms · Intentos: 1/1
+
+SALIDA
+
+53
+
+
+ERRORES
+
+sin salida
+
+✕
+Asignación automática de IP
+Mal · peso 1
+✕
+Resolución de nombres
+Mal · peso 1

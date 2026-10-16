@@ -1,0 +1,59 @@
+Heimdall
+Inicio
+Clases
+El examen
+Corregir
+Resultados
+Analíticas
+Histórico
+Ajustes
+Ayuda
+Motor listo · 0.9.1
+Modo proyector
+Tema claro
+Clase habitual · puerto 22
+Nombre de la clase
+Usuario común
+Aplicar a todos
+Usuario por alumno
+Puertos SSH
+Puerto 22 por defecto
+Alumnos
+
+Aquí no se guarda ninguna contraseña: se teclean al corregir y no se escriben en ningún sitio.
+
+Añadir columna
+Pegar alumnos
+Añadir alumno
+IDENTIFICADOR	NOMBRE Y APELLIDOS	CORREO O MOODLE	MÁQUINA	
+
+	
+	
+	
+	
+
+
+	
+	
+	
+	
+
+
+	
+	
+	
+	
+
+
+	
+	
+	
+	
+
+
+	
+	
+	
+	
+Guardar
+Cancelar

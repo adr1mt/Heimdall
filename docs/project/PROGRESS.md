@@ -1,23 +1,26 @@
 # Estado del proyecto
 
 Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
-**Actualizado**: 2026-10-14 · **Fase**: 9 — Endurecimiento y publicación
+**Actualizado**: 2026-10-16 · **Fase**: 9 — Endurecimiento y publicación
 
 ## Última sesión
 
-**T177 · Aviso visible al fallar la apertura de resultados.**
+**T178–T183 · Interfaz simplificada según la comparación con Teuton GUI.**
 
-- Si no se pueden abrir las notas, el motivo aparece en la pantalla actual,
-  también proyectando. Se retira el texto obsoleto de «siguiente entrega».
-- Go, 531 pruebas GUI y compilación correctos. Los cuatro timeouts de cierre
-  y recuperación eran restricciones del entorno a procesos hijos (EPERM):
-  las 13 pruebas focalizadas pasan con permiso, sin tocar guardado ni copias.
-- Arnés Electron reproduce el fallo antes y pasa después; capturas revisadas.
-  [Evidencia T177](../reviews/evidence/T177/RESULTADOS.md).
-- Aula GISAR y proyector físico no probados; se mantienen en T070/T084.
+- Editor solo YAML con Monaco local; colores, pegado, búsqueda y Ctrl+S.
+  Validación antes de guardar y conservación exacta del texto.
+- Corregir con recuadro de modo examen y lista previa; resultados coloreados,
+  detalle por alumno, cuatro secciones de analíticas y proyección simplificada.
+- Usuario común, puerto 22 oculto, ayuda con índice y vista previa de notas.
+- Go, 536 pruebas GUI, tipos y compilación correctos. Demo real por SSH con
+  cinco alumnos: 100/80/60/40/20; máquina inaccesible sin nota, nunca cero.
+- Editor, navegación, YAML inválido, primera ronda y parada verificados en
+  Electron. Capturas oscuro/claro/proyector inspeccionadas.
+  [Galería e informe](../reviews/evidence/T178-T183/RESULTADOS.md).
+- Aula GISAR y proyector físico siguen pendientes en T070/T084.
 
-**Contexto anterior:** T176 retiró las lecturas compartidas a petición de Adrià;
-ADR-0029 sustituye ADR-0028. T172 cerró las reparaciones de T166.
+**Contexto anterior:** T177 avisa de errores al abrir resultados; T176 retiró
+las lecturas compartidas (ADR-0029). T172 cerró las reparaciones de T166.
 [Auditoría T166](../reviews/T166-AUDITORIA.md).
 
 ## Problemas conocidos y límites
@@ -34,8 +37,8 @@ ADR-0029 sustituye ADR-0028. T172 cerró las reparaciones de T166.
 - Copias conservan notas y procedencia, sin salidas. Recuperación no sobrescribe.
 - Cierre normal espera resultado y copia; cierre forzado puede interrumpirlo.
 - Linux x64. Actualización automática solo AppImage; .deb mediante apt.
-- Editor formulario reformatea YAML; edición directa conserva texto.
-  Autenticación por clave SSH pendiente (T023), sin caso de uso aún.
+- Editor YAML conserva texto; Monaco se empaqueta en un chunk diferido local.
+- Autenticación por clave SSH pendiente (T023), sin caso de uso aún.
 
 ## Siguiente trabajo
 

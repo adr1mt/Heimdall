@@ -1,0 +1,90 @@
+Heimdall
+Inicio
+Clases
+El examen
+Corregir
+Resultados
+Analíticas
+Histórico
+Ajustes
+Ayuda
+Motor listo · 0.9.1
+Modo proyector
+Tema oscuro
+Clase guardada.
+El examen: Redes de prueba
+examen.yaml
+Validar
+Guardar
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+# Demo ficticia: conservar este comentario.
+examen: Redes de prueba
+version: 1
+hosts: [host1]
+por_defecto: { peso: 1, timeout: 10s }
+grupos:
+  - grupo: Fundamentos de redes
+    comprobaciones:
+      - id: p1
+        descripcion: Puerto de HTTPS
+        en: host1
+        cmd: ["echo", "${alumno.p1}"]
+        igual_a: "443"
+      - id: p2
+        descripcion: Puerto de SSH
+        en: host1
+        cmd: ["echo", "${alumno.p2}"]
+        igual_a: "22"
+      - id: p3
+        descripcion: Puerto de DNS
+        en: host1
+        cmd: ["echo", "${alumno.p3}"]
+        igual_a: "53"
+      - id: p4
+        descripcion: Asignación automática de IP
+        en: host1
+        cmd: ["echo", "${alumno.p4}"]
+        igual_a: "dhcp"
+      - id: p5
+        descripcion: Resolución de nombres
+        en: host1
+        cmd: ["echo", "${alumno.p5}"]
+        igual_a: "dns"
+# Pegado y guardado con Ctrl+S.
+YAML · 2 espacios · Ctrl+F buscar · Ctrl+S guardar
+Ayuda del examen

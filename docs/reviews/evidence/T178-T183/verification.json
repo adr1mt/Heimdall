@@ -1,0 +1,28 @@
+{
+  "grades": [
+    100,
+    80,
+    60,
+    40,
+    20
+  ],
+  "offlineGrade": null,
+  "ok": true,
+  "base": "/tmp/heimdall-ui-zcVnfq",
+  "checks": [
+    "YAML editor offline and syntax colours",
+    "paste, Ctrl+S and byte preservation",
+    "unsaved guard",
+    "invalid draft does not overwrite",
+    "malformed source reopens for repair",
+    "real SSH correction, five students",
+    "list, matrix and student detail",
+    "analytics, help, grading preview",
+    "default port hidden; custom port and shared user survive save and reopen",
+    "light and dark themes",
+    "projector",
+    "offline student",
+    "first automatic exam round and stop"
+  ],
+  "consoleErrors": []
+}

@@ -70,6 +70,11 @@ funciona en un equipo sin nada instalado.
 | Máquina | dónde está su equipo | `10.0.2.31` |
 | Usuario | con qué cuenta se entra | `alumno` |
 
+El usuario inicial es `usuario`. Puedes cambiar **Usuario común** y pulsar
+**Aplicar a todos**, o activar **Usuario por alumno** para las excepciones.
+El puerto habitual, 22, queda oculto: activa **Puertos SSH** para otro puerto.
+Los valores personalizados se conservan al ocultar la columna.
+
 Aquí **no se escribe ninguna contraseña**. Esta lista se reutiliza en todos
 los exámenes del curso.
 
@@ -80,15 +85,17 @@ que le tocó—, añade una columna tuya y rellénala. El examen la lee con
 ### 4.2 Abre o escribe el examen
 
 **Inicio → Nuevo…** crea una carpeta con su examen dentro. **El examen** es
-la pantalla donde se escribe cada comprobación en un formulario: qué comando
-se ejecuta en qué máquina, qué se espera y cuánto pesa.
+un editor YAML con colores, números de línea y búsqueda. Puedes escribir el
+examen o pegarlo completo: grupos, comandos, expectativas y pesos se definen
+en ese mismo texto.
 
 Si ya tienes el examen escrito, **Inicio → Abrir…** y elige su carpeta.
 
-**Guardar el examen** valida y guarda el borrador visible. Si el YAML contiene
+**Guardar** (o **Ctrl+S**) valida y guarda el borrador visible. Si el YAML contiene
 un error, lo conserva y bloquea el guardado hasta corregirlo. Al salir con cambios
-pendientes puedes volver al editor o descartarlos. Guardar desde la vista YAML
-conserva su texto y comentarios; editar en el formulario vuelve a formatearlo.
+pendientes puedes volver al editor o descartarlos. El guardado conserva
+el texto y los comentarios, sin reformatearlo. **Validar** permite comprobar
+el borrador con la clase elegida antes de guardarlo.
 Los pesos admiten decimales y cero para comprobaciones diagnósticas.
 
 ### 4.3 Corrige
@@ -98,7 +105,8 @@ Los pesos admiten decimales y cero para comprobaciones diagnósticas.
 La contraseña se guarda cifrada en tu ordenador, así que solo se escribe la
 primera vez. Se olvida desde **Ajustes**.
 
-Verás cada alumno avanzar en tiempo real.
+Antes de ejecutar verás el examen, la clase y los alumnos que se evaluarán.
+Después verás cada alumno avanzar en tiempo real.
 
 ### 4.4 Mira y publica las notas
 
@@ -106,18 +114,29 @@ Verás cada alumno avanzar en tiempo real.
 qué comando se ejecutó, qué contestó la máquina y qué se esperaba. Un suspenso
 siempre se puede enseñar; una avería también.
 
+La lista y la matriz muestran aprobados en verde, suspensos en rojo y
+comprobaciones pendientes en ámbar. Pulsa el nombre de un alumno para ver
+sus comprobaciones agrupadas, y cada comprobación para abrir su evidencia.
+Los filtros y la explicación de los estados están plegados.
+
 Desde ahí se exportan:
 
-- la **hoja de notas**, para ti;
+- la **hoja de notas**, en el menú de más opciones;
 - el **CSV de Moodle**, para subirlo.
 
 La escala —sobre 10, sobre 100— y dónde cae el aprobado se eligen en
 **Ajustes**. La corrección guardada no cambia: el motor siempre calcula sobre
-100 y la conversión es solo para leerlas.
+100 y la conversión es solo para leerlas. La vista previa muestra ejemplos
+de notas con esa escala.
+
+**Analíticas** reúne atención prioritaria, comprobaciones más falladas,
+distribución de puntos y tasa de éxito por grupo. Sin nota final, un alumno
+queda fuera de la media y de la distribución; nunca cuenta como un cero.
 
 ## 5. Mientras dura la práctica: el modo examen
 
-En **Corregir** puedes encender el **modo examen**: corrige la clase una y
+En **Corregir**, el recuadro **Modo examen** permite elegir el intervalo y
+pulsar **Iniciar modo examen**: corrige la clase una y
 otra vez mientras dura la práctica, con el intervalo que le digas (5 minutos
 como mínimo). Cada alumno se queda con su **mejor vuelta entera**, y en
 pantalla se dice de qué vuelta sale su nota.

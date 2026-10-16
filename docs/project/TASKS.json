@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated": "2026-10-14",
+  "updated": "2026-10-16",
   "status_values": [
     "BLOCKED",
     "READY",
@@ -3650,6 +3650,181 @@
       ],
       "notes": "Aviso global ante fallo de lectura; texto obsoleto retirado. Go, 531 pruebas GUI y build correctos. Los cuatro timeouts eran restricciones a procesos hijos (EPERM): 13/13 pruebas focalizadas pasan sin cambios. Arnés Electron rojo antes/verde después, capturas inspeccionadas. Evidencia docs/reviews/evidence/T177/RESULTADOS.md. Aula y proyector físico pendientes en T084.",
       "completed": "2026-10-14"
+    },
+    {
+      "id": "T178",
+      "title": "Editor YAML como único editor del examen",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "package": "GUI-TEUTON-20261015",
+      "depends_on": [
+        "T177"
+      ],
+      "goal": "Aplicar el feedback explícito de Adrià sobre las 21 comparaciones, conservando el motor y las garantías de nota.",
+      "scope": [
+        "gui/src/renderer/",
+        "gui/tests/",
+        "gui/scripts/",
+        "docs/"
+      ],
+      "acceptance": [
+        "Editor con colores, números de línea, buscar, deshacer, pegar y Ctrl+S, sin formulario ni editor de comprobaciones.",
+        "Se mantienen los bytes escritos, la validación del motor y la protección de cambios sin guardar."
+      ],
+      "tests": [
+        "make check gui-check gui-build",
+        "Arnés Electron de demo y capturas",
+        "make docs-check tools-check"
+      ],
+      "completed": "2026-10-16",
+      "notes": "Interfaz implementada y verificada con motor real, cinco alumnos ficticios, estados técnicos y edición YAML. 536 pruebas GUI, Go, tipos y build correctos. Evidencia docs/reviews/evidence/T178-T183/RESULTADOS.md."
+    },
+    {
+      "id": "T179",
+      "title": "Corregir con el flujo de Teuton GUI",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "package": "GUI-TEUTON-20261015",
+      "depends_on": [
+        "T177"
+      ],
+      "goal": "Aplicar el feedback explícito de Adrià sobre las 21 comparaciones, conservando el motor y las garantías de nota.",
+      "scope": [
+        "gui/src/renderer/",
+        "gui/tests/",
+        "gui/scripts/",
+        "docs/"
+      ],
+      "acceptance": [
+        "Examen y clase visibles, acción principal en cabecera y recuadro independiente de modo examen.",
+        "Lista de alumnos visible antes de ejecutar, progreso real y parada conservados; intervalos vigentes y lógica de sesión intactos."
+      ],
+      "tests": [
+        "make check gui-check gui-build",
+        "Arnés Electron de demo y capturas",
+        "make docs-check tools-check"
+      ],
+      "completed": "2026-10-16",
+      "notes": "Interfaz implementada y verificada con motor real, cinco alumnos ficticios, estados técnicos y edición YAML. 536 pruebas GUI, Go, tipos y build correctos. Evidencia docs/reviews/evidence/T178-T183/RESULTADOS.md."
+    },
+    {
+      "id": "T180",
+      "title": "Resultados y proyección centrados en las notas",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "package": "GUI-TEUTON-20261015",
+      "depends_on": [
+        "T177"
+      ],
+      "goal": "Aplicar el feedback explícito de Adrià sobre las 21 comparaciones, conservando el motor y las garantías de nota.",
+      "scope": [
+        "gui/src/renderer/",
+        "gui/tests/",
+        "gui/scripts/",
+        "docs/"
+      ],
+      "acceptance": [
+        "Aprobados verdes, suspensos rojos, problemas técnicos ámbar sin convertirlos en cero ni aprobación provisional.",
+        "Sin tarjeta explicativa permanente; lista y matriz compactas y detalle dedicado por alumno con nombres de comprobación.",
+        "Proyección sin exportación ni filtros administrativos; errores y datos incompletos siguen visibles."
+      ],
+      "tests": [
+        "make check gui-check gui-build",
+        "Arnés Electron de demo y capturas",
+        "make docs-check tools-check"
+      ],
+      "completed": "2026-10-16",
+      "notes": "Interfaz implementada y verificada con motor real, cinco alumnos ficticios, estados técnicos y edición YAML. 536 pruebas GUI, Go, tipos y build correctos. Evidencia docs/reviews/evidence/T178-T183/RESULTADOS.md."
+    },
+    {
+      "id": "T181",
+      "title": "Analíticas como Teuton GUI sobre datos nativos",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "package": "GUI-TEUTON-20261015",
+      "depends_on": [
+        "T177"
+      ],
+      "goal": "Aplicar el feedback explícito de Adrià sobre las 21 comparaciones, conservando el motor y las garantías de nota.",
+      "scope": [
+        "gui/src/renderer/",
+        "gui/tests/",
+        "gui/scripts/",
+        "docs/"
+      ],
+      "acceptance": [
+        "Atención prioritaria, objetivos fallados, distribución y tasa por grupo, con gráficos y acceso a Resultados.",
+        "Sin nota final no entra como cero en distribuciones ni medias; datos derivan del artefacto nativo."
+      ],
+      "tests": [
+        "make check gui-check gui-build",
+        "Arnés Electron de demo y capturas",
+        "make docs-check tools-check"
+      ],
+      "completed": "2026-10-16",
+      "notes": "Interfaz implementada y verificada con motor real, cinco alumnos ficticios, estados técnicos y edición YAML. 536 pruebas GUI, Go, tipos y build correctos. Evidencia docs/reviews/evidence/T178-T183/RESULTADOS.md."
+    },
+    {
+      "id": "T182",
+      "title": "Clases, ayuda y vista previa de notas",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "package": "GUI-TEUTON-20261015",
+      "depends_on": [
+        "T177"
+      ],
+      "goal": "Aplicar el feedback explícito de Adrià sobre las 21 comparaciones, conservando el motor y las garantías de nota.",
+      "scope": [
+        "gui/src/renderer/",
+        "gui/tests/",
+        "gui/scripts/",
+        "docs/"
+      ],
+      "acceptance": [
+        "Puerto 22 oculto por defecto, excepciones accesibles sin perder valores; edición de usuario común sin cambiar el formato persistido.",
+        "Ayuda con índice y flujo completo, YAML y grupos/pesos documentados, vista previa de escala de notas."
+      ],
+      "tests": [
+        "make check gui-check gui-build",
+        "Arnés Electron de demo y capturas",
+        "make docs-check tools-check"
+      ],
+      "completed": "2026-10-16",
+      "notes": "Interfaz implementada y verificada con motor real, cinco alumnos ficticios, estados técnicos y edición YAML. 536 pruebas GUI, Go, tipos y build correctos. Evidencia docs/reviews/evidence/T178-T183/RESULTADOS.md."
+    },
+    {
+      "id": "T183",
+      "title": "Verificar la interfaz con la demo de cinco alumnos",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "package": "GUI-TEUTON-20261015",
+      "depends_on": [
+        "T177"
+      ],
+      "goal": "Aplicar el feedback explícito de Adrià sobre las 21 comparaciones, conservando el motor y las garantías de nota.",
+      "scope": [
+        "gui/src/renderer/",
+        "gui/tests/",
+        "gui/scripts/",
+        "docs/"
+      ],
+      "acceptance": [
+        "Pruebas rápidas, tipos y compilación correctos; capturas nuevas revisadas en temas claro/oscuro y proyección.",
+        "Guardar evidencias de corrección real y de editor/estados técnicos; repositorio documentado y commit local sin push."
+      ],
+      "tests": [
+        "make check gui-check gui-build",
+        "Arnés Electron de demo y capturas",
+        "make docs-check tools-check"
+      ],
+      "completed": "2026-10-16",
+      "notes": "Interfaz implementada y verificada con motor real, cinco alumnos ficticios, estados técnicos y edición YAML. 536 pruebas GUI, Go, tipos y build correctos. Evidencia docs/reviews/evidence/T178-T183/RESULTADOS.md."
     }
   ]
 }

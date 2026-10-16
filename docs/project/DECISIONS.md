@@ -789,3 +789,22 @@ ahorro local modesto. ADR-0029 sustituye ADR-0028. Motor, parser y formulario
 vuelven al estado previo a T173; se retiran arneses y fixtures exclusivos.
 La medición se conserva como evidencia histórica, sin instrucciones activas
 para una función que ya no existe. No se añade optimización automática.
+
+## T178–T183 · Simplificar la GUI tomando Teuton GUI como referencia (2026-10-16)
+
+Adrià revisa las 21 parejas de capturas y fija la dirección: retirar el
+formulario de exámenes y trabajar solo en YAML; recuperar el recuadro de
+modo examen, resultados coloreados, detalle por alumno, cuatro secciones de
+analíticas, ayuda con índice y vista previa de notas. Puerto 22 oculto y
+usuario común editable, manteniendo las excepciones. Histórico se conserva.
+
+Monaco se empaqueta localmente y se carga al abrir el editor: colores, búsqueda,
+deshacer y Ctrl+S sin CDN. El motor sigue validando el texto antes de escribirlo.
+Grupos, pesos y comentarios no pasan por un serializador de formulario.
+La nueva presentación lee el artefacto nativo y la escala existente. No cambia
+el contrato, el cálculo de notas ni la lógica del modo examen. Los incidentes
+técnicos conservan su causa y no se representan como ceros o suspensos.
+El proyector oculta controles y el aviso informativo HOST_KEY_ACCEPTED; los
+avisos que requieren actuación siguen disponibles.
+
+[Evidencia y límites](../reviews/evidence/T178-T183/RESULTADOS.md).

@@ -1,0 +1,65 @@
+Heimdall
+Inicio
+Clases
+El examen
+Corregir
+Resultados
+Analíticas
+Histórico
+Ajustes
+Ayuda
+Motor listo · 0.9.1
+Modo proyector
+Tema claro
+Analíticas
+5 alumnos · media 4,3 · 2 aprobados
+Atención prioritaria 3
+
+Primero los problemas técnicos; después, las notas por debajo del aprobado.
+
+Alumno	Nota	Objetivos	Atención
+Elena Demo	1,4	4/5 fallados	Por debajo del aprobado
+Diego Demo	2,9	3/5 fallados	Por debajo del aprobado
+Carla Demo	4,3	2/5 fallados	Por debajo del aprobado
+Ver la lista completa en Resultados →
+Objetivos fallados con más frecuencia
+
+Número de alumnos que no superan cada comprobación.
+
+Resolución de nombres
+4×
+Asignación automática de IP
+3×
+Puerto de DNS
+2×
+Puerto de SSH
+1×
+Distribución de notas
+
+Aprobado a partir de 70 puntos de 100.
+
+aprobado ≥ 70
+0
+10
+1
+20
+30
+1
+40
+50
+1
+60
+70
+1
+80
+1
+90
+
+Puntos del motor · último intervalo: 90–100
+
+Tasa de éxito por grupo
+
+Comprobaciones superadas entre las evaluadas de cada grupo.
+
+Fundamentos de redes
+60%

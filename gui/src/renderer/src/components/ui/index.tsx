@@ -277,7 +277,7 @@ export function Meter({
 }: {
   value: number
   total: number
-  tone?: 'pass' | 'fail' | 'neutral'
+  tone?: 'pass' | 'fail' | 'neutral' | 'warning'
   className?: string
 }) {
   const pct = total > 0 ? Math.round((value / total) * 100) : 0
@@ -290,7 +290,7 @@ export function Meter({
       <div
         className={cn(
           'h-full rounded-full transition-[width] duration-300 ease-out',
-          tone === 'pass' ? 'bg-success' : tone === 'fail' ? 'bg-destructive' : 'bg-muted-foreground/50'
+          tone === 'pass' ? 'bg-success' : tone === 'fail' ? 'bg-destructive' : tone === 'warning' ? 'bg-warning' : 'bg-muted-foreground/50'
         )}
         style={{ width: `${pct}%` }}
       />

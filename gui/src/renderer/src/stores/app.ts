@@ -21,9 +21,6 @@ export interface EditorDraft {
   path: string
   text: string
   savedText: string
-  yamlView: boolean
-  /** In-progress form fields may not be valid YAML numbers yet. */
-  formExam?: import('../../../shared/exam').Exam
 }
 type Navigation = { view: View } | { project: OpenProject | null }
 

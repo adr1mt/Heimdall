@@ -167,3 +167,24 @@ export function successByGroup(run: RunResult): GroupRate[] {
     }))
     .sort((a, b) => (a.rate ?? 101) - (b.rate ?? 101) || a.group.localeCompare(b.group, 'es'))
 }
+
+/** Ten bins over the canonical points; incomplete grades stay outside the plot. */
+export function gradeHistogram(run: RunResult, passMark: number) {
+  const bins = Array.from({ length: 10 }, (_, index) => ({ from: index * 10, passed: 0, failed: 0 }))
+  let ungraded = 0
+  for (const student of run.students.filter(counts)) {
+    const score = finalScore(student)
+    if (score === null) { ungraded++; continue }
+    const bin = bins[Math.min(9, Math.floor(score / 10))]
+    if (score >= passMark) bin.passed++
+    else bin.failed++
+  }
+  return { bins, ungraded }
+}
+
+/** Technical incidents first; then the lowest final grades. */
+export function attentionStudents(run: RunResult, passMark: number): StudentResult[] {
+  const technical = (student: StudentResult) => student.checks.some(check => check.status === 'UNEVALUATED')
+  return run.students.filter(student => counts(student) && (technical(student) || (finalScore(student) !== null && finalScore(student)! < passMark)))
+    .sort((a, b) => Number(technical(b)) - Number(technical(a)) || (finalScore(a) ?? -1) - (finalScore(b) ?? -1))
+}

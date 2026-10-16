@@ -1,0 +1,27 @@
+Salir del proyector
+Clase guardada.
+Resultados
+5 alumnos · 5 comprobaciones
+Lista
+Matriz
+2/5
+APROBADOS
+De los 5 alumnos de la clase
+4,3
+NOTA MEDIA
+Aprobado a partir de 5,0 sobre 10
+3
+REQUIEREN ATENCIÓN
+OK
+superada
+✕
+fallada
+?
+sin evaluar
+COMPROBACIÓN	Ana	Bruno	Carla	Diego	Elena
+Puerto de HTTPS ×1	OK	OK	OK	OK	OK
+Puerto de SSH ×1	OK	OK	OK	OK	✕
+Puerto de DNS ×1	OK	OK	OK	✕	✕
+Asignación automática de IP ×1	OK	OK	✕	✕	✕
+Resolución de nombres ×1	OK	✕	✕	✕	✕
+Nota	10,0	6,7	4,3	2,9	1,4

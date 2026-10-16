@@ -1,0 +1,57 @@
+Heimdall
+Inicio
+Clases
+El examen
+Corregir
+Resultados
+Analíticas
+Histórico
+Ajustes
+Ayuda
+Motor listo · 0.9.1
+Modo proyector
+Tema claro
+Corregir
+Corregir
+EXAMEN
+
+Redes de prueba
+
+5 comprobaciones
+
+CLASE
+
+Clase demo · 5 alumnos
+
+Sin clase elegida
+Clase demo
+Demo con una máquina apagada
+Clase habitual · puerto 22
+Contraseña del aula
+Modo examen
+
+Reevalúa la clase automáticamente mientras el alumnado trabaja.
+
+Intervalo:
+5 min
+10 min
+15 min
+30 min
+
+Se conserva la mejor nota completa de cada alumno.
+
+Iniciar modo examen
+Alumnos a evaluar 5
+
+Se evaluará toda la clase.
+
+1
+Ana Demo
+2
+Bruno Demo
+3
+Carla Demo
+4
+Diego Demo
+5
+Elena Demo

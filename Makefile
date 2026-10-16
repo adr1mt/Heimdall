@@ -97,7 +97,7 @@ gui-lab:
 	cd gui && ./scripts/secretos.sh
 
 ## gui-editor: write an exam from the application's editor and correct the lab
-## with it (T109). Needs `make build`, `make gui-build` and `make lab`.
+## with it (T178–T183). Needs `make build`, `make gui-build` and `make lab`.
 gui-editor:
 	cd gui && HEIMDALL_ENGINE=$(PWD)/bin/heimdall LAB_SECRET=HEIMDALL_SECRET_TEST_12345 npm run --silent editor-lab
 

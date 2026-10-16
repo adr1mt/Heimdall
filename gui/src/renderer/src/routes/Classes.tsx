@@ -65,7 +65,12 @@ export default function ClassesView() {
   }
 
   function startNew(): void {
-    setDraft({ id: crypto.randomUUID(), name: '', columns: [], students: [emptyStudent()] })
+    setDraft({
+      id: crypto.randomUUID(),
+      name: '',
+      columns: [],
+      students: [{ ...emptyStudent(), user: 'usuario' }]
+    })
   }
 
   async function duplicate(group: ClassGroup): Promise<void> {
@@ -257,10 +262,15 @@ function ClassDetail({
                 <th className="px-2 py-1.5 font-normal">{t.classes.col.name}</th>
                 <th className="px-2 py-1.5 font-normal">{t.classes.col.contact}</th>
                 <th className="px-2 py-1.5 font-normal">{t.classes.col.host}</th>
-                <th className="px-2 py-1.5 font-normal">{t.classes.col.port}</th>
+                {group.students.some((student) => student.port && student.port !== '22') && (
+                  <th className="px-2 py-1.5 font-normal">{t.classes.col.port}</th>
+                )}
                 <th className="px-2 py-1.5 font-normal">{t.classes.col.user}</th>
                 {group.columns.map((column) => (
-                  <th key={column} className="px-2 py-1.5 font-mono font-normal normal-case tracking-normal">
+                  <th
+                    key={column}
+                    className="px-2 py-1.5 font-mono font-normal normal-case tracking-normal"
+                  >
                     {column}
                   </th>
                 ))}
@@ -273,7 +283,9 @@ function ClassDetail({
                   <td className="px-2 py-1.5">{student.name || '—'}</td>
                   <td className="px-2 py-1.5">{student.contact || '—'}</td>
                   <td className="px-2 py-1.5 font-mono">{student.host || '—'}</td>
-                  <td className="px-2 py-1.5 font-mono">{student.port || '22'}</td>
+                  {group.students.some((other) => other.port && other.port !== '22') && (
+                    <td className="px-2 py-1.5 font-mono">{student.port || '22'}</td>
+                  )}
                   <td className="px-2 py-1.5 font-mono">{student.user || '—'}</td>
                   {group.columns.map((column) => (
                     <td key={column} className="px-2 py-1.5 font-mono">
@@ -313,6 +325,13 @@ function ClassEditor({
   onSave: (group: ClassGroup) => void
 }) {
   const problem = problemWith(draft, others)
+  const [showPorts, setShowPorts] = useState(() =>
+    draft.students.some((student) => student.port && student.port !== '22')
+  )
+  const [commonUser, setCommonUser] = useState(() => draft.students[0]?.user || 'usuario')
+  const [showUsers, setShowUsers] = useState(
+    () => new Set(draft.students.map((student) => student.user)).size > 1
+  )
   const [addingColumn, setAddingColumn] = useState(false)
   const [removingColumn, setRemovingColumn] = useState<string | null>(null)
   const [pasting, setPasting] = useState(false)
@@ -320,7 +339,9 @@ function ClassEditor({
   function setStudent(index: number, patch: Partial<ClassStudent>): void {
     onChange({
       ...draft,
-      students: draft.students.map((student, i) => (i === index ? { ...student, ...patch } : student))
+      students: draft.students.map((student, i) =>
+        i === index ? { ...student, ...patch } : student
+      )
     })
   }
 
@@ -337,6 +358,55 @@ function ClassEditor({
           />
         </label>
 
+        <div className="flex flex-wrap items-end gap-3">
+          <label className="space-y-1 text-xs text-muted-foreground">
+            Usuario común
+            <Input
+              className="w-36"
+              aria-label="Usuario común"
+              value={commonUser}
+              onChange={(e) => setCommonUser(e.target.value)}
+            />
+          </label>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={!commonUser.trim()}
+            onClick={() =>
+              onChange({
+                ...draft,
+                students: draft.students.map((student) => ({ ...student, user: commonUser.trim() }))
+              })
+            }
+          >
+            Aplicar a todos
+          </Button>
+          <label className="flex items-center gap-2 py-2 text-xs">
+            <input
+              type="checkbox"
+              checked={showUsers}
+              onChange={(e) => setShowUsers(e.target.checked)}
+            />
+            Usuario por alumno
+          </label>
+          <label className="flex items-center gap-2 py-2 text-xs">
+            <input
+              type="checkbox"
+              checked={showPorts}
+              onChange={(e) => setShowPorts(e.target.checked)}
+            />
+            Puertos SSH
+          </label>
+          {!showPorts && (
+            <span className="py-2 text-xs text-muted-foreground">
+              Puerto 22 por defecto
+              {draft.students.some((student) => student.port && student.port !== '22')
+                ? ' · hay puertos personalizados'
+                : ''}
+            </span>
+          )}
+        </div>
+
         <SectionTitle
           hint={t.classes.noPasswords}
           actions={
@@ -352,7 +422,12 @@ function ClassEditor({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => onChange({ ...draft, students: [...draft.students, emptyStudent()] })}
+                onClick={() =>
+                  onChange({
+                    ...draft,
+                    students: [...draft.students, { ...emptyStudent(), user: commonUser }]
+                  })
+                }
               >
                 <Plus className="h-4 w-4" />
                 {t.classes.addStudent}
@@ -385,6 +460,7 @@ function ClassEditor({
             draft={draft}
             onCancel={() => setPasting(false)}
             onAdd={(students, columns) => {
+              if (students.some((student) => student.user !== commonUser)) setShowUsers(true)
               onChange({
                 ...draft,
                 columns: [...draft.columns, ...columns],
@@ -412,10 +488,12 @@ function ClassEditor({
                 <th className={cn('font-normal', STICKY_NAME)}>{t.classes.col.name}</th>
                 <th className="font-normal">{t.classes.col.contact}</th>
                 <th className="font-normal">{t.classes.col.host}</th>
-                <th className="font-normal" title={t.classes.portHint}>
-                  {t.classes.col.port}
-                </th>
-                <th className="font-normal">{t.classes.col.user}</th>
+                {showPorts && (
+                  <th className="font-normal" title={t.classes.portHint}>
+                    {t.classes.col.port}
+                  </th>
+                )}
+                {showUsers && <th className="font-normal">{t.classes.col.user}</th>}
                 {draft.columns.map((column) => (
                   <th key={column} className="font-normal">
                     <span className="flex items-center gap-1">
@@ -466,21 +544,25 @@ function ClassEditor({
                       onChange={(e) => setStudent(index, { host: e.target.value })}
                     />
                   </td>
-                  <td className="w-20">
-                    <Input
-                      aria-label={t.classes.col.port}
-                      placeholder="22"
-                      value={student.port}
-                      onChange={(e) => setStudent(index, { port: e.target.value })}
-                    />
-                  </td>
-                  <td className="w-28">
-                    <Input
-                      aria-label={t.classes.col.user}
-                      value={student.user}
-                      onChange={(e) => setStudent(index, { user: e.target.value })}
-                    />
-                  </td>
+                  {showPorts && (
+                    <td className="w-20">
+                      <Input
+                        aria-label={t.classes.col.port}
+                        placeholder="22"
+                        value={student.port}
+                        onChange={(e) => setStudent(index, { port: e.target.value })}
+                      />
+                    </td>
+                  )}
+                  {showUsers && (
+                    <td className="w-28">
+                      <Input
+                        aria-label={t.classes.col.user}
+                        value={student.user}
+                        onChange={(e) => setStudent(index, { user: e.target.value })}
+                      />
+                    </td>
+                  )}
                   {draft.columns.map((column) => (
                     <td key={column} className="w-36">
                       <Input
@@ -501,7 +583,10 @@ function ClassEditor({
                       aria-label={t.classes.removeStudent}
                       title={t.classes.removeStudent}
                       onClick={() =>
-                        onChange({ ...draft, students: draft.students.filter((_, i) => i !== index) })
+                        onChange({
+                          ...draft,
+                          students: draft.students.filter((_, i) => i !== index)
+                        })
                       }
                     >
                       <Trash2 className="h-4 w-4" />
@@ -585,7 +670,11 @@ function ColumnAdder({
             if (e.key === 'Enter' && !problem && name.trim()) onAdd(name.trim())
           }}
         />
-        <Button size="sm" disabled={!name.trim() || problem !== null} onClick={() => onAdd(name.trim())}>
+        <Button
+          size="sm"
+          disabled={!name.trim() || problem !== null}
+          onClick={() => onAdd(name.trim())}
+        >
           {t.classes.columnAdd}
         </Button>
         <Button variant="ghost" size="sm" onClick={onCancel}>

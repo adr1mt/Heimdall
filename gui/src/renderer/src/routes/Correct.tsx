@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Download, FileText, Layers, Play, RotateCcw, Square, Timer, Users } from 'lucide-react'
+import { Download, FileText, Layers, Play, Square, Timer, Users } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -30,12 +30,7 @@ import {
 } from '@/lib/session'
 import { scoreView } from '@/lib/results'
 
-import {
-  sessionCsv,
-  sessionCsvName,
-  sessionExportSummary,
-  sessionGradeRows
-} from '@/lib/export'
+import { sessionCsv, sessionCsvName, sessionExportSummary, sessionGradeRows } from '@/lib/export'
 import { MoodleExportButton } from '@/components/MoodleExport'
 import { startCorrection } from '@/lib/start-run'
 import type { Session } from '../../../shared/session'
@@ -223,10 +218,28 @@ export default function CorrectView() {
 
   return (
     <div className="flex h-full flex-col">
-      <ViewHeader title={t.correct.title} />
+      <ViewHeader
+        title={t.correct.title}
+        actions={
+          busy ? (
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={run.cancelling}
+              onClick={() => setConfirmStop(true)}
+            >
+              <Square className="h-4 w-4" />
+              {run.cancelling ? t.run.cancelling : t.run.cancel}
+            </Button>
+          ) : (
+            <Button size="sm" disabled={!!missing || exam.active} onClick={() => void start()}>
+              <Play className="h-4 w-4" />
+              {retry ? t.run.retryStart : run.phase === 'finished' ? t.run.again : t.run.start}
+            </Button>
+          )
+        }
+      />
       <div className="min-h-0 flex-1 space-y-5 overflow-auto p-6">
-        <p className="max-w-3xl text-sm text-muted-foreground">{t.correct.hint}</p>
-
         <div className="grid gap-4 md:grid-cols-2">
           <ExamCard
             name={examPath ? (described.exam?.name ?? t.home.unnamed) : null}
@@ -237,7 +250,7 @@ export default function CorrectView() {
             group={group}
             groups={groups}
             missingClass={classId !== null && group === null}
-            disabled={busy}
+            disabled={busy || exam.active}
             onChoose={setClassId}
             onGoToClasses={() => setView('classes')}
           />
@@ -266,39 +279,18 @@ export default function CorrectView() {
           </div>
         )}
 
-        <div>
-          <SectionTitle>{t.correct.action}</SectionTitle>
-          <div className="flex flex-wrap items-center gap-3">
-            {busy ? (
-              <Button
-                variant="destructive"
-                disabled={run.cancelling}
-                onClick={() => setConfirmStop(true)}
-              >
-                <Square className="h-4 w-4" />
-                {run.cancelling ? t.run.cancelling : t.run.cancel}
-              </Button>
-            ) : (
-              <Button disabled={!!missing} onClick={() => void start()}>
-                {retry ? <RotateCcw className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                {retry ? t.run.retryStart : run.phase === 'finished' ? t.run.again : t.run.start}
-              </Button>
-            )}
-            <ExamControl
-              exam={exam}
-              disabled={!!missing && !exam.active}
-              onStart={(minutes) => void startExamMode(minutes)}
-              onStop={() => void stopExamMode()}
-            />
-            {missing && !busy && <span className="text-xs text-muted-foreground">{missing}</span>}
-          </div>
-          {exam.active && <p className="mt-2 text-xs text-muted-foreground">{t.exam.hint}</p>}
-        </div>
+        {missing && !busy && <p className="text-sm text-muted-foreground">{missing}</p>}
+        <ExamControl
+          exam={exam}
+          disabled={busy || !!missing}
+          onStart={(minutes) => void startExamMode(minutes)}
+          onStop={() => void stopExamMode()}
+        />
+        {group && !exam.active && run.phase === 'idle' && <PendingStudents group={group} />}
 
         {exam.active && (
           <>
             <ExamStrip exam={exam} percent={percent} session={examSession.session} />
-            <ExamRules minutes={exam.everyMinutes} />
             {!examSession.session && group && <PendingStudents group={group} />}
           </>
         )}
@@ -445,29 +437,20 @@ function Credentials({
   disabled: boolean
   onPassword: (value: string) => void
 }) {
+  if (!asked) return null
   return (
-    <div className="space-y-2 rounded-md border border-border p-4">
-      <p className="text-micro uppercase tracking-[0.09em] text-muted-foreground">
-        {t.credentials.title}
-      </p>
-      <p className="text-xs text-muted-foreground">
-        {asked ? t.credentials.hint : t.credentials.none}
-      </p>
-      {asked && (
-        <label className="flex items-center gap-3">
-          <span className="w-56 shrink-0 text-sm">{t.credentials.label}</span>
-          <Input
-            type="password"
-            autoComplete="off"
-            disabled={disabled}
-            aria-label={t.credentials.label}
-            placeholder={t.credentials.placeholder}
-            value={password}
-            onChange={(e) => onPassword(e.target.value)}
-          />
-        </label>
-      )}
-    </div>
+    <label className="flex max-w-xl items-center gap-3 text-sm">
+      <span className="shrink-0">Contraseña del aula</span>
+      <Input
+        type="password"
+        autoComplete="off"
+        disabled={disabled}
+        aria-label={t.credentials.label}
+        placeholder={t.credentials.placeholder}
+        value={password}
+        onChange={(e) => onPassword(e.target.value)}
+      />
+    </label>
   )
 }
 
@@ -489,29 +472,48 @@ function ExamControl({
 }) {
   const [minutes, setMinutes] = useState<number>(exam.everyMinutes)
 
-  if (exam.active) {
-    return (
-      <Button variant="outline" onClick={onStop}>
-        <Timer className="h-4 w-4" />
-        {t.exam.stop}
-      </Button>
-    )
-  }
-
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <Button variant="outline" disabled={disabled} onClick={() => onStart(minutes)}>
+    <section
+      className="max-w-xl space-y-3 rounded-md border border-border bg-card p-4"
+      aria-label="Modo examen"
+    >
+      <h2 className="flex items-center gap-2 text-sm font-semibold">
+        <Timer className="h-4 w-4 text-primary" />
+        Modo examen
+      </h2>
+      <p className="text-xs text-muted-foreground">
+        Reevalúa la clase automáticamente mientras el alumnado trabaja.
+      </p>
+      {!exam.active && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs">Intervalo:</span>
+          <Segmented>
+            {EXAM_INTERVALS.map((value) => (
+              <SegmentedItem
+                key={value}
+                active={value === minutes}
+                disabled={disabled}
+                onClick={() => setMinutes(value)}
+              >
+                {value} min
+              </SegmentedItem>
+            ))}
+          </Segmented>
+        </div>
+      )}
+      <p className="text-xs text-muted-foreground">
+        Se conserva la mejor nota completa de cada alumno.
+      </p>
+      <Button
+        className="w-full"
+        variant={exam.active ? 'destructive' : 'outline'}
+        disabled={!exam.active && disabled}
+        onClick={() => (exam.active ? onStop() : onStart(minutes))}
+      >
         <Timer className="h-4 w-4" />
-        {t.exam.start}
+        {exam.active ? 'Detener modo examen' : 'Iniciar modo examen'}
       </Button>
-      <Segmented>
-        {EXAM_INTERVALS.map((value) => (
-          <SegmentedItem key={value} active={value === minutes} onClick={() => setMinutes(value)}>
-            {t.exam.everyMinutes(value)}
-          </SegmentedItem>
-        ))}
-      </Segmented>
-    </div>
+    </section>
   )
 }
 
@@ -547,60 +549,52 @@ function ExamStrip({
 
   return (
     <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-5">
-      <Reading value={String(exam.passes)} label={t.exam.roundLabel} hint={t.exam.ofMinutes(exam.everyMinutes)} />
       <Reading
-        value={left === null ? t.exam.nowCorrecting : left >= 60 ? `${Math.ceil(left / 60)} min` : `${left} s`}
+        value={String(exam.passes)}
+        label={t.exam.roundLabel}
+        hint={t.exam.ofMinutes(exam.everyMinutes)}
+      />
+      <Reading
+        value={
+          left === null
+            ? t.exam.nowCorrecting
+            : left >= 60
+              ? `${Math.ceil(left / 60)} min`
+              : `${left} s`
+        }
         label={t.exam.nextLabel}
       />
-      <Reading value={active === null ? '—' : String(Math.max(active, 0))} label={t.exam.activeLabel} />
+      <Reading
+        value={active === null ? '—' : String(Math.max(active, 0))}
+        label={t.exam.activeLabel}
+      />
       <Reading value={tally === null ? '—' : String(tally.finished)} label={t.exam.finishedLabel} />
       <Reading value={percent === null ? '—' : `${percent}%`} label={t.exam.progressLabel} />
     </div>
   )
 }
 
-/**
- * The rule of exam mode, in words, next to the readings.
- *
- * The numbers up top say where the exam is; this says what will be done with
- * them, which is what the teacher is asked in the room: which round counts and
- * that a bad one cannot take a grade away.
- */
-function ExamRules({ minutes }: { minutes: number }) {
-  return (
-    <div className="space-y-1 rounded-md border border-border p-4">
-      <div className="flex items-center gap-2 text-sm font-medium">
-        <Timer className="h-4 w-4" />
-        {t.exam.ruleTitle}
-      </div>
-      <p className="max-w-3xl text-xs text-muted-foreground">{t.exam.ruleBest}</p>
-      <p className="max-w-3xl text-xs text-muted-foreground">{t.exam.ruleRound}</p>
-      <p className="max-w-3xl text-xs text-muted-foreground">{t.exam.ruleEvery(minutes)}</p>
-    </div>
-  )
-}
-
-/**
- * Who is going to be corrected, while no round has finished yet. It is the
- * class as it is, not a grade: the engine has not said anything about these
- * students, so nothing is shown next to them.
- */
+/** The roster is visible before the first correction, just as in Teuton GUI. */
 function PendingStudents({ group }: { group: ClassGroup }) {
   return (
-    <div className="space-y-2 rounded-md border border-border p-4">
-      <div className="flex items-center gap-2 text-sm font-medium">
-        <Users className="h-4 w-4" />
-        {t.exam.pendingTitle}
-      </div>
-      <p className="max-w-3xl text-xs text-muted-foreground">{t.exam.pendingHint}</p>
-      <div className="flex flex-wrap gap-2">
-        {group.students.map((student) => (
-          <span key={student.id} className="rounded-md border border-border px-2 py-1 text-xs">
+    <section className="space-y-3">
+      <SectionTitle>
+        Alumnos a evaluar{' '}
+        <span className="ml-2 text-muted-foreground">{group.students.length}</span>
+      </SectionTitle>
+      <p className="text-xs text-muted-foreground">Se evaluará toda la clase.</p>
+      <div className="grid max-w-3xl gap-2 sm:grid-cols-2">
+        {group.students.map((student, index) => (
+          <div
+            key={student.id}
+            className="flex items-center gap-3 rounded border border-border px-3 py-2 text-sm"
+          >
+            <span className="text-xs text-muted-foreground">{index + 1}</span>
             {student.name}
-          </span>
+          </div>
         ))}
       </div>
-    </div>
+    </section>
   )
 }
 
@@ -688,7 +682,10 @@ function SessionPanel({
       {loading && <p className="text-xs text-muted-foreground">{t.session.loading}</p>}
 
       {problem && (
-        <p role="alert" className="rounded-md bg-destructive/10 p-3 text-sm text-destructive-strong">
+        <p
+          role="alert"
+          className="rounded-md bg-destructive/10 p-3 text-sm text-destructive-strong"
+        >
           {problem}
         </p>
       )}
@@ -716,7 +713,10 @@ function SessionPanel({
               const score = scoreView(student.score, scale)
               const next = nextRoundText(student)
               return (
-                <div key={student.student_id} className="space-y-1 rounded-md border border-border p-3">
+                <div
+                  key={student.student_id}
+                  className="space-y-1 rounded-md border border-border p-3"
+                >
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">{student.name}</span>
@@ -786,7 +786,10 @@ function SessionExportButton({ session }: { session: Session }) {
   async function save(): Promise<void> {
     setConfirm(false)
     try {
-      const path = await window.heimdall.saveCsv(sessionCsvName(session), sessionCsv(session, scale))
+      const path = await window.heimdall.saveCsv(
+        sessionCsvName(session),
+        sessionCsv(session, scale)
+      )
       setNotice(path ? t.export.saved(path) : t.export.cancelled)
     } catch (error) {
       setNotice(noticeFrom(t.export.failed, error))
@@ -829,7 +832,10 @@ function RunPanel({ percent }: { percent: number | null }) {
       />
 
       {run.problem && (
-        <p role="alert" className="whitespace-pre-wrap rounded-md bg-destructive/10 p-3 text-sm text-destructive-strong">
+        <p
+          role="alert"
+          className="whitespace-pre-wrap rounded-md bg-destructive/10 p-3 text-sm text-destructive-strong"
+        >
           {run.problem}
         </p>
       )}
@@ -837,11 +843,6 @@ function RunPanel({ percent }: { percent: number | null }) {
       {run.end && (
         <div className="space-y-1 text-sm">
           <p>{t.run.status[run.end.status]}</p>
-          {run.end.artifact && (
-            <p className="truncate font-mono text-dense text-muted-foreground" title={run.end.artifact}>
-              {t.run.artifact} {run.end.artifact}
-            </p>
-          )}
           <p className="text-xs text-muted-foreground">{t.run.resultsPending}</p>
         </div>
       )}
@@ -851,7 +852,11 @@ function RunPanel({ percent }: { percent: number | null }) {
           <SectionTitle>{t.run.classTitle}</SectionTitle>
           <div className="grid gap-2 md:grid-cols-2">
             {run.students.map((student) => (
-              <StudentRow key={student.studentId} student={student} checks={run.start?.plan.check_count ?? 0} />
+              <StudentRow
+                key={student.studentId}
+                student={student}
+                checks={run.start?.plan.check_count ?? 0}
+              />
             ))}
           </div>
         </div>
@@ -899,4 +904,3 @@ function StudentRow({ student, checks }: { student: StudentProgress; checks: num
     </div>
   )
 }
-

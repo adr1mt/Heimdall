@@ -153,6 +153,37 @@ export default function SettingsView() {
           </p>
         </section>
 
+        <section className="max-w-2xl" aria-label="Vista previa de las notas">
+          <SectionTitle>Vista previa</SectionTitle>
+          <div className="overflow-x-auto rounded-md border border-border">
+            <table className="w-full text-center text-sm">
+              <thead>
+                <tr className="border-b border-border bg-secondary/40">
+                  <th className="px-3 py-2 text-left font-medium">Puntos</th>
+                  {[0, 25, 50, 70, 85, 100].map((points) => (
+                    <th key={points} className="px-2 py-2 font-normal">
+                      {points}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th className="px-3 py-3 text-left font-medium">Nota</th>
+                  {[0, 25, 50, 70, 85, 100].map((points) => (
+                    <td
+                      key={points}
+                      className={`px-2 py-3 font-semibold tabular-nums ${points >= passMark ? 'text-success-strong' : 'text-destructive-strong'}`}
+                    >
+                      {toScale(points, scaleOf(scale, passMark))}
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
         {/* La contraseña de las máquinas se escribe una vez y se guarda
             cifrada. Aquí solo se puede olvidar (ADR-0023). */}
         <section className="max-w-2xl">

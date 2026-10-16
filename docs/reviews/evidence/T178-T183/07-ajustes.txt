@@ -1,0 +1,56 @@
+Heimdall
+Inicio
+Clases
+El examen
+Corregir
+Resultados
+Analíticas
+Histórico
+Ajustes
+Ayuda
+Motor listo · 0.9.1
+Modo proyector
+Tema claro
+Ajustes
+Motor de corrección
+
+Programa que hace la corrección. Si está en el PATH del sistema basta con su nombre.
+
+Buscar…
+Guardar y comprobar
+
+Motor listo · 0.9.1
+
+Escala de las notas
+
+Con qué escala se escriben las notas, en pantalla y al exportarlas. La corrección guardada no cambia: el motor siempre calcula sobre 100 y la conversión es solo para leerlas.
+
+0 a 10
+0 a 100
+
+Un 87 del motor se escribe como 7,8.
+
+Marca de aprobado
+
+Desde qué puntuación, sobre las 100 que publica el motor, se cuenta a un alumno como aprobado. Es también donde cae el aprobado en la escala: lo que marques aquí es el 5. Ninguna nota del motor cambia.
+
+Aprobado a partir de
+/ 100
+
+Ahí está el aprobado: se escribe como un 5,0.
+
+Vista previa
+Puntos	0	25	50	70	85	100
+Nota	0,0	1,8	3,6	5,0	7,5	10,0
+Contraseña del aula
+
+La contraseña de las máquinas del alumnado se guarda cifrada en este ordenador para no tener que escribirla en cada examen. No se escribe en la clase, ni en las notas, ni en ningún informe.
+
+Hay una contraseña guardada.
+
+Olvidar la contraseña guardada
+Acerca de
+
+Heimdall corrige prácticas de sistemas y redes conectándose por SSH a las máquinas del alumnado.
+
+Adrià Muñoz · Institut El Puig

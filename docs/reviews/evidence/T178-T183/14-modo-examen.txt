@@ -1,0 +1,119 @@
+Heimdall
+Inicio
+Clases
+El examen
+Corregir
+Resultados
+Analíticas
+Histórico
+Ajustes
+Ayuda
+Motor listo · 0.9.1
+Modo proyector
+Tema claro
+Clase guardada.
+Corregir
+Corregir otra vez
+EXAMEN
+
+Redes de prueba
+
+5 comprobaciones
+
+CLASE
+
+Clase demo · 5 alumnos
+
+Sin clase elegida
+Clase demo
+Demo con una máquina apagada
+Clase habitual · puerto 22
+Contraseña del aula
+Modo examen
+
+Reevalúa la clase automáticamente mientras el alumnado trabaja.
+
+Se conserva la mejor nota completa de cada alumno.
+
+Detener modo examen
+1
+VUELTA
+cada 10 min
+10 min
+SIGUIENTE
+4
+ACTIVOS
+1
+FINALIZADOS
+100%
+PROGRESO
+La nota del examen
+
+Cada alumno se queda con su mejor vuelta entera. Una vuelta que no llegó a evaluarlo del todo no le baja la nota, y quien ya lo tiene todo bien deja de ser corregido. La nota la cierra el motor leyendo las vueltas; aquí solo se enseña.
+
+Una sola vuelta, la del 16/10/2026, 07:58
+
+5 alumnos con nota · 1 han terminado · 0 todavía sin nota
+
+Exportar las notas del examen…
+Exportar a Moodle…
+Ana Demo
+Terminado
+10,0
+Sale de la vuelta 1
+
+Terminado: en la vuelta 1 ya tenía el examen entero bien, así que las vueltas siguientes no lo corrigen.
+
+Lo que dijo cada vuelta
+Bruno Demo
+En curso
+6,7
+Sale de la vuelta 1
+Lo que dijo cada vuelta
+Carla Demo
+En curso
+4,3
+Sale de la vuelta 1
+Lo que dijo cada vuelta
+Diego Demo
+En curso
+2,9
+Sale de la vuelta 1
+Lo que dijo cada vuelta
+Elena Demo
+En curso
+1,4
+Sale de la vuelta 1
+Lo que dijo cada vuelta
+25 de 25 comprobaciones
+100%
+
+Corregida la clase entera.
+
+Al abrir el resultado podrás consultar las notas de cada alumno.
+
+La clase
+Ana Demo
+Evaluado
+
+5 bien · 0 mal · 0 sin evaluar
+
+Bruno Demo
+Evaluado
+
+4 bien · 1 mal · 0 sin evaluar
+
+Carla Demo
+Evaluado
+
+3 bien · 2 mal · 0 sin evaluar
+
+Diego Demo
+Evaluado
+
+2 bien · 3 mal · 0 sin evaluar
+
+Elena Demo
+Evaluado
+
+1 bien · 4 mal · 0 sin evaluar

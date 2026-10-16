@@ -72,7 +72,9 @@
     }
   },
   "dependencies": {
-    "js-yaml": "^4.3.1"
+    "@monaco-editor/react": "^4.6.0",
+    "js-yaml": "^4.3.1",
+    "monaco-editor": "^0.50.0"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
