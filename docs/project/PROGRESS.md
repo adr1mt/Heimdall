@@ -7,6 +7,8 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 **Versión 1.0.0 publicada** (AppImage, .deb y SHA256SUMS en GitHub), por
 decisión de Adrià antes del examen real de aula (T084 sigue pendiente).
+README reescrito como recorrido del profesor (clase, examen, corregir,
+resultados, informes) con el formato del examen y un prompt para IA.
 
 **T188 · El informe se deja en la máquina de cada alumno (ADR-0031).**
 
@@ -22,9 +24,6 @@ decisión de Adrià antes del examen real de aula (T084 sigue pendiente).
 - Go (valor envenenado, nombres, PLAN cambiado), integración SSH, GUI y
   `make gui-informes` con tres máquinas y una apagada
   ([evidencias](../reviews/evidence/T188/RESULTADOS.md)).
-
-**Antes:** T185 hizo el informe por alumno; T184 guardó la contraseña de las
-máquinas en cada clase (ADR-0030).
 
 ## Problemas conocidos y límites
 
