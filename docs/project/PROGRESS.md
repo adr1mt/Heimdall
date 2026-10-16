@@ -5,22 +5,23 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T185 · Informe por alumno generado por la app.**
+**T188 · El informe se deja en la máquina de cada alumno (ADR-0031).**
 
-- Resultados tiene «Informes por alumno…»: crea una carpeta nueva con una
-  página HTML autocontenida por alumno, imprimible a PDF, para Moodle o correo.
-- Cada página: alumno, examen, fecha, nota en la escala del profesor y cada
-  comprobación por grupo como correcta, fallada o «no se pudo comprobar»
-  (gris, trazo discontinuo, con su motivo y una nota que dice que no es fallo).
-- Se construye por lista blanca desde el artefacto: sin comandos, salidas,
-  contraseña, rutas ni otros alumnos. Excluidos sin informe. El título del
-  examen solo se toma si el YAML coincide con la huella de la corrección.
-- 537 pruebas GUI (valor envenenado), Go, tipos y build. `make gui-informes`
-  contra el laboratorio: cuatro alumnos, uno con la máquina apagada
-  ([evidencias](../reviews/evidence/T185/RESULTADOS.md)).
+- Resultados tiene «Enviar informes…»: deja la página de T185 como
+  `informe-<examen>.html` en la carpeta personal de cada alumno, en la máquina
+  que se corrigió; si ya estaba, la sustituye. Nunca automático.
+- Lo escribe el motor (`heimdall deliver`), con la contraseña de la clase por
+  stdin. Solo envía si el examen y la clase no han cambiado desde la corrección
+  y la máquina presenta la misma identidad; si no, dice por qué.
+- Tras enviar: a quién le ha llegado, a quién no y el motivo; «Volver a
+  enviar». Una máquina apagada no retrasa a las demás.
+- Retirado el guardado de informes en carpeta local de T185.
+- Go (valor envenenado, nombres, PLAN cambiado), integración SSH, GUI y
+  `make gui-informes` con tres máquinas y una apagada
+  ([evidencias](../reviews/evidence/T188/RESULTADOS.md)).
 
-**Antes:** T184 guardó la contraseña de las máquinas en cada clase (ADR-0030).
-T178–T183 simplificaron la GUI tomando Teuton GUI como referencia.
+**Antes:** T185 hizo el informe por alumno; T184 guardó la contraseña de las
+máquinas en cada clase (ADR-0030).
 
 ## Problemas conocidos y límites
 
@@ -40,11 +41,13 @@ T178–T183 simplificaron la GUI tomando Teuton GUI como referencia.
 - Autenticación por clave SSH pendiente (T023), sin caso de uso aún.
 - examen-lab.ts está desfasado desde T178 (T186); ui-refresh cubre el modo examen.
 - La barra de avisos pinta en rojo también los guardados correctos (T187).
+- Un resultado cuyo examen o clase cambió después no se puede enviar: se
+  vuelve a corregir. Los motivos de conexión fallida son frases técnicas.
+- Un informe que contenga el texto de la contraseña de la clase no se envía
+  (p. ej. contraseña «alumno» y una descripción que dice «alumno»).
 
 ## Siguiente trabajo
 
-**T188**: enviar el informe a la carpeta personal de cada alumno por SSH,
-pedido por Adrià; necesita ADR antes del código.
 **T070**: rehacer exámenes del curso en formato nativo; desbloquea **T084**,
 examen real de aula que ejecuta Adrià. Consultar
 `python3 scripts/tasks.py T070` antes de empezar. **T023**, **T186** y

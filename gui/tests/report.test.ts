@@ -1,18 +1,15 @@
-import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import type { CheckResult, RunResult, StudentResult } from '../src/shared/artifact'
 import {
   examTitleOf,
-  reportFiles,
-  reportsFolderName,
+  reportFileName,
   reportsSummary,
-  studentReport
+  studentReport,
+  studentReports
 } from '../src/renderer/src/lib/report'
 import { scaleOf } from '../src/renderer/src/lib/scale'
-import { writeReports } from '../src/main/reports'
+import { deliverArgs, deliverInput, readDelivery } from '../src/main/deliver'
 import { validRun } from './fixtures/valid-run'
 
 const POISON = 'VENENO-7f3a'
@@ -103,14 +100,14 @@ const scale = scaleOf('ten', 70)
 
 describe('student reports (T185)', () => {
   it('carries no command, output, password, path or other student', () => {
-    const files = reportFiles(run(), scale, 'Examen de redes')
-    expect(files).toHaveLength(2)
-    const ana = files[0].html
+    const pages = studentReports(run(), scale, 'Examen de redes')
+    expect(Object.keys(pages)).toHaveLength(2)
+    const [ana, otro] = Object.values(pages)
     expect(ana).not.toContain(POISON)
     expect(ana).not.toContain(PASSWORD)
     expect(ana).not.toContain('Otro')
-    expect(files[1].html).not.toContain(PASSWORD)
-    expect(files[1].html.replaceAll(`Otro ${POISON}-alumno`, '')).not.toContain(POISON)
+    expect(otro).not.toContain(PASSWORD)
+    expect(otro.replaceAll(`Otro ${POISON}-alumno`, '')).not.toContain(POISON)
   })
 
   it('escapes what the classroom wrote', () => {
@@ -145,13 +142,17 @@ describe('student reports (T185)', () => {
     expect(html).not.toContain('<small>/ 10</small>')
   })
 
-  it('names files and folder without clashes and says who is left out', () => {
+  it('gives each student their own page, one file name per exam, and says who is left out', () => {
     const r = run()
-    r.students[1] = { ...r.students[1], name: r.students[0].name }
-    const names = reportFiles(r, scale, 'Examen').map((f) => f.name)
-    expect(names).toEqual(['ana-b-ficticia-b.html', 'ana-b-ficticia-b-b2.html'])
-    expect(reportsFolderName(r, 'Examen RA2 · Redes')).toBe('informes-examen-ra2-redes-20261002-100000')
-    expect(reportsSummary(r)).toContain('2 informes')
+    const pages = studentReports(r, scale, 'Examen')
+    for (const student of r.students.filter((s) => s.status !== 'EXCLUDED')) {
+      expect(pages[student.student_id]).toBe(studentReport(r, student, scale, 'Examen'))
+    }
+    expect(Object.keys(pages)).not.toContain('c3')
+    expect(reportFileName('Examen RA2 · Redes')).toBe('informe-examen-ra2-redes.html')
+    expect(reportFileName('«»')).toBe('informe-examen.html')
+    expect(reportFileName(`${'a'.repeat(59)} b`)).toMatch(/^informe-a+\.html$/)
+    expect(reportsSummary(r)).toContain('2 alumnos')
     expect(reportsSummary(r)).toContain('1 excluidos sin informe')
   })
 
@@ -164,20 +165,32 @@ describe('student reports (T185)', () => {
   })
 })
 
-describe('writing the reports', () => {
-  it('always writes a new folder and refuses unsafe names', () => {
-    const parent = mkdtempSync(join(tmpdir(), 'heimdall-reports-'))
-    const files = [{ name: 'ana.html', html: '<p>a</p>' }]
-    const first = writeReports(parent, 'informes-x', files)
-    writeFileSync(join(first, 'ana.html'), 'ya repartido')
-    const second = writeReports(parent, 'informes-x', files)
-    expect(second).toBe(join(parent, 'informes-x-2'))
-    expect(readFileSync(join(first, 'ana.html'), 'utf-8')).toBe('ya repartido')
-    expect(readdirSync(second)).toEqual(['ana.html'])
-    expect(writeReports(parent, '../../fuera', files)).toBe(join(parent, 'fuera'))
-    expect(readdirSync(writeReports(parent, 'y', [{ name: '../../evil.html', html: '' }]))).toEqual(['evil.html'])
-    expect(() => writeReports(parent, 'z', [{ name: 'a.sh', html: '' }])).toThrow()
-    expect(() => writeReports(parent, 'z', [])).toThrow()
-    expect(() => writeReports(parent, 'z', [files[0], files[0]])).toThrow()
+describe('sending the reports (ADR-0031)', () => {
+  it('keeps the password and the pages out of argv', () => {
+    const args = deliverArgs('/aula/var/run-1.json', 'informe-redes.html')
+    expect(args).toEqual(['deliver', '--secrets=stdin', '--artifact=/aula/var/run-1.json', '--file=informe-redes.html'])
+    const input = deliverInput({ AULA_PASSWORD: PASSWORD }, { c1: '<p>Ana</p>' })
+    const [secrets, reports] = input.split('\n')
+    expect(JSON.parse(secrets)).toEqual({ schema: 1, secrets: { AULA_PASSWORD: PASSWORD } })
+    expect(JSON.parse(reports)).toEqual({ schema: 1, reports: { c1: '<p>Ana</p>' } })
+    expect(args.join(' ')).not.toContain(PASSWORD)
+  })
+
+  it('reads to whom it arrived, and the engine refusal as a sentence', () => {
+    const line = JSON.stringify({
+      kind: 'delivery', delivery_version: 1, run_id: 'R', file: 'informe-x.html',
+      students: [
+        { student_id: 'a', name: 'Ana', delivered: true },
+        { student_id: 'b', name: 'Bea', delivered: false, reason: 'no se ha podido conectar' }
+      ]
+    })
+    expect(readDelivery(3, line, '').students).toEqual([
+      { student_id: 'a', name: 'Ana', delivered: true, reason: undefined },
+      { student_id: 'b', name: 'Bea', delivered: false, reason: 'no se ha podido conectar' }
+    ])
+    expect(() => readDelivery(2, '', 'heimdall deliver: el examen o la clase han cambiado\n')).toThrow(
+      'el examen o la clase han cambiado'
+    )
+    expect(() => readDelivery(0, '{"kind":"run"}', '')).toThrow()
   })
 })

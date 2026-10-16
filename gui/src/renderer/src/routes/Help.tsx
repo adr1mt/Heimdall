@@ -214,9 +214,10 @@ export default function HelpView() {
               Desde Resultados, pulsa «Exportar a Moodle…» y comprueba el resumen antes de guardar
               el CSV. El correo o identificador debe coincidir con el que usa Moodle. Una nota no
               definitiva se deja vacía, nunca se exporta como un cero. El menú de más opciones
-              permite exportar las notas en el formato general. «Informes por alumno…» guarda una
-              página por alumno, imprimible a PDF, para repartirla por Moodle o por correo: su nota
-              y cada comprobación, sin comandos, salidas de las máquinas ni datos de otros alumnos.
+              permite exportar las notas en el formato general. «Enviar informes…» deja a cada alumno,
+              en la carpeta personal de su máquina, una página con su nota y cada comprobación, sin
+              comandos, salidas de las máquinas ni datos de otros alumnos, y dice a quién le ha
+              llegado y a quién no.
             </p>
           </Block>
           <Block id="problemas" title="Problemas frecuentes">

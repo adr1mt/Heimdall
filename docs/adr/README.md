@@ -33,3 +33,4 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 | [0028](0028-lecturas-compartidas.md) | Captura compartida (sustituida por ADR-0029) |
 | [0029](0029-retirar-lecturas-compartidas.md) | Retirada de lecturas compartidas para simplificar la autoría |
 | [0030](0030-contrasena-por-clase.md) | La contraseña de las máquinas se guarda en cada clase |
+| [0031](0031-informe-en-la-maquina-del-alumno.md) | El informe de cada alumno se deja en su máquina, solo ese fichero |

@@ -233,7 +233,24 @@ Lo que **no** cambia es el PLAN: `check_ids`, pesos, `total_weight` y
 una decisión de ejecución, no de nota. `--session` no se combina con `--retry`
 —son las dos reglas distintas— ni con la fachada congelada.
 
-## 9. Cómo se verifica
+## 9. El informe en la máquina del alumno
+
+La única escritura en las máquinas del alumnado (ADR-0031):
+
+```
+heimdall deliver --secrets=stdin --artifact=<resultado.json> --file=informe-<examen>.html
+```
+
+Por `stdin` llegan la línea de secretos y, detrás, `{"schema":1,"reports":
+{"<student_id>":"<html>"}}`. El motor rehace el PLAN del examen y el aula del
+resultado y exige el mismo `plan_hash`; cada informe va solo a la máquina de
+su alumno, que tiene que presentar la identidad anotada en esa corrección.
+Imprime una línea con `kind: "delivery"`, `delivery_version: 1` y, por alumno,
+`delivered` y `reason`. Sale con `0` si llegó a todos, `3` si a alguno no y `2`
+si la petición no es válida, con el motivo en `stderr`. No escribe nada en
+este equipo ni cambia el artefacto.
+
+## 10. Cómo se verifica
 
 [`test/eventos.sh`](../../test/eventos.sh) es el consumidor de prueba: lee una
 ejecución entera del laboratorio con nada más que el flujo y el artefacto al

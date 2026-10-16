@@ -160,10 +160,12 @@ export interface HeimdallApi {
    */
   saveCsv: (name: string, text: string) => Promise<string | null>
   /**
-   * Writes one report per student into a new folder inside the one the
-   * teacher picks. Returns that folder, or null if they cancelled the dialog.
+   * Leaves each student's report, `file`, in the home directory of their own
+   * machine, through the engine (ADR-0031). `reports` is keyed by student_id.
+   * The class password never crosses to the renderer: the main process takes
+   * it from the class the correction was made with.
    */
-  saveReports: (folder: string, files: { name: string; html: string }[]) => Promise<string | null>
+  sendReports: (artifactPath: string, file: string, reports: Record<string, string>) => Promise<Delivery>
   /**
    * The teacher's classes, as they were last saved. It throws when the file
    * cannot be read: an empty list would look like «you have no classes»
@@ -186,4 +188,10 @@ export interface HeimdallApi {
   onRunClosed: (listener: (closed: RunClosed) => void) => () => void
   /** A new version is on disk; it installs itself when the teacher closes. */
   onUpdateReady: (listener: (version: string) => void) => () => void
+}
+
+/** To whom a report arrived, and why not (ADR-0031). */
+export interface Delivery {
+  file: string
+  students: { student_id: string; name: string; delivered: boolean; reason?: string }[]
 }

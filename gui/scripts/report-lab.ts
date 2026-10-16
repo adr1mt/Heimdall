@@ -1,8 +1,11 @@
-// T185: per-student reports from a real SSH correction. Real IPC, preload,
-// renderer and engine; only the native folder dialog is stubbed. Writes the
-// screenshots and one PDF to docs/reviews/evidence/T185. Run from gui/ after
-// build, with the lab up (make lab).
+// T188: each student's report, left over SSH in the home directory of their own
+// machine. Real IPC, preload, renderer and engine; only the native folder
+// dialog is stubbed. Two extra lab machines are started from the lab image so
+// that every student has a machine of their own, and the file is read back
+// from each machine with podman, not through Heimdall. Writes screenshots to
+// docs/reviews/evidence/T188. Run from gui/ after build, with `make lab` up.
 import { app, BrowserWindow, dialog } from 'electron'
+import { execFileSync } from 'node:child_process'
 import { mkdtempSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { tmpdir } from 'node:os'
@@ -10,13 +13,24 @@ import assert from 'node:assert/strict'
 import { registerIpc } from '../src/main/ipc'
 
 const SECRET = process.env.LAB_SECRET || 'HEIMDALL_SECRET_TEST_12345'
-const base = mkdtempSync(join(tmpdir(), 'heimdall-report-'))
+const base = mkdtempSync(join(tmpdir(), 'heimdall-send-'))
 const project = join(base, 'redes-demo')
 const profile = join(base, 'profile')
-const target = join(base, 'entrega')
-const out = resolve('../docs/reviews/evidence/T185')
-for (const dir of [project, profile, target]) mkdirSync(dir)
+const out = resolve('../docs/reviews/evidence/T188')
+for (const dir of [project, profile]) mkdirSync(dir)
 mkdirSync(out, { recursive: true })
+
+// One machine per student: the lab's alu1 plus two more from the same image.
+// Diego's machine (2299) is off.
+const MACHINES = ['alu1', 'heimdall-envio-2', 'heimdall-envio-3']
+const podman = (...args: string[]) => execFileSync('podman', args, { encoding: 'utf8' })
+for (const [i, name] of MACHINES.slice(1).entries()) {
+  podman('run', '-d', '--replace', '--name', name, '--hostname', name, '-p', `127.1.2.3:${2202 + i}:22`, 'heimdall-lab-ssh')
+}
+const FILE = 'informe-practica-3-servicios-de-red.html'
+// An old report of the same exam on Ana's machine: it must be replaced.
+podman('exec', '-u', 'alumno', 'alu1', 'sh', '-c', `printf 'informe viejo' > /home/alumno/${FILE}`)
+for (const name of MACHINES.slice(1)) podman('exec', name, 'rm', '-f', `/home/alumno/${FILE}`)
 
 const names = ['Ana Demo', 'Bruno Demo', 'Carla Demo', 'Diego Demo']
 const expected = ['443', '22', '53', 'dhcp', 'dns']
@@ -35,7 +49,7 @@ const students = names.map((name, index) => ({
   contact: `alu${index + 1}@example.invalid`,
   host: '127.1.2.3',
   // Diego's machine is off: his checks cannot be looked at.
-  port: index === 3 ? '2299' : '2201',
+  port: String(index === 3 ? 2299 : 2201 + index),
   user: 'alumno',
   fields: Object.fromEntries(expected.map((value, i) => [`p${i + 1}`, i < 5 - index * 2 ? value : WRONG]))
 }))
@@ -60,8 +74,33 @@ writeFileSync(
 
 app.setPath('userData', profile)
 app.disableHardwareAcceleration()
-let picks = 0
-dialog.showOpenDialog = (async () => ({ canceled: false, filePaths: [picks++ === 0 ? project : target] })) as never
+dialog.showOpenDialog = (async () => ({ canceled: false, filePaths: [project] })) as never
+
+// Every process alive while the reports are sent: none may carry the password.
+// The harness's own ancestors are left out: make hands LAB_SECRET to the shell
+// that starts it, and that is the test's doing, not Heimdall's.
+const ancestors = new Set<string>()
+for (let pid = String(process.pid); pid !== '0' && pid !== '1'; ) {
+  ancestors.add(pid)
+  pid = readFileSync(`/proc/${pid}/stat`, 'utf8').split(') ')[1].split(' ')[1]
+}
+const leaks: string[] = []
+let watching = true
+async function watchArgv() {
+  while (watching) {
+    for (const pid of readdirSync('/proc').filter((p) => /^\d+$/.test(p))) {
+      try {
+        const cmd = readFileSync(`/proc/${pid}/cmdline`, 'utf8')
+        if (cmd.includes(SECRET) && !ancestors.has(pid)) leaks.push(`${pid}: ${cmd.split('\0')[0]}`)
+        if (cmd.includes('\0deliver\0')) engineSeen.add(pid)
+      } catch {
+        // gone already
+      }
+    }
+    await delay(20)
+  }
+}
+const engineSeen = new Set<string>()
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))
 let win: BrowserWindow
@@ -109,48 +148,100 @@ app
     await delay(400)
     await click('Corregir', 'header button')
     await until("document.querySelector('header h1')?.textContent === 'Resultados'", 'results')
-    await click('Informes por alumno…')
-    await shot(win, '01-confirmacion')
-    assert.match(await text(), /3 informes, uno por alumno|4 informes, uno por alumno/)
-    await click('Elegir carpeta y guardar')
-    await until("document.body.innerText.includes('Informes guardados en')", 'reports saved')
-    await shot(win, '02-guardado')
+    const runs = readdirSync(join(project, 'var')).filter((f) => f.startsWith('run-'))
+    assert.equal(runs.length, 1)
+    const artifact = JSON.parse(readFileSync(join(project, 'var', runs[0]), 'utf8'))
 
-    const [folder] = readdirSync(target)
-    assert.match(folder, /^informes-practica-3-servicios-de-red-\d{8}-\d{6}$/)
-    const files = readdirSync(join(target, folder)).sort()
-    assert.deepEqual(files, ['ana-demo.html', 'bruno-demo.html', 'carla-demo.html', 'diego-demo.html'])
-    for (const [i, file] of files.entries()) {
-      const html = readFileSync(join(target, folder, file), 'utf8')
-      assert.ok(!html.includes(SECRET), `${file}: password`)
-      assert.ok(!html.includes(WRONG), `${file}: machine output`)
-      assert.ok(!html.includes('echo'), `${file}: command`)
-      assert.ok(!html.includes('127.1.2.3'), `${file}: address`)
-      assert.ok(!/<script|https?:\/\//.test(html), `${file}: not self-contained`)
-      for (const [j, other] of names.entries()) assert.equal(html.includes(other), i === j, `${file}: ${other}`)
+    await click('Enviar informes…')
+    await until("document.body.innerText.includes('carpeta personal')", 'confirmation')
+    await shot(win, '01-confirmacion')
+    const asked = await text()
+    assert.match(asked, /4 alumnos, cada uno con su informe/)
+    assert.ok(asked.includes(`«${FILE}»`))
+
+    const watcher = watchArgv()
+    const started = Date.now()
+    await click('Enviar')
+    await until("document.body.innerText.includes('Informe entregado a')", 'delivery', 120000)
+    const seconds = (Date.now() - started) / 1000
+    let secondSeconds = 0
+    await shot(win, '02-resultado')
+    const told = await text()
+    assert.match(told, /Informe entregado a 3 de 4 alumnos/)
+    assert.match(told, /No le ha llegado\s+Diego Demo · en esta corrección no se llegó a conectar con su máquina/)
+    assert.match(told, /Le ha llegado\s+Ana Demo · Bruno Demo · Carla Demo/)
+
+    // A second send replaces the same file. Carla's machine was corrected but
+    // is off now: she is told apart, with the reason, and nobody waits for her.
+    podman('stop', '-t', '0', MACHINES[2])
+    const again = Date.now()
+    await click('Volver a enviar')
+    await until("document.body.innerText.includes('Informe entregado a 2 de 4')", 'second delivery', 120000)
+    secondSeconds = (Date.now() - again) / 1000
+    await shot(win, '03-maquina-apagada-al-enviar')
+    const second = await text()
+    assert.match(second, /Carla Demo · no se ha podido conectar con 127\.1\.2\.3:2203/)
+    assert.match(second, /Le ha llegado\s+Ana Demo · Bruno Demo/)
+    assert.ok(secondSeconds < 60, `the second send took ${secondSeconds}s`)
+    podman('start', MACHINES[2])
+    for (let i = 0; i < 50 && !podman('exec', MACHINES[2], 'sh', '-c', 'test -s /run/sshd.pid && echo y || true').trim(); i++) await delay(100)
+    watching = false
+    await watcher
+    assert.ok(engineSeen.size >= 1, 'the engine was not seen running')
+    assert.deepEqual(leaks, [], 'password in argv')
+    await click('Cerrar')
+
+    // Read back from each machine with podman, not through Heimdall.
+    const files: string[] = []
+    for (const [i, machine] of MACHINES.entries()) {
+      const [mode, owner] = podman('exec', machine, 'stat', '-c', '%a %U', `/home/alumno/${FILE}`).trim().split(' ')
+      assert.equal(mode, '644', `${machine}: permissions`)
+      assert.equal(owner, 'alumno', `${machine}: owner`)
+      assert.equal(podman('exec', machine, 'sh', '-c', 'ls -a /home/alumno | grep -c "^.heimdall-" || true').trim(), '0', `${machine}: temporary left`)
+      const html = podman('exec', machine, 'cat', `/home/alumno/${FILE}`)
+      const local = join(base, `${machine}.html`)
+      writeFileSync(local, html)
+      files.push(local)
+      assert.ok(!html.includes('informe viejo'), `${machine}: old report not replaced`)
+      assert.ok(!html.includes(SECRET), `${machine}: password`)
+      assert.ok(!html.includes(WRONG), `${machine}: machine output`)
+      assert.ok(!html.includes('echo'), `${machine}: command`)
+      assert.ok(!html.includes('127.1.2.3'), `${machine}: address`)
+      for (const [j, other] of names.entries()) assert.equal(html.includes(other), i === j, `${machine}: ${other}`)
       assert.match(html, /Práctica 3 · Servicios de red/)
     }
-    const diego = readFileSync(join(target, folder, 'diego-demo.html'), 'utf8')
-    assert.match(diego, /Sin nota final/)
-    assert.doesNotMatch(diego, /class="check fail"/)
+
+    // Nothing on this computer carries the password but the class itself
+    // (ADR-0030): not the exam folder, not the results, not a report.
+    const written = execFileSync('grep', ['-rl', SECRET, base], { encoding: 'utf8' }).trim().split('\n')
+    assert.deepEqual(written, [join(profile, 'classes.json')])
 
     const viewer = new BrowserWindow({ width: 900, height: 1200, show: true, webPreferences: { javascript: false } })
-    for (const file of files) {
-      await viewer.loadFile(join(target, folder, file))
-      await shot(viewer, `03-informe-${file.replace('.html', '')}`)
-    }
-    await viewer.loadFile(join(target, folder, 'carla-demo.html'))
-    writeFileSync(join(out, '04-carla-demo.pdf'), await viewer.webContents.printToPDF({ pageSize: 'A4', printBackground: true }))
+    await viewer.loadFile(files[1])
+    await shot(viewer, '04-informe-en-la-maquina-de-bruno')
     viewer.setSize(390, 1400)
     await shot(viewer, '05-informe-movil')
 
     assert.deepEqual(consoleErrors, [])
-    const result = { ok: true, base, folder, files, consoleErrors }
+    const result = {
+      ok: true,
+      file: FILE,
+      run_id: artifact.run_id,
+      delivered_to: MACHINES,
+      not_delivered: ['Diego Demo (máquina apagada)'],
+      first_send_seconds: seconds,
+      second_send_seconds_with_carla_off: secondSeconds,
+      engine_processes_seen: engineSeen.size,
+      password_in_argv: leaks.length,
+      consoleErrors
+    }
     writeFileSync(join(out, 'verification.json'), JSON.stringify(result, null, 2))
     console.log(JSON.stringify(result))
+    for (const name of MACHINES.slice(1)) podman('rm', '-f', name)
     app.quit()
   })
   .catch(async (error) => {
+    for (const name of MACHINES.slice(1)) podman('rm', '-f', name)
     console.error(error)
     if (win) console.error(await text().catch(() => ''))
     app.exit(1)

@@ -10,7 +10,7 @@ import {
 } from 'electron'
 import { IPC } from '../shared/ipc'
 import { detectEngine } from './engine'
-import { readArtifact } from './artifact'
+import { readArtifact, readArtifactAsync } from './artifact'
 import { consolidateChain } from './consolidate'
 import { readExamSession } from './session'
 import { listRuns, varDirOf } from './history'
@@ -30,12 +30,13 @@ import {
   rememberProject
 } from './projects'
 import { validateExam } from './validate'
-import { writeReports } from './reports'
+import { deliverReports } from './deliver'
 import { writeGeneratedAula } from './aula'
-import { aulaYaml } from '../shared/aula'
+import { aulaFileName, aulaYaml } from '../shared/aula'
 import { readGroup, type ClassGroup } from '../shared/classes'
 import type { Description } from '../shared/describe'
 import type {
+  Delivery,
   EngineStatus,
   ExamCheck,
   ExamModeRequest,
@@ -410,15 +411,24 @@ export function registerIpc(): void {
     return result.filePath
   })
 
-  // The students' reports: pages the renderer built from the artifact, written
-  // into a new folder where the teacher points.
-  ipcMain.handle(IPC.saveReports, async (_e, folder: unknown, files: unknown): Promise<string | null> => {
-    const result = await dialog.showOpenDialog({
-      title: 'Carpeta donde guardar los informes',
-      properties: ['openDirectory', 'createDirectory']
-    })
-    if (result.canceled || !result.filePaths[0]) return null
-    return writeReports(result.filePaths[0], folder, files)
+  // The students' reports, left on each student's own machine by the engine
+  // (ADR-0031). The password is taken here from the class the correction was
+  // made with: it never crosses to the renderer and never reaches argv.
+  ipcMain.handle(IPC.sendReports, async (_e, artifactPath: unknown, file: unknown, reports: unknown): Promise<Delivery> => {
+    if (typeof artifactPath !== 'string' || !artifactPath) throw new Error('No hay ninguna corrección abierta.')
+    if (typeof file !== 'string' || !reports || typeof reports !== 'object') throw new Error('No hay ningún informe que enviar.')
+    const pages: Record<string, string> = {}
+    for (const [id, html] of Object.entries(reports as Record<string, unknown>)) {
+      if (typeof html === 'string') pages[id] = html
+    }
+    const run = await readArtifactAsync(artifactPath)
+    const group = readClasses(settingsDir()).find((other) => aulaFileName(other) === basename(run.inventory.path))
+    if (!group) {
+      throw new Error('Esta corrección no se hizo con una clase guardada en la aplicación: sin su contraseña no se puede entrar en las máquinas.')
+    }
+    const secrets: Record<string, string> = {}
+    for (const name of secretRefsIn(readFileSync(run.inventory.path, 'utf-8'))) secrets[name] = group.password
+    return deliverReports(readSettings(settingsDir()).enginePath, artifactPath, file, secrets, pages)
   })
 
   // The teacher's own classes. They touch no machine and no grade: this is

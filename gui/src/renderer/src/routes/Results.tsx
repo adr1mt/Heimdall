@@ -4,11 +4,11 @@ import {
   Check,
   AlertTriangle,
   Download,
-  FileText,
   Grid3x3,
   Layers,
   List,
   RotateCcw,
+  Send,
   X
 } from 'lucide-react'
 import {
@@ -48,7 +48,7 @@ import {
   type Pending
 } from '@/lib/results'
 import { MoodleExportButton } from '@/components/MoodleExport'
-import { examTitleOf, reportFiles, reportsFolderName, reportsSummary } from '@/lib/report'
+import { examTitleOf, reportFileName, reportsSummary, studentReports } from '@/lib/report'
 import {
   chainCsv,
   chainCsvName,
@@ -67,6 +67,7 @@ import { machineLiterals, maskerFor } from '@/lib/projector'
 import type { Consolidation, ConsolidatedCheck } from '../../../shared/consolidation'
 import type { AcademicStatus } from '../../../shared/events'
 import type { CheckResult, RunResult, Stream, StudentResult } from '../../../shared/artifact'
+import type { Delivery } from '../../../shared/types'
 import { gradeAppearance } from '@/lib/grade-appearance'
 import { cn } from '@/lib/utils'
 import { t } from '@/i18n/es'
@@ -202,7 +203,7 @@ export default function ResultsView() {
             </Segmented>
             {!projector && (
               <>
-                <ReportsButton />
+                <ReportsButton artifactPath={artifactPath} />
                 <RunMoodleButton />
                 <details className="relative">
                   <summary
@@ -726,52 +727,99 @@ function ExportButton() {
 }
 
 /**
- * One page per student, to hand back through Moodle or by mail (T185). It is
- * built from the artifact on screen and carries no command, no output and no
- * other student; what each page holds is said before anything is written.
+ * Each student's page, left in the home directory of their own machine by the
+ * engine (T185, ADR-0031). Never automatic: the teacher presses it, is told
+ * what is sent and where, and is then told to whom it arrived and why not.
  */
-function ReportsButton() {
+function ReportsButton({ artifactPath }: { artifactPath: string | null }) {
   const artifact = useRun((s) => s.artifact)
   const project = useApp((s) => s.project)
   const scale = useScale()
   const setNotice = useApp((s) => s.setNotice)
   const [confirm, setConfirm] = useState(false)
+  const [file, setFile] = useState<string | null>(null)
+  const [sending, setSending] = useState(false)
+  const [delivery, setDelivery] = useState<Delivery | null>(null)
 
-  if (!artifact) return null
+  if (!artifact || !artifactPath) return null
 
-  async function save(): Promise<void> {
+  async function title(): Promise<string> {
+    if (!artifact) return 'Examen'
+    const yaml = project ? await window.heimdall.readExam(project.examPath).catch(() => null) : null
+    return examTitleOf(yaml, artifact.exam.sha256, project?.name ?? 'Examen')
+  }
+
+  async function ask(): Promise<void> {
+    setDelivery(null)
+    setFile(reportFileName(await title()))
+    setConfirm(true)
+  }
+
+  async function send(): Promise<void> {
     setConfirm(false)
-    if (!artifact) return
+    setDelivery(null)
+    if (!artifact || !artifactPath) return
+    setSending(true)
     try {
-      const yaml = project ? await window.heimdall.readExam(project.examPath).catch(() => null) : null
-      const title = await examTitleOf(yaml, artifact.exam.sha256, project?.name ?? 'Examen')
-      const path = await window.heimdall.saveReports(
-        reportsFolderName(artifact, title),
-        reportFiles(artifact, scale, title)
+      const examTitle = await title()
+      setDelivery(
+        await window.heimdall.sendReports(artifactPath, reportFileName(examTitle), studentReports(artifact, scale, examTitle))
       )
-      setNotice(path ? t.reports.saved(path) : t.export.cancelled)
     } catch (error) {
       setNotice(noticeFrom(t.reports.failed, error))
+    } finally {
+      setSending(false)
     }
   }
 
+  const sent = delivery?.students.filter((s) => s.delivered) ?? []
+  const missing = delivery?.students.filter((s) => !s.delivered) ?? []
+
   return (
     <>
-      <Button variant="outline" size="sm" onClick={() => setConfirm(true)}>
-        <FileText className="h-4 w-4" />
-        {t.reports.button}
+      <Button variant="outline" size="sm" disabled={sending} onClick={() => void ask()}>
+        {sending ? <Spinner /> : <Send className="h-4 w-4" />}
+        {sending ? t.reports.sending : t.reports.button}
       </Button>
       <ConfirmDialog
         open={confirm}
         title={t.reports.title}
         confirmLabel={t.reports.yes}
-        onConfirm={() => void save()}
+        onConfirm={() => void send()}
         onCancel={() => setConfirm(false)}
       >
         <span className="block space-y-2">
           <span className="block">{reportsSummary(artifact)}</span>
+          {file && <span className="block">{t.reports.where(file)}</span>}
           <span className="block">{t.reports.hint}</span>
           <span className="block text-xs text-muted-foreground">{t.export.scale(scale.label)}</span>
+        </span>
+      </ConfirmDialog>
+      <ConfirmDialog
+        open={delivery !== null}
+        title={delivery ? t.reports.done(sent.length, delivery.students.length) : ''}
+        cancelLabel={t.reports.close}
+        confirmLabel={missing.length > 0 ? t.reports.retry : undefined}
+        onConfirm={missing.length > 0 ? () => void send() : undefined}
+        onCancel={() => setDelivery(null)}
+      >
+        <span className="block max-h-80 space-y-3 overflow-auto">
+          {missing.length > 0 && (
+            <span className="block">
+              <span className="block font-medium text-destructive-strong">{t.reports.missing}</span>
+              {missing.map((s) => (
+                <span key={s.student_id} className="block">
+                  <span className="text-foreground">{s.name}</span> · {s.reason}
+                </span>
+              ))}
+            </span>
+          )}
+          {sent.length > 0 && (
+            <span className="block">
+              <span className="block font-medium text-success-strong">{t.reports.arrived}</span>
+              <span className="block">{sent.map((s) => s.name).join(' · ')}</span>
+            </span>
+          )}
         </span>
       </ConfirmDialog>
     </>

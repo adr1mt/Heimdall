@@ -22,13 +22,31 @@ import (
 // seen. The guarantee it gives is narrower and it is written in the report:
 // the fingerprint of every host, so a swap is auditable afterwards.
 type HostKeys struct {
-	mu   sync.Mutex
-	seen map[string]string // address -> fingerprint
+	mu     sync.Mutex
+	seen   map[string]string // address -> fingerprint
+	pinned map[string]bool   // addresses whose identity comes from a correction
 }
 
 // NewHostKeys returns an empty registry for one run.
 func NewHostKeys() *HostKeys {
 	return &HostKeys{seen: map[string]string{}}
+}
+
+// Pin records the identity a machine presented in an earlier correction, so
+// that only that machine is accepted at this address. Delivering a student's
+// report uses it: the report goes to the machine that was corrected, or to
+// none (ADR-0031).
+func (h *HostKeys) Pin(address, fingerprint string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.seen == nil {
+		h.seen = map[string]string{}
+	}
+	if h.pinned == nil {
+		h.pinned = map[string]bool{}
+	}
+	h.seen[address] = fingerprint
+	h.pinned[address] = true
 }
 
 // check accepts the first identity of an address and refuses a later one.
@@ -46,6 +64,11 @@ func (h *HostKeys) check(address string, key ssh.PublicKey) (first bool, err err
 	if !ok {
 		h.seen[address] = fp
 		return true, nil
+	}
+	if known != fp && h.pinned[address] {
+		return false, fmt.Errorf(
+			"la máquina %s no es la que se corrigió: presenta la identidad %s y en la corrección presentó %s",
+			address, fp, known)
 	}
 	if known != fp {
 		return false, fmt.Errorf(

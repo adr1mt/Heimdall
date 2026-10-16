@@ -3925,7 +3925,7 @@
       "id": "T188",
       "title": "Enviar el informe de cada alumno a su carpeta personal por SSH",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T185"
@@ -3952,7 +3952,8 @@
         "make check test gui-check gui-build",
         "Arnés con laboratorio: fichero presente en el home de cada alumno"
       ],
-      "notes": "Área crítica (SSH, secretos, escritura remota): una tarea por sesión. Hay que decidir en el ADR si escribe el motor o la GUI; el contrato motor↔GUI no se cambia sin ese ADR."
+      "completed": "2026-10-16",
+      "notes": "Hecho con ADR-0031: escribe el motor (heimdall deliver), solo informe-<examen>.html en la carpeta personal, 0644, sustituyendo por renombrado; solo a la máquina corregida (mismo plan_hash e identidad anotada en esa corrección, comprobada antes de autenticarse); contraseña solo por stdin. Botón «Enviar informes…» en Resultados con resultado por alumno y «Volver a enviar»; retirado el guardado local de T185. Pruebas Go (valor envenenado, nombre, PLAN cambiado), integración SSH y make gui-informes con tres máquinas y una apagada; evidencias en docs/reviews/evidence/T188."
     }
   ]
 }

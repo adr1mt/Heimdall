@@ -122,12 +122,17 @@ Los filtros y la explicación de los estados están plegados.
 Desde ahí se exportan:
 
 - la **hoja de notas**, en el menú de más opciones;
-- el **CSV de Moodle**, para subirlo;
-- los **informes por alumno**: una carpeta con una página por alumno, con su
-  nota y cada comprobación como correcta, fallada o «no se pudo comprobar».
-  Se abren en el navegador, se imprimen a PDF y se reparten por Moodle o por
-  correo. No llevan comandos, salidas de las máquinas, contraseña ni datos de
-  otros alumnos. Los excluidos no reciben informe.
+- el **CSV de Moodle**, para subirlo.
+
+Y con **«Enviar informes…»** cada alumno recibe en su máquina, en su carpeta
+personal, una página con su nota y cada comprobación como correcta, fallada o
+«no se pudo comprobar» (`informe-<examen>.html`; si ya estaba, se sustituye).
+Solo la suya: sin comandos, salidas de las máquinas, contraseña ni datos de
+otros alumnos. Se envía solo cuando lo pulsas, y solo a la máquina que se
+corrigió: si el examen o la clase han cambiado desde entonces, hay que volver
+a corregir. Al terminar se dice a quién le ha llegado y a quién no, y por qué
+—por ejemplo, una máquina apagada—; «Volver a enviar» lo repite. Los
+excluidos no reciben informe.
 
 La escala —sobre 10, sobre 100— y dónde cae el aprobado se eligen en
 **Ajustes**. La corrección guardada no cambia: el motor siempre calcula sobre

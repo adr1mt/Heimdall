@@ -88,3 +88,23 @@ func TestEachAddressIsIndependent(t *testing.T) {
 		t.Error("la segunda máquina no se anunció como nueva")
 	}
 }
+
+// Delivering a report pins the identity seen in the correction: the machine
+// that was corrected is accepted, any other one is refused before it is
+// asked for a password (ADR-0031).
+func TestAPinnedIdentityOnlyAcceptsTheCorrectedMachine(t *testing.T) {
+	corrected := testKey(t, 1)
+	keys := NewHostKeys()
+	keys.Pin("10.0.0.1:22", ssh.FingerprintSHA256(corrected))
+
+	if first, err := keys.check("10.0.0.1:22", corrected); err != nil || first {
+		t.Fatalf("la máquina corregida tiene que aceptarse sin anunciarse: first=%v err=%v", first, err)
+	}
+	_, err := keys.check("10.0.0.1:22", testKey(t, 2))
+	if err == nil {
+		t.Fatal("se aceptó una máquina distinta de la corregida")
+	}
+	if !strings.Contains(err.Error(), "no es la que se corrigió") {
+		t.Errorf("el motivo tiene que decir que no es la máquina corregida: %s", err)
+	}
+}

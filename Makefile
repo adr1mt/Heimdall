@@ -101,8 +101,8 @@ gui-lab:
 gui-editor:
 	cd gui && HEIMDALL_ENGINE=$(PWD)/bin/heimdall LAB_SECRET=HEIMDALL_SECRET_TEST_12345 npm run --silent editor-lab
 
-## gui-informes: correct the lab from the application and save one report per
-## student (T185). Needs `make build`, `make gui-build` and `make lab`.
+## gui-informes: correct the lab from the application and send each student
+## their report over SSH (T188). Needs `make build`, `make gui-build` and `make lab`.
 gui-informes:
 	cd gui && HEIMDALL_ENGINE=$(PWD)/bin/heimdall LAB_SECRET=HEIMDALL_SECRET_TEST_12345 npm run --silent report-lab
 

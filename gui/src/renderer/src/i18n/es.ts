@@ -383,13 +383,21 @@ export const t = {
     failed: 'No se pudieron guardar las notas'
   },
   reports: {
-    button: 'Informes por alumno…',
-    title: '¿Guardar un informe por alumno?',
-    yes: 'Elegir carpeta y guardar',
+    button: 'Enviar informes…',
+    sending: 'Enviando…',
+    title: '¿Dejar a cada alumno su informe en su máquina?',
+    yes: 'Enviar',
+    where: (file: string) =>
+      `Se deja «${file}» en la carpeta personal de cada alumno, en la máquina que se corrigió. Si ya estaba, se sustituye.`,
     hint:
-      'Se crea una carpeta con una página por alumno: su nota, y cada comprobación del examen como correcta, fallada o no comprobada. Se abre en el navegador y se imprime a PDF. No sale ningún comando, ni lo que escribieron las máquinas, ni la contraseña, ni datos de otros alumnos.',
-    saved: (path: string) => `Informes guardados en ${path}`,
-    failed: 'No se pudieron guardar los informes'
+      'Cada alumno recibe solo el suyo: su nota y cada comprobación como correcta, fallada o no comprobada. No sale ningún comando, ni lo que escribieron las máquinas, ni la contraseña, ni datos de otros alumnos.',
+    done: (sent: number, total: number) =>
+      sent === total ? `Informe entregado a los ${total} alumnos` : `Informe entregado a ${sent} de ${total} alumnos`,
+    arrived: 'Le ha llegado',
+    missing: 'No le ha llegado',
+    retry: 'Volver a enviar',
+    close: 'Cerrar',
+    failed: 'No se pudieron enviar los informes'
   },
   moodle: {
     button: 'Exportar a Moodle…',

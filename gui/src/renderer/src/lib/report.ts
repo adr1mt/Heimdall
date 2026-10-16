@@ -5,7 +5,7 @@ import { CAUSE_TEXT, dateText } from './results'
 import { toScale, type Scale } from './scale'
 
 /**
- * One page per student, to hand back through Moodle or by mail (T185).
+ * One page per student, left on their own machine (T185, T188).
  *
  * It is read from the artifact and nothing else, and it takes only what the
  * student is meant to see: who they are, the exam, the grade in the teacher's
@@ -18,28 +18,24 @@ import { toScale, type Scale } from './scale'
  * a failure: a machine that did not answer is not a wrong answer (principio 3).
  */
 
-/** One report, ready to be written as a file. */
-export interface ReportFile {
-  name: string
-  html: string
-}
-
 /** The students that get a report: whoever took part in this correction. */
 export function reportStudents(run: RunResult): StudentResult[] {
   return run.students.filter((student) => student.status !== 'EXCLUDED')
 }
 
-/** Every report of a run, with a file name no other report shares. */
-export function reportFiles(run: RunResult, scale: Scale, examTitle: string): ReportFile[] {
-  const used = new Set<string>()
-  return reportStudents(run).map((student) => {
-    const base = slug(student.name) || 'alumno'
-    let name = `${base}.html`
-    if (used.has(name)) name = `${base}-${slug(student.student_id) || 'x'}.html`
-    for (let n = 2; used.has(name); n++) name = `${base}-${n}.html`
-    used.add(name)
-    return { name, html: studentReport(run, student, scale, examTitle) }
-  })
+/** Every student's page, by student_id: each one goes to that student only. */
+export function studentReports(run: RunResult, scale: Scale, examTitle: string): Record<string, string> {
+  return Object.fromEntries(
+    reportStudents(run).map((student) => [student.student_id, studentReport(run, student, scale, examTitle)])
+  )
+}
+
+/**
+ * The file left in each student's home directory: one per exam, so sending
+ * the same exam again replaces it and another exam sits next to it (ADR-0031).
+ */
+export function reportFileName(examTitle: string): string {
+  return `informe-${slug(examTitle) || 'examen'}.html`
 }
 
 /**
@@ -56,17 +52,11 @@ export async function examTitleOf(yaml: string | null, sha256: string, fallback:
   return 'exam' in read && read.exam.examen.trim() ? read.exam.examen.trim() : fallback
 }
 
-/** What the folder is called, so two rounds of reports never mix. */
-export function reportsFolderName(run: RunResult, examTitle: string): string {
-  const stamp = run.started_at.replace(/[-:]/g, '').replace(/[.Z].*$/, '').replace('T', '-')
-  return `informes-${slug(examTitle) || 'examen'}-${stamp}`
-}
-
-/** What the teacher is told before the reports are written. */
+/** What the teacher is told before the reports are sent. */
 export function reportsSummary(run: RunResult): string {
   const count = reportStudents(run).length
   const left = run.students.length - count
-  const parts = [`${count} informes, uno por alumno`, `corrección del ${dateText(run.finished_at)}`]
+  const parts = [`${count} alumnos, cada uno con su informe`, `corrección del ${dateText(run.finished_at)}`]
   if (left > 0) parts.push(`${left} excluidos sin informe`)
   return parts.join(' · ')
 }
@@ -226,8 +216,8 @@ function slug(text: string): string {
     .replace(/[̀-ͯ]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
     .slice(0, 60)
+    .replace(/^-+|-+$/g, '')
 }
 
 // Light only and system fonts only: the page is printed and opened offline,

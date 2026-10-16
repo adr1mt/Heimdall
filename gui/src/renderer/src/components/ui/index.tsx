@@ -317,10 +317,11 @@ export function ConfirmDialog({
   open: boolean
   title: string
   children?: React.ReactNode
-  confirmLabel: string
+  /** Without it the dialog only informs, and its one button closes it. */
+  confirmLabel?: string
   cancelLabel?: string
   destructive?: boolean
-  onConfirm: () => void
+  onConfirm?: () => void
   onCancel: () => void
 }) {
   const cancelRef = React.useRef<HTMLButtonElement>(null)
@@ -384,13 +385,15 @@ export function ConfirmDialog({
           <Button ref={cancelRef} variant="outline" size="sm" onClick={onCancel}>
             {cancelLabel}
           </Button>
-          <Button
-            variant={destructive ? 'destructive' : 'default'}
-            size="sm"
-            onClick={onConfirm}
-          >
-            {confirmLabel}
-          </Button>
+          {onConfirm && (
+            <Button
+              variant={destructive ? 'destructive' : 'default'}
+              size="sm"
+              onClick={onConfirm}
+            >
+              {confirmLabel}
+            </Button>
+          )}
         </div>
       </div>
     </div>

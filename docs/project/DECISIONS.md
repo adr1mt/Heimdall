@@ -816,3 +816,12 @@ contraseña de sus máquinas, sin cifrar: es la credencial compartida que
 conocen profesor y alumnos. ADR-0030 sustituye ADR-0023 y el punto 4 de
 ADR-0021. El motor y su política de secretos no cambian: la contraseña viaja
 solo por stdin y una contraseña por alumno se sigue descartando.
+
+## T188 · El informe se deja en la máquina del alumno (2026-10-16)
+
+Adrià quiere sustituir el `send` de Teuton: un fichero por examen en la
+carpeta personal de cada alumno, que sustituye al del mismo examen, enviado
+con un botón en Resultados. ADR-0031: escribe el motor (`heimdall deliver`),
+solo ese fichero, solo a la máquina corregida (mismo `plan_hash` e identidad
+anotada en la corrección), contraseña por stdin. Se retira el guardado local
+de informes de T185.
