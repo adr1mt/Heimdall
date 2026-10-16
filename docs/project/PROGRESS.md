@@ -43,6 +43,8 @@ T178–T183 simplificaron la GUI tomando Teuton GUI como referencia.
 
 ## Siguiente trabajo
 
+**T188**: enviar el informe a la carpeta personal de cada alumno por SSH,
+pedido por Adrià; necesita ADR antes del código.
 **T070**: rehacer exámenes del curso en formato nativo; desbloquea **T084**,
 examen real de aula que ejecuta Adrià. Consultar
 `python3 scripts/tasks.py T070` antes de empezar. **T023**, **T186** y

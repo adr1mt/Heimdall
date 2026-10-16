@@ -3920,6 +3920,39 @@
         "make gui-check gui-build"
       ],
       "notes": "Visto en T185: la barra de avisos de App.tsx es siempre role=alert y destructive, también para guardados correctos."
+    },
+    {
+      "id": "T188",
+      "title": "Enviar el informe de cada alumno a su carpeta personal por SSH",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [
+        "T185"
+      ],
+      "goal": "Como el send de Teuton pero legible: desde Resultados, dejar la página de T185 en la carpeta personal de cada alumno por la misma conexión SSH de la corrección.",
+      "scope": [
+        "docs/adr/",
+        "internal/",
+        "cmd/heimdall/",
+        "gui/src/",
+        "gui/tests/",
+        "gui/scripts/",
+        "docs/"
+      ],
+      "acceptance": [
+        "ADR nuevo antes del código: Heimdall pasa a escribir en las máquinas del alumnado, solo este fichero; dice qué se escribe, dónde, con qué permisos y qué se hace si ya existe.",
+        "Decisiones de Adrià (2026-10-16): un fichero por examen en la carpeta personal (p. ej. ~/informe-<examen>.html), que sustituye al del mismo examen; se envía con un botón en Resultados, nunca automáticamente; se retira el botón «Informes por alumno…» que guarda en una carpeta local.",
+        "Cada alumno recibe solo su propio informe, en su máquina; se verifica la identidad de la máquina como en la corrección (ADR-0011) y la contraseña solo viaja por stdin.",
+        "Tras enviar, la GUI dice a quién le ha llegado y a quién no, con el motivo; un alumno con la máquina apagada no bloquea a los demás y el envío tiene tiempo límite.",
+        "El informe enviado sigue sin comandos, salidas, contraseña ni datos de otros alumnos; prueba con valor envenenado y búsqueda de la contraseña en argv, logs y ficheros.",
+        "make check, make test, make gui-check y make gui-build; arnés contra el laboratorio que comprueba el fichero en la máquina de cada alumno."
+      ],
+      "tests": [
+        "make check test gui-check gui-build",
+        "Arnés con laboratorio: fichero presente en el home de cada alumno"
+      ],
+      "notes": "Área crítica (SSH, secretos, escritura remota): una tarea por sesión. Hay que decidir en el ADR si escribe el motor o la GUI; el contrato motor↔GUI no se cambia sin ese ADR."
     }
   ]
 }
