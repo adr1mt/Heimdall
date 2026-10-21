@@ -30,7 +30,7 @@ es siempre `NONE`.
 |---|---|---|
 | `NONE` | Hubo ejecución completa | Cualquier `PASS` o `FAIL` |
 | `CONNECT_FAILED` | No se pudo **establecer** la sesión: puerto cerrado, host inalcanzable, DNS, timeout **de conexión**, clave de host rechazada | `s03-sshfail`: puerto cerrado, `10.255.255.1` |
-| `AUTH_FAILED` | La sesión TCP se estableció y el servidor **rechazó las credenciales** | `s03-sshfail`: contraseña o usuario incorrectos |
+| `AUTH_FAILED` | La sesión TCP se estableció y el servidor **rechazó las credenciales**; o, en una comprobación con `sudo: true`, sudo no arrancó el comando (contraseña no aceptada, usuario sin sudo, máquina sin sudo; ADR-0032) | `s03-sshfail`: contraseña o usuario incorrectos |
 | `TIMEOUT` | El comando se envió y **no terminó** dentro del `timeout` de la comprobación | `s05-hang`: `sleep 100000` |
 | `CONNECTION_LOST` | La sesión estaba establecida y se **cayó** a mitad: la máquina se apaga, la red se corta, EOF inesperado | `s06-drop`: apagón durante la 2ª de 3 |
 | `OUTPUT_OVERFLOW` | Corte duro del lector o evidencia conservada insuficiente para probar la aserción (ADR-0015, ADR-0025) | `cat` de un fichero de 300 MB |

@@ -24,7 +24,8 @@ Derivadas de E1 y E2 (`01-TRADUCCION-EXAMENES.md`), no de un catálogo teórico.
 | M-11 | Comprobación **sin comando**: `valor:` contra un campo del inventario | E1 entero, sin shell |
 | M-12 | **Sustitución** `${alumno.campo}` y `${host1.ip}` en argumentos y valores esperados | Cuestionarios y exámenes con datos por alumno |
 | M-13 | `timeout` por comprobación (opcional, con valor por defecto) | C-3 |
-| M-14 | Valores por defecto del examen (`por_defecto:`) para peso y timeout | Evita repetir 16 veces lo mismo |
+| M-14 | Valores por defecto del examen (`por_defecto:`) para peso, timeout y sudo | Evita repetir 16 veces lo mismo |
+| M-15 | `sudo: true` por comprobación: el comando se ejecuta como administrador con la contraseña de la clase | Kea 3 en Ubuntu 26.04 deja `/etc/kea` solo a root; `nft list ruleset` también (ADR-0032) |
 
 Y **nada más**. No hay `if`, ni bucles, ni expresiones, ni inclusión de ficheros
 en el MVP.
@@ -174,8 +175,36 @@ grupos:
         igual_a: "255.255.255.0"
 ```
 
+En Ubuntu 26.04 con Kea 3, `/etc/kea` solo lo lee root: las dos comprobaciones
+de `kea-dhcp4.conf` llevarían `sudo: true` (§3.1).
+
 Peso total del ejemplo: 11. Idéntico para todos los alumnos, calculable sin
 encender nada.
+
+### 3.1 `sudo`
+
+```yaml
+      - id: kea-subnet
+        en: host1
+        sudo: true
+        cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
+        contiene: "10.0.0.0/8"
+```
+
+- `sudo: true` o `sudo: false`, en la comprobación o en `por_defecto:` (lo
+  heredan solo las comprobaciones con `cmd:`; una puede decir `sudo: false`).
+- El motor ejecuta `sudo -S -p '' -- <cmd…>` y escribe por la entrada estándar
+  la contraseña de ese host (la de su `password_ref`), la misma de la conexión.
+  Nunca va en `argv`, en el examen ni en el artefacto. El comando recibe
+  `/dev/null` como entrada: no puede leer la contraseña.
+- El artefacto muestra el `cmd` del examen, sin `sudo`. El hash del PLAN
+  incluye `sudo` solo cuando es `true`.
+- Escribir `sudo` o una contraseña dentro de `cmd` sigue estando prohibido de
+  hecho: la contraseña sería texto del examen (ADR-0009).
+- Si sudo no arranca el comando (contraseña no aceptada, usuario que no puede
+  usar sudo, máquina sin sudo), la comprobación es `UNEVALUATED` con causa
+  `AUTH_FAILED` y el motivo; no se vuelve a pedir sudo en ese host para ese
+  alumno. Nunca es `FAIL` (ADR-0032).
 
 ---
 
@@ -253,6 +282,8 @@ inválida** (F-02, F-06, C-14):
    y no entra en la nota.)
 8. Contraseña literal en el inventario.
 9. Inventario sin alumnos evaluables.
+10. `sudo` que no es `true`/`false`, `sudo: true` en una comprobación sin `cmd:`,
+    o `sudo: true` en un host sin `password_ref` para algún alumno.
 
 Cuando todo pasa, el PLAN publica: número de comprobaciones, peso total, hash
 del examen, hash del inventario y lista de alumnos. Ese número es el que la GUI

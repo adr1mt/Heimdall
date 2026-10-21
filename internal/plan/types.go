@@ -60,6 +60,7 @@ type Exam struct {
 type Defaults struct {
 	Weight  *float64  `yaml:"peso"`
 	Timeout *Duration `yaml:"timeout"`
+	Sudo    *bool     `yaml:"sudo"`
 }
 
 // Group is a titled block of checks. The GUI shows the title (M-3).
@@ -79,6 +80,11 @@ type Check struct {
 
 	Cmd   []string `yaml:"cmd"`   // argument vector, never a shell string
 	Value string   `yaml:"valor"` // check without a command (M-11)
+
+	// Sudo runs Cmd through sudo with the host's own password on stdin
+	// (ADR-0032). Nil means "not said"; por_defecto only fills it in for a
+	// check that has a command.
+	Sudo *bool `yaml:"sudo"`
 
 	// Assertions. A pointer distinguishes "absent" from "expects the empty
 	// string"; a check with none or with two incompatible ones is a PLAN

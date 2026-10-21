@@ -86,3 +86,25 @@ func TestCompletionRecordBeyondEvidenceLimit(t *testing.T) {
 		}
 	}
 }
+
+// TestConsumeSudoRecord: the record sudoScript prints is not student
+// evidence. It is removed from the text and from the byte count, and a stream
+// without it says so.
+func TestConsumeSudoRecord(t *testing.T) {
+	record := "\x1eHEIMDALL_abc:sudo\x1f"
+	var w capWriter
+	_, _ = w.Write([]byte(record + "aviso del comando\n"))
+	if !w.consume(record) {
+		t.Fatal("el registro estaba y no se ha encontrado")
+	}
+	got, _ := w.stream()
+	if got.Text != "aviso del comando\n" || got.BytesTotal != int64(len("aviso del comando\n")) || got.Truncated {
+		t.Fatalf("stderr tras quitar el registro: %+v", got)
+	}
+
+	var refused capWriter
+	_, _ = refused.Write([]byte("Sorry, try again.\n"))
+	if refused.consume(record) {
+		t.Fatal("sin registro, sudo no arrancó el comando")
+	}
+}

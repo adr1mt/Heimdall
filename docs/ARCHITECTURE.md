@@ -160,6 +160,10 @@ Cada uno es comprobable y tiene su test:
 - **Comandos**: vector de argumentos, sin shell local. SSH entrecomilla cada
   argumento para el shell del servidor; el supervisor remoto fijo de ADR-0024
   invoca el vector mediante `"$@"`, sin interpolarlo en el programa.
+- **sudo** (ADR-0032): con `sudo: true` el vector va tras `sudo -S -p '' --` y
+  un texto fijo que marca el arranque; la contraseña del host va por stdin y el
+  comando recibe `/dev/null`. El timeout remoto va dentro de sudo. Si sudo no
+  arranca el comando: `UNEVALUATED` / `AUTH_FAILED`, nunca `FAIL`.
 - **Timeouts**: conexión 10 s · comprobación 20 s (configurable) · alumno 10 min
   · cancelación por señal. No hay timeout global separado.
 - **Proceso remoto**: coreutils timeout y un registro privado distinguen los

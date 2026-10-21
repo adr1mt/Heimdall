@@ -80,7 +80,7 @@ func unresponsiveSession(t *testing.T, mode string) *Session {
 func TestUnconfirmedCompletionHasNoExitCode(t *testing.T) {
 	for _, mode := range []string{"no-marker", "wrong-marker"} {
 		s := unresponsiveSession(t, mode)
-		res := s.exec(context.Background(), []string{"true"}, time.Second, "\x1eHEIMDALL_expected:")
+		res, _ := s.exec(context.Background(), []string{"true"}, time.Second, "\x1eHEIMDALL_expected:", "", "")
 		if res.Completed || res.ExitCode != nil || res.RemoteProcess != model.RemoteUnknown {
 			t.Fatalf("%s: %+v", mode, res)
 		}

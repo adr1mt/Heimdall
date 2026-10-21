@@ -115,3 +115,16 @@ func (w *capWriter) completion(marker string) (int, bool) {
 	}
 	return code, true
 }
+
+// consume removes the record sudoScript prints before the command starts and
+// reports whether it was there. It comes first, so it is always inside the
+// kept prefix; whatever sudo printed before it stays as evidence.
+func (w *capWriter) consume(record string) bool {
+	at := bytes.Index(w.kept, []byte(record))
+	if at < 0 {
+		return false
+	}
+	w.kept = append(w.kept[:at], w.kept[at+len(record):]...)
+	w.total -= int64(len(record))
+	return true
+}

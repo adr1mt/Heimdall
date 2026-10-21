@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated": "2026-10-16",
+  "updated": "2026-10-21",
   "status_values": [
     "BLOCKED",
     "READY",
@@ -3954,6 +3954,44 @@
       ],
       "completed": "2026-10-16",
       "notes": "Hecho con ADR-0031: escribe el motor (heimdall deliver), solo informe-<examen>.html en la carpeta personal, 0644, sustituyendo por renombrado; solo a la máquina corregida (mismo plan_hash e identidad anotada en esa corrección, comprobada antes de autenticarse); contraseña solo por stdin. Botón «Enviar informes…» en Resultados con resultado por alumno y «Volver a enviar»; retirado el guardado local de T185. Pruebas Go (valor envenenado, nombre, PLAN cambiado), integración SSH y make gui-informes con tres máquinas y una apagada; evidencias en docs/reviews/evidence/T188."
+    },
+    {
+      "id": "T189",
+      "title": "Comprobaciones con sudo sin contraseña en el examen",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Leer como administrador lo que el usuario de la conexión no puede (/etc/kea de Kea 3 en Ubuntu 26.04, nft list ruleset) sin escribir la contraseña de la clase en el examen.",
+      "scope": [
+        "docs/adr/",
+        "internal/plan/",
+        "internal/ssh/",
+        "internal/engine/",
+        "test/",
+        "gui/src/shared/exam.ts",
+        "gui/src/renderer/src/routes/Help.tsx",
+        "gui/tests/",
+        "README.md",
+        "docs/"
+      ],
+      "acceptance": [
+        "ADR nuevo antes del código: clave sudo, de dónde sale la contraseña y cómo se clasifica un sudo que no arranca el comando.",
+        "sudo: true en la comprobación o en por_defecto; el motor ejecuta sudo -S -p '' -- con la contraseña del password_ref del host por stdin; nunca en argv, examen, artefacto ni registros.",
+        "Errores de PLAN: sudo no booleano, sudo: true sin cmd, host sin password_ref.",
+        "Contraseña no aceptada, usuario sin sudo o máquina sin sudo: UNEVALUATED/AUTH_FAILED con motivo, nunca FAIL; sin depender de mensajes localizados.",
+        "El timeout remoto mata también un comando que corre como root.",
+        "02-FORMATO.md, README (tabla y prompt para IA) y lectura del examen en la GUI conocen la clave.",
+        "Tests unitarios y de laboratorio (fichero solo de root, usuario sin sudo, argv sin contraseña); make check y make test.",
+        "Exámenes de 0227 migrados y validados; corrección real del servidor de prueba sin fallos por permisos."
+      ],
+      "tests": [
+        "make check test",
+        "npx vitest run tests/editor.test.ts",
+        "Corrección real: prova-guia-kea y ra1-dhcp-kea contra 192.168.236.60"
+      ],
+      "completed": "2026-10-21",
+      "notes": "ADR-0032. Detección por registro privado con nonce impreso por un texto fijo dentro de sudo; el comando recibe /dev/null. Sin causa nueva: AUTH_FAILED. Laboratorio con sudo, /etc/kea solo de root y usuario invitado sin sudo; lab.sh reconstruye la imagen si cambia el Containerfile. Corrección real del 2026-10-21: prova-guia-kea 100/100, ra1-dhcp-kea 34/100, todas las lecturas con sudo terminaron con 0."
     }
   ]
 }

@@ -208,7 +208,7 @@ func (s *Session) warn(code, message string) {
 func (s *Session) probeRemoteTimeout(ctx context.Context) {
 	probeCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
-	res := s.exec(probeCtx, []string{"command", "-v", "timeout"}, 0, "")
+	res, _ := s.exec(probeCtx, []string{"command", "-v", "timeout"}, 0, "", "", "")
 	s.hasRemoteKill = res.Completed && res.ExitCode != nil && *res.ExitCode == 0
 	if !s.hasRemoteKill {
 		s.warn("REMOTE_TIMEOUT_UNAVAILABLE",
@@ -219,28 +219,83 @@ func (s *Session) probeRemoteTimeout(ctx context.Context) {
 // Run executes argv on the student's machine and reports what happened. It
 // never blocks for longer than timeout plus the grace given to the remote kill.
 func (s *Session) Run(ctx context.Context, argv []string, timeout time.Duration) *model.ExecutionResult {
+	res, _ := s.run(ctx, argv, timeout, false)
+	return res
+}
+
+// SudoRefused says that sudo did not start the command: a wrong password, a
+// user who may not use sudo, or no sudo on the machine. Nothing of the
+// student's work was looked at, so it is never a FAIL (ADR-0032).
+type SudoRefused struct {
+	Detail string
+}
+
+func (e *SudoRefused) Error() string { return e.Detail }
+
+// sudoScript is the fixed text sudo runs (ADR-0032). Its first act as root is
+// a private record that proves sudo accepted the password and started it; a
+// run without that record never reached the command. The command gets
+// /dev/null as stdin, so the password line can never be read by it, not even
+// when sudo needed no password and left it unread.
+func sudoScript(nonce string) string {
+	return `printf '\036HEIMDALL_` + nonce + `:sudo\037' >&2; exec "$@" </dev/null`
+}
+
+// RunSudo executes argv as root through `sudo -S`, writing the session's own
+// password to stdin. The password never reaches argv. When sudo does not
+// start the command it says so in a *SudoRefused, alongside what the machine
+// answered.
+func (s *Session) RunSudo(ctx context.Context, argv []string, timeout time.Duration) (*model.ExecutionResult, *SudoRefused) {
+	res, refused := s.run(ctx, argv, timeout, true)
+	if !refused {
+		return res, nil
+	}
+	if res.ExitCode != nil && *res.ExitCode == 127 {
+		return res, &SudoRefused{Detail: fmt.Sprintf(
+			"en %s no está instalado sudo y la comprobación necesita leer como administrador", s.cfg.Host)}
+	}
+	return res, &SudoRefused{Detail: fmt.Sprintf(
+		"sudo no aceptó la contraseña del usuario %s en %s, o ese usuario no puede usar sudo; no se ha comprobado nada del alumno",
+		s.cfg.User, s.cfg.Host)}
+}
+
+func (s *Session) run(ctx context.Context, argv []string, timeout time.Duration, sudo bool) (*model.ExecutionResult, bool) {
 	sent := argv
 	local := timeout
 	marker := ""
+	var nonce [16]byte
+	if _, err := cryptorand.Read(nonce[:]); err != nil {
+		panic(err)
+	}
+	hexNonce := hex.EncodeToString(nonce[:])
 	if s.hasRemoteKill && timeout > 0 {
-		var nonce [16]byte
-		if _, err := cryptorand.Read(nonce[:]); err != nil {
-			panic(err)
-		}
-		marker = "\x1eHEIMDALL_" + hex.EncodeToString(nonce[:]) + ":"
+		marker = "\x1eHEIMDALL_" + hexNonce + ":"
 		// The fixed supervisor invokes only positional arguments. Its completion
 		// record distinguishes a command's own 124/137 from timeout's status.
-		script := `expired=0; trap 'expired=1' TERM; "$@"; code=$?; if [ "$expired" -eq 0 ]; then printf '\036HEIMDALL_` + hex.EncodeToString(nonce[:]) + `:%s\037' "$code" >&2; fi; exit "$code"`
+		script := `expired=0; trap 'expired=1' TERM; "$@"; code=$?; if [ "$expired" -eq 0 ]; then printf '\036HEIMDALL_` + hexNonce + `:%s\037' "$code" >&2; fi; exit "$code"`
 		secs := strconv.FormatFloat(timeout.Seconds(), 'f', -1, 64)
 		sent = append([]string{"timeout", "-k", "5s", secs + "s", "sh", "-c", script, "heimdall-command"}, argv...)
 		local = timeout + remoteGrace
 	}
-	res := s.exec(ctx, sent, local, marker)
+	stdin := ""
+	startMarker := ""
+	if sudo {
+		// timeout goes inside sudo: run as the user it could not kill a
+		// command that runs as root.
+		sent = append([]string{"sudo", "-S", "-p", "", "--", "sh", "-c", sudoScript(hexNonce), "heimdall-sudo"}, sent...)
+		stdin = s.cfg.Password + "\n"
+		startMarker = "\x1eHEIMDALL_" + hexNonce + ":sudo\x1f"
+	}
+	res, refused := s.exec(ctx, sent, local, marker, stdin, startMarker)
 	res.Command = argv // the artifact shows what the exam asked for
-	return res
+	return res, refused
 }
 
-func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration, marker string) *model.ExecutionResult {
+// exec runs argv once. stdin, when not empty, is written to the command and
+// closed. startMarker, when not empty, is the record sudoScript prints; the
+// second result is true when an exit status came back without it, which means
+// sudo refused to start the command.
+func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration, marker, stdin, startMarker string) (*model.ExecutionResult, bool) {
 	res := &model.ExecutionResult{
 		Host:            s.cfg.Host,
 		Address:         s.cfg.addr(),
@@ -267,31 +322,34 @@ func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration
 	stopClose := context.AfterFunc(runCtx, func() { _ = s.client.Close() })
 	defer stopClose()
 	if runCtx.Err() != nil {
-		return res
+		return res, false
 	}
 	sess, err := s.client.NewSession()
 	if err != nil {
 		res.Stdout, res.Stderr = emptyStreams()
-		return res
+		return res, false
 	}
 	defer sess.Close()
+	if stdin != "" {
+		sess.Stdin = strings.NewReader(stdin)
+	}
 
 	stdout, stderr := &capWriter{}, &capWriter{}
 	outPipe, err := sess.StdoutPipe()
 	if err != nil {
 		res.Stdout, res.Stderr = emptyStreams()
-		return res
+		return res, false
 	}
 	errPipe, err := sess.StderrPipe()
 	if err != nil {
 		res.Stdout, res.Stderr = emptyStreams()
-		return res
+		return res, false
 	}
 
 	// No pty: the two streams stay separate and nothing adds terminal escapes.
 	if err := sess.Start(quote(argv)); err != nil {
 		res.Stdout, res.Stderr = emptyStreams()
-		return res
+		return res, false
 	}
 
 	var wg sync.WaitGroup
@@ -346,6 +404,7 @@ func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration
 	}
 
 	commandCode, commandFinished := stderr.completion(marker)
+	started := startMarker == "" || stderr.consume(startMarker)
 	var sanitisedOut, sanitisedErr bool
 	res.Stdout, sanitisedOut = stdout.stream()
 	res.Stderr, sanitisedErr = stderr.stream()
@@ -355,12 +414,12 @@ func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration
 	if stdout.overflow || stderr.overflow {
 		res.Overflow = true
 		s.warn("OUTPUT_OVERFLOW", fmt.Sprintf("un comando en %s ha producido mas de 8 MB y se ha dejado de leer", s.cfg.Host))
-		return res // not completed: there is no trustworthy output to compare
+		return res, false // not completed: there is no trustworthy output to compare
 	}
 
 	switch {
 	case timedOut:
-		return res
+		return res, false
 	case waitErr == nil:
 		code := 0
 		res.ExitCode = &code
@@ -369,10 +428,16 @@ func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration
 		if !errors.As(waitErr, &ee) {
 			// The connection dropped mid-command: nothing is known about the
 			// other side.
-			return res
+			return res, false
 		}
 		code := ee.ExitStatus()
 		res.ExitCode = &code
+	}
+
+	if !started {
+		// An exit status with no record from sudoScript: sudo itself answered
+		// and the command never ran. The status is sudo's, not the student's.
+		return res, res.ExitCode != nil
 	}
 
 	if marker != "" && res.ExitCode != nil && (*res.ExitCode == 124 || *res.ExitCode == 137) && (!commandFinished || *res.ExitCode != commandCode) {
@@ -380,18 +445,18 @@ func (s *Session) exec(ctx context.Context, argv []string, timeout time.Duration
 		// gone for sure.
 		res.ExitCode = nil
 		res.RemoteProcess = model.RemoteKilledRemote
-		return res
+		return res, false
 	}
 
 	if marker != "" {
 		if !commandFinished || res.ExitCode == nil || *res.ExitCode != commandCode {
 			res.ExitCode = nil
-			return res
+			return res, false
 		}
 	}
 	res.Completed = true
 	res.RemoteProcess = model.RemoteFinished
-	return res
+	return res, false
 }
 
 func emptyStreams() (model.Stream, model.Stream) {

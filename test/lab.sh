@@ -25,8 +25,12 @@ require() {
 
 up() {
   require
-  podman image exists "$IMAGE" || \
-    podman build -t "$IMAGE" -f "$CONTAINERFILE_DIR/Containerfile" "$CONTAINERFILE_DIR"
+  # The image is rebuilt when the Containerfile changes (T189 added sudo).
+  local want have
+  want=$(sha256sum "$CONTAINERFILE_DIR/Containerfile" | cut -c1-16)
+  have=$(podman image inspect -f '{{index .Labels "heimdall.containerfile"}}' "$IMAGE" 2>/dev/null || true)
+  [ "$want" = "$have" ] || \
+    podman build --label "heimdall.containerfile=$want" -t "$IMAGE" -f "$CONTAINERFILE_DIR/Containerfile" "$CONTAINERFILE_DIR"
   # --replace makes a second run idempotent instead of a name clash.
   # --hostname: the prototype exam checks that the machine identifies itself,
   # and a container's default hostname is a random id.

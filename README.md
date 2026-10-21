@@ -115,6 +115,7 @@ grupos:
       - id: kea-subred
         descripcion: "KEA declara la subred 10.0.0.0/8"
         en: host1
+        sudo: true          # /etc/kea solo lo lee el administrador
         cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
         cerca_de: { ancla: '"subnet"', lineas: 0, contiene: "10.0.0.0/8" }
 
@@ -141,6 +142,11 @@ Lo que hay que saber:
   | `exit_code: 0` | el comando termina con ese código |
   | `cerca_de: { ancla, lineas, contiene }` | contiene el texto como mucho N líneas después de la línea que tiene el ancla (como `grep -A N`) |
 
+- `sudo: true` ejecuta el comando como administrador, para lo que el usuario de
+  la conexión no puede leer (`/etc/kea` en Ubuntu 26.04, `nft list ruleset`).
+  Usa la contraseña de la clase, la misma de la conexión: nunca la escribas en
+  el examen. Va en la comprobación o en `por_defecto` para todas. Si la
+  máquina no la acepta, la comprobación sale *sin evaluar*, no suspendida.
 - `peso` es lo que vale cada comprobación (por defecto, el de `por_defecto`).
   La nota es la suma de lo aprobado sobre la suma total, y el total es el
   mismo para todos.
@@ -174,6 +180,8 @@ grupos:
 
 Reglas:
 - cmd es una lista de palabras. Sin tuberías, sin grep, sin ; ni redirecciones.
+- Si el comando necesita ser administrador (leer /etc/kea, nft list ruleset...),
+  añade sudo: true a esa comprobación. Nunca escribas sudo ni contraseñas en cmd.
 - Aserciones posibles (una por comprobación): contiene: "x", no_contiene: "x",
   igual_a: "x", exit_code: 0, o cerca_de: { ancla: "x", lineas: N, contiene: "y" }
   (busca "y" en las N líneas siguientes a la que contiene "x").

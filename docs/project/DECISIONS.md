@@ -846,3 +846,16 @@ comprobación esperaba un minuto. Sustituye el punto 3 de T114.
 3. **El registro va también a disco**, en `~/.config/heimdall-gui/logs/actualizacion.log`
    (último cuarto de MB). Abierta desde el menú, la salida de error se perdía
    y un fallo no dejaba rastro. Solo contiene versiones, URLs públicas y errores.
+
+### 2026-10-21 · T189 · `sudo: true` en las comprobaciones (ADR-0032)
+
+1. **La contraseña de sudo es la del host** (`password_ref`), sin una segunda
+   referencia: en el aula son la misma y no hay caso de otra.
+2. **Sin causa nueva.** Un sudo que no arranca el comando es `AUTH_FAILED`; el
+   contrato con la GUI y el esquema no cambian. El motivo distingue «no hay
+   sudo» (127) de «no aceptó la contraseña o el usuario no puede usarlo».
+3. **Detección por registro con nonce**, nunca por el texto de sudo (F-08). El
+   comando recibe `/dev/null`: con `NOPASSWD` no puede leer la contraseña.
+4. **El timeout remoto va dentro de sudo**: fuera no podría matar a root.
+5. Un sudo rechazado no se vuelve a intentar en ese host para ese alumno.
+6. `test/lab.sh` reconstruye la imagen cuando cambia el `Containerfile`.

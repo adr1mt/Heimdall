@@ -82,6 +82,39 @@ grupos:
     expect(totalWeight(twice)).toBe(totalWeight(once))
   })
 
+  it('conserva sudo en por_defecto y en cada comprobación (ADR-0032)', () => {
+    const once = parse(`
+examen: "P"
+version: 1
+hosts: [host1]
+por_defecto: { peso: 1, timeout: 20s, sudo: true }
+grupos:
+  - grupo: "G"
+    comprobaciones:
+      - id: kea-conf
+        descripcion: "Lee la configuración de Kea"
+        en: host1
+        cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
+        contiene: "subnet4"
+      - id: sin-sudo
+        descripcion: "El nombre de la máquina"
+        en: host1
+        sudo: false
+        cmd: ["hostname"]
+        contiene: "srv"
+`)
+    expect(once.porDefecto.sudo).toBe(true)
+    const [first, second] = allChecks(once)
+    expect(first.sudo).toBeUndefined()
+    expect(second.sudo).toBe(false)
+    const yaml = examYaml(once)
+    expect(yaml).toContain('sudo: true')
+    expect(yaml).toContain('sudo: false')
+    expect(parse(yaml)).toEqual(once)
+    const wrong = readExam(yaml.replace('sudo: false', 'sudo: "no"'))
+    expect('problem' in wrong && wrong.problem).toContain('se esperaba true o false')
+  })
+
   it('conserva la aserción de cercanía con su ancla y sus líneas', () => {
     const exam = parse(`
 examen: "P"

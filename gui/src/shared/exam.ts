@@ -49,6 +49,8 @@ export interface Check {
   /** Empty means the exam's default. */
   peso: string
   timeout: string
+  /** Run the command through sudo (ADR-0032). Absent means the exam's default. */
+  sudo?: boolean
 }
 
 export interface Group {
@@ -60,7 +62,7 @@ export interface Exam {
   examen: string
   version: number
   hosts: string[]
-  porDefecto: { peso: string; timeout: string }
+  porDefecto: { peso: string; timeout: string; sudo?: boolean }
   grupos: Group[]
 }
 
@@ -119,7 +121,8 @@ function readCheck(value: unknown): Check {
     valor: text(raw.valor),
     assertion: readAssertion(raw),
     peso: text(raw.peso),
-    timeout: text(raw.timeout)
+    timeout: text(raw.timeout),
+    ...(typeof raw.sudo === 'boolean' ? { sudo: raw.sudo } : {})
   }
 }
 
@@ -131,9 +134,10 @@ function formatProblem(doc: unknown): string | null {
     for(const key of Object.keys(raw)) if(!keys.includes(key)) throw new Error(`${path}.${key}: clave desconocida.`)
     return raw
   }
-  const field=(raw:Record<string,unknown>,key:string,path:string,kind:'string'|'number'|'integer'):void=> {
+  const field=(raw:Record<string,unknown>,key:string,path:string,kind:'string'|'number'|'integer'|'boolean'):void=> {
     if(raw[key]===undefined) return
     const v=raw[key]
+    if(kind==='boolean') { if(typeof v!=='boolean') throw new Error(`${path}.${key}: tipo incorrecto; se esperaba true o false.`); return }
     if(typeof v!==(kind==='string'?'string':'number') || (typeof v==='number' && (!Number.isFinite(v) || (kind==='integer' && !Number.isInteger(v))))) throw new Error(`${path}.${key}: tipo incorrecto; se esperaba ${kind==='string'?'texto':'un número'}.`)
   }
   const array=(value:unknown,path:string):unknown[]=> { if(value===undefined) return []; if(!Array.isArray(value)) throw new Error(`${path}: se esperaba una lista.`);return value }
@@ -142,17 +146,17 @@ function formatProblem(doc: unknown): string | null {
     field(raw,'examen','examen','string');field(raw,'version','examen','integer')
     for(const host of array(raw.hosts,'hosts')) if(typeof host!=='string') throw new Error('hosts: cada máquina debe ser texto.')
     if(raw.por_defecto!==undefined) {
-      const defaults=object(raw.por_defecto,'por_defecto',['peso','timeout'])
-      field(defaults,'peso','por_defecto','number');field(defaults,'timeout','por_defecto','string')
+      const defaults=object(raw.por_defecto,'por_defecto',['peso','timeout','sudo'])
+      field(defaults,'peso','por_defecto','number');field(defaults,'timeout','por_defecto','string');field(defaults,'sudo','por_defecto','boolean')
     }
     for(const [i,value] of array(raw.grupos,'grupos').entries()) {
       const path=`grupos[${i+1}]`
       const group=object(value,path,['grupo','comprobaciones']);field(group,'grupo',path,'string')
       for(const [j,value] of array(group.comprobaciones,`${path}.comprobaciones`).entries()) {
         const at=`${path}.comprobaciones[${j+1}]`
-        const c=object(value,at,['id','descripcion','en','cmd','valor','peso','timeout',...ASSERTIONS])
+        const c=object(value,at,['id','descripcion','en','cmd','valor','peso','timeout','sudo',...ASSERTIONS])
         for(const key of ['id','descripcion','en','valor','timeout','contiene','igual_a','no_contiene']) field(c,key,at,'string')
-        field(c,'peso',at,'number');field(c,'exit_code',at,'integer')
+        field(c,'peso',at,'number');field(c,'exit_code',at,'integer');field(c,'sudo',at,'boolean')
         for(const arg of array(c.cmd,`${at}.cmd`)) if(typeof arg!=='string') throw new Error(`${at}.cmd: cada argumento debe ser texto.`)
         if(ASSERTIONS.filter(key=>c[key]!==undefined).length!==1) throw new Error(`${at}: debe tener exactamente una aserción.`)
         if(c.cmd!==undefined && c.valor!==undefined) throw new Error(`${at}: cmd y valor no pueden aparecer juntos.`)
@@ -191,7 +195,11 @@ export function readExam(yaml: string): { exam: Exam } | { problem: string } {
       examen: text(raw.examen),
       version: typeof raw.version === 'number' ? raw.version : 1,
       hosts: Array.isArray(raw.hosts) ? raw.hosts.map(text).filter(Boolean) : [],
-      porDefecto: { peso: text(defaults.peso), timeout: text(defaults.timeout) },
+      porDefecto: {
+        peso: text(defaults.peso),
+        timeout: text(defaults.timeout),
+        ...(typeof defaults.sudo === 'boolean' ? { sudo: defaults.sudo } : {})
+      },
       grupos: groups.map((group) => {
         const g = (group ?? {}) as Record<string, unknown>
         return {
@@ -226,10 +234,13 @@ function writeCheck(check: Check): Record<string, unknown> {
     if (check.en) out.en = check.en
     if (check.peso.trim()) out.peso = weight(check.peso)
     if (check.timeout.trim()) out.timeout = check.timeout.trim()
+    if (check.sudo !== undefined) out.sudo = check.sudo
     out.cmd = check.cmd
   } else {
     if (check.peso.trim()) out.peso = weight(check.peso)
     out.valor = check.valor
+    // Invalid without a command, and the engine says so: kept, never dropped.
+    if (check.sudo !== undefined) out.sudo = check.sudo
   }
   if (check.timeout.trim()) out.timeout=check.timeout.trim()
   const { kind, value, anchor, lines } = check.assertion
@@ -257,6 +268,7 @@ export function examYaml(exam: Exam): string {
   const defaults: Record<string, unknown> = {}
   if (exam.porDefecto.peso.trim()) defaults.peso = weight(exam.porDefecto.peso)
   if (exam.porDefecto.timeout.trim()) defaults.timeout = exam.porDefecto.timeout.trim()
+  if (exam.porDefecto.sudo !== undefined) defaults.sudo = exam.porDefecto.sudo
   if (Object.keys(defaults).length > 0) doc.por_defecto = defaults
   doc.grupos = exam.grupos.map((group) => ({
     grupo: group.grupo,

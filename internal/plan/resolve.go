@@ -91,6 +91,7 @@ type ResolvedCheck struct {
 
 	Cmd   []string
 	Value string
+	Sudo  bool // run Cmd through sudo with the host's password (ADR-0032)
 
 	Contains    *string
 	NotContains *string
@@ -260,6 +261,10 @@ func validateExam(exam *Exam, errs *[]error) []Check {
 			// exit status to compare. Caught here, in the PLAN, and not at
 			// run time: an exam that cannot be evaluated must not reach any
 			// machine.
+			if !hasCmd && check.Sudo != nil && *check.Sudo {
+				*errs = append(*errs, errf(check.Line,
+					"la comprobación %q pide sudo, pero no ejecuta ningún comando", check.ID))
+			}
 			if !hasCmd && check.ExitCode != nil {
 				*errs = append(*errs, errf(check.Line,
 					"la comprobación %q compara el código de salida, pero no ejecuta ningún comando",
@@ -405,6 +410,23 @@ func resolveStudents(exam *Exam, inv *Inventory, checks []Check, examPath, inven
 			}
 		}
 
+		// sudo is given the same password the session logs in with. A host
+		// without one has nothing to give it, and that is the teacher's
+		// configuration, not a check the student failed.
+		noPassword := map[string]bool{}
+		for _, check := range checks {
+			if check.Sudo == nil || !*check.Sudo || noPassword[check.On] {
+				continue
+			}
+			if host, ok := student.Hosts[check.On]; ok && host.IP != "" && host.PasswordRef == "" {
+				noPassword[check.On] = true
+				errs = append(errs, withFile(inventoryPath, errf(student.Line,
+					"el examen usa sudo en el host %q, pero el alumno %q no tiene password_ref "+
+						"en ese host: sudo necesita la contraseña de la clase",
+					check.On, student.ID)))
+			}
+		}
+
 		sc := scope{studentID: student.ID, fields: studentFields(student), hosts: student.Hosts}
 		for _, check := range checks {
 			resolved, err := resolveCheck(check, sc, exam)
@@ -444,6 +466,7 @@ func resolveCheck(check Check, sc scope, exam *Exam) (ResolvedCheck, error) {
 		Timeout:     time.Duration(*check.Timeout),
 		Host:        check.On,
 		ExitCode:    check.ExitCode,
+		Sudo:        check.Sudo != nil && *check.Sudo,
 	}
 	out.Group = groupOf(exam, check.ID)
 	if check.On != "" {
@@ -559,6 +582,7 @@ func hashPlan(p *Plan) string {
 		Address  string   `json:"address"`
 		User     string   `json:"user"`
 		Cmd      []string `json:"cmd"`
+		Sudo     bool     `json:"sudo,omitempty"` // omitted when false: older plans keep their hash
 		Value    string   `json:"value"`
 		Assert   string   `json:"assert"`
 		Expected string   `json:"expected"`
@@ -627,7 +651,7 @@ func hashPlan(p *Plan) string {
 				Host:    c.Host,
 				Address: fmt.Sprintf("%s:%d", c.Target.IP, c.Target.Port),
 				User:    c.Target.User,
-				Cmd:     c.Cmd, Value: c.Value,
+				Cmd:     c.Cmd, Sudo: c.Sudo, Value: c.Value,
 				Assert: kind, Expected: expected,
 			}) {
 				return ""

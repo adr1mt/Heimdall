@@ -26,6 +26,9 @@ import (
 // implementation in production is *ssh.Session.
 type Session interface {
 	Run(ctx context.Context, argv []string, timeout time.Duration) *model.ExecutionResult
+	// RunSudo runs argv through sudo with the session's own password on
+	// stdin (ADR-0032). A non-nil refusal means the command never started.
+	RunSudo(ctx context.Context, argv []string, timeout time.Duration) (*model.ExecutionResult, *ssh.SudoRefused)
 	Warnings() []model.Warning
 	Close() error
 }

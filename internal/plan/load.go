@@ -255,6 +255,12 @@ func (e *Exam) applyDefaults() {
 	for g := range e.Groups {
 		for c := range e.Groups[g].Checks {
 			check := &e.Groups[g].Checks[c]
+			// A valor: check runs nothing, so a default sudo does not reach it;
+			// only one the teacher wrote on the check itself is an error.
+			if check.Sudo == nil && e.Defaults.Sudo != nil && len(check.Cmd) > 0 {
+				sudo := *e.Defaults.Sudo
+				check.Sudo = &sudo
+			}
 			if check.Weight == nil {
 				w := weight
 				check.Weight = &w

@@ -114,6 +114,13 @@ export default function HelpView() {
               operadores de shell. Usa espacios para indentar, no tabuladores.
             </p>
             <p>
+              Si un fichero o un comando solo lo puede leer el administrador (por ejemplo{' '}
+              <code>/etc/kea</code> o <code>nft list ruleset</code>), añade{' '}
+              <code>sudo: true</code> a la comprobación, o a <code>por_defecto</code> para todas.
+              Heimdall usa la contraseña de la clase; nunca la escribas en el examen. Si la máquina
+              no la acepta, la comprobación queda sin evaluar, no suspendida.
+            </p>
+            <p>
               <strong>Validar</strong> comprueba el examen con la clase elegida.{' '}
               <strong>Guardar</strong> lo valida antes de escribirlo. Si hay un error, se muestra el
               motivo y se conserva el fichero anterior. Los comentarios y el texto se guardan tal

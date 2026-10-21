@@ -20,10 +20,20 @@ type fakeSession struct {
 	run    func(ctx context.Context, argv []string, timeout time.Duration) *model.ExecutionResult
 	warn   []model.Warning
 	closed bool
+
+	// sudo answers RunSudo. Nil means the machine has no sudo for anybody:
+	// a test that does not expect sudo fails loudly if the engine asks.
+	sudo func(argv []string) (*model.ExecutionResult, *ssh.SudoRefused)
 }
 
 func (f *fakeSession) Run(ctx context.Context, argv []string, timeout time.Duration) *model.ExecutionResult {
 	return f.run(ctx, argv, timeout)
+}
+func (f *fakeSession) RunSudo(_ context.Context, argv []string, _ time.Duration) (*model.ExecutionResult, *ssh.SudoRefused) {
+	if f.sudo == nil {
+		panic("RunSudo sin sudo en la sesión de prueba")
+	}
+	return f.sudo(argv)
 }
 func (f *fakeSession) Warnings() []model.Warning { return f.warn }
 func (f *fakeSession) Close() error              { f.closed = true; return nil }

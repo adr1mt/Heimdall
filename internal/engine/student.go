@@ -152,6 +152,11 @@ func (r *runner) runCheck(runCtx, studentCtx context.Context, sp plan.StudentPla
 	if dialErr != nil {
 		return skeleton(c, dialErr.Cause, dialErr.Detail)
 	}
+	if refused, ok := hosts.sudoRefused[c.Host]; c.Sudo && ok {
+		// Asking again with the same password would get the same answer
+		// and could lock the account.
+		return skeleton(c, model.CauseAuthFailed, refused)
+	}
 
 	timeout := c.Timeout
 	if deadline, ok := studentCtx.Deadline(); ok {
@@ -160,7 +165,23 @@ func (r *runner) runCheck(runCtx, studentCtx context.Context, sp plan.StudentPla
 		}
 	}
 
-	exec := sess.Run(studentCtx, c.Cmd, timeout)
+	var exec *model.ExecutionResult
+	var refused *ssh.SudoRefused
+	if c.Sudo {
+		exec, refused = sess.RunSudo(studentCtx, c.Cmd, timeout)
+	} else {
+		exec = sess.Run(studentCtx, c.Cmd, timeout)
+	}
+	if refused != nil {
+		// sudo answered, not the student's machine: what it printed stays as
+		// evidence, but nothing of the student was looked at (ADR-0032).
+		hosts.sudoRefused[c.Host] = refused.Detail
+		out := skeleton(c, model.CauseAuthFailed, refused.Detail)
+		exec.Completed = false
+		exec.ExitCode = nil
+		out.Execution = exec
+		return out
+	}
 	cause, detail := causeOf(runCtx, studentCtx, sp, r.plan.StudentBudget, exec, c)
 
 	out := skeleton(c, model.CauseNone, "")
@@ -322,6 +343,8 @@ type hostPool struct {
 	sessions map[string]Session
 	failures map[string]*ssh.DialError
 	targets  map[string]plan.Host
+	// sudoRefused is host → why sudo did not start a command there.
+	sudoRefused map[string]string
 }
 
 func newHostPool(runCtx context.Context, r *runner, sp plan.StudentPlan) *hostPool {
@@ -338,6 +361,8 @@ func newHostPool(runCtx context.Context, r *runner, sp plan.StudentPlan) *hostPo
 		sessions: map[string]Session{},
 		failures: map[string]*ssh.DialError{},
 		targets:  targets,
+
+		sudoRefused: map[string]string{},
 	}
 }
 

@@ -30,9 +30,9 @@ que describe el sistema; esto describe **qué no se puede hacer**.
    con cancelación o con todos los alumnos rotos. Única excepción: PLAN inválido.
 
 7. **Comandos como vectores literales.** No hay shell local ni `shell: true`.
-   SSH entrecomilla cada argumento para el shell del servidor. Única excepción
-   remota: el supervisor de texto fijo de ADR-0024, que invoca `"$@"` sin
-   interpolar los argumentos del examen dentro del programa.
+   SSH entrecomilla cada argumento para el shell del servidor. Excepciones
+   remotas: los textos fijos del supervisor de ADR-0024 y de sudo de ADR-0032,
+   que invocan `"$@"` sin interpolar los argumentos del examen en el programa.
 
 8. **El motor no convierte la nota a la escala del profesor.** Publica 0-100
    entero y los números crudos. La conversión es de la GUI.
