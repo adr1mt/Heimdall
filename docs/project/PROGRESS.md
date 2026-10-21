@@ -5,6 +5,10 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
+**La nota, lo primero en Resultados.** En «Matriz» la nota va arriba, grande
+y rellena del color de aprobado/suspenso (ámbar si es provisional), fija bajo
+los nombres al desplazar las comprobaciones. En «Lista», la misma insignia.
+
 **T189 · Comprobaciones con `sudo: true` (ADR-0032).** Kea 3 en Ubuntu 26.04
 deja `/etc/kea` solo a root. Antes los exámenes de 0227 llevaban la contraseña
 dentro de un `bash -c`; ahora basta `sudo: true` y el motor usa la contraseña

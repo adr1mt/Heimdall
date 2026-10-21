@@ -480,7 +480,6 @@ function MatrixView({
   onPick: (selection: Selection) => void
   onStudent: (id: string) => void
 }) {
-  const scale = useScale()
   const matrix = useMemo(() => buildMatrix(rows), [rows])
   const names = useMemo(() => {
     const taken: string[] = []
@@ -494,17 +493,19 @@ function MatrixView({
   return (
     <div className="space-y-2">
       <Legend />
-      <div className="overflow-auto rounded-md border border-border">
+      <div className="max-h-[calc(100vh-16rem)] overflow-auto rounded-md border border-border">
         <table className="w-full border-collapse text-left">
-          <thead>
-            <tr className="border-b border-border bg-secondary/40">
-              <th className="sticky left-0 z-10 bg-secondary/40 px-3 py-2 text-micro uppercase tracking-[0.09em] text-muted-foreground">
+          {/* Names and grades stay pinned while the checks scroll under them:
+              the grade is what the teacher and the class look at first. */}
+          <thead className="sticky top-0 z-20 bg-background shadow-[0_1px_0_hsl(var(--border))]">
+            <tr className="bg-secondary/40">
+              <th className="sticky left-0 z-10 bg-background px-3 pt-2 text-micro uppercase tracking-[0.09em] text-muted-foreground">
                 {t.results.matrixCheck}
               </th>
               {names.map((name, index) => (
                 <th
                   key={matrix.students[index].student_id}
-                  className="px-1 py-2 text-center text-xs font-semibold"
+                  className="px-1 pt-2 text-center text-xs font-semibold"
                   title={matrix.students[index].name}
                 >
                   <button
@@ -514,6 +515,16 @@ function MatrixView({
                     {name}
                   </button>
                 </th>
+              ))}
+            </tr>
+            <tr className="bg-secondary/40">
+              <th className="sticky left-0 z-10 bg-background px-3 pb-2 pt-1 text-sm font-semibold">
+                {t.results.matrixScore}
+              </th>
+              {matrix.students.map((student) => (
+                <td key={student.student_id} className="px-1 pb-2 pt-1 text-center align-top">
+                  <GradeBadge student={student} onClick={() => onStudent(student.student_id)} />
+                </td>
               ))}
             </tr>
           </thead>
@@ -527,41 +538,68 @@ function MatrixView({
                 onPick={onPick}
               />
             ))}
-            <tr className="border-t border-border bg-secondary/40">
-              <th className="sticky left-0 z-10 bg-secondary/40 px-3 py-2 text-xs font-semibold">
-                {t.results.matrixScore}
-              </th>
-              {matrix.students.map((student) => {
-                const score = scoreView(student.score, scale)
-                return (
-                  <td
-                    key={student.student_id}
-                    className="px-1 py-2 text-center text-xs font-semibold tabular-nums"
-                  >
-                    {score.value === null ? (
-                      <span className="text-muted-foreground">—</span>
-                    ) : (
-                      <button
-                        onClick={() => onStudent(student.student_id)}
-                        className={gradeAppearance(student, scale.passMark).color}
-                        title={
-                          score.kind === 'provisional' ? `Provisional: ${score.note}` : score.note
-                        }
-                      >
-                        {score.text}
-                        {score.kind === 'provisional' && (
-                          <span className="block text-micro">provisional</span>
-                        )}
-                      </button>
-                    )}
-                  </td>
-                )
-              })}
-            </tr>
           </tbody>
         </table>
       </div>
     </div>
+  )
+}
+
+/**
+ * The grade as the teacher reads it first: large, filled with the pass/fail
+ * colour, never smaller than the cells around it. An unfinished grade keeps
+ * the amber of a technical incident and says «provisional» (principio 3).
+ */
+function GradeBadge({
+  student,
+  onClick,
+  large = false
+}: {
+  student: StudentResult
+  onClick?: () => void
+  large?: boolean
+}) {
+  const scale = useScale()
+  const score = scoreView(student.score, scale)
+  const appearance = gradeAppearance(student, scale.passMark)
+  const label = score.kind === 'provisional' ? 'Provisional' : appearance.label
+  const body = (
+    <>
+      <span
+        className={cn('block font-bold leading-none tabular-nums', large ? 'text-xl' : 'text-lg')}
+      >
+        {score.value === null ? '—' : score.text}
+      </span>
+      {score.kind === 'provisional' && (
+        <span className="mt-0.5 block text-micro font-medium leading-none">provisional</span>
+      )}
+    </>
+  )
+  const className = cn(
+    'inline-flex flex-col items-center justify-center rounded-md px-2 py-1',
+    large ? 'min-w-16' : 'min-w-14',
+    appearance.fill
+  )
+  const title = score.kind === 'final' ? `${label} · ${score.note}` : `${label}: ${score.note}`
+  if (!onClick)
+    return (
+      <span className={className} title={title}>
+        {body}
+      </span>
+    )
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      aria-label={`${student.name}: ${t.results.matrixScore} ${score.value === null ? '—' : score.text}, ${label}`}
+      className={cn(
+        className,
+        'transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+      )}
+    >
+      {body}
+    </button>
   )
 }
 
@@ -1218,7 +1256,6 @@ function PendingRow({ row }: { row: Pending }) {
 /** A compact row; technical incidents remain distinct from academic failure. */
 function StudentRow({ student, onToggle }: { student: StudentResult; onToggle: () => void }) {
   const scale = useScale()
-  const score = scoreView(student.score, scale)
   const counts = tally(student.checks)
   const appearance = gradeAppearance(student, scale.passMark)
   const cause = student.checks.find((check) => check.cause !== 'NONE')?.cause
@@ -1265,13 +1302,9 @@ function StudentRow({ student, onToggle }: { student: StudentResult; onToggle: (
       <span className="text-micro text-muted-foreground">
         {counts.pass}/{student.checks.length}
       </span>
-      <span className="min-w-16 text-right">
-        <span className={cn('block text-lg font-bold tabular-nums', appearance.color)}>
-          {score.value === null ? '—' : score.text}
-        </span>
-        <span className={cn('block text-micro', appearance.color)}>
-          {score.kind === 'provisional' ? 'Provisional' : appearance.label}
-        </span>
+      <span className="flex shrink-0 items-center gap-2">
+        <span className={cn('text-xs font-medium', appearance.color)}>{appearance.label}</span>
+        <GradeBadge student={student} large />
       </span>
     </button>
   )
