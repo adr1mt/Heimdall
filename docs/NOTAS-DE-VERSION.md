@@ -8,6 +8,15 @@ El número es uno solo para todo el producto: lo dice el fichero `VERSION` de
 la raíz, el motor se sella con él al compilar y la aplicación lo lleva en su
 paquete. `test/version.sh` comprueba que no se separan.
 
+## 1.1.0 — 21-10-2026 (solo local, sin publicar)
+
+- Comprobaciones con `sudo: true`: leen ficheros que solo puede leer root
+  (por ejemplo, la configuración de Kea en Ubuntu 26.04) con la contraseña de
+  la clase, sin escribirla en el examen. Si sudo no la acepta, el alumno sale
+  sin evaluar, nunca suspendido.
+- En Resultados la nota es lo primero: grande, con el color de aprobado o
+  suspenso y fija arriba de la matriz.
+
 ## 1.0.0 — 16-10-2026
 
 Primera versión estable:
