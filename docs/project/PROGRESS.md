@@ -1,18 +1,17 @@
 # Estado del proyecto
 
 Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
-**Actualizado**: 2026-10-16 · **Fase**: 9 — Endurecimiento y publicación
+**Actualizado**: 2026-10-21 · **Fase**: 9 — Endurecimiento y publicación
 
 ## Última sesión
 
-**El actualizador en sesiones cortas** (rama `fix/actualizador-sesiones-cortas`,
-sin publicar). La 0.9.2 de Adrià no pasó sola a la 1.0.0: la abrió 18 s y la
-comprobación esperaba un minuto. Ahora comprueba a los 10 s, la descarga solo
-se abandona tras un minuto parada (tope 30 min) y el registro va a
-`~/.config/heimdall-gui/logs/actualizacion.log`. Probado con un AppImage
-0.9.9 real que se actualizó solo a la 1.0.0 publicada
-([evidencia](../reviews/evidence/actualizador-sesiones-cortas/RESULTADOS.md)).
-Llega a las aulas con la próxima versión.
+**La nota, lo primero en Resultados** (rama `claude/gui-nota-destacada-058929`).
+En «Matriz» la nota va arriba, grande y rellena del color de aprobado/suspenso
+(ámbar si es provisional), fija bajo los nombres al desplazar las comprobaciones;
+sale la fila pequeña del final. En «Lista», la misma insignia. Solo GUI.
+
+**El actualizador en sesiones cortas** (rama `fix/actualizador-sesiones-cortas`):
+comprueba a los 10 s; probado con un AppImage 0.9.9 real que pasó solo a la 1.0.0.
 
 **Versión 1.0.0 publicada** antes del examen real de aula (T084 pendiente).
 
