@@ -5,10 +5,11 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T187:** los guardados correctos desaparecen a los 5 s y se muestran en verde.
-Errores persistentes; repetir un aviso reinicia el plazo. 579 pruebas GUI, tipos/build
-y arnés real correctos. [Evidencia](../reviews/evidence/T187/RESULTADOS.md). Pendiente de publicación.
-
+**T203:** validar y guardar exámenes ya no exige clase; el PLAN completo sigue
+obligatorio al corregir. Inicio muestra el nombre recién guardado. 582 pruebas
+GUI, motor/race y arnés real correctos. [Evidencia](../reviews/evidence/T203/RESULTADOS.md).
+**T187:** éxitos verdes durante 5 s, errores persistentes.
+[Evidencia](../reviews/evidence/T187/RESULTADOS.md). T187/T203 pendientes de publicación.
 Auditoría anterior autorizada por Adrià:
 - **T194:** una nota final ya no parece incompleta por un diagnóstico sin peso.
 - **T195/T196:** clases privadas, migración de permisos e informes SSH 0600;
@@ -29,8 +30,7 @@ Auditoría anterior autorizada por Adrià:
 Feed público, etiqueta y sumas comprobados. [Publicación y evidencia](../releases/1.0.1/PUBLICACION.md).
 CI omite sandbox real por su kernel; ese modo sí pasó localmente.
 
-**T189:** `sudo: true` usa la contraseña por stdin, sin secreto en el examen.
-Exámenes de 0227 migrados; servidor real de Manuel Cadenas (2026-10-21):
+**T189:** sudo por stdin, 0227 migrado; Manuel Cadenas (2026-10-21):
 prova-guia-kea 100/100, ra1-dhcp-kea 34/100, sin fallos por permisos.
 
 ## Problemas conocidos y límites

@@ -89,6 +89,14 @@ describe('la lista de exámenes recientes', () => {
     expect(readRecents(data)).toEqual([{ dir, name: 'Examen de prueba' }])
   })
 
+  it('muestra el nombre guardado actual al volver a Inicio', () => {
+    const data = dataDir()
+    const dir = projectDir()
+    rememberProject(data, openProjectAt(dir))
+    writeFileSync(join(dir, EXAM_FILE), 'examen: "Nombre nuevo"\n')
+    expect(readRecents(data)).toEqual([{ dir, name: 'Nombre nuevo' }])
+  })
+
   it('pone el último arriba y no repite el mismo proyecto', () => {
     const data = dataDir()
     const uno = openProjectAt(projectDir('examen: "Uno"\n'))

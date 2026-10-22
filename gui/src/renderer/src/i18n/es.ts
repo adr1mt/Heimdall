@@ -145,8 +145,7 @@ export const t = {
     checking: 'Comprobando con el motor…',
     valid: 'El motor acepta el examen.',
     invalid: 'El motor no acepta el examen',
-    needClass:
-      'Elige una clase en «Corregir» antes de guardar: media validación de un examen es sobre la clase con la que se corrige.',
+    validationScope: 'Los datos de la clase se comprobarán antes de corregir.',
     readFailed: 'No se pudo leer el examen',
     saveFailed: 'No se pudo guardar el examen',
     assertionName: {

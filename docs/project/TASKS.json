@@ -4415,6 +4415,41 @@
       ],
       "notes": "Autorización explícita de Adrià el 2026-10-22: adelante con todo salvo probar en clase, que hará él. Incluye push, etiqueta y publicación. La prueba de aula permanece pendiente; no bloquea esta reparación. Primer recorrido remoto 39827851971: integración y seguridad correctas, empaquetado falla porque electron-builder intenta publicar implícitamente en CI sin token. make gui-dist pasa ahora --publish never, la misma orden usada para los paquetes locales comprobados; no se concede un token a la validación. Segundo recorrido 39828867559: construcción, paquetes e instalación Ubuntu correctos; falla el arnés Chromium porque npm ci no descarga automáticamente el binario Electron de desarrollo. Se añade su instalador oficial explícito antes de los arneses; no cambia la aplicación ni los paquetes. Tercer recorrido 39830665212 descubre una carrera del comprobador CDP: document.body aún no existe y la consulta devuelve excepción en vez de una página. Regresión reproducida antes del arreglo; la sonda tolera solo ese estado inicial y sigue exigiendo interfaz y preload dentro del plazo original. Cierre: v1.0.1 pública y latest el 2026-10-22T18:46:04Z; Checks 39832488570 y Release validation 39832515560 correctos para a5ccaf9ddedf2bf2a5e6b8f495b76cf0c70d464b. Tres assets con tamaños y digests remotos iguales a los locales; SHA256SUMS público descargado idéntico; feed público reconocido por el parser del actualizador como superior a 1.0.0. CI omite sandbox real por kernel; local sí comprobado. T070/T084 sin cerrar. Evidencia: docs/releases/1.0.1/PUBLICACION.md.",
       "completed": "2026-10-22"
+    },
+    {
+      "id": "T203",
+      "title": "Validar y guardar exámenes sin depender de una clase",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Permitir la autoría independiente del examen y reservar la validación de sus datos de clase para el PLAN previo a corregir.",
+      "scope": [
+        "Validación nativa del examen sin leer aula, compartiendo las reglas del PLAN.",
+        "Editor e IPC sin clase al validar y guardar; conservar texto exacto y copias.",
+        "Regresiones CLI, servicio y flujo real de editor; documentación del contrato."
+      ],
+      "out_of_scope": [
+        "Publicar o instalar paquetes.",
+        "Cambiar notas, ejecución SSH o permitir ejecutar sin PLAN completo."
+      ],
+      "acceptance": [
+        "Validar y guardar un examen válido, incluido cambiar su nombre, funciona sin ninguna clase creada o seleccionada.",
+        "Validar no escribe el original; guardar conserva bytes exactos, escritura atómica y versiones recuperables.",
+        "Errores propios del examen (YAML, claves, IDs, pesos, aserciones, hosts y referencias inválidas o secretas) siguen rechazándose con fichero y línea.",
+        "Las referencias a campos de alumnado se admiten sin clase; la falta de datos o máquinas reales sigue impidiendo resolver el PLAN completo antes de ejecutar.",
+        "El editor explica el alcance de la validación independiente y conserva los cambios ante un fallo.",
+        "Inicio refleja el nuevo nombre del examen guardado, sin mantener el nombre antiguo en recientes."
+      ],
+      "tests": [
+        "make check",
+        "make gui-check",
+        "make build gui-build",
+        "Arnés Electron de autoría sin clases",
+        "make docs-check tools-check"
+      ],
+      "completed": "2026-10-22",
+      "notes": "ADR-0035: check --exam-only comparte reglas y referencias con el PLAN, sin leer aulas; editor e IPC sin clases. Guardado exacto y copias conservadas, errores propios del examen visibles. Inicio deriva el nombre actual del fichero. 582 pruebas GUI, tipos/build, make check/build, race plan/CLI, docs/tools y arnés Electron real correctos. Pruebas de procesos locales y arnés fuera del aislamiento por EPERM/timeouts; sin aula real ni publicación. Evidencia: docs/reviews/evidence/T203/RESULTADOS.md."
     }
   ]
 }

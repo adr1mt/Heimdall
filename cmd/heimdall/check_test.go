@@ -10,6 +10,57 @@ import (
 
 const protoProject = "../../testdata/proto"
 
+func TestCheckExamOnlyWithoutClassroom(t *testing.T) {
+	yaml, err := os.ReadFile(filepath.Join(protoProject, "examen.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	dir := t.TempDir()
+	path := filepath.Join(dir, "examen.yaml")
+	if err := os.WriteFile(path, yaml, 0600); err != nil {
+		t.Fatal(err)
+	}
+	var stdout, stderr bytes.Buffer
+	if got := run([]string{"check", "--exam-only", dir}, &stdout, &stderr); got != exitOK {
+		t.Fatalf("exit=%d: %s", got, stderr.String())
+	}
+	if !strings.Contains(stdout.String(), "Examen válido") || strings.Contains(stdout.String(), "Hash del plan") {
+		t.Fatal(stdout.String())
+	}
+	// A corrupt inventory must also be ignored by exam-only validation.
+	if err := os.WriteFile(filepath.Join(dir, "aula.yaml"), []byte("[broken"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	stdout.Reset()
+	stderr.Reset()
+	if got := run([]string{"check", "--exam-only", dir}, &stdout, &stderr); got != exitOK {
+		t.Fatalf("exit=%d: %s", got, stderr.String())
+	}
+	stdout.Reset()
+	stderr.Reset()
+	if got := run([]string{"check", dir}, &stdout, &stderr); got != exitInvalidConfig {
+		t.Fatalf("full PLAN accepted invalid class: %d", got)
+	}
+	after, err := os.ReadFile(path)
+	if err != nil || !bytes.Equal(yaml, after) {
+		t.Fatal("exam changed during validation", err)
+	}
+	entries, err := os.ReadDir(dir)
+	if err != nil || len(entries) != 2 {
+		t.Fatal("validation wrote extra files", err)
+	}
+}
+
+func TestCheckExamOnlyRejectsInvalidExam(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	if got := run([]string{"check", "--exam-only", "testdata/proyecto-invalido"}, &stdout, &stderr); got != exitInvalidConfig {
+		t.Fatalf("exit=%d", got)
+	}
+	if stdout.Len() != 0 || !strings.Contains(stderr.String(), "examen.yaml:7") || !strings.Contains(stderr.String(), "le falta la aserción") {
+		t.Fatalf("out=%s err=%s", &stdout, &stderr)
+	}
+}
+
 // heimdall check must publish the exact number of checks and the exact total
 // weight of the prototype (6, docs/design/07-PROTOTIPO.md §5) without opening
 // a single connection. This is the number the GUI used to guess (c14-check).

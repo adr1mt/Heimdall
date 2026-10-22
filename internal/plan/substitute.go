@@ -18,6 +18,10 @@ type scope struct {
 // whole argument or as a whole expected value and is never re-interpreted:
 // spaces, quotes and ';' travel inside it and die there (rule 5 of §2).
 func substitute(in string, sc scope) (string, error) {
+	return expandReferences(in, func(ref string) (string, error) { return resolveRef(ref, sc) })
+}
+
+func expandReferences(in string, resolve func(string) (string, error)) (string, error) {
 	if !strings.Contains(in, "${") {
 		return in, nil
 	}
@@ -35,7 +39,7 @@ func substitute(in string, sc scope) (string, error) {
 			return "", fmt.Errorf("referencia sin cerrar en %q: falta la llave final", in)
 		}
 		ref := rest[start+2 : start+end]
-		value, err := resolveRef(ref, sc)
+		value, err := resolve(ref)
 		if err != nil {
 			return "", err
 		}
@@ -45,13 +49,9 @@ func substitute(in string, sc scope) (string, error) {
 }
 
 func resolveRef(ref string, sc scope) (string, error) {
-	if isSecretRef(ref) {
-		return "", fmt.Errorf("${%s} es una referencia a un secreto y solo puede aparecer "+
-			"en los campos de autenticación del aula, nunca en el examen", ref)
-	}
-	kind, name, ok := strings.Cut(ref, ".")
-	if !ok || kind == "" || name == "" {
-		return "", fmt.Errorf("referencia ${%s} inválida: se espera ${alumno.campo} o ${host.ip}", ref)
+	kind, name, err := referenceParts(ref)
+	if err != nil {
+		return "", err
 	}
 
 	if kind == "alumno" {
@@ -76,6 +76,53 @@ func resolveRef(ref string, sc scope) (string, error) {
 	default:
 		return "", fmt.Errorf("${%s}: de un host solo se puede usar ip, puerto o usuario", ref)
 	}
+}
+
+// Shared grammar for authoring and full student substitution.
+func referenceParts(ref string) (kind, name string, err error) {
+	if isSecretRef(ref) {
+		return "", "", fmt.Errorf("${%s} es una referencia a un secreto y solo puede aparecer "+
+			"en los campos de autenticación del aula, nunca en el examen", ref)
+	}
+	kind, name, ok := strings.Cut(ref, ".")
+	if !ok || kind == "" || name == "" {
+		return "", "", fmt.Errorf("referencia ${%s} inválida: se espera ${alumno.campo} o ${host.ip}", ref)
+	}
+	return kind, name, nil
+}
+
+func validateCheckReferences(check Check, declared map[string]bool) error {
+	values := append([]string{check.Value}, check.Cmd...)
+	for _, value := range []*string{check.Contains, check.NotContains, check.Equals} {
+		if value != nil {
+			values = append(values, *value)
+		}
+	}
+	if check.Near != nil {
+		values = append(values, check.Near.Anchor, check.Near.Contains)
+	}
+	// Host lookup and permitted attributes reuse the full resolver. Student
+	// fields are left unresolved; their presence belongs to the complete PLAN.
+	hosts := make(map[string]Host, len(declared))
+	for name := range declared {
+		hosts[name] = Host{}
+	}
+	for _, value := range values {
+		_, err := expandReferences(value, func(ref string) (string, error) {
+			kind, _, err := referenceParts(ref)
+			if err != nil {
+				return "", err
+			}
+			if kind == "alumno" {
+				return "", nil
+			}
+			return resolveRef(ref, scope{hosts: hosts})
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // containsSecretRef reports whether a string carries a ${MAYUSCULAS}

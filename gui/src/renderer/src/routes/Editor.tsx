@@ -2,7 +2,6 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import { History, Save, ShieldCheck } from 'lucide-react'
 import { Button, Spinner, ViewHeader } from '@/components/ui'
 import { useApp, noticeFrom } from '@/stores/app'
-import { useClasses, groupById } from '@/stores/classes'
 import { readExam } from '../../../shared/exam'
 import { t } from '@/i18n/es'
 
@@ -11,19 +10,11 @@ const YamlEditor = lazy(() => import('@/components/YamlEditor'))
 /** Edit the source verbatim; the engine still validates before any write. */
 export default function EditorView() {
   const project = useApp((s) => s.project)
-  const classId = useApp((s) => s.classId)
   const draft = useApp((s) => s.editorDraft)
   const setDraft = useApp((s) => s.setEditorDraft)
   const setNotice = useApp((s) => s.setNotice)
-  const groups = useClasses((s) => s.groups)
-  const loaded = useClasses((s) => s.loaded)
-  const load = useClasses((s) => s.load)
-  const group = groupById(groups, classId)
   const [checking, setChecking] = useState(false)
   const [verdict, setVerdict] = useState<{ ok: boolean; message: string } | null>(null)
-  useEffect(() => {
-    if (!loaded) void load()
-  }, [loaded, load])
   useEffect(() => {
     if (!project || useApp.getState().editorDraft?.path === project.examPath) return
     let current = true
@@ -42,16 +33,11 @@ export default function EditorView() {
 
   async function validate(write: boolean): Promise<void> {
     if (!project || !draft || checking) return
-    if (!group) {
-      setVerdict({ ok: false, message: 'Elige una clase en Corregir para validar este examen.' })
-      return
-    }
     const yaml = draft.text
     setChecking(true)
     try {
       const answer = await window.heimdall.validateExam({
         examPath: project.examPath,
-        classId: group.id,
         yaml
       })
       if (
@@ -63,7 +49,7 @@ export default function EditorView() {
       if (write && answer.ok) {
         await window.heimdall.writeExam(project.examPath, yaml)
         setDraft({ ...draft, savedText: yaml })
-        setVerdict({ ok: true, message: 'Examen guardado.' })
+        setVerdict({ ok: true, message: `Examen guardado. ${t.editor.validationScope}` })
       }
     } catch (error) {
       setNotice(noticeFrom(t.editor.saveFailed, error))
@@ -160,7 +146,7 @@ export default function EditorView() {
         </div>
       )}
       <div className="flex shrink-0 justify-between border-t border-border px-4 py-2 text-xs text-muted-foreground">
-        <span>YAML · 2 espacios · Ctrl+F buscar · Ctrl+S guardar</span>
+        <span>YAML · 2 espacios · Ctrl+F buscar · Ctrl+S guardar · {t.editor.validationScope}</span>
         <button className="hover:text-foreground" onClick={() => useApp.getState().setView('help')}>
           Ayuda del examen
         </button>

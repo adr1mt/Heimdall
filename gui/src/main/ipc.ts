@@ -280,13 +280,13 @@ export function registerIpc(): void {
     return chooseSourceCopy(examPath, 'exam')
   })
 
-  // Whether the engine accepts this exam. It resolves the PLAN and stops: no
-  // machine is touched and nothing is written where the teacher can see it.
+  // Authoring validation is independent of classes. The complete PLAN remains
+  // mandatory before correction, where real student data can be checked.
   ipcMain.handle(IPC.validateExam, (_e, request: unknown): Promise<ExamCheck> => {
-    const raw = (request ?? {}) as { examPath?: unknown; classId?: unknown; yaml?: unknown }
+    const raw = (request ?? {}) as { examPath?: unknown; yaml?: unknown }
     if (typeof raw.yaml !== 'string') throw new Error('No hay ningún examen que comprobar.')
     const shownAs = typeof raw.examPath === 'string' ? dirname(raw.examPath) : ''
-    return validateExam(readSettings(settingsDir()).enginePath, raw.yaml, groupOf(raw.classId), shownAs)
+    return validateExam(readSettings(settingsDir()).enginePath, raw.yaml, shownAs)
   })
 
   // http(s) only: shell.openExternal opens any scheme the system knows, and a

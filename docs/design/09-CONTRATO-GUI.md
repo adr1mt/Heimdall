@@ -53,6 +53,21 @@ printf '%s' "$SECRETS_JSON" | heimdall run --secrets=stdin --events=ndjson --var
 Códigos de salida, sin cambios: `0` todo evaluado · `2` configuración inválida
 · `3` ejecución parcial · `4` cancelada · `1` ni se pudo escribir.
 
+### Validar el examen durante la edición
+
+`heimdall check --exam-only <directorio>` valida únicamente `examen.yaml`, sin
+leer ni generar un aula. Reutiliza las reglas del examen del PLAN: YAML,
+claves, comprobaciones, aserciones, pesos y referencias. Admite referencias
+`${alumno.campo}` sin resolver sus valores; rechaza referencias mal formadas,
+hosts no declarados y referencias a secretos. Sale con 0 si el examen es válido
+y con 2 si hay errores, indicando fichero y línea. No crea un PLAN ni publica
+su hash; no se combina con `--cname`.
+
+El editor usa esta operación al validar y antes de guardar. No requiere clase,
+ni siquiera para un examen con `sudo`. `check` sin la bandera y `run` mantienen
+la resolución completa de examen × aula antes de abrir conexiones. Véase
+[ADR-0035](../adr/0035-validar-examen-sin-clase.md).
+
 ## 3. Formato
 
 Una línea, un objeto JSON, codificación UTF-8, sin sangrado y sin escapar

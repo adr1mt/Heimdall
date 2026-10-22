@@ -2,8 +2,6 @@ import { execFile } from 'node:child_process'
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { aulaFileName, aulaYaml } from '../shared/aula'
-import type { ClassGroup } from '../shared/classes'
 import type { ExamCheck } from '../shared/types'
 
 /** The exam file the engine looks for. Same name as anywhere else. */
@@ -17,25 +15,21 @@ const TIMEOUT_MS = 20_000
  *
  * It is the engine that answers and not a second validator in the interface:
  * two validators drift, and the one that decides is the one that corrects.
- * `heimdall check` touches no machine — it resolves the PLAN and stops.
+ * `heimdall check --exam-only` touches no machine and needs no class.
  *
  * The exam is written to a folder of its own, so the teacher's file is never
- * touched by a check that failed. The classroom is the one this class would
- * really produce, because half the errors of an exam are about the class:
- * `${alumno.subdominio}` is only valid if that column exists.
+ * touched by a check that failed. Student fields are checked with the actual
+ * classroom by the complete PLAN before correction, never while authoring.
  */
 export async function validateExam(
   enginePath: string,
   yaml: string,
-  group: ClassGroup,
   shownAs: string
 ): Promise<ExamCheck> {
   const dir = mkdtempSync(join(tmpdir(), 'heimdall-check-'))
   try {
     writeFileSync(join(dir, EXAM_FILE), yaml, 'utf-8')
-    const cname = aulaFileName(group)
-    writeFileSync(join(dir, cname), aulaYaml(group), 'utf-8')
-    const { code, stdout, stderr } = await run(enginePath, ['check', `--cname=${cname}`, dir])
+    const { code, stdout, stderr } = await run(enginePath, ['check', '--exam-only', dir])
     // The engine names the file it read, which is the temporary copy. What
     // the teacher has open is the project's exam, and the line number is the
     // same one: only the name in front of it changes.

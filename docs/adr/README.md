@@ -39,3 +39,5 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 - [ADR-0033 · Informes privados del alumno](0033-permisos-privados-de-informes.md).
 
 - [ADR-0034 · Versiones recuperables de clases y exámenes](0034-copias-de-clases-y-examenes.md).
+
+- [ADR-0035 · Validación del examen independiente de la clase](0035-validar-examen-sin-clase.md).

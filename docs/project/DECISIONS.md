@@ -910,3 +910,10 @@ Confirmaciones de éxito y cancelación desaparecen a los 5 segundos; los errore
 permanecen hasta cerrarlos. El tipo de aviso se declara al emitirlo, sin deducirlo
 del texto. Cada nuevo aviso reinicia el plazo, incluso repitiendo el mensaje.
 Se mantienen la X y los colores existentes del tema. Sin cambio arquitectónico.
+
+### 2026-10-22 · T203 · Autoría del examen sin clase
+
+ADR-0035 añade `check --exam-only` para validar y guardar el examen sin consultar
+clases. Comparte reglas con el PLAN, admite campos del alumnado pendientes y
+rechaza errores propios del examen. La resolución completa de examen × aula
+sigue siendo obligatoria antes de corregir.

@@ -94,7 +94,10 @@ Si ya tienes el examen escrito, **Inicio → Abrir…** y elige su carpeta.
 un error, lo conserva y bloquea el guardado hasta corregirlo. Al salir con cambios
 pendientes puedes volver al editor o descartarlos. El guardado conserva
 el texto y los comentarios, sin reformatearlo. **Validar** permite comprobar
-el borrador con la clase elegida antes de guardarlo.
+el borrador sin guardar ni elegir una clase. **Validar** y **Guardar** comprueban
+el examen de forma independiente: formato, comprobaciones, pesos y referencias.
+Los campos del alumnado pueden quedar pendientes; al corregir se comprueba
+que la clase elegida tiene todos los datos y máquinas que el examen necesita.
 Los pesos admiten decimales y cero para comprobaciones diagnósticas.
 
 ### 4.3 Corrige

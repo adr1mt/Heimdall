@@ -39,6 +39,10 @@ export function readRecents(dir: string): RecentProject[] {
       .map(readRecent)
       .filter((project): project is RecentProject => project !== null)
       .slice(0, MAX_RECENTS)
+      .map((project) => ({
+        ...project,
+        name: describeExam(join(project.dir, EXAM_FILE))?.name ?? project.name
+      }))
   } catch {
     return []
   }

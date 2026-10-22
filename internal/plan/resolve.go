@@ -143,14 +143,6 @@ func Resolve(exam *Exam, inventory *Inventory, examPath, inventoryPath string) (
 	var examErrs, inventoryErrs []error
 
 	checks := validateExam(exam, &examErrs)
-	if weight := totalWeight(checks); math.IsNaN(weight) || math.IsInf(weight, 0) {
-		examErrs = append(examErrs, errf(1, "la suma de pesos debe ser un número finito"))
-	} else if weight <= 0 {
-		examErrs = append(examErrs, errf(1, "el examen debe tener al menos una comprobación con peso positivo"))
-	}
-	if exam.Defaults.Weight != nil && (math.IsNaN(*exam.Defaults.Weight) || math.IsInf(*exam.Defaults.Weight, 0) || *exam.Defaults.Weight < 0) {
-		examErrs = append(examErrs, errf(1, "por_defecto.peso debe ser finito y no negativo"))
-	}
 	validateInventory(inventory, &inventoryErrs)
 
 	if err := join(examErrs); err != nil {
@@ -201,6 +193,18 @@ func Resolve(exam *Exam, inventory *Inventory, examPath, inventoryPath string) (
 	return plan, nil
 }
 
+// CheckExam validates only the source exam, without reading an inventory or
+// resolving student data. Resolve still checks the complete PLAN before a run.
+func CheckExam(path string) error {
+	exam, err := LoadExam(path)
+	if err != nil {
+		return err
+	}
+	var errs []error
+	validateExam(exam, &errs)
+	return withFile(path, join(errs))
+}
+
 // validateExam checks what does not depend on any student and returns the
 // checks in order.
 func validateExam(exam *Exam, errs *[]error) []Check {
@@ -215,6 +219,9 @@ func validateExam(exam *Exam, errs *[]error) []Check {
 	for _, group := range exam.Groups {
 		for _, check := range group.Checks {
 			checks = append(checks, check)
+			if err := validateCheckReferences(check, declared); err != nil {
+				*errs = append(*errs, errf(check.Line, "%s", err))
+			}
 
 			// 2. id duplicated or missing.
 			switch {
@@ -302,6 +309,14 @@ func validateExam(exam *Exam, errs *[]error) []Check {
 
 	if len(checks) == 0 {
 		*errs = append(*errs, errf(1, "el examen no tiene ninguna comprobación"))
+	}
+	if weight := totalWeight(checks); math.IsNaN(weight) || math.IsInf(weight, 0) {
+		*errs = append(*errs, errf(1, "la suma de pesos debe ser un número finito"))
+	} else if weight <= 0 {
+		*errs = append(*errs, errf(1, "el examen debe tener al menos una comprobación con peso positivo"))
+	}
+	if exam.Defaults.Weight != nil && (math.IsNaN(*exam.Defaults.Weight) || math.IsInf(*exam.Defaults.Weight, 0) || *exam.Defaults.Weight < 0) {
+		*errs = append(*errs, errf(1, "por_defecto.peso debe ser finito y no negativo"))
 	}
 	return checks
 }

@@ -232,8 +232,8 @@ export default function HelpView() {
               <div>
                 <dt className="font-medium">No puedo guardar el examen</dt>
                 <dd>
-                  Elige una clase en Corregir y revisa el mensaje de validación. No cierres el
-                  borrador si aún necesitas corregirlo.
+                  Revisa el mensaje de validación: no hace falta elegir una clase para guardar.
+                  No cierres el borrador si aún necesitas corregirlo.
                 </dd>
               </div>
               <div>

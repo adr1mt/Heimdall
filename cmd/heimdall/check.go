@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"path/filepath"
 	"strconv"
 
 	"heimdall/internal/plan"
@@ -16,12 +17,25 @@ func checkCmd(args []string, stdout, stderr io.Writer) int {
 	fs := flag.NewFlagSet("check", flag.ContinueOnError)
 	fs.SetOutput(stderr)
 	cname := fs.String("cname", "", "nombre del fichero de aula, sin la extensión; por defecto aula.yaml")
+	examOnly := fs.Bool("exam-only", false, "valida solo el examen, sin aula ni PLAN de ejecución")
 	if err := fs.Parse(args); err != nil {
 		return exitInvalidConfig
 	}
 	if fs.NArg() != 1 {
-		fmt.Fprintln(stderr, "uso: heimdall check [--cname=aula] <directorio del examen>")
+		fmt.Fprintln(stderr, "uso: heimdall check [--exam-only | --cname=aula] <directorio del examen>")
 		return exitInvalidConfig
+	}
+	if *examOnly {
+		if *cname != "" {
+			fmt.Fprintln(stderr, "heimdall check: --exam-only no se combina con --cname")
+			return exitInvalidConfig
+		}
+		if err := plan.CheckExam(filepath.Join(fs.Arg(0), plan.ExamFile)); err != nil {
+			fmt.Fprintf(stderr, "heimdall check: el examen no es válido\n\n%s\n", err)
+			return exitInvalidConfig
+		}
+		fmt.Fprintln(stdout, "Examen válido. Los datos de la clase se comprobarán antes de corregir.")
+		return exitOK
 	}
 
 	p, err := plan.LoadNamed(fs.Arg(0), *cname)

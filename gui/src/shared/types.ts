@@ -114,12 +114,11 @@ export interface HeimdallApi {
   recoverClasses: () => Promise<boolean>
   /**
    * Asks the engine whether this exam is valid, without saving it and without
-   * touching a single machine. The class is needed because half the errors of
-   * an exam are about the class it is corrected with.
+   * touching a single machine or reading classes. Student data is checked by
+   * the full PLAN before correction.
    */
   validateExam: (request: {
     examPath: string
-    classId: string
     yaml: string
   }) => Promise<ExamCheck>
   openExternal: (url: string) => Promise<void>
