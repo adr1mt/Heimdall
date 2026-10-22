@@ -1,5 +1,5 @@
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { readGroup, isColumnName, type ClassGroup } from '../shared/classes'
 
 /**
@@ -17,6 +17,7 @@ export function classesFile(dir: string): string {
 }
 
 export function readClasses(dir: string): ClassGroup[] {
+  protectClasses(dir)
   const path = classesFile(dir)
   if (!existsSync(path)) return []
   let raw: unknown
@@ -71,10 +72,34 @@ export function writeClasses(dir: string, classes: ClassGroup[]): void {
       }))
     }))
   }
-  mkdirSync(dirname(path), { recursive: true })
-  const tmp = `${path}.tmp`
-  writeFileSync(tmp, `${JSON.stringify(payload, null, 2)}\n`, 'utf-8')
-  renameSync(tmp, path)
+  const staged = mkdtempSync(join(dir, '.classes-'))
+  try {
+    const tmp = join(staged, 'classes.json')
+    writeFileSync(tmp, `${JSON.stringify(payload, null, 2)}\n`, { encoding: 'utf8', mode: 0o600, flag: 'wx' })
+    renameSync(tmp, path)
+  } finally {
+    rmSync(staged, { recursive: true, force: true })
+  }
+}
+
+/** Repairs old installations before reading, even when their JSON is corrupt. */
+function protectClasses(dir: string): void {
+  try {
+    mkdirSync(dir, { recursive: true, mode: 0o700 })
+    if (!lstatSync(dir).isDirectory()) throw new Error('la carpeta de datos no es un directorio propio')
+    chmodSync(dir, 0o700)
+    for (const path of [classesFile(dir), `${classesFile(dir)}.tmp`]) {
+      let info
+      try { info = lstatSync(path) } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT') continue
+        throw error
+      }
+      if (!info.isFile()) throw new Error(`${path}: se esperaba un fichero regular, sin enlaces`)
+      chmodSync(path, 0o600)
+    }
+  } catch (error) {
+    throw new Error(`No se pudieron proteger los datos de las clases (${dir}): ${error instanceof Error ? error.message : String(error)}. No se han leído ni guardado clases.`)
+  }
 }
 
 /** File reads cannot use the tolerant importer: every saved row must survive. */

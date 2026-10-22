@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { chmodSync, mkdtempSync, readFileSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { classesFile, readClasses, writeClasses } from '../src/main/classes'
@@ -284,4 +284,49 @@ it.each([
  expect(()=>readClasses(dir)).toThrow(/classes\[2\]/)
  expect(()=>writeClasses(dir,[group()])).toThrow()
  expect(readFileSync(classesFile(dir),'utf8')).toBe(original)
+})
+
+
+describe('private class data', () => {
+  it('creates a private data directory and file, regardless of umask', () => {
+    const dir = join(emptyDir(), 'data')
+    writeClasses(dir, [group()])
+    expect(statSync(dir).mode & 0o777).toBe(0o700)
+    expect(statSync(classesFile(dir)).mode & 0o777).toBe(0o600)
+    expect(readClasses(dir)).toEqual([group()])
+  })
+
+  it('repairs existing permissions and an old temporary file before reading', () => {
+    const dir = emptyDir()
+    const file = classesFile(dir)
+    const text = JSON.stringify({ classes: [group()] })
+    writeFileSync(file, text, { mode: 0o644 })
+    writeFileSync(`${file}.tmp`, text, { mode: 0o644 })
+    chmodSync(dir, 0o755)
+    expect(readClasses(dir)).toEqual([group()])
+    expect(statSync(dir).mode & 0o777).toBe(0o700)
+    for (const path of [file, `${file}.tmp`]) {
+      expect(statSync(path).mode & 0o777).toBe(0o600)
+      expect(readFileSync(path, 'utf8')).toBe(text)
+    }
+    writeClasses(dir, [group({ name: 'Cambio' })])
+    expect(statSync(file).mode & 0o777).toBe(0o600)
+  })
+
+  it('protects corrupt files too, without overwriting their content', () => {
+    const dir = emptyDir(), file = classesFile(dir)
+    writeFileSync(file, '{broken', { mode: 0o644 })
+    expect(() => readClasses(dir)).toThrow(/no se pudo leer/i)
+    expect(statSync(file).mode & 0o777).toBe(0o600)
+    expect(readFileSync(file, 'utf8')).toBe('{broken')
+  })
+
+  it('refuses a symlink instead of changing permissions outside its data directory', () => {
+    const dir = emptyDir(), target = join(emptyDir(), 'outside.json')
+    writeFileSync(target, JSON.stringify({ classes: [group()] }), { mode: 0o644 })
+    symlinkSync(target, classesFile(dir))
+    expect(() => readClasses(dir)).toThrow(/proteger/i)
+    expect(() => writeClasses(dir, [group()])).toThrow(/proteger/i)
+    expect(statSync(target).mode & 0o777).toBe(0o644)
+  })
 })

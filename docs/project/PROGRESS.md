@@ -8,7 +8,10 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 **Auditoría 2026-10-22, autorizada por Adrià:** T194–T201 desglosadas.
 **T194:** una nota final ya no se presenta incompleta por diagnósticos de peso
 cero pendientes; se conserva su incidencia técnica. Regresión antes/después,
-tipos, suite GUI y build/preload correctos. Siguiente: permisos T195/T196,
+tipos, suite GUI y build/preload correctos. **T195:** datos de clases privados
+(0700/0600), incluidas instalaciones existentes y temporales antiguos; JSON
+corrupto intacto y enlaces rechazados. 562 pruebas GUI y controles correctos.
+Siguiente: permisos de informes T196,
 validación de publicación y copias de clases/exámenes. Aula real sigue en T084.
 
 **T189 · Comprobaciones con `sudo: true` (ADR-0032).** Kea 3 en Ubuntu 26.04

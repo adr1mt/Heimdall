@@ -4162,7 +4162,7 @@
       "id": "T195",
       "title": "Proteger las clases y sus credenciales con permisos privados",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "Proteger las clases y sus credenciales con permisos privados",
@@ -4178,7 +4178,8 @@
         "No se pierden clases ni cambian sus datos; fallos de permisos son visibles y hay regresiones de lectura y escritura."
       ],
       "tests": [],
-      "notes": "Autorizada por Adrià el 2026-10-22 tras contrastar auditoría técnica. Commits separados por reparación; T084 sigue reservada al aula real."
+      "notes": "Cuatro regresiones fallan antes y pasan después: datos nuevos, migración de permisos de instalaciones existentes y temporales antiguos, JSON corrupto y rechazo de enlaces. Directorio 0700, ficheros 0600; escritura atómica en staging privado. Tipos, 562 tests GUI, make check y controles documentales correctos. Suite completa fuera del aislamiento por límite conocido de subprocesos.",
+      "completed": "2026-10-22"
     },
     {
       "id": "T196",
@@ -4282,7 +4283,7 @@
       "id": "T200",
       "title": "Conservar copias recuperables de clases y exámenes al guardar",
       "phase": 9,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T195"
