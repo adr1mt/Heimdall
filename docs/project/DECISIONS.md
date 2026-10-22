@@ -891,3 +891,9 @@ interna y no cambian notas individuales, informes ni exportaciones. Ejemplo:
 10,0; 6,7; 4,3; 2,9; 1,4 → 5,06. La tercera lectura del resumen muestra la
 comprobación con más fallos, sin contar incidencias técnicas. Evidencia:
 [RESULTADOS.md](../reviews/evidence/T191/RESULTADOS.md). Sin cambio arquitectónico.
+
+### 2026-10-22 · T196 · Informes privados
+
+ADR-0033 cambia solo los permisos de entrega de ADR-0031 a 0600; dueño el
+usuario SSH. Los informes existentes se protegen al reenviarlos, sin recorrer
+las máquinas ni modificar otros archivos.

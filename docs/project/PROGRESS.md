@@ -11,7 +11,8 @@ cero pendientes; se conserva su incidencia técnica. Regresión antes/después,
 tipos, suite GUI y build/preload correctos. **T195:** datos de clases privados
 (0700/0600), incluidas instalaciones existentes y temporales antiguos; JSON
 corrupto intacto y enlaces rechazados. 562 pruebas GUI y controles correctos.
-Siguiente: permisos de informes T196,
+**T196:** informes 0600 con dueño SSH, probado contra el laboratorio real;
+enlaces y directorios conservan la protección (ADR-0033). Siguiente:
 validación de publicación y copias de clases/exámenes. Aula real sigue en T084.
 
 **T189 · Comprobaciones con `sudo: true` (ADR-0032).** Kea 3 en Ubuntu 26.04

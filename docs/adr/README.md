@@ -35,3 +35,5 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 | [0030](0030-contrasena-por-clase.md) | La contraseña de las máquinas se guarda en cada clase |
 | [0031](0031-informe-en-la-maquina-del-alumno.md) | El informe de cada alumno se deja en su máquina, solo ese fichero |
 | [0032](0032-sudo-en-las-comprobaciones.md) | Comprobaciones con `sudo: true`: contraseña de la clase por stdin, nunca en el examen |
+
+- [ADR-0033 · Informes privados del alumno](0033-permisos-privados-de-informes.md).

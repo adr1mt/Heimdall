@@ -4185,7 +4185,7 @@
       "id": "T196",
       "title": "Entregar informes privados en la máquina del alumno",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "Entregar informes privados en la máquina del alumno",
@@ -4201,7 +4201,8 @@
         "Prueba SSH real de permisos, conservación de escritura atómica y enlaces; decisión documentada sin reescribir ADR-0031."
       ],
       "tests": [],
-      "notes": "Autorizada por Adrià el 2026-10-22 tras contrastar auditoría técnica. Commits separados por reparación; T084 sigue reservada al aula real."
+      "notes": "ADR-0033 limita entrega a 0600. SSH real: creación y reemplazo privados con dueño alumno, directorios intactos, enlace sustituido sin alterar su destino. make check y docs-check correctos. Los sockets requieren ejecutar fuera del aislamiento.",
+      "completed": "2026-10-22"
     },
     {
       "id": "T197",

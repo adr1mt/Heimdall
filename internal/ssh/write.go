@@ -18,10 +18,10 @@ import (
 // over the target, so the report of the same exam is replaced whole and never
 // left half written. A symlink with that name is replaced, not followed; a
 // directory with that name is left alone.
-const writeHomeScript = `cd || exit 13; umask 077; [ ! -d "$1" ] || exit 10; t=$(mktemp ./.heimdall-XXXXXX) || exit 11; cat > "$t" && chmod 644 "$t" && mv -f "$t" "$1" && exit 0; rm -f "$t"; exit 12`
+const writeHomeScript = `cd || exit 13; umask 077; [ ! -d "$1" ] || exit 10; t=$(mktemp ./.heimdall-XXXXXX) || exit 11; cat > "$t" && chmod 600 "$t" && mv -f "$t" "$1" && exit 0; rm -f "$t"; exit 12`
 
 // WriteHome leaves data in the home directory of the user this session logged
-// in as, under name, with permissions 0644. It returns one sentence when the
+// in as, under name, with permissions 0600. It returns one sentence when the
 // file is not there for sure.
 func (s *Session) WriteHome(ctx context.Context, name string, data []byte, timeout time.Duration) error {
 	runCtx, cancel := context.WithTimeout(ctx, timeout)

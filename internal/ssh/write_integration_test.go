@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// The report lands in the home directory, whole, with 0644, and a second
+// The report lands in the home directory, whole, with 0600, and a second
 // delivery of the same exam replaces the first (ADR-0031).
 func TestWriteHomeLeavesAndReplacesTheReport(t *testing.T) {
 	s := dialLab(t)
@@ -23,11 +23,11 @@ func TestWriteHomeLeavesAndReplacesTheReport(t *testing.T) {
 	if err := s.WriteHome(ctx, name, []byte(poison), 30*time.Second); err != nil {
 		t.Fatalf("segunda escritura: %v", err)
 	}
-	res := s.Run(ctx, []string{"sh", "-c", `cd && stat -c %a "$1" && cat "$1" && ls -a | grep -c '^\.heimdall-' ; rm -f "$1"`, "x", name}, 20*time.Second)
+	res := s.Run(ctx, []string{"sh", "-c", `cd && stat -c %a:%U "$1" && cat "$1" && ls -a | grep -c '^\.heimdall-' ; rm -f "$1"`, "x", name}, 20*time.Second)
 	if !res.Completed {
 		t.Fatalf("no se pudo leer el fichero: %+v", res)
 	}
-	want := "644\n" + poison + "0\n"
+	want := "600:alumno\n" + poison + "0\n"
 	if res.Stdout.Text != want {
 		t.Errorf("en la máquina hay %q, se esperaba %q", res.Stdout.Text, want)
 	}
@@ -39,7 +39,9 @@ func TestWriteHomeLeavesADirectoryAlone(t *testing.T) {
 	ctx := context.Background()
 	name := "informe-prueba-carpeta.html"
 	s.Run(ctx, []string{"sh", "-c", `cd && mkdir -p "$1" && touch "$1/dentro"`, "x", name}, 20*time.Second)
-	t.Cleanup(func() { s.Run(context.Background(), []string{"sh", "-c", `cd && rm -rf "$1"`, "x", name}, 20*time.Second) })
+	t.Cleanup(func() {
+		s.Run(context.Background(), []string{"sh", "-c", `cd && rm -rf "$1"`, "x", name}, 20*time.Second)
+	})
 
 	err := s.WriteHome(ctx, name, []byte("x"), 30*time.Second)
 	if err == nil || !strings.Contains(err.Error(), "carpeta llamada") {
@@ -48,5 +50,23 @@ func TestWriteHomeLeavesADirectoryAlone(t *testing.T) {
 	res := s.Run(ctx, []string{"sh", "-c", `cd && ls "$1"`, "x", name}, 20*time.Second)
 	if strings.TrimSpace(res.Stdout.Text) != "dentro" {
 		t.Errorf("la carpeta se tocó: %q", res.Stdout.Text)
+	}
+}
+
+// Replacing a symlink must not change the target or its permissions.
+func TestWriteHomeReplacesASymlinkWithoutFollowingIt(t *testing.T) {
+	s := dialLab(t)
+	ctx := context.Background()
+	name := "informe-prueba-enlace.html"
+	s.Run(ctx, []string{"sh", "-c", `cd && printf original > .heimdall-target && chmod 644 .heimdall-target && ln -sf .heimdall-target "$1"`, "x", name}, 20*time.Second)
+	t.Cleanup(func() {
+		s.Run(context.Background(), []string{"sh", "-c", `cd && rm -f "$1" .heimdall-target`, "x", name}, 20*time.Second)
+	})
+	if err := s.WriteHome(ctx, name, []byte("nuevo"), 30*time.Second); err != nil {
+		t.Fatal(err)
+	}
+	res := s.Run(ctx, []string{"sh", "-c", `cd && test ! -L "$1" && stat -c %a:%U "$1" && cat "$1" && printf '\n' && stat -c %a .heimdall-target && cat .heimdall-target`, "x", name}, 20*time.Second)
+	if !res.Completed || res.Stdout.Text != "600:alumno\nnuevo\n644\noriginal" {
+		t.Fatalf("symlink replacement: %+v", res)
 	}
 }
