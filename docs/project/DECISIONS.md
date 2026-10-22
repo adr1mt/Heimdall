@@ -903,3 +903,10 @@ las máquinas ni modificar otros archivos.
 ADR-0034 conserva versiones privadas de clases y YAML, separadas de las notas.
 El examen se recupera como borrador; las clases requieren confirmación y
 conservan el original, incluso corrupto. Sin red ni cifrado nuevo.
+
+### 2026-10-22 · T187 · Cierre de avisos
+
+Confirmaciones de éxito y cancelación desaparecen a los 5 segundos; los errores
+permanecen hasta cerrarlos. El tipo de aviso se declara al emitirlo, sin deducirlo
+del texto. Cada nuevo aviso reinicia el plazo, incluso repitiendo el mensaje.
+Se mantienen la X y los colores existentes del tema. Sin cambio arquitectónico.

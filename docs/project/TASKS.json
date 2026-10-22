@@ -3903,23 +3903,29 @@
     },
     {
       "id": "T187",
-      "title": "Los avisos de éxito no se pintan como errores",
+      "title": "Los avisos de éxito se distinguen y desaparecen solos",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
-      "goal": "Que «Notas guardadas en…» o «Informes guardados en…» no aparezcan en rojo con icono de alerta, como un fallo.",
+      "goal": "Que las confirmaciones de guardado no parezcan errores y desaparezcan solas a los 5 segundos, manteniendo los problemas visibles hasta cerrarlos.",
       "scope": [
         "gui/src/renderer/"
       ],
       "acceptance": [
         "Un aviso de éxito y uno de error se distinguen por color, icono y rol accesible.",
-        "Pruebas GUI, tipos y build correctos; captura revisada."
+        "Pruebas GUI, tipos y build correctos; captura revisada.",
+        "Las confirmaciones de éxito y cancelación desaparecen solas a los 5 segundos; los errores permanecen hasta cerrarlos.",
+        "Un aviso nuevo reinicia el plazo incluso si repite el texto; cerrar o sustituir un aviso cancela su temporizador y no oculta un error posterior."
       ],
       "tests": [
-        "make gui-check gui-build"
+        "make gui-check gui-build",
+        "gui/tests/app-notice.test.ts",
+        "Arnés gui/scripts/notices-lab.ts",
+        "make check docs-check tools-check"
       ],
-      "notes": "Visto en T185: la barra de avisos de App.tsx es siempre role=alert y destructive, también para guardados correctos."
+      "notes": "Adrià comunica el 2026-10-22 que «Clase guardada» queda visible hasta pulsar la X. Confirmaciones de éxito y cancelación caducan a los 5 segundos; cada aviso reinicia el plazo, incluso con el mismo texto. Errores y restauraciones con problemas permanecen. Color, icono y rol distinguen éxito, información y error. Cinco regresiones reproducidas antes del arreglo; 579 pruebas GUI, tipos, build/preload y motor correctos. Arnés real y capturas claro/oscuro: docs/reviews/evidence/T187/RESULTADOS.md. Suite y arnés fuera del aislamiento del ejecutor, que bloquea subprocesos. Pendiente de nueva publicación.",
+      "completed": "2026-10-22"
     },
     {
       "id": "T188",

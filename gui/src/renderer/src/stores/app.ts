@@ -16,6 +16,7 @@ import { canOpen, type View } from '@/lib/nav'
 
 export type { View }
 export type Theme = 'dark' | 'light'
+export type NoticeKind = 'error' | 'success' | 'info'
 
 export interface EditorDraft {
   path: string
@@ -47,6 +48,7 @@ interface AppState {
   classId: string | null
   /** One operational notice on screen, or null. */
   notice: string | null
+  noticeKind: NoticeKind
   /**
    * The version that is downloaded and waiting for the application to close,
    * or null. It is news, not a problem: it changes nothing and it is never
@@ -93,7 +95,7 @@ interface AppState {
   setEngine: (engine: EngineStatus) => void
   setProject: (project: OpenProject | null) => void
   setClassId: (id: string | null) => void
-  setNotice: (message: string | null) => void
+  setNotice: (message: string | null, kind?: NoticeKind) => void
   setUpdate: (version: string | null) => void
   setScale: (scale: ScaleId) => void
   setPassMark: (mark: number) => void
@@ -170,6 +172,8 @@ function applyProjector(on: boolean): void {
 }
 applyProjector(savedProjector)
 
+let noticeTimer: ReturnType<typeof setTimeout> | undefined
+
 export const useApp = create<AppState>((set, get) => ({
   editorDraft: null,
   pendingNavigation: null,
@@ -188,6 +192,7 @@ export const useApp = create<AppState>((set, get) => ({
   project: null,
   classId: savedClassId,
   notice: null,
+  noticeKind: 'error',
   update: null,
   scale: savedScale,
   passMark: savedPassMark,
@@ -233,7 +238,16 @@ export const useApp = create<AppState>((set, get) => ({
     else localStorage.removeItem('heimdall-class-id')
     set({ classId })
   },
-  setNotice: (notice) => set({ notice }),
+  setNotice: (notice, noticeKind = 'error') => {
+    clearTimeout(noticeTimer)
+    noticeTimer = undefined
+    set({ notice, noticeKind })
+    // Problems stay readable until dismissed. Every confirmation gets its own
+    // full duration, even when saving the same class again repeats the text.
+    if (notice !== null && noticeKind !== 'error') {
+      noticeTimer = setTimeout(() => get().setNotice(null), 5000)
+    }
+  },
   setUpdate: (update) => set({ update }),
   setScale: (scale) => {
     localStorage.setItem('heimdall-scale', scale)

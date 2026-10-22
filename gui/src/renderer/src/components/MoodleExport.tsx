@@ -33,7 +33,7 @@ export function MoodleExportButton({
     setConfirm(false)
     try {
       const path = await window.heimdall.saveCsv(moodleCsvName(at), moodleCsv(going))
-      setNotice(path ? t.moodle.saved(path) : t.export.cancelled)
+      setNotice(path ? t.moodle.saved(path) : t.export.cancelled, path ? 'success' : 'info')
     } catch (error) {
       setNotice(noticeFrom(t.moodle.failed, error))
     }

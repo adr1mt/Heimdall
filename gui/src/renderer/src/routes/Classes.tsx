@@ -58,7 +58,7 @@ export default function ClassesView() {
         await load()
         setClassId(null)
         setChosen(null)
-        setNotice(t.sourceCopies.classesRecovered)
+        setNotice(t.sourceCopies.classesRecovered, 'success')
       }
     } catch (error) {
       setNotice(noticeFrom(t.sourceCopies.classesFailed, error))
@@ -106,7 +106,7 @@ export default function ClassesView() {
         // correcting nor on this screen.
         if (classId === group.id) setClassId(null)
         if (chosen === group.id) setChosen(null)
-        setNotice(t.classes.removed(group.name))
+        setNotice(t.classes.removed(group.name), 'success')
       }
     )
   }
@@ -125,7 +125,7 @@ export default function ClassesView() {
           void commit(next, () => {
             setDraft(null)
             setChosen(group.id)
-            setNotice(t.classes.saved)
+            setNotice(t.classes.saved, 'success')
           })
         }}
       />

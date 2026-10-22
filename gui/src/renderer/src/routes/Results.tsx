@@ -710,7 +710,7 @@ function ExportButton() {
     if (!artifact) return
     try {
       const path = await window.heimdall.saveCsv(csvName(artifact), toCsv(artifact, scale))
-      setNotice(path ? t.export.saved(path) : t.export.cancelled)
+      setNotice(path ? t.export.saved(path) : t.export.cancelled, path ? 'success' : 'info')
     } catch (error) {
       setNotice(noticeFrom(t.export.failed, error))
     }
@@ -1079,7 +1079,7 @@ function ChainExportButton({ chain }: { chain: Consolidation }) {
     setConfirm(false)
     try {
       const path = await window.heimdall.saveCsv(chainCsvName(chain), chainCsv(chain, scale))
-      setNotice(path ? t.export.saved(path) : t.export.cancelled)
+      setNotice(path ? t.export.saved(path) : t.export.cancelled, path ? 'success' : 'info')
     } catch (error) {
       setNotice(noticeFrom(t.export.failed, error))
     }

@@ -711,7 +711,7 @@ function SessionExportButton({ session }: { session: Session }) {
         sessionCsvName(session),
         sessionCsv(session, scale)
       )
-      setNotice(path ? t.export.saved(path) : t.export.cancelled)
+      setNotice(path ? t.export.saved(path) : t.export.cancelled, path ? 'success' : 'info')
     } catch (error) {
       setNotice(noticeFrom(t.export.failed, error))
     }

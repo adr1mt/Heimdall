@@ -5,7 +5,11 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-Auditoría autorizada por Adrià, reparaciones en commits separados:
+**T187:** los guardados correctos desaparecen a los 5 s y se muestran en verde.
+Errores persistentes; repetir un aviso reinicia el plazo. 579 pruebas GUI, tipos/build
+y arnés real correctos. [Evidencia](../reviews/evidence/T187/RESULTADOS.md). Pendiente de publicación.
+
+Auditoría anterior autorizada por Adrià:
 - **T194:** una nota final ya no parece incompleta por un diagnóstico sin peso.
 - **T195/T196:** clases privadas, migración de permisos e informes SSH 0600;
   originales, directorios y destinos de enlaces conservados (ADR-0033).
@@ -44,7 +48,6 @@ prova-guia-kea 100/100, ra1-dhcp-kea 34/100, sin fallos por permisos.
 - Linux x64. Actualización automática AppImage; .deb instalando nueva versión.
 - Editor YAML conserva texto; Monaco en chunk diferido local.
 - T023 (clave SSH) sigue sin caso real; examen-lab desfasado (T186).
-- La barra de éxito sigue roja (T187).
 - Si examen/clase cambiaron tras corregir, hay que corregir antes de enviar.
 - Un informe que contenga la contraseña de la clase no se envía.
 - Electron 43.8.3 aún incorpora Node 24.22.0; mitigada red del actualizador,
@@ -52,7 +55,6 @@ prova-guia-kea 100/100, ra1-dhcp-kea 34/100, sin fallos por permisos.
 
 ## Siguiente trabajo
 
-**T202 cerrada:** publicación autorizada completa; la prueba de clase la hará
-Adrià. T084 sigue pendiente.
+**T202 cerrada:** 1.0.1 publicada; Adrià hará la prueba de clase (T084 pendiente).
 **T070** desbloquea **T084**, examen real de aula que ejecuta Adrià. Consultar
-`python3 scripts/tasks.py T070`. T023, T186 y T187 siguen READY.
+`python3 scripts/tasks.py T070`. T023 y T186 siguen READY.

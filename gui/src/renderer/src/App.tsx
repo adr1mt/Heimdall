@@ -8,6 +8,7 @@ import {
   HelpCircle,
   History as HistoryIcon,
   Home,
+  Info,
   ListChecks,
   Loader2,
   Monitor,
@@ -66,6 +67,7 @@ export default function App() {
 function AppBody() {
   const { theme, view, setView, toggleTheme } = useApp()
   const notice = useApp((s) => s.notice)
+  const noticeKind = useApp((s) => s.noticeKind)
   const setNotice = useApp((s) => s.setNotice)
   const setEngine = useApp((s) => s.setEngine)
   // Without an exam open there is nothing to correct, no results and no
@@ -252,15 +254,24 @@ function AppBody() {
         )}
         {notice && (
           <div
-            role="alert"
-            className="flex shrink-0 items-start gap-2 border-b border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive-strong"
+            role={noticeKind === 'error' ? 'alert' : 'status'}
+            className={cn(
+              'flex shrink-0 items-start gap-2 border-b px-4 py-2 text-sm',
+              noticeKind === 'error' && 'border-destructive/30 bg-destructive/10 text-destructive-strong',
+              noticeKind === 'success' && 'border-success/30 bg-success/10 text-success-strong',
+              noticeKind === 'info' && 'border-border bg-muted text-muted-foreground'
+            )}
           >
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+            {noticeKind === 'error'
+              ? <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+              : noticeKind === 'success'
+                ? <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                : <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />}
             <span className="min-w-0 flex-1">{notice}</span>
             <button
               type="button"
               onClick={() => setNotice(null)}
-              className="rounded p-0.5 hover:bg-destructive/10 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+              className="rounded p-0.5 hover:bg-foreground/10 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
               aria-label={t.errors.dismiss}
             >
               <X className="h-4 w-4" />

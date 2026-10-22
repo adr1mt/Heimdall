@@ -87,7 +87,7 @@ export default function HistoryView() {
       const done = t.backups.done(report.restored, report.kept)
       setNotice(report.problems?.length
         ? `${done} Se omitieron ${report.problems.length} copias con problemas. ${report.problems[0]}`
-        : done)
+        : done, report.problems?.length ? 'error' : 'success')
       load()
     } catch (error) {
       setNotice(noticeFrom('No se pudieron restaurar las notas', error))
