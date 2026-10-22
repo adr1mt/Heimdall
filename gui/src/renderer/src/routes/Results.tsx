@@ -492,12 +492,15 @@ function MatrixGrade({ student }: { student: StudentResult }) {
   const appearance = gradeAppearance(student, scale.passMark)
   const label = score.kind === 'provisional' ? 'Provisional' : appearance.label
   return (
-    <div className="mt-1.5" title={score.note}>
+    <div className="mt-1.5" role="group" title={`${label} · ${score.note}`}
+      aria-label={`${student.name}: ${score.value === null ? 'sin nota' : `${score.text} sobre ${scale.max}`}, ${label}`}>
       <span className={cn('text-xl font-semibold leading-6 tabular-nums', appearance.color)}>
         {score.value === null ? '—' : score.text}
       </span>
       {score.value !== null && <span className="ml-0.5 text-xs font-normal text-muted-foreground">/{scale.max}</span>}
-      <span className={`mt-0.5 block text-micro font-normal ${appearance.color}`}>{label}</span>
+      {appearance.tone !== 'pass' && appearance.tone !== 'fail' && (
+        <span className={`mt-0.5 block text-micro font-normal ${appearance.color}`}>{label}</span>
+      )}
     </div>
   )
 }

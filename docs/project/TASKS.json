@@ -4068,6 +4068,36 @@
       ],
       "notes": "Inicio desde 20eeba8, main y origin/main sincronizados (git fetch, 0/0). La media anterior convertía la media canónica mediante una escala no lineal. Se mantiene el modelo canónico y se corrige solo el resumen presentado. Completada: 549 tests GUI, tipos, build/preload y make check correctos; enlaces y herramientas correctos. Arnés Electron con 5/30 alumnos y 50 comprobaciones, 3 tamaños × 2 temas, scroll y esquina con desviación 0 px; filtros/órdenes/detalle y estados sin nota probados. Las pruebas de subprocesos requieren salir del aislamiento de esta sesión; no se alteran timeouts. Evidencias: docs/reviews/evidence/T191/RESULTADOS.md. Sin push.",
       "completed": "2026-10-22"
+    },
+    {
+      "id": "T192",
+      "title": "Retirar las etiquetas redundantes de aprobado y suspenso en la matriz",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P2",
+      "depends_on": [
+        "T191"
+      ],
+      "goal": "Que la cabecera muestre nombre y nota sin repetir el estado académico en texto visible, a petición de Adrià.",
+      "scope": [
+        "Solo la presentación de las notas en la cabecera de la matriz."
+      ],
+      "out_of_scope": [
+        "Calificaciones, filtros, lista y detalle individual."
+      ],
+      "acceptance": [
+        "Las notas finales mantienen número, escala y color, sin las etiquetas visibles Aprobado o Suspenso.",
+        "Los estados provisional, incompleto, sin evaluar y excluido conservan su aclaración visible.",
+        "El estado académico sigue disponible para lectores de pantalla y en el tooltip.",
+        "Tipos, suite GUI y build pasan; cabecera revisada en claro y oscuro."
+      ],
+      "tests": [
+        "make check",
+        "cd gui && npm run typecheck && npm test && npm run build",
+        "Arnés visual de Resultados"
+      ],
+      "notes": "Continuación de T191 solicitada por Adrià. Base 56dead3. Validado: make check, tipos, 549 tests, build/preload y arnés visual existente correctos. Evidencias: docs/reviews/evidence/T192/RESULTADOS.md. Sin push.",
+      "completed": "2026-10-22"
     }
   ]
 }

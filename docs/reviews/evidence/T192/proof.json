@@ -1,0 +1,185 @@
+[
+  {
+    "count": 5,
+    "width": 1440,
+    "theme": "light",
+    "geometry": {
+      "horizontal": false,
+      "vertical": true
+    },
+    "sticky": {
+      "cornerX": 0,
+      "cornerY": 0,
+      "rowX": 0,
+      "onTop": true
+    }
+  },
+  {
+    "count": 5,
+    "width": 1440,
+    "theme": "dark",
+    "geometry": {
+      "horizontal": false,
+      "vertical": true
+    },
+    "sticky": {
+      "cornerX": 0,
+      "cornerY": 0,
+      "rowX": 0,
+      "onTop": true
+    }
+  },
+  {
+    "count": 5,
+    "width": 1024,
+    "theme": "light",
+    "geometry": {
+      "horizontal": true,
+      "vertical": true
+    },
+    "sticky": {
+      "cornerX": 0,
+      "cornerY": 0,
+      "rowX": 0,
+      "onTop": true
+    }
+  },
+  {
+    "count": 5,
+    "width": 1024,
+    "theme": "dark",
+    "geometry": {
+      "horizontal": true,
+      "vertical": true
+    },
+    "sticky": {
+      "cornerX": 0,
+      "cornerY": 0,
+      "rowX": 0,
+      "onTop": true
+    }
+  },
+  {
+    "count": 5,
+    "width": 390,
+    "theme": "light",
+    "geometry": {
+      "horizontal": true,
+      "vertical": true
+    },
+    "sticky": {
+      "cornerX": 0,
+      "cornerY": 0,
+      "rowX": 0,
+      "onTop": true
+    }
+  },
+  {
+    "count": 5,
+    "width": 390,
+    "theme": "dark",
+    "geometry": {
+      "horizontal": true,
+      "vertical": true
+    },
+    "sticky": {
+      "cornerX": 0,
+      "cornerY": 0,
+      "rowX": 0,
+      "onTop": true
+    }
+  },
+  {
+    "count": 30,
+    "width": 1440,
+    "theme": "light",
+    "geometry": {
+      "horizontal": true,
+      "vertical": true
+    },
+    "sticky": {
+      "cornerX": 0,
+      "cornerY": 0,
+      "rowX": 0,
+      "onTop": true
+    }
+  },
+  {
+    "count": 30,
+    "width": 1440,
+    "theme": "dark",
+    "geometry": {
+      "horizontal": true,
+      "vertical": true
+    },
+    "sticky": {
+      "cornerX": 0,
+      "cornerY": 0,
+      "rowX": 0,
+      "onTop": true
+    }
+  },
+  {
+    "count": 30,
+    "width": 1024,
+    "theme": "light",
+    "geometry": {
+      "horizontal": true,
+      "vertical": true
+    },
+    "sticky": {
+      "cornerX": 0,
+      "cornerY": 0,
+      "rowX": 0,
+      "onTop": true
+    }
+  },
+  {
+    "count": 30,
+    "width": 1024,
+    "theme": "dark",
+    "geometry": {
+      "horizontal": true,
+      "vertical": true
+    },
+    "sticky": {
+      "cornerX": 0,
+      "cornerY": 0,
+      "rowX": 0,
+      "onTop": true
+    }
+  },
+  {
+    "count": 30,
+    "width": 390,
+    "theme": "light",
+    "geometry": {
+      "horizontal": true,
+      "vertical": true
+    },
+    "sticky": {
+      "cornerX": 0,
+      "cornerY": 0,
+      "rowX": 0,
+      "onTop": true
+    }
+  },
+  {
+    "count": 30,
+    "width": 390,
+    "theme": "dark",
+    "geometry": {
+      "horizontal": true,
+      "vertical": true
+    },
+    "sticky": {
+      "cornerX": 0,
+      "cornerY": 0,
+      "rowX": 0,
+      "onTop": true
+    }
+  },
+  {
+    "interactions": "pass/fail/ungraded, list/matrix, all four orders, detail/back, reset, combined filters: PASS"
+  }
+]

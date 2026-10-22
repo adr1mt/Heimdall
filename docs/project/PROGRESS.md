@@ -5,14 +5,14 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
+**T192 · Cabecera más compacta.** Retiradas las etiquetas visibles Aprobado y
+Suspenso de la matriz; se conservan nota, color, accesibilidad y avisos técnicos.
+
 **T191 · Resultados más claros y explorables.** Notas bajo el nombre, matriz
 compacta con recuentos y ejes fijos, filtros por alumno, cuatro órdenes y
 comprobación con más fallos. Media de notas visibles corregida (5,06 en vez de
 4,3), también en Analíticas; notas individuales intactas. Pruebas y ventanas
 con 5/30 alumnos, claro/oscuro y tres tamaños ([evidencias](../reviews/evidence/T191/RESULTADOS.md)).
-
-**T190 · Tailwind CSS 4.** Sin los 5 avisos graves de npm audit;
-corrección real y comparación visual ([evidencias](../reviews/evidence/T190/RESULTADOS.md)).
 
 **T189 · Comprobaciones con `sudo: true` (ADR-0032).** Kea 3 en Ubuntu 26.04
 deja `/etc/kea` solo a root. Antes los exámenes de 0227 llevaban la contraseña
