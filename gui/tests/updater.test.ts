@@ -245,3 +245,16 @@ it('checks the staged file again before replacing the installation', async () =>
 it.each([{}, {size: 0, digest: 'sha256:' + 'a'.repeat(64)}, {size: 10, digest:'bad'}])('requires valid release integrity metadata: %j', metadata => {
   expect(parseRelease(JSON.stringify({tag_name:'v1.0.0', assets:[{browser_download_url:'https://github.com/adr1mt/Heimdall/releases/new.AppImage', ...metadata}]}))).toBeNull()
 })
+
+
+it.each(['first publication', 'replacement publication'])(
+  'updates the %s of 1.0.0 to 1.0.1 only on quit', async (build) => {
+    const h = harness({ currentVersion: '1.0.0' }, feed('1.0.1'))
+    writeFileSync(h.appImage, build)
+    expect(await h.updater.check()).toBe('ready')
+    expect(h.updater.pendingVersion()).toBe('1.0.1')
+    expect(readFileSync(h.appImage, 'utf8')).toBe(build)
+    expect(h.updater.applyOnQuit()).toBe(true)
+    expect(readFileSync(h.appImage, 'utf8')).toBe('la versión nueva')
+  }
+)

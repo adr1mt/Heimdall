@@ -24,4 +24,12 @@ GOT="$("$BIN" version | awk '{print $2}')"
 GUI="$(grep -m1 '"version"' "$ROOT/gui/package.json" | sed 's/.*: *"\(.*\)".*/\1/')"
 [ "$GUI" = "$WANT" ] || fail "la aplicación dice $GUI y VERSION dice $WANT"
 
-echo "ok: motor, aplicación y VERSION dicen $WANT"
+python3 - "$ROOT/gui/package-lock.json" "$WANT" <<'PYTHON' || fail "El lock de la aplicación no coincide con VERSION"
+import json, sys
+with open(sys.argv[1]) as stream:
+    lock = json.load(stream)
+if lock['version'] != sys.argv[2] or lock['packages']['']['version'] != sys.argv[2]:
+    raise SystemExit('FALLO: package-lock no coincide con VERSION')
+PYTHON
+
+echo "ok: motor, aplicación, lock y VERSION dicen $WANT"

@@ -1,0 +1,18 @@
+{
+  "ok": true,
+  "file": "informe-practica-3-servicios-de-red.html",
+  "run_id": "01M5JC1GYF3J03KFTYG3H6BY56",
+  "delivered_to": [
+    "alu1",
+    "heimdall-envio-2",
+    "heimdall-envio-3"
+  ],
+  "not_delivered": [
+    "Diego Demo (máquina apagada)"
+  ],
+  "first_send_seconds": 0.204,
+  "second_send_seconds_with_carla_off": 4.583,
+  "engine_processes_seen": 2,
+  "password_in_argv": 0,
+  "consoleErrors": []
+}

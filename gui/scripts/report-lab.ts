@@ -16,7 +16,7 @@ const SECRET = process.env.LAB_SECRET || 'HEIMDALL_SECRET_TEST_12345'
 const base = mkdtempSync(join(tmpdir(), 'heimdall-send-'))
 const project = join(base, 'redes-demo')
 const profile = join(base, 'profile')
-const out = resolve('../docs/reviews/evidence/T188')
+const out = resolve(process.env.HEIMDALL_REPORT_EVIDENCE || '../docs/reviews/evidence/T188')
 for (const dir of [project, profile]) mkdirSync(dir)
 mkdirSync(out, { recursive: true })
 
@@ -195,7 +195,7 @@ app
     const files: string[] = []
     for (const [i, machine] of MACHINES.entries()) {
       const [mode, owner] = podman('exec', machine, 'stat', '-c', '%a %U', `/home/alumno/${FILE}`).trim().split(' ')
-      assert.equal(mode, '644', `${machine}: permissions`)
+      assert.equal(mode, '600', `${machine}: permissions`)
       assert.equal(owner, 'alumno', `${machine}: owner`)
       assert.equal(podman('exec', machine, 'sh', '-c', 'ls -a /home/alumno | grep -c "^.heimdall-" || true').trim(), '0', `${machine}: temporary left`)
       const html = podman('exec', machine, 'cat', `/home/alumno/${FILE}`)

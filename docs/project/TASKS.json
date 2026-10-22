@@ -4154,7 +4154,11 @@
         "La presentación usa el estado y la nota final canónicos; los diagnósticos pendientes siguen visibles por separado.",
         "Regresión con diagnóstico de peso cero, aprobado, suspenso, nota provisional, sin evaluar y excluido; tipos y suite GUI correctos."
       ],
-      "tests": [],
+      "tests": [
+        "make gui-check",
+        "make gui-build",
+        "make check"
+      ],
       "notes": "Regresión reproducida antes del arreglo: aprobado y suspenso finales aparecían incompletos con un diagnóstico de peso 0. La nota se presenta desde score; la incidencia se conserva en comprobaciones y atención. Tipos, suite GUI y build/preload correctos. No se cambia el motor ni el cálculo.",
       "completed": "2026-10-22"
     },
@@ -4177,7 +4181,11 @@
         "Directorio propio 0700 y clases y temporales 0600, también para instalaciones existentes y antes de leer datos corruptos.",
         "No se pierden clases ni cambian sus datos; fallos de permisos son visibles y hay regresiones de lectura y escritura."
       ],
-      "tests": [],
+      "tests": [
+        "cd gui && npm test -- tests/classes.test.ts",
+        "make gui-check",
+        "make check"
+      ],
       "notes": "Cuatro regresiones fallan antes y pasan después: datos nuevos, migración de permisos de instalaciones existentes y temporales antiguos, JSON corrupto y rechazo de enlaces. Directorio 0700, ficheros 0600; escritura atómica en staging privado. Tipos, 562 tests GUI, make check y controles documentales correctos. Suite completa fuera del aislamiento por límite conocido de subprocesos.",
       "completed": "2026-10-22"
     },
@@ -4200,7 +4208,10 @@
         "Informes nuevos y reemplazados con permisos 0600 y dueño de la conexión.",
         "Prueba SSH real de permisos, conservación de escritura atómica y enlaces; decisión documentada sin reescribir ADR-0031."
       ],
-      "tests": [],
+      "tests": [
+        "go test -tags=integration ./internal/ssh -run TestWriteHome -count=1",
+        "Arnés report-lab con motor 1.0.1 y expectativa 0600"
+      ],
       "notes": "ADR-0033 limita entrega a 0600. SSH real: creación y reemplazo privados con dueño alumno, directorios intactos, enlace sustituido sin alterar su destino. make check y docs-check correctos. Los sockets requieren ejecutar fuera del aislamiento.",
       "completed": "2026-10-22"
     },
@@ -4208,7 +4219,7 @@
       "id": "T197",
       "title": "Preparar la siguiente reparación como 1.0.1 sin reutilizar versiones",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T194",
@@ -4231,8 +4242,17 @@
         "VERSION, GUI y lock coinciden en 1.0.1; pruebas de actualización desde ambas 1.0.0.",
         "Paquetes construidos y comprobados; publicación externa pendiente de aprobación final con artefactos revisables."
       ],
-      "tests": [],
-      "notes": "Autorizada por Adrià el 2026-10-22 tras contrastar auditoría técnica. Commits separados por reparación; T084 sigue reservada al aula real."
+      "tests": [
+        "GOTOOLCHAIN=go1.26.10 make version",
+        "cd gui && npm run dist -- --publish never",
+        "bash gui/scripts/release-check.sh",
+        "bash gui/scripts/deb-install-lab.sh",
+        "make gui-paquete",
+        "make gui-check",
+        "GOTOOLCHAIN=go1.26.10 go test -race ./..."
+      ],
+      "notes": "1.0.1 preparada localmente, sin publicar. Motor/app/lock/paquetes coinciden; dos regresiones actualizan ambas publicaciones 1.0.0 al cerrar. Go 1.26.10: tests/race y govulncheck sin vulnerabilidades alcanzables. 573 tests GUI; diez herramientas. AppImage probado auto/sandbox/fallback, motor del paquete corrige; .deb instalado/retirado en Ubuntu 24.04/26.04. Entrega GUI→motor 1.0.1 con 0600 y privacidad comprobada. Sumarios y hashes en docs/releases/1.0.1/VERIFICACION.md. Pendientes publicación remota, workflows GitHub y aula T084.",
+      "completed": "2026-10-22"
     },
     {
       "id": "T198",
@@ -4255,7 +4275,15 @@
         "Workflow manual de validación de publicación levanta los laboratorios y ejecuta integración SSH y comprobación de paquetes; fallo impide dar la publicación por validada.",
         "Validación local y límites de CI documentados; no se declara ejecutado un workflow remoto sin evidencia."
       ],
-      "tests": [],
+      "tests": [
+        "go test -race ./...",
+        "govulncheck ./...",
+        "npm audit --registry=https://registry.npmjs.org --json",
+        "make test",
+        "make tools-check",
+        "bash gui/scripts/release-check.sh",
+        "bash gui/scripts/deb-install-lab.sh"
+      ],
       "notes": "CI añade race Go, govulncheck 1.9.0 y política npm con excepción exacta dev-only del aviso conocido. Workflow manual de publicación sin publicar: laboratorios, make test, paquetes, renderer/preload, instalación/desinstalación .deb Ubuntu 24.04/26.04 y red Chromium real. Recorrido local y límites documentados en docs/reviews/evidence/T198/RESULTADOS.md; workflow remoto aún no ejecutado. Nueve regresiones de herramientas correctas.",
       "completed": "2026-10-22"
     },
@@ -4278,7 +4306,10 @@
         "Sesión SSH válida recibe una contraseña sudo incorrecta sin alterar la contraseña real del usuario; rechazo no produce fallo académico ni filtra la credencial.",
         "Máquina sin sudo y usuario sin privilegios cubiertos sin depender de mensajes localizados; prueba SSH real."
       ],
-      "tests": [],
+      "tests": [
+        "go test -tags=integration ./internal/ssh -run TestRunSudo -count=1",
+        "go test ./internal/engine -run Sudo -count=1"
+      ],
       "notes": "SSH real: contraseña sudo incorrecta tras autenticación válida y caché invalidada, usuario sin privilegios y segundo contenedor sin binario sudo. El comando no corre, no se filtran credenciales y la negativa sigue UNEVALUATED/AUTH_FAILED. Pruebas sudo SSH y motor, make check y docs-check correctos.",
       "completed": "2026-10-22"
     },
@@ -4305,7 +4336,12 @@
         "Recuperación accesible al profesor conservando siempre el original y sin exponer contraseñas; copia fallida evita reemplazar la versión anterior y muestra el motivo. Examen recuperado como borrador; clases con confirmación y original conservado incluso si está corrupto.",
         "Regresiones de recuperación, corrupción, retención y permisos; documentación y pruebas GUI."
       ],
-      "tests": [],
+      "tests": [
+        "make gui-check",
+        "make gui-build",
+        "Arnés gui/scripts/source-backup-lab.ts",
+        "make check docs-check tools-check"
+      ],
       "notes": "ADR-0034: versiones privadas previas y propuestas, huella validada, 50 por origen y máximo 4 MiB. Recuperación por interfaz: clases con confirmación y original conservado incluso corrupto; examen como borrador sin tocar disco ni descartar cambios. Fallos de copia/publicación, rotación, límites, enlaces y corrupción probados. 571 tests GUI, tipos, build/preload, motor y herramientas correctos; arnés Electron real y capturas en docs/reviews/evidence/T200/RESULTADOS.md.",
       "completed": "2026-10-22"
     },
@@ -4329,7 +4365,13 @@
         "Modo de arranque real del AppImage documentado y comprobación del paquete con y sin sandbox cuando el entorno lo permita; límites explícitos.",
         "Feed y descarga usan red de Chromium con prueba de cableado y arnés real Brotli; se conserva validación del actualizador."
       ],
-      "tests": [],
+      "tests": [
+        "make gui-check",
+        "make gui-build",
+        "Arnés gui/scripts/update-network-lab.ts",
+        "python3 scripts/check_apprun.py <AppRun extraído>",
+        "node gui/scripts/smoke-package.mjs <binario> sandbox|fallback"
+      ],
       "notes": "Actualizador migrado a Chromium para feed y descarga, sin fallback implícito a Node. Prueba Electron real con respuesta Brotli y Node fetch bloqueado; 563 tests GUI, tipos/build y motor correctos. AppImage existente: AppRun probado en cuatro ramas; renderer/preload comprobados en sandbox real y fallback con perfiles ficticios. Electron estable consultado aún sin Node parcheado. Evidencia y límites: docs/reviews/evidence/T201/RESULTADOS.md.",
       "completed": "2026-10-22"
     }
