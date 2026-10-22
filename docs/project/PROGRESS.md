@@ -51,6 +51,7 @@ prova-guia-kea 100/100, ra1-dhcp-kea 34/100, sin fallos por permisos.
 
 ## Siguiente trabajo
 
-Publicación remota de 1.0.1 y ejecución de los workflows pendientes.
+**T202 en curso:** Adrià autoriza publicar 1.0.1 y ejecutar los workflows;
+se reserva la prueba de clase. T084 sigue pendiente.
 **T070** desbloquea **T084**, examen real de aula que ejecuta Adrià. Consultar
 `python3 scripts/tasks.py T070`. T023, T186 y T187 siguen READY.

@@ -195,7 +195,9 @@ Se debe registrar cualquier modo no probado. El workflow no publica nada.
 Antes de publicar, conservar el resultado de ese workflow, las sumas SHA-256 y
 la evidencia de aula de T084. Una comprobación local no equivale a una ejecución
 remota: no se declara CI verde hasta que GitHub la ejecute. No se reutilizan
-versiones ni etiquetas publicadas; la siguiente reparación es 1.0.1.
+versiones ni etiquetas publicadas. Para la reparación 1.0.1, Adrià autoriza
+expresamente publicar con T084 pendiente y realizar él después la prueba de
+aula (T202, 2026-10-22). Esta excepción no equivale a una validación de aula.
 
 La política npm de `scripts/check_npm_audit.py` solo admite el aviso moderado
 GHSA-hp3w-g68c-fv3c de sprintf-js y su cadena conocida de construcción, siempre

@@ -4374,6 +4374,40 @@
       ],
       "notes": "Actualizador migrado a Chromium para feed y descarga, sin fallback implícito a Node. Prueba Electron real con respuesta Brotli y Node fetch bloqueado; 563 tests GUI, tipos/build y motor correctos. AppImage existente: AppRun probado en cuatro ramas; renderer/preload comprobados en sandbox real y fallback con perfiles ficticios. Electron estable consultado aún sin Node parcheado. Evidencia y límites: docs/reviews/evidence/T201/RESULTADOS.md.",
       "completed": "2026-10-22"
+    },
+    {
+      "id": "T202",
+      "title": "Publicar 1.0.1 y ejecutar la validación remota, con aula pendiente de Adrià",
+      "phase": 9,
+      "status": "IN_PROGRESS",
+      "priority": "P1",
+      "depends_on": [
+        "T197",
+        "T198"
+      ],
+      "goal": "Publicar los paquetes 1.0.1 verificados, ejecutar Checks y Release validation en GitHub y comprobar la descarga e integridad publicadas.",
+      "scope": [
+        "Push de los commits locales, ejecución de controles GitHub y reparación de fallos necesarios para publicar.",
+        "Publicación nueva v1.0.1 sin reutilizar etiquetas; AppImage, .deb y SHA256SUMS.",
+        "Registrar enlaces, SHA del código validado, conclusiones de CI y límite de la prueba de aula."
+      ],
+      "out_of_scope": [
+        "T070/T084 y máquinas reales: Adrià hará la prueba de clase.",
+        "Mejoras futuras de la auditoría fuera de las reparaciones publicadas."
+      ],
+      "acceptance": [
+        "Checks y Release validation terminan correctamente en GitHub para el código de la publicación.",
+        "v1.0.1 pública con los tres archivos verificados; digests GitHub y SHA256SUMS coinciden.",
+        "La publicación queda como última versión estable y ofrece una versión mayor que 1.0.0.",
+        "Estado y evidencia actualizados sin marcar T084 terminada."
+      ],
+      "tests": [
+        "make check",
+        "GitHub Actions Checks",
+        "GitHub Actions Release validation",
+        "SHA-256 local y digest de assets GitHub"
+      ],
+      "notes": "Autorización explícita de Adrià el 2026-10-22: adelante con todo salvo probar en clase, que hará él. Incluye push, etiqueta y publicación. La prueba de aula permanece pendiente; no bloquea esta reparación."
     }
   ]
 }
