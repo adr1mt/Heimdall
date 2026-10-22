@@ -359,9 +359,10 @@ function ClassEditor({
     <div className="flex h-full flex-col">
       <ViewHeader title={draft.name.trim() || t.classes.newName} />
       <div className="min-h-0 flex-1 space-y-4 overflow-auto p-6">
-        <label className="block max-w-md space-y-1">
+        <label className="block max-w-md">
           <span className="text-xs text-muted-foreground">{t.classes.nameLabel}</span>
           <Input
+            className="mt-1"
             value={draft.name}
             placeholder={t.classes.namePlaceholder}
             onChange={(e) => onChange({ ...draft, name: e.target.value })}

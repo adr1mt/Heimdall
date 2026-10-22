@@ -3997,7 +3997,7 @@
       "id": "T190",
       "title": "Migrar la GUI a Tailwind CSS v4",
       "phase": 9,
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P2",
       "depends_on": [],
       "goal": "Quitar los avisos graves de npm audit, que vienen todos de Tailwind v3 (braces, micromatch, fast-glob, chokidar), sin cambiar cómo se ve ninguna pantalla. Solo afectan a la compilación, no a la app instalada.",
@@ -4027,7 +4027,8 @@
         "cd gui && npm run screenshot (antes y después)",
         "cd gui && npm audit"
       ],
-      "notes": "Estimación: 2 h. npm audit fix --force no sirve: instala tailwindcss 4 sin migrar la configuración y rompe la compilación. 2026-10-22: migración hecha con @tailwindcss/upgrade y @tailwindcss/vite. La herramienta renombró por error la variante 'outline' de Button y Badge a 'outline-solid' (revertido). space-y-* en v4 deja ganar el margen propio del hijo: SectionTitle (mb-3) dentro de space-y-4 en Clases pasaba de 16 a 12 px (className=\"mb-4\"); un análisis del JSX no encontró más casos que cambien. Compatibilidad en globals.css: color de borde, cursor de botón y placeholder de v3; el cursor con los selectores exactos de v3, porque uno más específico cambia la barra de Monaco. Capturas de las 9 secciones en claro y oscuro, antes y después: idénticas salvo 28 px de antialiasing en una esquina de Corregir y la ruta temporal de Ajustes, que ya varía entre dos capturas de v3. 541 tests, typecheck y build en verde; npm audit solo deja los 8 moderados de electron-builder. Falta: capturar Resultados y Corregir con datos (requiere Go y el laboratorio SSH, no instalados en esta máquina) y el anillo de foco en imagen (el evento sintético no activa :focus-visible; el CSS de ring-2 es idéntico)."
+      "notes": "ADR no necesario. @tailwindcss/upgrade + @tailwindcss/vite. Correcciones a mano: variante 'outline' y rounded-[0.25rem] que la herramienta cambió; relleno de 1px en th/td; tres casos de space-y en Clases; cursor, placeholder y borde de v3. Corrección real de 5 alumnos en v3 y v4 con ui-refresh y el laboratorio: mismos píxeles salvo datos variables, tres ejecuciones. npm audit sin avisos de Tailwind; quedan 8 moderados de electron-builder. Anillo de foco verificado en CSS, no en imagen. Evidencias: docs/reviews/evidence/T190/RESULTADOS.md.",
+      "completed": "2026-10-22"
     }
   ]
 }

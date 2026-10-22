@@ -5,14 +5,9 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T190 (en curso) · La GUI ya compila con Tailwind CSS 4.** Desaparecen los 5
-avisos graves de `npm audit`; las 9 secciones se ven igual que antes en claro y
-oscuro. Falta comparar Resultados y Corregir con datos de una corrección, que
-necesita Go y el laboratorio SSH.
-
-**La nota, lo primero en Resultados.** En «Matriz» la nota va arriba, grande
-y rellena del color de aprobado/suspenso (ámbar si es provisional), fija bajo
-los nombres al desplazar las comprobaciones. En «Lista», la misma insignia.
+**T190 · La GUI ya compila con Tailwind CSS 4.** Desaparecen los 5 avisos
+graves de `npm audit`. Corrección real de 5 alumnos antes y después: mismas
+pantallas, píxel a píxel ([evidencias](../reviews/evidence/T190/RESULTADOS.md)).
 
 **T189 · Comprobaciones con `sudo: true` (ADR-0032).** Kea 3 en Ubuntu 26.04
 deja `/etc/kea` solo a root. Antes los exámenes de 0227 llevaban la contraseña
@@ -57,4 +52,4 @@ prova-guia-kea 100/100, ra1-dhcp-kea 34/100, sin fallos por permisos.
 **T070**: rehacer exámenes del curso en formato nativo; desbloquea **T084**,
 examen real de aula que ejecuta Adrià. Consultar
 `python3 scripts/tasks.py T070` antes de empezar. **T023**, **T186** y
-**T187** siguen READY; **T190** en curso.
+**T187** siguen READY.

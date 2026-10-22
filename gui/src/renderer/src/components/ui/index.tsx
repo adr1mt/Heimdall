@@ -187,7 +187,7 @@ export function SegmentedItem({
       type="button"
       aria-pressed={active}
       className={cn(
-        'flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+        'flex items-center gap-1.5 rounded-[0.25rem] px-2.5 py-1 text-xs font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
         active ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground',
         className
       )}

@@ -102,8 +102,7 @@
     border-color: var(--color-gray-200, currentcolor);
   }
 
-  /* v4 also dropped these two v3 defaults: pointer cursor and gray placeholder.
-     Keep v3's exact selectors: a more specific one changes Monaco's scrollbar. */
+  /* v4 also dropped two v3 defaults: pointer cursor and gray placeholder. */
   button,
   [role='button'] {
     cursor: pointer;
@@ -116,6 +115,12 @@
   input::placeholder,
   textarea::placeholder {
     color: var(--color-gray-400);
+  }
+
+  /* v4's reset also zeroes the browser's 1px table cell padding. */
+  th,
+  td {
+    padding: 1px;
   }
 }
 
