@@ -34,3 +34,9 @@ limitados a construcción y una excepción específica que se revisa al publicar
 Las copias de fuentes contienen la contraseña de la clase y son privadas;
 conservan hasta 50 versiones de cada origen, máximo 4 MiB por fichero. Permanecen
 en el mismo disco y no sustituyen una copia externa.
+
+## Validación en GitHub
+
+[Checks](https://github.com/adr1mt/Heimdall/actions/runs/39832488570) y
+[validación de publicación](https://github.com/adr1mt/Heimdall/actions/runs/39832515560).
+La prueba con clase real la realizará Adrià después de esta publicación.

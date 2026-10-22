@@ -1,6 +1,9 @@
 # Verificación local de Heimdall 1.0.1
 
 2026-10-22. Linux x64. Preparación local: **sin push, etiqueta ni publicación**.
+Cierre posterior: [publicación y validación en GitHub](PUBLICACION.md).
+Las afirmaciones de preparación de este informe describen su momento original.
+
 Base de código 617b9e6, más los cambios de versión de T197 y actualización del
 arnés de entrega a permisos 0600. El último commit de preparación registra
 exactamente estos cambios y este informe.

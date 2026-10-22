@@ -3,7 +3,7 @@
 Para el profesor que va a corregir con Heimdall. No hace falta programar ni
 saber Go. Del cero a la primera nota, en unos veinte minutos.
 
-Versión de esta guía: **1.0.0**.
+Versión de esta guía: **1.0.1**.
 
 ---
 
@@ -37,14 +37,14 @@ Descarga uno de los dos paquetes de la
 [última versión](https://github.com/adr1mt/Heimdall/releases/latest):
 
 ```bash
-sudo apt install ./Heimdall-1.0.0.deb
+sudo apt install ./Heimdall-1.0.1.deb
 ```
 
 o, si prefieres no instalar nada:
 
 ```bash
-chmod +x Heimdall-1.0.0.AppImage
-./Heimdall-1.0.0.AppImage
+chmod +x Heimdall-1.0.1.AppImage
+./Heimdall-1.0.1.AppImage
 ```
 
 Desde el repositorio clonado, `make gui-dist` construye los mismos dos
@@ -221,7 +221,7 @@ inválida · `3` ejecución parcial · `4` cancelado.
 ---
 
 ¿Algo no encaja con lo que ves en pantalla? Es un fallo de esta guía: está
-escrita sobre la versión 1.0.0.
+escrita sobre la versión 1.0.1.
 
 
 ## Recuperar clases o una versión del examen

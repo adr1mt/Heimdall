@@ -11,7 +11,7 @@
 
 <p align="center">
   <img alt="Go 1.26+" src="https://img.shields.io/badge/Go-1.26%2B-00ADD8?logo=go&logoColor=white">
-  <img alt="Versión 1.0.0" src="https://img.shields.io/badge/versi%C3%B3n-1.0.0-blue">
+  <img alt="Versión 1.0.1" src="https://img.shields.io/badge/versi%C3%B3n-1.0.1-blue">
   <img alt="Linux x64" src="https://img.shields.io/badge/Linux-x64-brightgreen?logo=linux&logoColor=white">
 </p>
 
@@ -38,14 +38,14 @@ descanso.
 64 bits. El motor de corrección va dentro: no hay nada más que instalar.
 
 ```bash
-sudo apt install ./Heimdall-1.0.0.deb
+sudo apt install ./Heimdall-1.0.1.deb
 ```
 
 Si prefieres el AppImage, dale permiso de ejecución y ábrelo:
 
 ```bash
-chmod +x Heimdall-1.0.0.AppImage
-./Heimdall-1.0.0.AppImage
+chmod +x Heimdall-1.0.1.AppImage
+./Heimdall-1.0.1.AppImage
 ```
 
 El AppImage publicado no necesita `libfuse2`.
@@ -239,14 +239,15 @@ y su [impresión en PDF](docs/reviews/evidence/T193/corto.pdf), con datos fictic
 
 ## Estado
 
-**Versión 1.0.0**: completa y empaquetada en `.deb` y AppImage con el motor
+**Versión 1.0.1**: completa y empaquetada en `.deb` y AppImage con el motor
 dentro. Queda pendiente corregir con ella un examen real de aula de principio
 a fin.
 
-La rama `main` incluye mejoras posteriores en la matriz de resultados, los
-filtros, el cálculo de la media mostrada y los informes individuales que se
-describen y muestran aquí. Para tenerlas antes de la próxima publicación,
-consulta cómo [compilar desde el código fuente](docs/DESARROLLO.md).
+La 1.0.1 incluye las mejoras de la matriz, los filtros, la media mostrada y
+los informes individuales que se muestran aquí, además de permisos privados,
+recuperación de clases y exámenes y correcciones de seguridad. Consulta las
+[notas de publicación](docs/releases/1.0.1/NOTAS.md) y la
+[guía de desarrollo](docs/DESARROLLO.md) para compilar desde el código fuente.
 
 ## Documentación
 

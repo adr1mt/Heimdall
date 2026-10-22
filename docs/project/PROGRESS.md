@@ -20,9 +20,10 @@ Auditoría autorizada por Adrià, reparaciones en commits separados:
   Examen como borrador; clases con confirmación y original conservado incluso
   corrupto. 571 pruebas GUI; arnés real y capturas claro/oscuro.
   [Evidencia](../reviews/evidence/T200/RESULTADOS.md).
-**T197:** 1.0.1 preparada, sin publicar. 573 pruebas GUI, Go 1.26.10 y race
-correctos; paquetes y entrega real 0600 comprobados. [Verificación y hashes](../releases/1.0.1/VERIFICACION.md).
-GitHub aún no ha ejecutado estos cambios.
+**T197/T202:** 1.0.1 publicada. Checks y Release validation correctos sobre
+`a5ccaf9`; 574 pruebas GUI, Go 1.26.10 y race, paquetes y entrega 0600 correctos.
+Feed público, etiqueta y sumas comprobados. [Publicación y evidencia](../releases/1.0.1/PUBLICACION.md).
+CI omite sandbox real por su kernel; ese modo sí pasó localmente.
 
 **T189:** `sudo: true` usa la contraseña por stdin, sin secreto en el examen.
 Exámenes de 0227 migrados; servidor real de Manuel Cadenas (2026-10-21):
@@ -51,7 +52,7 @@ prova-guia-kea 100/100, ra1-dhcp-kea 34/100, sin fallos por permisos.
 
 ## Siguiente trabajo
 
-**T202 en curso:** Adrià autoriza publicar 1.0.1 y ejecutar los workflows;
-se reserva la prueba de clase. T084 sigue pendiente.
+**T202 cerrada:** publicación autorizada completa; la prueba de clase la hará
+Adrià. T084 sigue pendiente.
 **T070** desbloquea **T084**, examen real de aula que ejecuta Adrià. Consultar
 `python3 scripts/tasks.py T070`. T023, T186 y T187 siguen READY.
