@@ -1,0 +1,221 @@
+{
+  "metrics": [
+    {
+      "example": "corto",
+      "width": 982,
+      "scrollWidth": 982,
+      "clipped": 0,
+      "rows": 6,
+      "review": 2,
+      "headerOverlap": false
+    },
+    {
+      "example": "corto",
+      "width": 602,
+      "scrollWidth": 587,
+      "clipped": 0,
+      "rows": 6,
+      "review": 2,
+      "headerOverlap": false
+    },
+    {
+      "example": "corto",
+      "width": 392,
+      "scrollWidth": 377,
+      "clipped": 0,
+      "rows": 6,
+      "review": 2,
+      "headerOverlap": false
+    },
+    {
+      "example": "corto",
+      "width": 320,
+      "scrollWidth": 305,
+      "clipped": 0,
+      "rows": 6,
+      "review": 2,
+      "headerOverlap": false
+    },
+    {
+      "example": "mixto",
+      "width": 981,
+      "scrollWidth": 966,
+      "clipped": 0,
+      "rows": 6,
+      "review": 2,
+      "headerOverlap": false
+    },
+    {
+      "example": "mixto",
+      "width": 601,
+      "scrollWidth": 586,
+      "clipped": 0,
+      "rows": 6,
+      "review": 2,
+      "headerOverlap": false
+    },
+    {
+      "example": "mixto",
+      "width": 391,
+      "scrollWidth": 376,
+      "clipped": 0,
+      "rows": 6,
+      "review": 2,
+      "headerOverlap": false
+    },
+    {
+      "example": "mixto",
+      "width": 320,
+      "scrollWidth": 305,
+      "clipped": 0,
+      "rows": 6,
+      "review": 2,
+      "headerOverlap": false
+    },
+    {
+      "example": "correcto",
+      "width": 981,
+      "scrollWidth": 981,
+      "clipped": 0,
+      "rows": 6,
+      "review": 0,
+      "headerOverlap": false
+    },
+    {
+      "example": "correcto",
+      "width": 601,
+      "scrollWidth": 601,
+      "clipped": 0,
+      "rows": 6,
+      "review": 0,
+      "headerOverlap": false
+    },
+    {
+      "example": "correcto",
+      "width": 391,
+      "scrollWidth": 391,
+      "clipped": 0,
+      "rows": 6,
+      "review": 0,
+      "headerOverlap": false
+    },
+    {
+      "example": "correcto",
+      "width": 320,
+      "scrollWidth": 320,
+      "clipped": 0,
+      "rows": 6,
+      "review": 0,
+      "headerOverlap": false
+    },
+    {
+      "example": "largo",
+      "width": 981,
+      "scrollWidth": 966,
+      "clipped": 0,
+      "rows": 75,
+      "review": 8,
+      "headerOverlap": false
+    },
+    {
+      "example": "largo",
+      "width": 601,
+      "scrollWidth": 586,
+      "clipped": 0,
+      "rows": 75,
+      "review": 8,
+      "headerOverlap": false
+    },
+    {
+      "example": "largo",
+      "width": 391,
+      "scrollWidth": 376,
+      "clipped": 0,
+      "rows": 75,
+      "review": 8,
+      "headerOverlap": false
+    },
+    {
+      "example": "largo",
+      "width": 320,
+      "scrollWidth": 305,
+      "clipped": 0,
+      "rows": 75,
+      "review": 8,
+      "headerOverlap": false
+    },
+    {
+      "example": "extremo",
+      "width": 981,
+      "scrollWidth": 966,
+      "clipped": 0,
+      "rows": 3,
+      "review": 1,
+      "headerOverlap": false
+    },
+    {
+      "example": "extremo",
+      "width": 601,
+      "scrollWidth": 586,
+      "clipped": 0,
+      "rows": 3,
+      "review": 1,
+      "headerOverlap": false
+    },
+    {
+      "example": "extremo",
+      "width": 391,
+      "scrollWidth": 376,
+      "clipped": 0,
+      "rows": 3,
+      "review": 1,
+      "headerOverlap": false
+    },
+    {
+      "example": "extremo",
+      "width": 320,
+      "scrollWidth": 305,
+      "clipped": 0,
+      "rows": 3,
+      "review": 1,
+      "headerOverlap": false
+    },
+    {
+      "example": "vacio",
+      "width": 981,
+      "scrollWidth": 981,
+      "clipped": 0,
+      "rows": 0,
+      "review": 0,
+      "headerOverlap": false
+    },
+    {
+      "example": "vacio",
+      "width": 601,
+      "scrollWidth": 601,
+      "clipped": 0,
+      "rows": 0,
+      "review": 0,
+      "headerOverlap": false
+    },
+    {
+      "example": "vacio",
+      "width": 391,
+      "scrollWidth": 391,
+      "clipped": 0,
+      "rows": 0,
+      "review": 0,
+      "headerOverlap": false
+    },
+    {
+      "example": "vacio",
+      "width": 320,
+      "scrollWidth": 320,
+      "clipped": 0,
+      "rows": 0,
+      "review": 0,
+      "headerOverlap": false
+    }
+  ],
+  "network": []
+}

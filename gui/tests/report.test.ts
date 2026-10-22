@@ -8,7 +8,7 @@ import {
   studentReport,
   studentReports
 } from '../src/renderer/src/lib/report'
-import { scaleOf } from '../src/renderer/src/lib/scale'
+import { scaleOf, toScale } from '../src/renderer/src/lib/scale'
 import { deliverArgs, deliverInput, readDelivery } from '../src/main/deliver'
 import { validRun } from './fixtures/valid-run'
 
@@ -162,6 +162,107 @@ describe('student reports (T185)', () => {
     expect(await examTitleOf(yaml, sha, 'carpeta')).toBe('Examen RA2')
     expect(await examTitleOf(yaml, 'f'.repeat(64), 'carpeta')).toBe('carpeta')
     expect(await examTitleOf(null, sha, 'carpeta')).toBe('carpeta')
+  })
+
+  it('omits the review when everything passed or could not be evaluated', () => {
+    for (const status of ['PASS', 'UNEVALUATED'] as const) {
+      const s = student('a', 'Alumna ficticia', [check('uno', 'Red', status)])
+      const html = studentReport(run(), s, scale, 'Examen')
+      expect(html).not.toContain('Qué debes revisar')
+      if (status === 'UNEVALUATED') {
+        expect(html).toContain('Sin nota final')
+        expect(html).toContain('No se pudo comprobar ninguna parte del examen.')
+        expect(html).not.toContain('>Aprobado<')
+        expect(html).not.toContain('>Suspenso<')
+      }
+    }
+  })
+
+  it('reviews only academic failures, after the technical notice and before the full breakdown', () => {
+    const s = student('a', 'Alumna ficticia', [
+      check('ok', 'Red', 'PASS'), check('fallo1', 'Red', 'FAIL'),
+      check('tecnico', 'DNS', 'UNEVALUATED'), check('fallo2', 'DNS', 'FAIL')
+    ])
+    const html = studentReport(run(), s, scale, 'Examen')
+    const review = html.slice(html.indexOf('<section class="review"'), html.indexOf('<section id="desglose"'))
+    expect(review).toContain('Comprobaciones no superadas')
+    expect(review).toContain('Descripción fallo1')
+    expect(review).toContain('Descripción fallo2')
+    expect(review).not.toContain('Descripción ok')
+    expect(review).not.toContain('Descripción tecnico')
+    expect(review.indexOf('<h3>Red</h3>')).toBeLessThan(review.indexOf('<h3>DNS</h3>'))
+    expect(html.indexOf('<aside class="note"')).toBeLessThan(html.indexOf('<section class="review"'))
+    expect(html).toContain('Sin nota final')
+    expect(html).not.toContain(POISON)
+    expect(html).not.toContain(PASSWORD)
+  })
+
+  it('limits the review to eight failures in block order while preserving every row in the breakdown', () => {
+    const checks = Array.from({ length: 13 }, (_, i) => check(`f${i}`, i < 5 ? 'Primero' : 'Segundo', 'FAIL'))
+    const html = studentReport(run(), student('a', 'Alumna ficticia', checks), scale, 'Examen')
+    const [before, full] = html.split('<section id="desglose"')
+    const review = before.slice(before.indexOf('<section class="review"'))
+    expect(review.match(/<li>/g)).toHaveLength(8)
+    expect(review).toContain('5 comprobaciones falladas más')
+    expect(review).toContain('href="#desglose"')
+    expect(review).not.toContain('Descripción f8')
+    expect(full.match(/class="check fail"/g)).toHaveLength(13)
+    for (const c of checks) expect(full).toContain(c.description)
+    expect(full.indexOf('<h2>Primero</h2>')).toBeLessThan(full.indexOf('<h2>Segundo</h2>'))
+    const eight = studentReport(run(), student('a', 'Demo', checks.slice(0, 8)), scale, 'Examen')
+    expect(eight).not.toContain('comprobaciones falladas más')
+  })
+
+  it('escapes descriptions and block names in both lists without exposing internal diagnostics', () => {
+    const c = { ...check('x', '<img src=x onerror="bad()">', 'FAIL'), description: 'A & <script>bad()</script> "texto"' }
+    const html = studentReport(run(), student('a', 'Demo', [c]), scale, 'Examen')
+    expect(html.match(/A &amp; &lt;script&gt;bad\(\)&lt;\/script&gt; &quot;texto&quot;/g)).toHaveLength(2)
+    expect(html).not.toContain('<img')
+    expect(html).not.toContain('<script>')
+    expect(html).not.toContain(POISON)
+    expect(html).not.toContain(PASSWORD)
+    expect(html).not.toContain('src="http')
+    expect(html).not.toContain('<link')
+  })
+
+  it('keeps canonical weighted grades, both scales, decimals and configurable pass marks', () => {
+    // Half of the checks pass, but they carry 9 of 10 weight: the grade is 90.
+    const s = student('a', 'Demo', [check('ok', 'Red', 'PASS', 9), check('fallo', 'Red', 'FAIL')])
+    for (const id of ['ten', 'hundred'] as const) {
+      for (const passMark of [60, 90, 95]) {
+        const selected = { ...scaleOf(id, passMark), decimals: 2 }
+        const html = studentReport(run(), s, selected, 'Examen')
+        expect(html).toContain(`<span>${toScale(90, selected)}</span><small>/ ${selected.max}</small>`)
+        expect(html).toContain(passMark <= 90 ? '>Aprobado<' : '>Suspenso<')
+        expect(html).toContain('peso 9')
+        expect(html).toContain('peso 1')
+        expect(html).toContain('1 correctas, 1 falladas y 0 sin comprobar de 2')
+      }
+    }
+    const source = structuredClone(s)
+    studentReport(run(), s, scale, 'Examen')
+    expect(s).toEqual(source)
+  })
+
+  it('handles an empty report without a misleading bar or a computed grade', () => {
+    const s = { ...student('a', 'Demo', []), score: { ...student('a', 'Demo', []).score, status: 'NOT_EVALUATED' as const } }
+    const html = studentReport(run(), s, scale, 'Examen')
+    expect(html).toContain('No hay comprobaciones en este informe.')
+    expect(html).not.toContain('class="bar"')
+    expect(html).not.toMatch(/NaN|Infinity/)
+    expect(html).not.toContain('Qué debes revisar')
+    expect(html).toContain('Sin nota final')
+  })
+
+  it('keeps a canonical final grade when only a zero-weight check could not be evaluated', () => {
+    const s = student('a', 'Demo', [check('ok', 'Red', 'PASS'), check('diagnostico', 'Red', 'UNEVALUATED', 0)])
+    const html = studentReport(run(), s, scale, 'Examen')
+    expect(html).toContain('<span>10,0</span><small>/ 10</small>')
+    expect(html).toContain('>Aprobado<')
+    expect(html).toContain('No se pudo comprobar')
+    expect(html).toContain('peso 0')
+    expect(html).not.toContain('Sin nota final')
+    expect(html).not.toContain('Qué debes revisar')
   })
 })
 

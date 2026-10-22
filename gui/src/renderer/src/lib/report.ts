@@ -131,6 +131,25 @@ export function studentReport(
     )
     .join('')
 
+  // A short reading aid, drawn from the same descriptions as the full list.
+  // Technical problems never enter this list, including in a partial run.
+  let reviewSlots = 8
+  const reviewGroups = groups
+    .map((group) => {
+      const failed = group.checks.filter((check) => check.status === 'FAIL').slice(0, reviewSlots)
+      reviewSlots -= failed.length
+      if (failed.length === 0) return ''
+      return `<div class="review-group"><h3>${esc(group.name) || 'Comprobaciones'}</h3><ul>${failed
+        .map((check) => `<li>${ICON.fail}<span>${esc(check.description) || '<i>Sin descripción</i>'}</span></li>`)
+        .join('')}</ul></div>`
+    })
+    .join('')
+  const remaining = counts.fail - (8 - reviewSlots)
+  const review =
+    counts.fail > 0
+      ? `<section class="review" aria-labelledby="review-title"><h2 id="review-title">Qué debes revisar</h2><p class="review-intro">Comprobaciones no superadas en esta corrección:</p>${reviewGroups}${remaining > 0 ? `<p class="review-more">${remaining} comprobaciones falladas más en el <a href="#desglose">desglose completo</a>.</p>` : ''}</section>`
+      : ''
+
   const sections = groups
     .map((group) => {
       const ok = group.checks.filter((check) => check.status === 'PASS').length
@@ -145,7 +164,7 @@ export function studentReport(
           ]
             .filter(Boolean)
             .join(' · ')
-          return `<li class="check ${tone}">${ICON[tone]}<div class="what"><p>${esc(check.description) || '<i>Sin descripción</i>'}</p>${extra ? `<small>${extra}</small>` : ''}</div><span class="tag">${LABEL[tone]}</span></li>`
+          return `<li class="check ${tone}">${ICON[tone]}<div class="what"><span class="${tone === 'unchecked' ? 'tag' : 'sr-only'}">${LABEL[tone]}</span><p>${esc(check.description) || '<i>Sin descripción</i>'}</p>${extra ? `<small>${extra}</small>` : ''}</div></li>`
         })
         .join('')
       return `<section class="group"><header><h2>${esc(group.name) || 'Comprobaciones'}</h2><span>${tally}</span></header><ul>${rows}</ul></section>`
@@ -187,11 +206,14 @@ export function studentReport(
 ${why ? `<p class="why">${why}</p>` : ''}
 </header>
 <section class="summary" aria-label="Resumen">
-<div class="bar" role="img" aria-label="${counts.pass} correctas, ${counts.fail} falladas y ${counts.unchecked} sin comprobar de ${total}">${bar}</div>
+${total > 0 ? `<div class="bar" role="img" aria-label="${counts.pass} correctas, ${counts.fail} falladas y ${counts.unchecked} sin comprobar de ${total}">${bar}</div>` : '<p class="empty">No hay comprobaciones en este informe.</p>'}
 <ul class="legend">${legend}</ul>
 </section>
 ${note}
+${review}
+<section id="desglose" aria-label="Desglose completo">
 ${sections}
+</section>
 <footer>Informe de corrección · ${exam} · generado con Heimdall</footer>
 </main>
 </body>
@@ -224,65 +246,89 @@ function slug(text: string): string {
 // often from a mail attachment, and must look the same everywhere.
 const CSS = `
 :root{--ink:#0f172a;--muted:#475569;--line:#e2e8f0;--paper:#fff;--bg:#f1f5f9;
---pass:#15803d;--pass-bg:#f0fdf4;--fail:#b91c1c;--fail-bg:#fef2f2;
+--pass:#15803d;--fail:#b91c1c;--fail-bg:#fffafa;
 --unchecked:#475569;--unchecked-bg:#f8fafc;--pending:#92400e;--pending-bg:#fffbeb;--accent:#1d4ed8}
 *{box-sizing:border-box}
 html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",Ubuntu,Cantarell,sans-serif}
-main{max-width:800px;margin:32px auto;padding:40px 44px;background:var(--paper);border-radius:12px;box-shadow:0 1px 3px rgba(15,23,42,.08)}
-p,h1,h2{margin:0}
+main{max-width:800px;margin:32px auto;padding:40px 44px;background:var(--paper);border-radius:12px;box-shadow:0 1px 3px rgba(15,23,42,.08);overflow-wrap:anywhere}
+p,h1,h2,h3{margin:0}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 ul{list-style:none;margin:0;padding:0}
 svg{width:20px;height:20px;flex:none}
-.top{border-bottom:1px solid var(--line);padding-bottom:24px}
+.top{border-bottom:1px solid var(--line);padding-bottom:18px}
 ::selection{background:#bfdbfe;color:var(--ink)}
 .head{display:flex;gap:24px;align-items:center;justify-content:space-between}
-.who{min-width:0}
+.who{min-width:0;flex:1}
 .exam{font-size:15px;color:var(--accent);font-weight:600}
-h1{font-size:34px;line-height:1.15;font-weight:700;letter-spacing:-.01em;margin-top:4px;overflow-wrap:anywhere}
+h1{font-size:30px;line-height:1.15;font-weight:700;letter-spacing:-.01em;margin-top:4px;overflow-wrap:anywhere}
 .date{font-size:14px;color:var(--muted);margin-top:6px}
-.grade{flex:none;min-width:168px;text-align:center;padding:14px 20px 12px;border-radius:12px;border:2px solid currentColor}
-.grade.pass{color:var(--pass);background:var(--pass-bg)}
-.grade.fail{color:var(--fail);background:var(--fail-bg)}
-.grade.pending{color:var(--pending);background:var(--pending-bg)}
+.grade{flex:none;max-width:100%;text-align:right;padding:4px 0 4px 20px;border-left:1px solid var(--line)}
+.grade.pass{color:var(--pass)}
+.grade.fail{color:var(--fail)}
+.grade.pending{color:var(--pending)}
 .grade .label{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
 .grade .value{line-height:1;margin:4px 0 6px;font-variant-numeric:tabular-nums}
-.grade .value span{font-size:60px;font-weight:800;letter-spacing:-.02em}
-.grade .value small{font-size:20px;font-weight:600;margin-left:4px}
-.grade .verdict{font-size:15px;font-weight:700}
+.grade .value span{font-size:52px;font-weight:600;letter-spacing:-.02em}
+.grade .value small{font-size:18px;font-weight:400;margin-left:4px;color:var(--muted)}
+.grade .verdict{font-size:14px;font-weight:500}
 .why{margin-top:16px;font-size:14px;color:var(--pending);background:var(--pending-bg);border-radius:8px;padding:10px 14px}
-.summary{padding:22px 0 6px}
-.bar{display:flex;gap:3px;height:12px;border-radius:999px;overflow:hidden;background:var(--line)}
+.summary{padding:18px 0 4px}
+.bar{display:flex;gap:0;height:8px;border-radius:999px;overflow:hidden;background:var(--line)}
 .seg.pass{background:var(--pass)}
 .seg.fail{background:var(--fail)}
 .seg.unchecked{background:repeating-linear-gradient(135deg,#94a3b8 0 4px,#cbd5e1 4px 8px)}
-.legend{display:flex;flex-wrap:wrap;gap:8px 24px;margin-top:12px;font-size:14px;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 24px;margin-top:10px;font-size:14px;color:var(--muted)}
 .legend li{display:flex;align-items:center;gap:8px}
 .legend b{color:var(--ink);font-variant-numeric:tabular-nums}
 .legend .pass svg{color:var(--pass)}
 .legend .fail svg{color:var(--fail)}
 .legend .unchecked svg{color:var(--unchecked)}
-.note{display:flex;gap:12px;align-items:flex-start;margin-top:18px;padding:12px 16px;border:1.5px dashed #94a3b8;border-radius:10px;background:var(--unchecked-bg);font-size:14px;color:var(--muted)}
+.note{display:flex;gap:10px;align-items:flex-start;margin-top:16px;padding:10px 12px;border:1px dashed #94a3b8;border-radius:8px;background:var(--unchecked-bg);font-size:14px;color:var(--muted)}
 .note svg{color:var(--unchecked);margin-top:2px}
 .note b{color:var(--ink)}
-.group{margin-top:26px;break-inside:avoid-page}
-.group header{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding-bottom:8px;border-bottom:2px solid var(--ink)}
-.group h2{font-size:18px;font-weight:700}
-.group header span{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
-.check{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line);break-inside:avoid}
-.check svg{margin-top:2px}
+.review{margin-top:22px;padding:14px 16px;background:var(--fail-bg);border:1px solid var(--line);border-radius:8px}
+.review h2{font-size:19px;font-weight:600;break-after:avoid}
+.review-intro,.review-more{font-size:14px;color:var(--muted)}
+.review-intro{margin-top:2px;break-after:avoid}
+.review-group{margin-top:12px}
+.review h3{font-size:14px;font-weight:600;break-after:avoid}
+.review li{display:flex;align-items:flex-start;gap:8px;margin-top:5px;font-size:14px;break-inside:avoid}
+.review svg{width:16px;height:16px;color:var(--fail);margin-top:3px}
+.review-more{margin-top:12px}
+.group{margin-top:22px}
+.group header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 16px;padding-bottom:7px;border-bottom:1px solid var(--line);break-after:avoid}
+.group h2{font-size:18px;font-weight:600;min-width:0}
+.group header span{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.group>ul{break-before:avoid}
+.check{display:flex;gap:10px;align-items:flex-start;padding:9px 8px;border-bottom:1px solid var(--line);break-inside:avoid}
+.check:first-child{break-before:avoid}
+.check svg{width:18px;height:18px;margin-top:3px}
 .check .what{flex:1;min-width:0}
-.check p{overflow-wrap:anywhere}
 .check small{display:block;font-size:13px;color:var(--muted);margin-top:2px}
-.tag{flex:none;font-size:13px;font-weight:600;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.tag{display:block;font-size:13px;font-weight:600;color:var(--unchecked);margin-bottom:2px}
 .check.pass svg{color:var(--pass)}
-.check.pass .tag{color:var(--pass);background:var(--pass-bg)}
+.check.fail{background:var(--fail-bg)}
 .check.fail svg{color:var(--fail)}
-.check.fail .tag{color:var(--fail);background:var(--fail-bg)}
 .check.unchecked svg{color:var(--unchecked)}
 .check.unchecked p{color:var(--muted)}
-.check.unchecked .tag{color:var(--unchecked);background:var(--unchecked-bg);border:1px dashed #94a3b8}
-footer{margin-top:32px;font-size:12px;color:var(--muted);text-align:center}
-@media (max-width:600px){main{margin:0;border-radius:0;padding:24px 16px}.head{flex-direction:column;align-items:stretch}h1{font-size:28px}}
+footer{margin-top:26px;font-size:12px;color:var(--muted);text-align:center}
+@media (max-width:600px){main{margin:0;border-radius:0;padding:24px 16px}.head{gap:14px;flex-wrap:wrap;align-items:flex-start}.who{flex-basis:210px}.grade{padding-left:14px}h1{font-size:26px}.grade .value span{font-size:44px}.review{padding:12px}.legend{gap:6px 16px}}
 @page{size:A4;margin:14mm}
-@media print{body{background:#fff}main{margin:0;max-width:none;padding:0;box-shadow:none;border-radius:0}}
+@media print{
+body{background:#fff;font-size:11pt;orphans:2;widows:2}
+main{margin:0;max-width:none;padding:0;box-shadow:none;border-radius:0}
+.top,.summary,.note{break-inside:avoid}
+.group{break-inside:auto}
+.check{display:block;position:relative;padding-left:28px;break-inside:auto;orphans:3;widows:3}
+.check>svg{position:absolute;left:0;top:9px}
+.tag{break-after:avoid}
+.check small{break-before:avoid}
+.review{background:none}
+.review li{display:block;position:relative;padding-left:24px;break-inside:auto;orphans:3;widows:3}
+.review li svg{position:absolute;left:0;top:0}
+footer{font-size:9pt}
+}
 `

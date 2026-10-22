@@ -4098,6 +4098,42 @@
       ],
       "notes": "Continuación de T191 solicitada por Adrià. Base 56dead3. Validado: make check, tipos, 549 tests, build/preload y arnés visual existente correctos. Evidencias: docs/reviews/evidence/T192/RESULTADOS.md. Sin push.",
       "completed": "2026-10-22"
+    },
+    {
+      "id": "T193",
+      "title": "Refinar el informe individual y resumir qué debe revisar el alumno",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T185",
+        "T188"
+      ],
+      "goal": "Mejora visual y pedagógica solicitada expresamente por Adrià, conservando el HTML autónomo y la evaluación.",
+      "scope": [
+        "Solo el informe individual, sus pruebas y ejemplos sintéticos de pantalla e impresión."
+      ],
+      "out_of_scope": [
+        "Motor, calificación, escala, entrega, destinatarios, dependencias y ampliación de datos permitidos."
+      ],
+      "acceptance": [
+        "Qué debes revisar incluye solo FAIL en orden de bloque, hasta ocho; omisión sin fallos y enlace con recuento restante. El desglose conserva todas las comprobaciones.",
+        "Se conservan nota canónica, conversión, máximo, umbral, pesos y Sin nota final, sin equiparar aciertos a nota.",
+        "HTML autónomo y textos escapados; no se filtran detalles internos ni otros alumnos. Solo mensajes técnicos ya autorizados.",
+        "Cabecera compacta, estados accesibles sin depender del color, barra proporcional y ausencia de comprobaciones explícita.",
+        "Diseño legible en ancho y estrecho, A4 con bloques divisibles y textos largos sin recortes; revisar informe corto y de varias páginas, también PDF si está disponible.",
+        "Pruebas de comportamiento, tipos, suite GUI, build, make check y controles documentales correctos; evidencia y limitaciones registradas."
+      ],
+      "tests": [
+        "make check",
+        "make gui-check",
+        "make gui-build",
+        "make docs-check",
+        "make tools-check",
+        "Arnés sintético de informes y PDF"
+      ],
+      "completed": "2026-10-22",
+      "notes": "Completada por petición explícita desde bef8e7c. Solo presentación del informe. 556 pruebas GUI, tipos, build/preload y make check correctos; enlaces y herramientas correctos. Seis ejemplos sintéticos, cuatro anchos sin desbordamientos ni solapamientos, sin red. PDF A4 de una y ocho páginas inspeccionados, también en gris sin fondos; contenido y márgenes verificados. Límites: otros navegadores e impresión física no probados. Evidencias: docs/reviews/evidence/T193/RESULTADOS.md. Sin push."
     }
   ]
 }
