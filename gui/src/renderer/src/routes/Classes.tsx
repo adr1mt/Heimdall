@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ClipboardPaste, Copy, Pencil, Plus, Trash2, Users } from 'lucide-react'
+import { ClipboardPaste, Copy, History, Pencil, Plus, Trash2, Users } from 'lucide-react'
 import {
   Button,
   Card,
@@ -48,6 +48,24 @@ export default function ClassesView() {
    * anything (T121).
    */
   const [chosen, setChosen] = useState<string | null>(null)
+  const [recovering, setRecovering] = useState(false)
+
+  async function recover(): Promise<void> {
+    if (recovering) return
+    setRecovering(true)
+    try {
+      if (await window.heimdall.recoverClasses()) {
+        await load()
+        setClassId(null)
+        setChosen(null)
+        setNotice(t.sourceCopies.classesRecovered)
+      }
+    } catch (error) {
+      setNotice(noticeFrom(t.sourceCopies.classesFailed, error))
+    } finally {
+      setRecovering(false)
+    }
+  }
 
   useEffect(() => {
     if (!loaded) void load()
@@ -119,10 +137,15 @@ export default function ClassesView() {
       <ViewHeader
         title={t.classes.title}
         actions={
-          <Button size="sm" disabled={!!problem} onClick={startNew}>
+          <>
+          <Button size="sm" variant="outline" disabled={recovering} onClick={() => void recover()}>
+            <History className="h-4 w-4" />{t.sourceCopies.recover}
+          </Button>
+          <Button size="sm" disabled={!!problem || recovering} onClick={startNew}>
             <Plus className="h-4 w-4" />
             {t.classes.create}
           </Button>
+          </>
         }
       />
 

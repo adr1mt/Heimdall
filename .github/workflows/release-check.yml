@@ -48,6 +48,11 @@ jobs:
         run: |
           node_modules/.bin/esbuild scripts/update-network-lab.ts --bundle --platform=node --format=esm --outfile="$RUNNER_TEMP/update-network.mjs" --external:electron
           xvfb-run -a node_modules/electron/dist/electron "$RUNNER_TEMP/update-network.mjs" --no-sandbox
+      - name: Verify source recovery through the real interface
+        working-directory: gui
+        run: |
+          node_modules/.bin/esbuild scripts/source-backup-lab.ts --bundle --platform=node --format=esm --outfile="$RUNNER_TEMP/source-backup-lab.mjs" --external:electron
+          timeout --kill-after=2s 45s xvfb-run -a node_modules/electron/dist/electron "$RUNNER_TEMP/source-backup-lab.mjs" --no-sandbox
       - name: Stop disposable labs
         if: always()
         run: make lab-down lab-ra2-down

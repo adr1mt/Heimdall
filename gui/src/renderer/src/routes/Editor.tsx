@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
-import { Save, ShieldCheck } from 'lucide-react'
+import { History, Save, ShieldCheck } from 'lucide-react'
 import { Button, Spinner, ViewHeader } from '@/components/ui'
 import { useApp, noticeFrom } from '@/stores/app'
 import { useClasses, groupById } from '@/stores/classes'
@@ -72,6 +72,22 @@ export default function EditorView() {
     }
   }
 
+  async function recover(): Promise<void> {
+    if (!project || !draft || checking || draft.text !== draft.savedText) return
+    setChecking(true)
+    try {
+      const text = await window.heimdall.recoverExam(project.examPath)
+      if (text !== null && useApp.getState().project?.examPath === project.examPath && useApp.getState().editorDraft?.text === draft.text) {
+        setDraft({ ...draft, text })
+        setVerdict({ ok: true, message: t.sourceCopies.examDraft })
+      }
+    } catch (error) {
+      setNotice(noticeFrom(t.sourceCopies.examFailed, error))
+    } finally {
+      setChecking(false)
+    }
+  }
+
   if (!project || !draft || draft.path !== project.examPath)
     return (
       <div className="flex h-full items-center justify-center">
@@ -89,6 +105,11 @@ export default function EditorView() {
         actions={
           <>
             {dirty && <span className="text-xs text-warning-strong">Sin guardar</span>}
+            <Button size="sm" variant="outline" disabled={checking || dirty}
+              title={dirty ? t.sourceCopies.dirty : t.sourceCopies.asDraft}
+              onClick={() => void recover()}>
+              <History className="h-4 w-4" />{t.sourceCopies.recover}
+            </Button>
             <Button
               size="sm"
               variant="outline"

@@ -4208,7 +4208,7 @@
       "id": "T197",
       "title": "Preparar la siguiente reparación como 1.0.1 sin reutilizar versiones",
       "phase": 9,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T194",
@@ -4286,7 +4286,7 @@
       "id": "T200",
       "title": "Conservar copias recuperables de clases y exámenes al guardar",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T195"
@@ -4306,7 +4306,8 @@
         "Regresiones de recuperación, corrupción, retención y permisos; documentación y pruebas GUI."
       ],
       "tests": [],
-      "notes": "Autorizada por Adrià el 2026-10-22 tras contrastar auditoría técnica. Commits separados por reparación; T084 sigue reservada al aula real. Diseño de recuperación y retención fijado antes de implementar en ADR-0034."
+      "notes": "ADR-0034: versiones privadas previas y propuestas, huella validada, 50 por origen y máximo 4 MiB. Recuperación por interfaz: clases con confirmación y original conservado incluso corrupto; examen como borrador sin tocar disco ni descartar cambios. Fallos de copia/publicación, rotación, límites, enlaces y corrupción probados. 571 tests GUI, tipos, build/preload, motor y herramientas correctos; arnés Electron real y capturas en docs/reviews/evidence/T200/RESULTADOS.md.",
+      "completed": "2026-10-22"
     },
     {
       "id": "T201",

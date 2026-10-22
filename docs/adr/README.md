@@ -37,3 +37,5 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 | [0032](0032-sudo-en-las-comprobaciones.md) | Comprobaciones con `sudo: true`: contraseña de la clase por stdin, nunca en el examen |
 
 - [ADR-0033 · Informes privados del alumno](0033-permisos-privados-de-informes.md).
+
+- [ADR-0034 · Versiones recuperables de clases y exámenes](0034-copias-de-clases-y-examenes.md).

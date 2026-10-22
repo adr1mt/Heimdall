@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { chmodSync, mkdtempSync, readFileSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
+import { chmodSync, mkdtempSync, readFileSync, readdirSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { classesFile, readClasses, writeClasses } from '../src/main/classes'
+import { classesFile, readClasses, restoreClasses, writeClasses } from '../src/main/classes'
+import { readSourceCopy, sourceCopiesSlot } from '../src/main/source-backup'
 import {
   columnProblem,
   duplicateOf,
@@ -329,4 +330,21 @@ describe('private class data', () => {
     expect(() => writeClasses(dir, [group()])).toThrow(/proteger/i)
     expect(statSync(target).mode & 0o777).toBe(0o644)
   })
+})
+
+
+it('recovers classes explicitly while preserving the exact corrupt original', () => {
+  const dir = emptyDir(), file = classesFile(dir)
+  const corrupt = '{broken-original'
+  writeFileSync(file, corrupt)
+  const recovered = group({ name: 'Recuperada' })
+  restoreClasses(dir, JSON.stringify({ classes: [recovered] }))
+  expect(readClasses(dir)).toEqual([recovered])
+  const slot = sourceCopiesSlot(dir, file, 'classes')
+  const versions = readdirSync(slot).filter(name => name.endsWith('.json')).map(name => readSourceCopy(dir, join(slot, name), 'classes'))
+  expect(versions).toContain(corrupt)
+  expect(statSync(file).mode & 0o777).toBe(0o600)
+  const current = readFileSync(file, 'utf8')
+  expect(() => restoreClasses(dir, '{wrong-copy')).toThrow()
+  expect(readFileSync(file, 'utf8')).toBe(current)
 })

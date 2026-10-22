@@ -222,3 +222,24 @@ inválida · `3` ejecución parcial · `4` cancelado.
 
 ¿Algo no encaja con lo que ves en pantalla? Es un fallo de esta guía: está
 escrita sobre la versión 1.0.0.
+
+
+## Recuperar clases o una versión del examen
+
+Heimdall conserva automáticamente hasta 50 versiones por fichero al guardar
+clases o exámenes. En **Clases** y en el **Editor**, usa **Recuperar versión…**
+y elige la fecha de la copia. Se guardan en la carpeta privada
+`copias-fuentes` de los datos de la aplicación. Puedes subir una carpeta en el
+diálogo para localizar también las de un proyecto que hayas movido.
+
+El examen se abre como borrador: compruébalo, valida y guarda para aplicarlo.
+Si tienes cambios sin guardar, primero guárdalos o descártalos; recuperar no
+los elimina. Para las clases se pide confirmación: se activa la lista elegida
+y la actual se conserva en las copias, también si estaba dañada. Puedes
+deshacerlo recuperando esa versión anterior. Una copia corrupta se rechaza y se
+explica el motivo. El botón sigue disponible si la lista de clases no se lee.
+
+Estas copias contienen los datos y la contraseña de la clase y solo tu usuario
+puede leerlas. No se envían a Internet. Son distintas de las copias de notas y
+no protegen frente a perder el disco entero: conserva también una copia del
+equipo. Los archivos fuente de más de 4 MiB no se reemplazan automáticamente.

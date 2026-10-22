@@ -108,6 +108,10 @@ export interface HeimdallApi {
   readExam: (examPath: string) => Promise<string>
   /** Writes the exam, atomically. Only called once the engine said it is valid. */
   writeExam: (examPath: string, yaml: string) => Promise<void>
+  /** Select a verified source copy; return a draft without touching the exam. */
+  recoverExam: (examPath: string) => Promise<string | null>
+  /** Explicit native confirmation; the original class file is preserved. */
+  recoverClasses: () => Promise<boolean>
   /**
    * Asks the engine whether this exam is valid, without saving it and without
    * touching a single machine. The class is needed because half the errors of

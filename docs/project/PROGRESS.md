@@ -5,60 +5,50 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**Auditoría 2026-10-22, autorizada por Adrià:** T194–T201 desglosadas.
-**T194:** una nota final ya no se presenta incompleta por diagnósticos de peso
-cero pendientes; se conserva su incidencia técnica. Regresión antes/después,
-tipos, suite GUI y build/preload correctos. **T195:** datos de clases privados
-(0700/0600), incluidas instalaciones existentes y temporales antiguos; JSON
-corrupto intacto y enlaces rechazados. 562 pruebas GUI y controles correctos.
-**T196:** informes 0600 con dueño SSH, probado contra el laboratorio real;
-enlaces y directorios conservan la protección (ADR-0033). Siguiente:
-validación de publicación y copias de clases/exámenes. **T199:** sudo probado
-con contraseña incorrecta real, usuario sin privilegios y máquina sin sudo;
-no se ejecuta el comando ni se convierte el rechazo en suspenso. **T201:**
-red del actualizador por Chromium; arnés Brotli real y paquete con/sin sandbox
-correctos. 563 pruebas GUI. [Evidencia](../reviews/evidence/T201/RESULTADOS.md).
-**T198:** barreras race/Go/npm y workflow manual de publicación preparados;
-integración completa, 100 ficticios y .deb instalado/retirado en Ubuntu 24/26
-correctos. [Evidencia y límites](../reviews/evidence/T198/RESULTADOS.md).
-GitHub aún no ha ejecutado estos cambios; aula real sigue en T084.
+Auditoría autorizada por Adrià, reparaciones en commits separados:
+- **T194:** una nota final ya no parece incompleta por un diagnóstico sin peso.
+- **T195/T196:** clases privadas, migración de permisos e informes SSH 0600;
+  originales, directorios y destinos de enlaces conservados (ADR-0033).
+- **T199:** sudo probado con contraseña incorrecta real, usuario sin privilegios
+  y máquina sin sudo. El rechazo no ejecuta el comando ni produce suspenso.
+- **T201:** actualizador por red de Chromium. Brotli real, renderer y preload
+  con sandbox/fallback comprobados. [Evidencia](../reviews/evidence/T201/RESULTADOS.md).
+- **T198:** barreras race/Go/npm y workflow manual de publicación. Integración
+  completa, 100 ficticios, .deb instalado/retirado en Ubuntu 24/26 y AppImage
+  correctos. [Evidencia y límites](../reviews/evidence/T198/RESULTADOS.md).
+- **T200:** versiones privadas recuperables de clases y YAML (ADR-0034).
+  Examen como borrador; clases con confirmación y original conservado incluso
+  corrupto. 571 pruebas GUI; arnés real y capturas claro/oscuro.
+  [Evidencia](../reviews/evidence/T200/RESULTADOS.md).
+GitHub aún no ha ejecutado estos cambios. Siguiente: preparar 1.0.1 (T197).
 
-**T189 · Comprobaciones con `sudo: true` (ADR-0032).** Kea 3 en Ubuntu 26.04
-deja `/etc/kea` solo a root. Antes los exámenes de 0227 llevaban la contraseña
-dentro de un `bash -c`; ahora basta `sudo: true` y el motor usa la contraseña
-de la clase por stdin. Si sudo no la acepta: sin evaluar (`AUTH_FAILED`), nunca
-suspenso. Laboratorio con sudo y fichero solo de root. Exámenes de 0227
-migrados; corrección real del servidor de Manuel Cadenas (2026-10-21):
+**T189:** `sudo: true` usa la contraseña por stdin, sin secreto en el examen.
+Exámenes de 0227 migrados; servidor real de Manuel Cadenas (2026-10-21):
 prova-guia-kea 100/100, ra1-dhcp-kea 34/100, sin fallos por permisos.
-
-**1.0.0 rehecha (2026-10-22).** AppImage sin FUSE probado en Ubuntu 24.04/26.04.
 
 ## Problemas conocidos y límites
 
 - Si un consumidor no lee, puede faltar progreso y `run.end`; el resultado
   guardado mantiene la nota. La GUI trata un flujo sin cierre como incompleto.
-- La copia sigue leyendo cada original para validar cambios y corrupción; el
-  límite de 128 MB probado es del heap V8, no del RSS ni de cualquier examen.
-- Laboratorio en 127.1.2.3; arneses SSH y secretos se ejecutan secuencialmente.
-- Reintentos: mismo PLAN y máximo 50 eslabones. Modo examen: mínimo 5 min.
-- Hasta 2000 celdas y 1 MiB de metadatos resueltos; inventario hasta
-  65536 bytes. PLAN no admitido se rechaza antes de SSH.
-- Copias conservan notas y procedencia, sin salidas. Recuperación no sobrescribe.
-- Cierre normal espera resultado y copia; cierre forzado puede interrumpirlo.
-- Linux x64. Actualización automática solo AppImage; .deb mediante apt. El
-  .deb se probó extraído, sin instalarlo.
-- Editor YAML conserva texto; Monaco se empaqueta en un chunk diferido local.
-- Autenticación por clave SSH pendiente (T023), sin caso de uso aún.
-- examen-lab.ts está desfasado desde T178 (T186); ui-refresh cubre el modo examen.
-- La barra de avisos pinta en rojo también los guardados correctos (T187).
-- Un resultado cuyo examen o clase cambió después no se puede enviar: se
-  vuelve a corregir. Los motivos de conexión fallida son frases técnicas.
-- Un informe que contenga el texto de la contraseña de la clase no se envía.
-- Parches 2026-10-22: go1.26.10, vite 7.3.7, Electron 43.8.3 (Node 24.22.0, aún
-  sin el parche del 21-oct). npm audit: 8 moderados de electron-builder, solo build.
+- La copia de notas lee originales para validar cambios/corrupción; 128 MB
+  probado es heap V8, no RSS ni cualquier examen. Sin salidas; no sobrescribe.
+- Fuentes: hasta 50 versiones por origen, máximo 4 MiB. Clases y copias incluyen
+  su contraseña (ADR-0030), privadas y sin red. No protegen de perder el disco.
+- Laboratorio en 127.1.2.3; arneses SSH/secretos secuenciales. Sin sudo: 2298.
+- Reintentos: mismo PLAN, máximo 50 eslabones. Modo examen: mínimo 5 min.
+- Hasta 2000 celdas y 1 MiB de metadatos; inventario hasta 65536 bytes.
+- Cierre normal espera resultado/copia; cierre forzado puede interrumpirlo.
+- Linux x64. Actualización automática AppImage; .deb instalando nueva versión.
+- Editor YAML conserva texto; Monaco en chunk diferido local.
+- T023 (clave SSH) sigue sin caso real; examen-lab desfasado (T186).
+- La barra de éxito sigue roja (T187).
+- Si examen/clase cambiaron tras corregir, hay que corregir antes de enviar.
+- Un informe que contenga la contraseña de la clase no se envía.
+- Electron 43.8.3 aún incorpora Node 24.22.0; mitigada red del actualizador,
+  pendiente parche del runtime. npm: 8 moderados build con excepción específica.
 
 ## Siguiente trabajo
 
-**T070**: rehacer exámenes del curso en formato nativo; desbloquea **T084**,
-examen real de aula que ejecuta Adrià. Consultar `python3 scripts/tasks.py T070`
-antes de empezar. **T023**, **T186** y **T187** siguen READY.
+**T197:** paquetes 1.0.1 y validación propia antes de publicación.
+**T070** desbloquea **T084**, examen real de aula que ejecuta Adrià. Consultar
+`python3 scripts/tasks.py T070`. T023, T186 y T187 siguen READY.

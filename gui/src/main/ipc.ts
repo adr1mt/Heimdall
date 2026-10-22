@@ -1,4 +1,4 @@
-import { readFileSync, renameSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { basename, dirname } from 'node:path'
 import {
   app,
@@ -20,7 +20,8 @@ import { RunSession, projectDirOf } from './run'
 import { describeExam } from './describe'
 import { secretRefsIn } from './secrets'
 import { readSettings, writeSettings } from './store'
-import { readClasses, writeClasses } from './classes'
+import { classesFile, readClasses, restoreClasses, writeClasses } from './classes'
+import { readSourceCopy, sourceCopiesRoot, sourceCopiesSlot, writeSourceFile, type SourceKind } from './source-backup'
 import {
   createProjectAt,
   folderOf,
@@ -55,6 +56,24 @@ const FILTERS: Record<'exam' | 'engine' | 'result', Electron.FileFilter[]> = {
 /** Where the settings file lives: the app's own data directory. */
 function settingsDir(): string {
   return app.getPath('userData')
+}
+
+/** Native selection can also locate a copy belonging to a previous folder. */
+async function chooseSourceCopy(source: string, kind: SourceKind): Promise<string | null> {
+  const root = sourceCopiesRoot(settingsDir())
+  if (!existsSync(root)) {
+    await dialog.showMessageBox({ type: 'info', message: 'Todavía no hay versiones conservadas. Se crean al guardar clases o exámenes.', buttons: ['Cerrar'] })
+    return null
+  }
+  const slot = sourceCopiesSlot(settingsDir(), source, kind)
+  const answer = await dialog.showOpenDialog({
+    title: kind === 'classes' ? 'Recuperar lista de clases: elige la fecha de la versión' : 'Recuperar examen como borrador: elige la fecha de la versión',
+    defaultPath: existsSync(slot) ? slot : root,
+    filters: [{ name: 'Versiones conservadas de Heimdall', extensions: ['json'] }],
+    properties: ['openFile']
+  })
+  if (answer.canceled || !answer.filePaths[0]) return null
+  return readSourceCopy(settingsDir(), answer.filePaths[0], kind)
 }
 
 /**
@@ -252,9 +271,13 @@ export function registerIpc(): void {
   ipcMain.handle(IPC.writeExam, (_e, examPath: unknown, yaml: unknown): void => {
     if (typeof examPath !== 'string' || !examPath) throw new Error('No hay ningún examen abierto.')
     if (typeof yaml !== 'string') throw new Error('No hay ningún examen que guardar.')
-    const tmp = `${examPath}.tmp`
-    writeFileSync(tmp, yaml, 'utf-8')
-    renameSync(tmp, examPath)
+    writeSourceFile(settingsDir(), examPath, 'exam', yaml)
+  })
+
+  ipcMain.handle(IPC.recoverExam, (_e, examPath: unknown): Promise<string | null> => {
+    if (typeof examPath !== 'string' || !examPath) throw new Error('No hay ningún examen abierto.')
+    projectDirOf(examPath)
+    return chooseSourceCopy(examPath, 'exam')
   })
 
   // Whether the engine accepts this exam. It resolves the PLAN and stops: no
@@ -442,6 +465,21 @@ export function registerIpc(): void {
     if (!Array.isArray(classes)) throw new Error('No hay ninguna lista de clases que guardar.')
     const groups = classes.map(readGroup).filter((group): group is ClassGroup => group !== null)
     writeClasses(settingsDir(), groups)
+  })
+
+  ipcMain.handle(IPC.recoverClasses, async (): Promise<boolean> => {
+    if (isRunActive() || isExamModeActive()) throw new Error('Termina la corrección o el modo examen antes de recuperar clases.')
+    const text = await chooseSourceCopy(classesFile(settingsDir()), 'classes')
+    if (text === null) return false
+    const answer = await dialog.showMessageBox({
+      type: 'question', title: 'Recuperar lista de clases',
+      message: 'Se activará la lista de clases de la versión elegida. La lista actual se conservará en las copias, incluso si está dañada.',
+      buttons: ['Cancelar', 'Conservar actual y recuperar'], defaultId: 0, cancelId: 0
+    })
+    if (answer.response !== 1) return false
+    if (isRunActive() || isExamModeActive()) throw new Error('Ha empezado una corrección; no se han cambiado las clases.')
+    restoreClasses(settingsDir(), text)
+    return true
   })
 
   ipcMain.handle(IPC.cancelRun, (): void => {

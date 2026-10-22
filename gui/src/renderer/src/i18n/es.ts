@@ -1,6 +1,15 @@
 // Every string the teacher reads, in one place. The application is used in
 // Spanish in the classroom; interface text is not scattered across the views.
 export const t = {
+  sourceCopies: {
+    recover: 'Recuperar versión…',
+    classesRecovered: 'Clases recuperadas. La lista anterior se conserva en las copias.',
+    classesFailed: 'No se pudieron recuperar las clases.',
+    examFailed: 'No se pudo recuperar el examen.',
+    examDraft: 'Versión recuperada como borrador. Valida y guarda para aplicarla; el examen en disco sigue intacto.',
+    dirty: 'Guarda o descarta el borrador antes de recuperar otra versión.',
+    asDraft: 'Cargar una versión conservada como borrador'
+  },
   app: {
     name: 'Heimdall'
   },

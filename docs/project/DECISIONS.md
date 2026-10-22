@@ -897,3 +897,9 @@ comprobación con más fallos, sin contar incidencias técnicas. Evidencia:
 ADR-0033 cambia solo los permisos de entrega de ADR-0031 a 0600; dueño el
 usuario SSH. Los informes existentes se protegen al reenviarlos, sin recorrer
 las máquinas ni modificar otros archivos.
+
+### 2026-10-22 · T200 · Copias de fuentes
+
+ADR-0034 conserva versiones privadas de clases y YAML, separadas de las notas.
+El examen se recupera como borrador; las clases requieren confirmación y
+conservan el original, incluso corrupto. Sin red ni cifrado nuevo.

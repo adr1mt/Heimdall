@@ -11,6 +11,7 @@ export const IPC = {
   removeRecent: 'projects:removeRecent',
   readExam: 'exam:read',
   writeExam: 'exam:write',
+  recoverExam: 'exam:recover',
   validateExam: 'exam:validate',
   openExternal: 'shell:openExternal',
   secretRefs: 'run:secretRefs',
@@ -29,6 +30,7 @@ export const IPC = {
   sendReports: 'reports:send',
   listClasses: 'classes:list',
   saveClasses: 'classes:save',
+  recoverClasses: 'classes:recover',
   // Pushed from the main process while a run is alive.
   runEvent: 'run:event',
   runClosed: 'run:closed',

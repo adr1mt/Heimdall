@@ -1,5 +1,6 @@
-import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { chmodSync, existsSync, lstatSync, mkdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { writeSourceFile } from './source-backup'
 import { readGroup, isColumnName, type ClassGroup } from '../shared/classes'
 
 /**
@@ -54,7 +55,21 @@ export function readClasses(dir: string): ClassGroup[] {
 export function writeClasses(dir: string, classes: ClassGroup[]): void {
   readClasses(dir)
   validateClasses(classes)
-  const path = classesFile(dir)
+  writeSourceFile(dir, classesFile(dir), 'classes', serializeClasses(classes))
+}
+
+/** Explicit recovery validates the copy but preserves even a corrupt original. */
+export function restoreClasses(dir: string, text: string): void {
+  protectClasses(dir)
+  const raw: unknown = JSON.parse(text)
+  const list = (raw as { classes?: unknown })?.classes
+  if (!Array.isArray(list)) throw new Error('La copia no contiene una lista de clases válida.')
+  validateClasses(list)
+  const groups = list.map(value => readGroup(value)!)
+  writeSourceFile(dir, classesFile(dir), 'classes', serializeClasses(groups))
+}
+
+function serializeClasses(classes: ClassGroup[]): string {
   const payload = {
     classes: classes.map((group) => ({
       id: group.id,
@@ -72,14 +87,7 @@ export function writeClasses(dir: string, classes: ClassGroup[]): void {
       }))
     }))
   }
-  const staged = mkdtempSync(join(dir, '.classes-'))
-  try {
-    const tmp = join(staged, 'classes.json')
-    writeFileSync(tmp, `${JSON.stringify(payload, null, 2)}\n`, { encoding: 'utf8', mode: 0o600, flag: 'wx' })
-    renameSync(tmp, path)
-  } finally {
-    rmSync(staged, { recursive: true, force: true })
-  }
+  return `${JSON.stringify(payload, null, 2)}\n`
 }
 
 /** Repairs old installations before reading, even when their JSON is corrupt. */
