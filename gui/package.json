@@ -1,6 +1,6 @@
 {
   "name": "heimdall-gui",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "Heimdall GUI: interfaz de escritorio del motor de evaluacion Heimdall",
   "desktopName": "heimdall-gui",
   "main": "./out/main/index.js",
@@ -10,6 +10,7 @@
   },
   "license": "MPL-2.0",
   "homepage": "https://github.com/adr1mt/Heimdall",
+  "repository": "github:adr1mt/Heimdall",
   "type": "module",
   "scripts": {
     "dev": "electron-vite dev",
@@ -34,6 +35,9 @@
     "appId": "net.xeill.elpuig.heimdall",
     "productName": "Heimdall",
     "copyright": "Copyright (c) 2026 Adria Munoz",
+    "toolsets": {
+      "appimage": "1.0.3"
+    },
     "directories": {
       "buildResources": "build",
       "output": "dist"

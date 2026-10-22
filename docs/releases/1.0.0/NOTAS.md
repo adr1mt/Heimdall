@@ -1,21 +1,24 @@
 # Heimdall 1.0.0
 
-Primera versión estable. Sobre la 0.9.2:
+Primera versión estable. Sustituye a las publicaciones anteriores (0.9.1,
+0.9.2 y la primera 1.0.0), que se retiran.
 
-- Los exámenes se escriben directamente en YAML, con un editor con colores,
-  búsqueda y Ctrl+S que funciona sin conexión. El formulario de exámenes
-  desaparece.
-- Resultados vuelve a enseñarse en colores, con detalle por alumno, cuatro
-  secciones de analíticas y vista previa de notas. La ayuda tiene índice.
-- Cada clase guarda la contraseña de sus máquinas junto al usuario común: ya
-  no se pide al corregir.
-- «Enviar informes…» deja a cada alumno, en su carpeta personal y en la máquina
-  que se corrigió, una página con su nota y cada comprobación: correcta,
-  fallada o no comprobada. Sin comandos, salidas, contraseña ni datos de otros
-  alumnos. Dice a quién le ha llegado y por qué no a los demás.
-
-Linux de 64 bits. El motor va incluido en ambos paquetes. El AppImage incorpora
-el actualizador; el .deb se instala o actualiza con apt. Las sumas de los dos
-paquetes están en SHA256SUMS.
+- El AppImage se abre con doble clic en Ubuntu 22.04, 24.04 y 26.04 sin
+  instalar nada: ya no pide libfuse2 y, donde el sistema no deja usar el
+  aislamiento de Chromium, arranca sin él.
+- Los exámenes se escriben en YAML con un editor que funciona sin conexión.
+- Comprobaciones con `sudo: true`: leen ficheros que solo puede leer root
+  (por ejemplo, la configuración de Kea en Ubuntu 26.04) con la contraseña de
+  la clase, sin escribirla en el examen. Si sudo no la acepta, el alumno sale
+  sin evaluar, nunca suspendido.
+- En Resultados la nota es lo primero: grande, con el color de aprobado o
+  suspenso. Detalle por alumno, analíticas y ayuda con índice.
+- Cada clase guarda la contraseña de sus máquinas: no se pide al corregir.
+- «Enviar informes…» deja a cada alumno su informe en su carpeta personal,
+  solo con lo suyo, y dice a quién le ha llegado y por qué no a los demás.
+- El AppImage se actualiza solo; el `.deb` se actualiza instalando el nuevo.
 
 Queda pendiente corregir con ella un examen real de aula de principio a fin.
+
+Linux de 64 bits. El motor va incluido en ambos paquetes. Las sumas de los dos
+paquetes están en SHA256SUMS.

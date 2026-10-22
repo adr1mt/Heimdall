@@ -8,104 +8,24 @@ El número es uno solo para todo el producto: lo dice el fichero `VERSION` de
 la raíz, el motor se sella con él al compilar y la aplicación lo lleva en su
 paquete. `test/version.sh` comprueba que no se separan.
 
-## 1.1.0 — 21-10-2026 (solo local, sin publicar)
+## 1.0.0 — 22-10-2026
 
+Primera versión estable. Sustituye a las publicaciones anteriores (0.9.1,
+0.9.2 y la primera 1.0.0), que se retiran.
+
+- El AppImage se abre con doble clic en Ubuntu 22.04, 24.04 y 26.04 sin
+  instalar nada: ya no pide libfuse2 y, donde el sistema no deja usar el
+  aislamiento de Chromium, arranca sin él.
+- Los exámenes se escriben en YAML con un editor que funciona sin conexión.
 - Comprobaciones con `sudo: true`: leen ficheros que solo puede leer root
   (por ejemplo, la configuración de Kea en Ubuntu 26.04) con la contraseña de
   la clase, sin escribirla en el examen. Si sudo no la acepta, el alumno sale
   sin evaluar, nunca suspendido.
 - En Resultados la nota es lo primero: grande, con el color de aprobado o
-  suspenso y fija arriba de la matriz.
-
-## 1.0.0 — 16-10-2026
-
-Primera versión estable:
-
-- Los exámenes se escriben en YAML con un editor que funciona sin conexión;
-  desaparece el formulario de exámenes.
-- Resultados en colores, detalle por alumno, analíticas y ayuda con índice.
-- Cada clase guarda la contraseña de sus máquinas: ya no se pide al corregir.
+  suspenso. Detalle por alumno, analíticas y ayuda con índice.
+- Cada clase guarda la contraseña de sus máquinas: no se pide al corregir.
 - «Enviar informes…» deja a cada alumno su informe en su carpeta personal,
   solo con lo suyo, y dice a quién le ha llegado y por qué no a los demás.
+- El AppImage se actualiza solo; el `.deb` se actualiza instalando el nuevo.
 
 Queda pendiente corregir con ella un examen real de aula de principio a fin.
-
-## 0.9.2 — 14-10-2026
-
-Nuevo icono y arreglos de robustez:
-
-- El icono de la aplicación (menú, ventana y barra de tareas) es el guardián
-  que aparece dentro de la aplicación.
-- Si un resultado, el histórico o una copia no se pueden leer, se avisa con el
-  fichero afectado en lugar de darlos por inexistentes.
-- Las copias de seguridad gastan menos memoria con muchas correcciones.
-- El progreso de una corrección llega acotado y su final nunca se pierde.
-- Mejor foco de teclado en la navegación y en los exámenes recientes.
-
-## 0.9.1 — 03-10-2026
-
-Reparaciones de las dos auditorías y mejoras de la revisión de arquitectura:
-
-- Las salidas recortadas y los comandos fallidos no producen aprobados sin
-  prueba; los límites SSH y la cancelación dejan estados técnicos correctos.
-- Guardar valida el borrador visible y conserva los errores y cambios pendientes.
-- Reintentos e histórico conservan la cadena completa y sus notas.
-- Las copias retienen las correcciones recientes y sus antecedentes, avisan
-  si no pudieron guardarse y recuperan los datos sin sobrescribir originales.
-- Pesos decimales, vueltas perfectas, clases corruptas y resultados incompletos
-  se tratan de forma coherente; los lectores del motor y la aplicación usan
-  los mismos criterios para aceptar resultados.
-- Mejor contraste en ambos temas y actualizaciones aplazadas durante la corrección.
-- La actualización comprueba tamaño y SHA-256 antes de instalar el AppImage.
-
-AppImage y .deb reconstruidos con T156–T159 y
-[publicados en GitHub](https://github.com/adr1mt/Heimdall/releases/tag/v0.9.1)
-en el repositorio público de Heimdall. Las descargas y el actualizador son
-accesibles sin iniciar sesión. La revisión de arquitectura está terminada.
-La prueba de aula con alumnado real sigue pendiente.
-[Primera reparación](audits/2026-10-02/REPARACION.md),
-[segunda reparación](audits/2026-10-02/post/repair/REPARACION.md) y
-[recuperación de copias](audits/2026-10-03/RECUPERACION.md).
-
-## 0.9.0 — 22-09-2026
-
-Primera versión completa, lista para usarse en el aula. Todavía no se ha
-corregido con ella un examen real de principio a fin: eso es lo que falta para
-la 1.0.0.
-
-**Corregir**
-
-- Se abre un examen, se elige la clase y se corrige. El motor viaja dentro de
-  la aplicación: no hay nada más que instalar.
-- Modo examen: corrige la clase una y otra vez mientras dura la práctica y
-  cada alumno se queda con su mejor vuelta entera, diciendo en pantalla de qué
-  vuelta sale su nota.
-- Modo proyector para enseñar el progreso en clase sin mostrar las direcciones
-  de las máquinas.
-- Lo que quedó sin evaluar se puede repetir sin mover el peso total ni la
-  lista de comprobaciones.
-
-**Las notas**
-
-- Resultados enseña, de cada comprobación, el comando ejecutado, lo que
-  contestó la máquina y lo que se esperaba.
-- Exportación a hoja de notas y a CSV de Moodle, en la escala que elija el
-  profesor.
-- Copias de seguridad de las notas fuera de la carpeta del examen.
-
-**Lo que protege la nota**
-
-- Un problema técnico nunca es un suspenso, y con algo sin evaluar no hay nota
-  final.
-- Un alumno roto no bloquea al resto, ningún comando puede colgar la
-  corrección y cancelar conserva lo ya corregido.
-- La contraseña del aula se escribe una vez, se guarda cifrada y no aparece en
-  ningún informe, log ni lista de procesos. Auditado de punta a punta
-  ([modos de fallo](MODOS-DE-FALLO-HEIMDALL.md)).
-
-**Lo que no hay**
-
-- Paquete solo para Linux de 64 bits.
-- Autenticación por clave SSH: hoy se corrige con usuario y contraseña.
-- La actualización automática solo cubre el AppImage; el `.deb` lo lleva
-  `apt`.

@@ -859,3 +859,24 @@ comprobación esperaba un minuto. Sustituye el punto 3 de T114.
 4. **El timeout remoto va dentro de sudo**: fuera no podría matar a root.
 5. Un sudo rechazado no se vuelve a intentar en ese host para ese alumno.
 6. `test/lab.sh` reconstruye la imagen cuando cambia el `Containerfile`.
+
+### 2026-10-22 · El AppImage sin libfuse2 y una sola 1.0.0
+
+1. **Runtime estático de AppImage** (`toolsets.appimage: "1.0.3"` en
+   electron-builder 26.18). El runtime antiguo enlazaba libfuse2, que Ubuntu
+   22.04 y posteriores ya no instalan: el AppImage no abría con doble clic. El
+   nuevo lleva FUSE dentro y solo necesita `fusermount3`, presente en el
+   escritorio. Comprobado: el paquete antiguo da `dlopen(): error loading
+   libfuse.so.2` en un sistema sin libfuse2 y el nuevo monta y arranca Electron.
+2. **Sin envoltorio propio para el sandbox.** El `AppRun` que genera
+   electron-builder ya prueba `unshare -Ur true` y añade `--no-sandbox` solo si
+   los user namespaces no están disponibles (restricción de AppArmor de Ubuntu
+   24.04 y posteriores). El `.deb` conserva el sandbox con `chrome-sandbox`
+   setuid.
+3. **`repository` en `gui/package.json`.** Con el runtime nuevo,
+   electron-builder falla al generar la información de actualización si no
+   sabe el repositorio. Deja además `app-update.yml` y `latest-linux.yml`, que
+   el actualizador propio no usa.
+4. **Las publicaciones 0.9.1, 0.9.2 y la primera 1.0.0 se retiran** y la
+   versión vuelve a 1.0.0. Quien tenga la primera 1.0.0 funcionando no verá
+   esta como actualización (mismo número): la instala a mano una vez.

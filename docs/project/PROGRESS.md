@@ -17,7 +17,9 @@ suspenso. Laboratorio con sudo y fichero solo de root. Exámenes de 0227
 migrados; corrección real del servidor de Manuel Cadenas (2026-10-21):
 prova-guia-kea 100/100, ra1-dhcp-kea 34/100, sin fallos por permisos.
 
-**Versión 1.0.0 publicada** antes del examen real de aula (T084 pendiente).
+**Versión 1.0.0 rehecha (2026-10-22).** El AppImage ya no necesita libfuse2
+ni falla por el sandbox en Ubuntu 24.04/26.04. Se retiran las publicaciones
+anteriores; examen real de aula pendiente (T084).
 
 ## Problemas conocidos y límites
 
