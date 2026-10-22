@@ -5,6 +5,11 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
+**T190 (en curso) · La GUI ya compila con Tailwind CSS 4.** Desaparecen los 5
+avisos graves de `npm audit`; las 9 secciones se ven igual que antes en claro y
+oscuro. Falta comparar Resultados y Corregir con datos de una corrección, que
+necesita Go y el laboratorio SSH.
+
 **La nota, lo primero en Resultados.** En «Matriz» la nota va arriba, grande
 y rellena del color de aprobado/suspenso (ámbar si es provisional), fija bajo
 los nombres al desplazar las comprobaciones. En «Lista», la misma insignia.
@@ -17,15 +22,7 @@ suspenso. Laboratorio con sudo y fichero solo de root. Exámenes de 0227
 migrados; corrección real del servidor de Manuel Cadenas (2026-10-21):
 prova-guia-kea 100/100, ra1-dhcp-kea 34/100, sin fallos por permisos.
 
-**El actualizador en sesiones cortas**: comprueba a los 10 s y la descarga
-solo se abandona parada un minuto
-([evidencia](../reviews/evidence/actualizador-sesiones-cortas/RESULTADOS.md)).
-
 **Versión 1.0.0 publicada** antes del examen real de aula (T084 pendiente).
-
-**T188 · El informe se deja en la máquina de cada alumno (ADR-0031)**:
-«Enviar informes…» en Resultados, con quién lo recibió y quién no
-([evidencias](../reviews/evidence/T188/RESULTADOS.md)).
 
 ## Problemas conocidos y límites
 
@@ -52,12 +49,12 @@ solo se abandona parada un minuto
 - Un informe que contenga el texto de la contraseña de la clase no se envía
   (p. ej. contraseña «alumno» y una descripción que dice «alumno»).
 - Parches 2026-10-22: go1.26.10, vite 7.3.7, Electron 43.8.3 (Node 24.22.0, aún
-  sin el parche del 21-oct). tailwindcss 3 arrastra 5 avisos graves de npm audit,
-  solo en build; migración a v4 en T190.
+  sin el parche del 21-oct). npm audit: quedan 8 moderados
+  de electron-builder (sprintf-js), solo en build.
 
 ## Siguiente trabajo
 
 **T070**: rehacer exámenes del curso en formato nativo; desbloquea **T084**,
 examen real de aula que ejecuta Adrià. Consultar
-`python3 scripts/tasks.py T070` antes de empezar. **T023**, **T186**,
-**T187** y **T190** siguen READY.
+`python3 scripts/tasks.py T070` antes de empezar. **T023**, **T186** y
+**T187** siguen READY; **T190** en curso.

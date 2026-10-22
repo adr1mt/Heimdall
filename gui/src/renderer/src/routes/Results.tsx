@@ -388,7 +388,7 @@ function KpiStrip({
         disabled={projector}
         onClick={onAttention}
         className={cn(
-          'flex items-baseline gap-3 bg-background px-4 py-3 text-left transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
+          'flex items-baseline gap-3 bg-background px-4 py-3 text-left transition-colors hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
           attentionOnly && 'bg-accent'
         )}
       >
@@ -595,7 +595,7 @@ function GradeBadge({
       aria-label={`${student.name}: ${t.results.matrixScore} ${score.value === null ? '—' : score.text}, ${label}`}
       className={cn(
         className,
-        'transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+        'transition-opacity hover:opacity-85 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring'
       )}
     >
       {body}
@@ -648,7 +648,7 @@ function MatrixRowView({
               title={`${student.name} · ${row.description} · ${STATUS_TEXT[check.status]}${check.cause !== 'NONE' ? ` · ${CAUSE_TEXT[check.cause]}` : ''}`}
               aria-label={`${student.name}, ${row.description}: ${STATUS_TEXT[check.status]}`}
               className={cn(
-                'inline-flex h-6 w-7 items-center justify-center rounded text-glyph font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                'inline-flex h-6 w-7 items-center justify-center rounded text-glyph font-bold transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                 cellTone(check.status),
                 active && 'ring-2 ring-ring'
               )}
@@ -1000,7 +1000,7 @@ function ChainResult({ chain }: { chain: Consolidation }) {
                     title={`${check.check_id} · ${STATUS_TEXT[check.status]} · ${fromRunText(check)}`}
                     aria-label={`${check.check_id}: ${STATUS_TEXT[check.status]}`}
                     className={cn(
-                      'max-w-[14rem] truncate rounded px-2 py-1 text-micro font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                      'max-w-56 truncate rounded px-2 py-1 text-micro font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                       cellTone(check.status),
                       selected?.studentId === student.student_id &&
                         selected.checkId === check.check_id &&
@@ -1264,7 +1264,7 @@ function StudentRow({ student, onToggle }: { student: StudentResult; onToggle: (
       type="button"
       onClick={onToggle}
       aria-label={`Ver detalle: ${student.name}`}
-      className="flex w-full items-center gap-3 rounded-md px-3 py-3 text-left hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="flex w-full items-center gap-3 rounded-md px-3 py-3 text-left hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
     >
       <span
         className={cn(

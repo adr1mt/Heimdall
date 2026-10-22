@@ -213,7 +213,7 @@ function RecentRow({
         type="button"
         disabled={disabled}
         onClick={onOpen}
-        className="flex min-w-0 flex-1 items-center gap-3 rounded-md py-3 pl-2 pr-2 text-left transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:opacity-60"
+        className="flex min-w-0 flex-1 items-center gap-3 rounded-md py-3 pl-2 pr-2 text-left transition-colors hover:bg-muted/50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:opacity-60"
       >
         <FolderOpen className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
         <div className="min-w-0 flex-1">
@@ -255,4 +255,4 @@ function RecentRow({
 
 /** Las acciones de cada examen siempre se ven y siguen el orden de teclado de la fila. */
 const ROW_ACTION =
-  'inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50'
+  'inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50'

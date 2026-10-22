@@ -221,7 +221,7 @@ function AppBody() {
           <ProjectorToggle />
           <button
             onClick={toggleTheme}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs text-sidebar-foreground/70 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs text-sidebar-foreground/70 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
           >
             {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             {theme === 'dark' ? t.theme.toLight : t.theme.toDark}
@@ -243,7 +243,7 @@ function AppBody() {
             <button
               type="button"
               onClick={() => setUpdate(null)}
-              className="rounded p-0.5 hover:bg-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="rounded p-0.5 hover:bg-foreground/10 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
               aria-label={t.update.dismiss}
             >
               <X className="h-4 w-4" />
@@ -260,7 +260,7 @@ function AppBody() {
             <button
               type="button"
               onClick={() => setNotice(null)}
-              className="rounded p-0.5 hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="rounded p-0.5 hover:bg-destructive/10 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
               aria-label={t.errors.dismiss}
             >
               <X className="h-4 w-4" />
@@ -309,7 +309,7 @@ function NavButton({
       }
       onClick={() => onPick(entry.id)}
       className={cn(
-        'group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary',
+        'group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary',
         active
           ? 'bg-primary/20 text-white'
           : 'text-sidebar-foreground/70 hover:bg-white/5 hover:text-white',
@@ -344,7 +344,7 @@ function ProjectorToggle() {
       aria-pressed={projector}
       title={projector ? t.projector.hintOn : t.projector.hintOff}
       className={cn(
-        'flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary',
+        'flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary',
         projector
           ? 'bg-primary/20 text-white'
           : 'text-sidebar-foreground/60 hover:bg-white/5 hover:text-white'
@@ -366,7 +366,7 @@ function ProjectorExit() {
     <div className="flex shrink-0 justify-end px-4 pt-3">
       <button
         onClick={toggleProjector}
-        className="flex items-center gap-2 rounded-md px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex items-center gap-2 rounded-md px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
       >
         <Monitor className="h-4 w-4" />
         {t.projector.off}
@@ -399,7 +399,7 @@ function EngineBadge() {
   ) : (
     <button
       onClick={() => setView('settings')}
-      className="flex w-full items-center gap-2 rounded-md bg-sidebar-destructive/10 px-3 py-2 text-left text-xs text-sidebar-destructive transition-colors hover:bg-sidebar-destructive/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-foreground"
+      className="flex w-full items-center gap-2 rounded-md bg-sidebar-destructive/10 px-3 py-2 text-left text-xs text-sidebar-destructive transition-colors hover:bg-sidebar-destructive/20 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-sidebar-foreground"
     >
       <AlertTriangle className="h-4 w-4 shrink-0" />
       <span className="truncate">{t.engine.missing}</span>
@@ -443,7 +443,7 @@ class ErrorCard extends Component<BoundaryProps, { error: Error | null }> {
             this.props.onRetry?.()
             this.setState({ error: null })
           }}
-          className="rounded-md border border-input px-3 py-2 text-sm hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="rounded-md border border-input px-3 py-2 text-sm hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
         >
           {this.props.retryLabel}
         </button>

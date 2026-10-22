@@ -355,7 +355,7 @@ function ClassCard({
               disabled={disabled}
               value={group?.id ?? ''}
               onChange={(e) => onChoose(e.target.value || null)}
-              className="h-9 rounded-md border border-input bg-background px-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+              className="h-9 rounded-md border border-input bg-background px-2 text-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
             >
               <option value="">{t.correct.classNone}</option>
               {groups.map((other) => (

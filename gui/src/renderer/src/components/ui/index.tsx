@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 
 // ---- Button ----
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 select-none',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 select-none',
   {
     variants: {
       // Planos: en un sistema de tono + filete de 1px, la sombra bajo un botón
@@ -101,7 +101,7 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
     <input
       ref={ref}
       className={cn(
-        'flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
+        'flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
         className
       )}
       {...props}
@@ -187,7 +187,7 @@ export function SegmentedItem({
       type="button"
       aria-pressed={active}
       className={cn(
-        'flex items-center gap-1.5 rounded-[0.25rem] px-2.5 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        'flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
         active ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground',
         className
       )}
@@ -228,7 +228,7 @@ export function Foldaway({
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
         className={cn(
-          'flex w-full items-center gap-2 px-3 py-2 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
+          'flex w-full items-center gap-2 px-3 py-2 text-left text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
           tone === 'warning' ? 'text-warning-strong' : 'text-foreground'
         )}
       >
@@ -249,14 +249,21 @@ export function Foldaway({
 export function SectionTitle({
   children,
   hint,
-  actions
+  actions,
+  className
 }: {
   children: React.ReactNode
   hint?: React.ReactNode
   actions?: React.ReactNode
+  className?: string
 }) {
   return (
-    <div className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-b border-border pb-2">
+    <div
+      className={cn(
+        'mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-b border-border pb-2',
+        className
+      )}
+    >
       <h2 className="text-sm font-semibold tracking-tight">{children}</h2>
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
       {actions && <div className="ml-auto">{actions}</div>}
@@ -478,7 +485,7 @@ export function Menu({
       {open && (
         <div
           role="menu"
-          className="absolute right-0 top-full z-40 mt-1 min-w-[15rem] animate-fade-in rounded-lg border border-border bg-popover p-1 shadow-lg"
+          className="absolute right-0 top-full z-40 mt-1 min-w-60 animate-fade-in rounded-lg border border-border bg-popover p-1 shadow-lg"
         >
           {children(close)}
         </div>
@@ -503,7 +510,7 @@ export function MenuItem({
       role="menuitem"
       onClick={onClick}
       className={cn(
-        'flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        'flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-sm transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
         destructive
           ? 'text-destructive hover:bg-destructive/10'
           : 'hover:bg-accent hover:text-accent-foreground'

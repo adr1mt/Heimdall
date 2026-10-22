@@ -164,7 +164,7 @@ export default function ClassesView() {
                       aria-current={shown?.id === group.id ? 'true' : undefined}
                       onClick={() => setChosen(group.id)}
                       className={cn(
-                        'flex w-full items-center gap-2 rounded-md px-2 py-2 text-left transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
+                        'flex w-full items-center gap-2 rounded-md px-2 py-2 text-left transition-colors hover:bg-muted/60 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
                         shown?.id === group.id && 'bg-accent'
                       )}
                     >
@@ -231,6 +231,8 @@ function ClassDetail({
   return (
     <div className="space-y-4 p-6">
       <SectionTitle
+        // Tailwind v4 lets this margin beat the parent space-y-4: keep the 16px gap.
+        className="mb-4"
         hint={t.classes.count(group.students.length)}
         actions={
           <div className="flex flex-wrap items-center gap-2">
@@ -427,6 +429,8 @@ function ClassEditor({
         </div>
 
         <SectionTitle
+          // Tailwind v4 lets this margin beat the parent space-y-4: keep the 16px gap.
+          className="mb-4"
           hint={t.classes.passwordHint}
           actions={
             <div className="flex flex-wrap items-center gap-2">
@@ -522,7 +526,7 @@ function ClassEditor({
                         aria-label={t.classes.removeColumn(column)}
                         title={t.classes.removeColumn(column)}
                         onClick={() => setRemovingColumn(column)}
-                        className="rounded p-0.5 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="rounded p-0.5 hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         <Trash2 className="h-3 w-3" />
                       </button>
@@ -755,7 +759,7 @@ function StudentPaster({
         onKeyDown={(e) => {
           if (e.key === 'Escape') onCancel()
         }}
-        className="h-32 w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-dense focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="h-32 w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-dense focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
       />
 
       {paste.warnings.map((warning) => (

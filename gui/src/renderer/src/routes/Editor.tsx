@@ -133,7 +133,7 @@ export default function EditorView() {
           role="status"
           className={`max-h-40 shrink-0 overflow-auto border-t border-border p-3 text-sm ${verdict.ok ? 'text-success-strong' : 'text-destructive-strong'}`}
         >
-          <pre className="whitespace-pre-wrap break-words font-mono">
+          <pre className="whitespace-pre-wrap wrap-break-word font-mono">
             {verdict.ok ? verdict.message || 'El examen es válido.' : verdict.message}
           </pre>
         </div>

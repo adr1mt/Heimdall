@@ -47,7 +47,7 @@ export default function HelpView() {
                 event.preventDefault()
                 document.getElementById(`help-${id}`)?.scrollIntoView({ block: 'start' })
               }}
-              className="block rounded px-2 py-2 text-xs text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="block rounded px-2 py-2 text-xs text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
             >
               {title}
             </a>

@@ -2,6 +2,7 @@ import { resolve } from 'path'
 import { defineConfig } from 'electron-vite'
 import type { Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 
 /**
  * La CSP de producción, incrustada en el HTML al compilar.
@@ -76,6 +77,6 @@ export default defineConfig({
         input: { index: resolve(__dirname, 'src/renderer/index.html') }
       }
     },
-    plugins: [react(), inlineCsp()]
+    plugins: [react(), tailwindcss(), inlineCsp()]
   }
 })

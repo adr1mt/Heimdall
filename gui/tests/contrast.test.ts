@@ -11,8 +11,8 @@ const luminance = (c: number[]): number => c.map(v => v <= 0.04045 ? v / 12.92 :
 function contrast(a: number[], b: number[]): number { const la = luminance(a), lb = luminance(b); return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05) }
 it.each(['light', 'dark'])('has AA contrast for sidebar and destructive actions in %s', theme => {
   const tokens = new Map<string, string>()
-  const root = css.slice(css.indexOf(':root'), css.indexOf('.dark'))
-  const dark = css.slice(css.indexOf('.dark'), css.indexOf('  * {'))
+  const root = css.slice(css.indexOf(':root {'), css.indexOf('.dark {'))
+  const dark = css.slice(css.indexOf('.dark {'), css.indexOf('  * {'))
   for (const part of [root, ...(theme === 'dark' ? [dark] : [])]) for (const m of part.matchAll(/--([a-z-]+):\s*([^;]+);/g)) tokens.set(m[1], m[2])
   const color = (key: string): number[] => rgb(tokens.get(key)!)
   for (const key of ['sidebar-success', 'sidebar-destructive']) for (const alpha of [0.1, 0.2]) {
