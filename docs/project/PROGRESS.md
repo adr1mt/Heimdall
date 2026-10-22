@@ -1,7 +1,7 @@
 # Estado del proyecto
 
 Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
-**Actualizado**: 2026-10-21 · **Fase**: 9 — Endurecimiento y publicación
+**Actualizado**: 2026-10-22 · **Fase**: 9 — Endurecimiento y publicación
 
 ## Última sesión
 
@@ -51,6 +51,8 @@ solo se abandona parada un minuto
   vuelve a corregir. Los motivos de conexión fallida son frases técnicas.
 - Un informe que contenga el texto de la contraseña de la clase no se envía
   (p. ej. contraseña «alumno» y una descripción que dice «alumno»).
+- Parches 2026-10-22: go1.26.10, vite 7.3.7, Electron 43.8.3 (Node 24.22.0, aún
+  sin el parche del 21-oct). tailwindcss 3 arrastra `braces` (DoS solo en build).
 
 ## Siguiente trabajo
 
