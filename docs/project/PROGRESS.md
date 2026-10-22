@@ -15,7 +15,10 @@ corrupto intacto y enlaces rechazados. 562 pruebas GUI y controles correctos.
 enlaces y directorios conservan la protección (ADR-0033). Siguiente:
 validación de publicación y copias de clases/exámenes. **T199:** sudo probado
 con contraseña incorrecta real, usuario sin privilegios y máquina sin sudo;
-no se ejecuta el comando ni se convierte el rechazo en suspenso. Aula T084.
+no se ejecuta el comando ni se convierte el rechazo en suspenso. **T201:**
+red del actualizador por Chromium; arnés Brotli real y paquete con/sin sandbox
+correctos. 563 pruebas GUI. [Evidencia](../reviews/evidence/T201/RESULTADOS.md).
+Aula real sigue en T084.
 
 **T189 · Comprobaciones con `sudo: true` (ADR-0032).** Kea 3 en Ubuntu 26.04
 deja `/etc/kea` solo a root. Antes los exámenes de 0227 llevaban la contraseña

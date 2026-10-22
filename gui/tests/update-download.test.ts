@@ -4,7 +4,10 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Readable, Writable } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
-import { DOWNLOAD_LIMITS, DownloadBudget, downloadUpdate, MAX_UPDATE_BYTES } from '../src/main/update-download'
+import { DOWNLOAD_LIMITS, DownloadBudget, downloadUpdate as downloadWithTransport, MAX_UPDATE_BYTES } from '../src/main/update-download'
+// Node transport belongs to this test harness; production injects Chromium.
+const downloadUpdate = (url: string, dest: string, signal: AbortSignal, limits = DOWNLOAD_LIMITS) =>
+  downloadWithTransport(url, dest, signal, (url, init) => fetch(url, init), limits)
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks() })
 it('bounds actual bytes even without Content-Length', async () => {
   const sink = new Writable({ write(_chunk, _encoding, done) { done() } })

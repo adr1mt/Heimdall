@@ -66,7 +66,7 @@ class StallWatch extends Transform {
 }
 
 /** Whole file or nothing. Cancellation leaves the working AppImage untouched. */
-export async function downloadUpdate(url: string, dest: string, signal: AbortSignal, limits: DownloadLimits = DOWNLOAD_LIMITS): Promise<void> {
+export async function downloadUpdate(url: string, dest: string, signal: AbortSignal, fetcher: (url: string, init: { signal: AbortSignal }) => Promise<Response>, limits: DownloadLimits = DOWNLOAD_LIMITS): Promise<void> {
   // The watch starts before the request: a server that never answers is as
   // stalled as one that stops sending.
   const stalled = new AbortController()
@@ -74,7 +74,7 @@ export async function downloadUpdate(url: string, dest: string, signal: AbortSig
   const bounded = AbortSignal.any([signal, stalled.signal, AbortSignal.timeout(limits.deadlineMs)])
   const partial = `${dest}.part`
   try {
-    const response = await fetch(url, { signal: bounded })
+    const response = await fetcher(url, { signal: bounded })
     if (!response.ok) {
       await response.body?.cancel()
       throw new Error(`${response.status} ${response.statusText}`)

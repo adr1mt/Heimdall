@@ -6,7 +6,7 @@
  * tests can drive it. This is only the wiring.
  */
 
-import { app, type BrowserWindow } from 'electron'
+import { app, net, type BrowserWindow } from 'electron'
 import { appendFileSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { IPC } from '../shared/ipc'
@@ -62,7 +62,7 @@ function log(message: string): void {
 }
 
 async function fetchText(url: string, signal: AbortSignal): Promise<string> {
-  const response = await fetch(url, {
+  const response = await net.fetch(url, {
     headers: { accept: 'application/vnd.github+json' },
     signal: AbortSignal.any([signal, AbortSignal.timeout(FEED_TIMEOUT_MS)])
   })
@@ -83,7 +83,8 @@ export function startUpdates(win: BrowserWindow): void {
     downloadDir: join(app.getPath('userData'), 'updates'),
     busy: () => isRunActive() || isExamModeActive(),
     fetchText,
-    download: downloadUpdate,
+    // Keep untrusted HTTP responses out of Node's TLS/HTTP/Brotli stack.
+    download: (url, file, signal) => downloadUpdate(url, file, signal, (url, init) => net.fetch(url, init)),
     onBusy: onCorrectionStarting,
     announce: (version) => {
       if (!win.isDestroyed()) win.webContents.send(IPC.updateReady, version)

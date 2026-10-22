@@ -4311,7 +4311,7 @@
       "id": "T201",
       "title": "Revisar exposición de Electron y arranque sin sandbox",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "Revisar exposición de Electron y arranque sin sandbox",
@@ -4324,10 +4324,12 @@
       ],
       "acceptance": [
         "Evaluación de las rutas alcanzables desde Heimdall para los avisos Node del 21-oct y comprobación de Electron estable con parches.",
-        "Modo de arranque real del AppImage documentado y comprobación del paquete con y sin sandbox cuando el entorno lo permita; límites explícitos."
+        "Modo de arranque real del AppImage documentado y comprobación del paquete con y sin sandbox cuando el entorno lo permita; límites explícitos.",
+        "Feed y descarga usan red de Chromium con prueba de cableado y arnés real Brotli; se conserva validación del actualizador."
       ],
       "tests": [],
-      "notes": "Autorizada por Adrià el 2026-10-22 tras contrastar auditoría técnica. Commits separados por reparación; T084 sigue reservada al aula real."
+      "notes": "Actualizador migrado a Chromium para feed y descarga, sin fallback implícito a Node. Prueba Electron real con respuesta Brotli y Node fetch bloqueado; 563 tests GUI, tipos/build y motor correctos. AppImage existente: AppRun probado en cuatro ramas; renderer/preload comprobados en sandbox real y fallback con perfiles ficticios. Electron estable consultado aún sin Node parcheado. Evidencia y límites: docs/reviews/evidence/T201/RESULTADOS.md.",
+      "completed": "2026-10-22"
     }
   ]
 }
