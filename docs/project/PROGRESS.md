@@ -18,7 +18,10 @@ con contraseña incorrecta real, usuario sin privilegios y máquina sin sudo;
 no se ejecuta el comando ni se convierte el rechazo en suspenso. **T201:**
 red del actualizador por Chromium; arnés Brotli real y paquete con/sin sandbox
 correctos. 563 pruebas GUI. [Evidencia](../reviews/evidence/T201/RESULTADOS.md).
-Aula real sigue en T084.
+**T198:** barreras race/Go/npm y workflow manual de publicación preparados;
+integración completa, 100 ficticios y .deb instalado/retirado en Ubuntu 24/26
+correctos. [Evidencia y límites](../reviews/evidence/T198/RESULTADOS.md).
+GitHub aún no ha ejecutado estos cambios; aula real sigue en T084.
 
 **T189 · Comprobaciones con `sudo: true` (ADR-0032).** Kea 3 en Ubuntu 26.04
 deja `/etc/kea` solo a root. Antes los exámenes de 0227 llevaban la contraseña

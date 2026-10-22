@@ -4238,7 +4238,7 @@
       "id": "T198",
       "title": "Automatizar barreras de seguridad e integración antes de publicar",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "Automatizar barreras de seguridad e integración antes de publicar",
@@ -4256,7 +4256,8 @@
         "Validación local y límites de CI documentados; no se declara ejecutado un workflow remoto sin evidencia."
       ],
       "tests": [],
-      "notes": "Autorizada por Adrià el 2026-10-22 tras contrastar auditoría técnica. Commits separados por reparación; T084 sigue reservada al aula real."
+      "notes": "CI añade race Go, govulncheck 1.9.0 y política npm con excepción exacta dev-only del aviso conocido. Workflow manual de publicación sin publicar: laboratorios, make test, paquetes, renderer/preload, instalación/desinstalación .deb Ubuntu 24.04/26.04 y red Chromium real. Recorrido local y límites documentados en docs/reviews/evidence/T198/RESULTADOS.md; workflow remoto aún no ejecutado. Nueve regresiones de herramientas correctas.",
+      "completed": "2026-10-22"
     },
     {
       "id": "T199",
@@ -4301,11 +4302,11 @@
       ],
       "acceptance": [
         "Antes de sobrescribir clases o YAML se conserva el contenido anterior en copias privadas y acotadas.",
-        "Recuperación accesible al profesor sin sobrescribir el original ni exponer contraseñas; copia fallida evita destruir la versión anterior y muestra el motivo.",
+        "Recuperación accesible al profesor conservando siempre el original y sin exponer contraseñas; copia fallida evita reemplazar la versión anterior y muestra el motivo. Examen recuperado como borrador; clases con confirmación y original conservado incluso si está corrupto.",
         "Regresiones de recuperación, corrupción, retención y permisos; documentación y pruebas GUI."
       ],
       "tests": [],
-      "notes": "Autorizada por Adrià el 2026-10-22 tras contrastar auditoría técnica. Commits separados por reparación; T084 sigue reservada al aula real."
+      "notes": "Autorizada por Adrià el 2026-10-22 tras contrastar auditoría técnica. Commits separados por reparación; T084 sigue reservada al aula real. Diseño de recuperación y retención fijado antes de implementar en ADR-0034."
     },
     {
       "id": "T201",

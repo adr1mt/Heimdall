@@ -1,0 +1,53 @@
+name: Release validation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-validation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  packages:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: gui/package-lock.json
+      - name: Install lab and package prerequisites
+        run: sudo apt-get update && sudo apt-get install -y podman jq xvfb libgtk-3-0t64 libnss3 libasound2t64
+      - run: npm ci
+        working-directory: gui
+      - run: make gui-check docs-check tools-check
+      - run: go test -race ./...
+      - run: go install golang.org/x/vuln/cmd/govulncheck@v1.9.0
+      - run: govulncheck ./...
+      - name: Audit dependency tree
+        run: |
+          npm audit --registry=https://registry.npmjs.org --json > "$RUNNER_TEMP/npm-audit.json" || test "$?" -eq 1
+          python3 ../scripts/check_npm_audit.py "$RUNNER_TEMP/npm-audit.json" package-lock.json
+        working-directory: gui
+      - run: make lab lab-ra2
+      - run: make test
+      - run: make gui-dist
+      - run: xvfb-run -a make gui-paquete
+      - run: xvfb-run -a bash gui/scripts/release-check.sh
+      - run: bash gui/scripts/deb-install-lab.sh
+      - name: Verify Chromium update transport
+        working-directory: gui
+        run: |
+          node_modules/.bin/esbuild scripts/update-network-lab.ts --bundle --platform=node --format=esm --outfile="$RUNNER_TEMP/update-network.mjs" --external:electron
+          xvfb-run -a node_modules/electron/dist/electron "$RUNNER_TEMP/update-network.mjs" --no-sandbox
+      - name: Stop disposable labs
+        if: always()
+        run: make lab-down lab-ra2-down

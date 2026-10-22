@@ -156,7 +156,7 @@ lista. El relevo y las revisiones se registran según
 [AGENT-WORKFLOW.md](project/AGENT-WORKFLOW.md).
 
 [CI](../.github/workflows/check.yml) ejecuta las suites rápidas Go y GUI, versión,
-build/preload, enlaces y herramientas en cada push y pull request. Los
+build/preload, carreras de Go, govulncheck, npm audit, enlaces y herramientas en cada push y pull request. Los
 laboratorios SSH y las pruebas de paquetes se ejecutan por separado; sus
 requisitos y el diagnóstico del aislamiento están en [test/README.md](../test/README.md).
 El workflow se activa cuando estos cambios llegan a GitHub.
@@ -181,3 +181,28 @@ DECISIONS porque conservan evidencia histórica y rutas de otras máquinas.
 | Los 16 modos de fallo del sistema viejo | [MODOS-DE-FALLO-HEIMDALL.md](MODOS-DE-FALLO-HEIMDALL.md) |
 | Estado actual del trabajo | [project/PROGRESS.md](project/PROGRESS.md) |
 | Investigación previa y mediciones | [research/](research/) |
+
+
+## Validación de una publicación
+
+El workflow manual [Release validation](../.github/workflows/release-check.yml)
+ejecuta los laboratorios SSH y RA2, integración y aceptación, construcción de
+paquetes y arranque del renderer y preload reales. Instala y desinstala el .deb
+en contenedores Ubuntu 24.04 y 26.04; nunca instala en el host. Comprueba el
+AppRun generado, fallback y sandbox cuando el kernel admite user namespaces.
+Se debe registrar cualquier modo no probado. El workflow no publica nada.
+
+Antes de publicar, conservar el resultado de ese workflow, las sumas SHA-256 y
+la evidencia de aula de T084. Una comprobación local no equivale a una ejecución
+remota: no se declara CI verde hasta que GitHub la ejecute. No se reutilizan
+versiones ni etiquetas publicadas; la siguiente reparación es 1.0.1.
+
+La política npm de `scripts/check_npm_audit.py` solo admite el aviso moderado
+GHSA-hp3w-g68c-fv3c de sprintf-js y su cadena conocida de construcción, siempre
+que todos sus nodos sean dependencias dev. Cualquier aviso nuevo, más grave,
+fuera de esa cadena, presente en producción o una consulta incompleta bloquea
+la comprobación. La excepción se revisa en cada publicación y se retira cuando
+el empaquetador tenga una corrección compatible; no se ejecuta audit fix --force.
+Govulncheck bloquea vulnerabilidades alcanzables, y deja visibles las de módulos
+o paquetes no usados. No examina el Node incorporado en Electron: T201 conserva
+esa evaluación separada.

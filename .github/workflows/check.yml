@@ -23,7 +23,10 @@ jobs:
           go-version-file: go.mod
           cache-dependency-path: go.sum
       - run: make check
+      - run: go test -race ./...
       - run: make version
+      - run: go install golang.org/x/vuln/cmd/govulncheck@v1.9.0
+      - run: govulncheck ./...
 
   gui:
     runs-on: ubuntu-latest
@@ -41,6 +44,11 @@ jobs:
           ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
       - run: make gui-check
       - run: make gui-build
+      - name: Audit dependency tree against the documented build exception
+        run: |
+          npm audit --registry=https://registry.npmjs.org --json > "$RUNNER_TEMP/npm-audit.json" || test "$?" -eq 1
+          python3 ../scripts/check_npm_audit.py "$RUNNER_TEMP/npm-audit.json" package-lock.json
+        working-directory: gui
 
   documentation:
     runs-on: ubuntu-latest
