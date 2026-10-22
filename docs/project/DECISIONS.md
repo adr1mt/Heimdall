@@ -880,3 +880,14 @@ comprobación esperaba un minuto. Sustituye el punto 3 de T114.
 4. **Las publicaciones 0.9.1, 0.9.2 y la primera 1.0.0 se retiran** y la
    versión vuelve a 1.0.0. Quien tenga la primera 1.0.0 funcionando no verá
    esta como actualización (mismo número): la instala a mano una vez.
+
+### 2026-10-22 · T191 · La media sigue las notas que ve el profesor
+
+La conversión de la escala no es lineal. La media de Resultados y Analíticas
+se calcula después de convertir cada nota final a la escala visible, con sus
+decimales, y se muestra con dos decimales. Solo entran notas finales de alumnos
+no excluidos; una nota ausente no es un cero. Se conserva la media canónica
+interna y no cambian notas individuales, informes ni exportaciones. Ejemplo:
+10,0; 6,7; 4,3; 2,9; 1,4 → 5,06. La tercera lectura del resumen muestra la
+comprobación con más fallos, sin contar incidencias técnicas. Evidencia:
+[RESULTADOS.md](../reviews/evidence/T191/RESULTADOS.md). Sin cambio arquitectónico.

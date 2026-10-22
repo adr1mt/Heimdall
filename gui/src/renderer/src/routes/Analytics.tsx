@@ -1,9 +1,8 @@
 import { Button, SectionTitle, ViewHeader } from '@/components/ui'
 import { useApp, useScale } from '@/stores/app'
-import { toScale } from '@/lib/scale'
 import { useRun } from '@/stores/run'
 import { attentionStudents, gradeHistogram, failingChecks, successByGroup } from '@/lib/analytics'
-import { classSummary } from '@/lib/summary'
+import { averageText, classSummary, displayedAverage } from '@/lib/summary'
 import { gradeAppearance } from '@/lib/grade-appearance'
 import { CAUSE_TEXT, scoreView, tally } from '@/lib/results'
 
@@ -36,7 +35,7 @@ export default function AnalyticsView() {
         meta={
           <span className="text-xs text-muted-foreground">
             {summary.students} alumnos · media{' '}
-            {summary.average === null ? '—' : toScale(summary.average, scale)} · {summary.passed}{' '}
+            {averageText(displayedAverage(artifact, scale))} · {summary.passed}{' '}
             aprobados
           </span>
         }

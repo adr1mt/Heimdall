@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { t } from '@/i18n/es'
-import { DEFAULT_PASS_MARK, classSummary, needsAttention, shortName } from '@/lib/summary'
+import { DEFAULT_PASS_MARK, averageText, classSummary, displayedAverage, needsAttention, shortName } from '@/lib/summary'
+import { scaleOf, toScale } from '@/lib/scale'
 import { buildMatrix } from '@/lib/matrix'
 import type { CheckResult, RunResult, StudentResult } from '../src/shared/artifact'
 import type { Score } from '../src/shared/events'
@@ -50,6 +51,36 @@ const complete = (value: number): Score =>
 const incomplete = score({ status: 'INCOMPLETE', provisional_score: 100, evaluable: 1, unevaluated: 1, total: 2 })
 
 describe('resumen de la clase', () => {
+  it('promedia las notas visibles después de la conversión no lineal', () => {
+    const students = [100, 80, 60, 40, 20].map((value, i) => student(String(i), String(i), complete(value), []))
+    const scale = scaleOf('ten')
+    expect(students.map((s) => toScale(s.score.final_score!, scale))).toEqual(['10,0', '6,7', '4,3', '2,9', '1,4'])
+    expect(averageText(displayedAverage(run(students), scale))).toBe('5,06')
+    expect(toScale(classSummary(run(students), 70).average!, scale)).toBe('4,3')
+  })
+
+  it('la media visible excluye provisionales y excluidos, e incluye el cero final', () => {
+    const students = [
+      student('zero', 'Cero', complete(0), []), student('full', 'Diez', complete(100), []),
+      student('partial', 'Parcial', incomplete, [], 'PARTIAL'),
+      student('excluded', 'Excluido', complete(100), [], 'EXCLUDED'),
+      student('missing', 'Sin nota', score({ status: 'COMPLETE', final_score: null }), [])
+    ]
+    expect(displayedAverage(run(students), scaleOf('ten'))).toBe(5)
+    expect(displayedAverage(run(students.slice(2)), scaleOf('ten'))).toBeNull()
+    expect(averageText(displayedAverage(run([]), scaleOf('ten')))).toBe('—')
+  })
+
+  it('la media visible respeta la escala y el umbral configurados', () => {
+    const students = [0, 60, 100].map((value, i) => student(String(i), String(i), complete(value), []))
+    expect(averageText(displayedAverage(run(students), scaleOf('ten', 60)))).toBe('5,00')
+    expect(averageText(displayedAverage(run(students), scaleOf('hundred', 60)))).toBe('50,00')
+  })
+
+  it('redondea las medias a dos decimales sin bajar las mitades por ruido binario', () => {
+    expect(averageText((10 + 6.7 + 4.3 + 2.9) / 4)).toBe('5,98')
+    expect(averageText(1.005)).toBe('1,01')
+  })
   it('cuenta aprobados y media solo sobre las notas cerradas', () => {
     const summary = classSummary(
       run([

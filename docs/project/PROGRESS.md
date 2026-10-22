@@ -5,9 +5,14 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T190 · La GUI ya compila con Tailwind CSS 4.** Desaparecen los 5 avisos
-graves de `npm audit`. Corrección real de 5 alumnos antes y después: mismas
-pantallas, píxel a píxel ([evidencias](../reviews/evidence/T190/RESULTADOS.md)).
+**T191 · Resultados más claros y explorables.** Notas bajo el nombre, matriz
+compacta con recuentos y ejes fijos, filtros por alumno, cuatro órdenes y
+comprobación con más fallos. Media de notas visibles corregida (5,06 en vez de
+4,3), también en Analíticas; notas individuales intactas. Pruebas y ventanas
+con 5/30 alumnos, claro/oscuro y tres tamaños ([evidencias](../reviews/evidence/T191/RESULTADOS.md)).
+
+**T190 · Tailwind CSS 4.** Sin los 5 avisos graves de npm audit;
+corrección real y comparación visual ([evidencias](../reviews/evidence/T190/RESULTADOS.md)).
 
 **T189 · Comprobaciones con `sudo: true` (ADR-0032).** Kea 3 en Ubuntu 26.04
 deja `/etc/kea` solo a root. Antes los exámenes de 0227 llevaban la contraseña
@@ -17,9 +22,8 @@ suspenso. Laboratorio con sudo y fichero solo de root. Exámenes de 0227
 migrados; corrección real del servidor de Manuel Cadenas (2026-10-21):
 prova-guia-kea 100/100, ra1-dhcp-kea 34/100, sin fallos por permisos.
 
-**Versión 1.0.0 rehecha (2026-10-22).** El AppImage ya no necesita libfuse2
-ni falla por el sandbox en Ubuntu 24.04/26.04. Se retiran las publicaciones
-anteriores; examen real de aula pendiente (T084).
+**Versión 1.0.0 rehecha (2026-10-22).** AppImage sin libfuse2, con arranque
+en Ubuntu 24.04/26.04; publicaciones anteriores retiradas. T084 pendiente.
 
 ## Problemas conocidos y límites
 
@@ -43,11 +47,9 @@ anteriores; examen real de aula pendiente (T084).
 - La barra de avisos pinta en rojo también los guardados correctos (T187).
 - Un resultado cuyo examen o clase cambió después no se puede enviar: se
   vuelve a corregir. Los motivos de conexión fallida son frases técnicas.
-- Un informe que contenga el texto de la contraseña de la clase no se envía
-  (p. ej. contraseña «alumno» y una descripción que dice «alumno»).
+- Un informe que contenga el texto de la contraseña de la clase no se envía.
 - Parches 2026-10-22: go1.26.10, vite 7.3.7, Electron 43.8.3 (Node 24.22.0, aún
-  sin el parche del 21-oct). npm audit: quedan 8 moderados
-  de electron-builder (sprintf-js), solo en build.
+  sin el parche del 21-oct). npm audit: 8 moderados de electron-builder, solo build.
 
 ## Siguiente trabajo
 

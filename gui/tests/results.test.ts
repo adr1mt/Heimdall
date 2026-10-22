@@ -10,6 +10,7 @@ import {
   causesIn,
   checkMatches,
   filterRun,
+  exploreResults,
   originText,
   pendingStudents,
   previousText,
@@ -22,6 +23,53 @@ import {
 import { validRun } from './fixtures/valid-run'
 import { SCALES } from '../src/renderer/src/lib/scale'
 import type { Score } from '../src/shared/events'
+
+describe('exploración de alumnos', () => {
+  function fixture() {
+    const make = (id: string, value: number | null, status: Score['status'] = 'COMPLETE') => ({
+      ...validRun().students[0], student_id: id, name: id,
+      score: score({ status, final_score: status === 'COMPLETE' ? value : null, provisional_score: value }),
+      checks: [check({ status: status === 'COMPLETE' ? 'FAIL' : 'UNEVALUATED', cause: status === 'COMPLETE' ? 'NONE' : 'TIMEOUT' })]
+    })
+    return { ...validRun(), students: [make('Zeta', 0), make('Ana', 70), make('Bruno', 100),
+      make('Parcial', 100, 'INCOMPLETE'), make('Sin nota', null),
+      { ...make('Excluido', null, 'EXCLUDED'), status: 'EXCLUDED' as const }] }
+  }
+  it('filtra por nota final con el umbral inclusivo, sin convertir averías en suspensos', () => {
+    const rows = filterRun(fixture(), NO_FILTERS)
+    expect(exploreResults(rows, 'pass', 'name', 70).map((r) => r.student.name)).toEqual(['Ana', 'Bruno'])
+    expect(exploreResults(rows, 'fail', 'name', 70).map((r) => r.student.name)).toEqual(['Zeta'])
+    expect(exploreResults(rows, 'ungraded', 'name', 70).map((r) => r.student.name)).toEqual(['Parcial', 'Sin nota'])
+    expect(exploreResults(rows, 'pass', 'name', 80).map((r) => r.student.name)).toEqual(['Bruno'])
+    expect(exploreResults(rows, 'all', 'name', 70)).toHaveLength(6)
+  })
+  it('ordena por notas dejando las ausentes al final y conserva la fuente', () => {
+    const rows = filterRun(fixture(), NO_FILTERS)
+    const original = rows.map((r) => r.student.name)
+    expect(exploreResults(rows, 'all', 'grade-asc', 70).map((r) => r.student.name)).toEqual([
+      'Zeta', 'Ana', 'Bruno', 'Excluido', 'Parcial', 'Sin nota'
+    ])
+    expect(exploreResults(rows, 'all', 'grade-desc', 70).map((r) => r.student.name)).toEqual([
+      'Bruno', 'Ana', 'Zeta', 'Excluido', 'Parcial', 'Sin nota'
+    ])
+    expect(rows.map((r) => r.student.name)).toEqual(original)
+  })
+  it('cuenta fallos de todo el alumno aunque solo se muestren comprobaciones bien', () => {
+    const run = fixture()
+    run.students = run.students.slice(0, 3)
+    run.students[0].checks = [check({ status: 'PASS' }), check({ status: 'FAIL', check_id: 'f1' }), check({ status: 'FAIL', check_id: 'f2' })]
+    run.students[1].checks = [check({ status: 'PASS' })]
+    run.students[2].checks = [check({ status: 'PASS' }), check({ status: 'UNEVALUATED', cause: 'TIMEOUT', check_id: 'f1' })]
+    const rows = filterRun(run, { ...NO_FILTERS, status: 'PASS' })
+    expect(exploreResults(rows, 'all', 'failures', 70).map((r) => r.student.name)).toEqual(['Zeta', 'Ana', 'Bruno'])
+    expect(exploreResults(rows, 'all', 'failures', 70)[0].checks).toHaveLength(1)
+  })
+  it('combina filtros de comprobación y alumno y resuelve empates por nombre', () => {
+    const failed = filterRun(fixture(), { ...NO_FILTERS, status: 'FAIL' })
+    expect(exploreResults(failed, 'pass', 'failures', 70).map((r) => r.student.name)).toEqual(['Ana', 'Bruno'])
+    expect(exploreResults([], 'all', 'grade-desc', 70)).toEqual([])
+  })
+})
 
 /** The engine's own enums, so a cause added there fails here and not in class. */
 function enumsOf(type: string): string[] {

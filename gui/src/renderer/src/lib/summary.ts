@@ -1,5 +1,5 @@
 import type { RunResult, StudentResult } from '../../../shared/artifact'
-import { DEFAULT_PASS_MARK } from './scale'
+import { DEFAULT_PASS_MARK, toScale, type Scale } from './scale'
 
 /**
  * How the class is doing, in the three numbers the teacher reads first.
@@ -76,6 +76,21 @@ export function classSummary(run: RunResult, passMark: number): ClassSummary {
 
 function round1(value: number): number {
   return Math.round(value * 10) / 10
+}
+
+/** Mean of the displayed final grades. The scale is nonlinear: convert first. */
+export function displayedAverage(run: RunResult, scale: Scale): number | null {
+  const grades = run.students.filter(counts).map(finalScore)
+    .filter((value): value is number => value !== null)
+    .map((value) => Number(toScale(value, scale).replace(',', '.')))
+  return grades.length ? grades.reduce((sum, value) => sum + value, 0) / grades.length : null
+}
+
+export function averageText(average: number | null): string {
+  if (average === null) return '—'
+  // Grades are bounded by 100. Remove binary noise before rounding to cents.
+  const rounded = Math.round((average + Number.EPSILON * 100) * 100) / 100
+  return rounded.toFixed(2).replace('.', ',')
 }
 
 /**

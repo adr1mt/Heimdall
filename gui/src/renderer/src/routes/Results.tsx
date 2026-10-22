@@ -26,7 +26,6 @@ import {
   ViewHeader
 } from '@/components/ui'
 import { useApp, useScale, messageOf, noticeFrom } from '@/stores/app'
-import { toScale } from '@/lib/scale'
 import { useRun } from '@/stores/run'
 import {
   CAUSE_TEXT,
@@ -36,6 +35,7 @@ import {
   STUDENT_TEXT,
   causesIn,
   filterRun,
+  exploreResults,
   hasFilters,
   originText,
   pendingStudents,
@@ -45,6 +45,8 @@ import {
   tally,
   truncationNote,
   type Filters,
+  type StudentFilter,
+  type StudentOrder,
   type Pending
 } from '@/lib/results'
 import { MoodleExportButton } from '@/components/MoodleExport'
@@ -60,7 +62,8 @@ import {
   toCsv
 } from '@/lib/export'
 
-import { classSummary, needsAttention, shortName, type ClassSummary } from '@/lib/summary'
+import { averageText, classSummary, displayedAverage, type ClassSummary } from '@/lib/summary'
+import { failingChecks, type FailingCheck } from '@/lib/analytics'
 import { buildMatrix, type MatrixRow } from '@/lib/matrix'
 import { attemptsText, chainTally, chainText, fromRunText } from '@/lib/chain'
 import { machineLiterals, maskerFor } from '@/lib/projector'
@@ -92,9 +95,11 @@ export default function ResultsView() {
   const projector = useApp((s) => s.projector)
   const artifactPath = useRun((s) => s.artifactPath)
   const problem = useRun((s) => s.artifactProblem)
-  const passMark = useApp((s) => s.passMark)
+  const scale = useScale()
+  const passMark = scale.passMark
   const [filters, setFilters] = useState<Filters>(NO_FILTERS)
-  const [attentionOnly, setAttentionOnly] = useState(false)
+  const [studentFilter, setStudentFilter] = useState<StudentFilter>('all')
+  const [order, setOrder] = useState<StudentOrder>('name')
   const [mode, setMode] = useState<Mode>('list')
   const [selected, setSelected] = useState<Selection | null>(null)
   const [openStudent, setOpenStudent] = useState<string | null>(null)
@@ -111,16 +116,18 @@ export default function ResultsView() {
     [artifact, passMark]
   )
 
-  // The students on screen: the filters narrow the checks, «requieren
-  // atención» narrows the class. Both views read this same list, so the two
-  // modes can never disagree about who is there.
+  const average = useMemo(() => artifact ? displayedAverage(artifact, scale) : null, [artifact, scale])
+  const mostFailed = useMemo(() => {
+    const checks = artifact ? failingChecks(artifact).filter((check) => check.failed > 0) : []
+    return checks.filter((check) => check.failed === checks[0]?.failed)
+  }, [artifact])
+
+  // Both views share the same student ordering and check filters.
   const rows = useMemo(() => {
     if (!artifact) return []
     if (projector) return artifact.students.map((student) => ({ student, checks: student.checks }))
-    const filtered = filterRun(artifact, filters)
-    if (!attentionOnly) return filtered
-    return filtered.filter((row) => needsAttention(row.student, passMark))
-  }, [artifact, filters, attentionOnly, passMark, projector])
+    return exploreResults(filterRun(artifact, filters), studentFilter, order, passMark)
+  }, [artifact, filters, studentFilter, order, passMark, projector])
 
   if (problem) {
     return (
@@ -148,11 +155,13 @@ export default function ResultsView() {
   const warnings = (artifact.warnings ?? []).filter(
     (warning) => !projector || warning.code !== 'HOST_KEY_ACCEPTED'
   )
-  const filtering = hasFilters(filters) || attentionOnly
+  const filtering = hasFilters(filters) || studentFilter !== 'all'
+  const exploring = filtering || order !== 'name'
 
   function clear(): void {
     setFilters(NO_FILTERS)
-    setAttentionOnly(false)
+    setStudentFilter('all')
+    setOrder('name')
   }
 
   const detailed = artifact.students.find((student) => student.student_id === openStudent)
@@ -182,15 +191,6 @@ export default function ResultsView() {
         }
         actions={
           <>
-            {!projector && (
-              <Input
-                className="w-40"
-                aria-label={t.results.filterText}
-                placeholder={t.results.filterText}
-                value={filters.text}
-                onChange={(e) => setFilters({ ...filters, text: e.target.value })}
-              />
-            )}
             <Segmented>
               <SegmentedItem active={mode === 'list'} onClick={() => setMode('list')}>
                 <List className="h-3.5 w-3.5" />
@@ -222,66 +222,79 @@ export default function ResultsView() {
         }
       />
 
-      <div className="min-h-0 flex-1 space-y-4 overflow-auto p-6">
-        {summary && (
-          <>
-            <KpiStrip
-              summary={summary}
-              attentionOnly={!projector && attentionOnly}
-              projector={projector}
-              onAttention={() => setAttentionOnly((on) => !on)}
-            />
-          </>
-        )}
+      <div className="min-h-0 flex-1 space-y-4 overflow-auto p-3 sm:p-6">
+        {summary && <KpiStrip summary={summary} average={average} mostFailed={mostFailed} />}
 
         {!projector && (
-          <details className="text-xs">
-            <summary className="cursor-pointer text-muted-foreground">
-              Filtros y estados{filtering ? ' · activos' : ''}
-            </summary>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <Segmented>
-                {(['ALL', 'PASS', 'FAIL', 'UNEVALUATED'] as const).map((status) => (
-                  <SegmentedItem
-                    key={status}
-                    active={filters.status === status}
-                    onClick={() => setFilters({ ...filters, status })}
-                    title={status === 'ALL' ? t.results.filterAll : STATE_TEXT[status]}
-                  >
-                    {status === 'ALL' ? t.results.filterAll : STATUS_TEXT[status]}
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <Input
+                className="w-full sm:w-64"
+                aria-label={t.results.filterText}
+                placeholder={t.results.filterText}
+                value={filters.text}
+                onChange={(e) => setFilters({ ...filters, text: e.target.value })}
+              />
+              <Segmented aria-label="Filtrar alumnos">
+                {([
+                  ['all', 'Todos'], ['pass', 'Aprobados'], ['fail', 'Suspensos'], ['ungraded', 'Sin evaluar']
+                ] as const).map(([value, label]) => (
+                  <SegmentedItem key={value} active={studentFilter === value}
+                    onClick={() => setStudentFilter(value)}
+                    title={value === 'ungraded' ? 'Sin nota final o con comprobaciones pendientes' : label}>
+                    {label}
                   </SegmentedItem>
                 ))}
               </Segmented>
-              {causes.length > 0 && (
+              <label className="flex items-center gap-2 text-xs text-muted-foreground sm:ml-auto">
+                Ordenar
                 <select
-                  className="h-8 rounded-md border border-input bg-background px-2 text-xs"
-                  aria-label={t.results.filterCause}
-                  value={filters.cause}
-                  onChange={(e) =>
-                    setFilters({ ...filters, cause: e.target.value as Filters['cause'] })
-                  }
+                  className={cn('h-8 max-w-full rounded-md border border-input bg-background px-2 text-xs text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring', order !== 'name' && 'border-primary')}
+                  aria-label="Ordenar alumnos"
+                  value={order}
+                  onChange={(e) => setOrder(e.target.value as StudentOrder)}
                 >
-                  <option value="ALL">
-                    {t.results.filterCause}: {t.results.filterAll.toLowerCase()}
-                  </option>
-                  {causes.map((cause) => (
-                    <option key={cause} value={cause}>
-                      {CAUSE_TEXT[cause]}
-                    </option>
-                  ))}
+                  <option value="name">Nombre</option>
+                  <option value="grade-asc">Nota: menor a mayor</option>
+                  <option value="grade-desc">Nota: mayor a menor</option>
+                  <option value="failures">Más comprobaciones falladas</option>
                 </select>
-              )}
-              {filtering && (
-                <Button variant="ghost" size="sm" onClick={clear}>
-                  {t.results.clear}
-                </Button>
-              )}
-              <span className="ml-auto text-micro text-muted-foreground">
-                {originText(artifact)}
-              </span>
+              </label>
+              {exploring && <Button variant="ghost" size="sm" onClick={clear}>Restablecer</Button>}
             </div>
-            <States />
-          </details>
+            {exploring && (
+              <p role="status" className="text-xs text-muted-foreground">
+                {rows.length} de {artifact.students.length} alumnos · {filtering ? 'Filtros activos' : 'Todos los alumnos'}
+                {order !== 'name' && ' · Orden personalizado'}
+              </p>
+            )}
+            <details className="text-xs">
+              <summary className="cursor-pointer text-muted-foreground">
+                Filtrar comprobaciones y ver estados{hasFilters(filters) ? ' · filtros activos' : ''}
+              </summary>
+              <div className="my-2 flex flex-wrap items-center gap-2">
+                <Segmented aria-label="Filtrar comprobaciones">
+                  {(['ALL', 'PASS', 'FAIL', 'UNEVALUATED'] as const).map((status) => (
+                    <SegmentedItem key={status} active={filters.status === status}
+                      onClick={() => setFilters({ ...filters, status })}
+                      title={status === 'ALL' ? t.results.filterAll : STATE_TEXT[status]}>
+                      {status === 'ALL' ? t.results.filterAll : STATUS_TEXT[status]}
+                    </SegmentedItem>
+                  ))}
+                </Segmented>
+                {causes.length > 0 && (
+                  <select className="h-8 rounded-md border border-input bg-background px-2 text-xs"
+                    aria-label={t.results.filterCause} value={filters.cause}
+                    onChange={(e) => setFilters({ ...filters, cause: e.target.value as Filters['cause'] })}>
+                    <option value="ALL">{t.results.filterCause}: {t.results.filterAll.toLowerCase()}</option>
+                    {causes.map((cause) => <option key={cause} value={cause}>{CAUSE_TEXT[cause]}</option>)}
+                  </select>
+                )}
+                <span className="ml-auto text-micro text-muted-foreground">{originText(artifact)}</span>
+              </div>
+              <States />
+            </details>
+          </div>
         )}
 
         {rows.length === 0 ? (
@@ -333,82 +346,37 @@ export default function ResultsView() {
   )
 }
 
-/**
- * How the class is doing, before any detail. Three readings and no more: the
- * fourth number nobody looks at is what pushed the students off the screen.
- *
- * «Requieren atención» is the only one that is a button, because it is the
- * only one that is a question with an answer: who do I walk over to.
- */
-function KpiStrip({
-  summary,
-  attentionOnly,
-  projector,
-  onAttention
-}: {
+/** Class-wide summary, independent of the current exploration filters. */
+function KpiStrip({ summary, average, mostFailed }: {
   summary: ClassSummary
-  attentionOnly: boolean
-  projector: boolean
-  onAttention: () => void
+  average: number | null
+  mostFailed: FailingCheck[]
 }) {
   const scale = useScale()
+  const hardest = mostFailed[0]
   return (
     <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3">
       <Reading
         value={`${summary.passed}/${summary.graded}`}
         label={t.results.kpiPassed}
         hint={t.results.kpiPassedHint(summary.graded, summary.students)}
-        color={
-          summary.graded === 0
-            ? 'text-muted-foreground'
-            : summary.passed / summary.graded >= 0.5
-              ? 'text-success-strong'
-              : 'text-destructive-strong'
-        }
+        color={summary.graded === 0 ? 'text-muted-foreground' : 'text-foreground'}
       />
       <Reading
-        value={summary.average === null ? '—' : toScale(summary.average, scale)}
+        value={averageText(average)}
         label={t.results.kpiAverage}
-        color={
-          summary.average === null
-            ? 'text-muted-foreground'
-            : summary.average >= scale.passMark
-              ? 'text-success-strong'
-              : 'text-destructive-strong'
-        }
-        hint={
-          summary.average === null
-            ? t.results.kpiNoGrades
-            : t.results.kpiAverageHint(toScale(scale.passMark, scale), scale.max)
-        }
+        color={average === null ? 'text-muted-foreground' : 'text-foreground'}
+        hint={average === null ? t.results.kpiNoGrades : `Media de ${summary.graded} notas finales · sobre ${scale.max}`}
       />
-      <button
-        type="button"
-        aria-pressed={attentionOnly}
-        disabled={projector}
-        onClick={onAttention}
-        className={cn(
-          'flex items-baseline gap-3 bg-background px-4 py-3 text-left transition-colors hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
-          attentionOnly && 'bg-accent'
-        )}
-      >
-        <span
-          className={cn(
-            'text-figure font-bold tabular-nums',
-            summary.attention > 0 ? 'text-warning-strong' : 'text-muted-foreground'
-          )}
-        >
-          {summary.attention}
-        </span>
-        <span className="min-w-0">
-          <span className="block text-micro uppercase tracking-[0.09em] text-muted-foreground">
-            {t.results.kpiAttention}
-          </span>
-          {!projector && (
-            <span className="block text-xs text-muted-foreground">Pulsa para verlos</span>
-          )}
-        </span>
-      </button>
+      <div className="min-w-0 bg-background px-4 py-3">
+        <p className="text-micro uppercase tracking-[0.09em] text-muted-foreground">Comprobación con más fallos</p>
+        <p className="mt-1 truncate text-sm font-semibold" title={mostFailed.map((check) => `${check.description} (${check.checkId})`).join(' · ')}>
+          {hardest ? hardest.description : 'Ninguna comprobación fallada'}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          {hardest ? `${hardest.failed} ${hardest.failed === 1 ? 'fallo' : 'fallos'} de ${hardest.evaluated} evaluados${mostFailed.length > 1 ? ` · ${mostFailed.length} empatadas` : ''}` : 'Las incidencias técnicas no cuentan como fallos'}
+        </p>
+      </div>
     </div>
   )
 }
@@ -451,7 +419,7 @@ function Reading({
 }) {
   return (
     <div className="flex items-baseline gap-3 bg-background px-4 py-3">
-      <span className={cn('text-figure font-bold tabular-nums', color)}>{value}</span>
+      <span className={cn('text-2xl font-semibold tabular-nums', color)}>{value}</span>
       <span className="min-w-0">
         <span className="block text-micro uppercase tracking-[0.09em] text-muted-foreground">
           {label}
@@ -462,85 +430,74 @@ function Reading({
   )
 }
 
-/**
- * The matrix: checks down, students across, as Teutón GUI had it.
- *
- * Amber is never red. A check nobody could evaluate is a technical incident
- * and an entire amber column is a machine that did not answer, which is the
- * opposite reaction to a column of failures (principio 3).
- */
-function MatrixView({
-  rows,
-  selected,
-  onPick,
-  onStudent
-}: {
+/** Compact comparison table; the scroll container owns both sticky axes. */
+function MatrixView({ rows, selected, onPick, onStudent }: {
   rows: { student: StudentResult; checks: CheckResult[] }[]
   selected: Selection | null
   onPick: (selection: Selection) => void
   onStudent: (id: string) => void
 }) {
   const matrix = useMemo(() => buildMatrix(rows), [rows])
-  const names = useMemo(() => {
-    const taken: string[] = []
-    return matrix.students.map((student) => {
-      const short = shortName(student.name, taken)
-      taken.push(short.split(' ')[0])
-      return short
-    })
-  }, [matrix])
-
+  const [column, setColumn] = useState<string | null>(null)
   return (
     <div className="space-y-2">
-      <Legend />
-      <div className="max-h-[calc(100vh-16rem)] overflow-auto rounded-md border border-border">
-        <table className="w-full border-collapse text-left">
-          {/* Names and grades stay pinned while the checks scroll under them:
-              the grade is what the teacher and the class look at first. */}
-          <thead className="sticky top-0 z-20 bg-background shadow-[0_1px_0_hsl(var(--border))]">
-            <tr className="bg-secondary/40">
-              <th className="sticky left-0 z-10 bg-background px-3 pt-2 text-micro uppercase tracking-[0.09em] text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Legend />
+        <span className="text-xs text-muted-foreground">Pulsa un nombre para ver su detalle</span>
+      </div>
+      <div className="max-h-[65vh] overflow-auto rounded-md border border-border focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+        role="region" aria-label="Matriz de resultados, desplazamiento horizontal y vertical" tabIndex={0}>
+        <table className="min-w-full table-fixed border-separate border-spacing-0 text-left"
+          style={{ width: `calc(clamp(10rem, 25vw, 18rem) + ${matrix.students.length * 9}rem)` }}
+          onPointerOver={(event) => setColumn((event.target as HTMLElement).closest<HTMLElement>('[data-column]')?.dataset.column ?? null)}
+          onPointerLeave={() => setColumn(null)}
+          onFocusCapture={(event) => setColumn(event.target.closest<HTMLElement>('[data-column]')?.dataset.column ?? null)}
+          onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setColumn(null) }}>
+          <caption className="sr-only">Notas por alumno y comprobaciones superadas por los alumnos visibles</caption>
+          <colgroup>
+            <col style={{ width: 'clamp(10rem, 25vw, 18rem)' }} />
+            {matrix.students.map((student) => <col key={student.student_id} style={{ width: '9rem' }} />)}
+          </colgroup>
+          <thead className="sticky top-0 z-20">
+            <tr>
+              <th scope="col" className="sticky left-0 z-30 border-b border-r border-border bg-background px-3 py-3 align-bottom text-xs font-medium text-muted-foreground">
                 {t.results.matrixCheck}
-              </th>
-              {names.map((name, index) => (
-                <th
-                  key={matrix.students[index].student_id}
-                  className="px-1 pt-2 text-center text-xs font-semibold"
-                  title={matrix.students[index].name}
-                >
-                  <button
-                    className="hover:underline"
-                    onClick={() => onStudent(matrix.students[index].student_id)}
-                  >
-                    {name}
-                  </button>
-                </th>
-              ))}
-            </tr>
-            <tr className="bg-secondary/40">
-              <th className="sticky left-0 z-10 bg-background px-3 pb-2 pt-1 text-sm font-semibold">
-                {t.results.matrixScore}
+                <span className="mt-1 block text-micro font-normal">Superados / alumnos visibles</span>
               </th>
               {matrix.students.map((student) => (
-                <td key={student.student_id} className="px-1 pb-2 pt-1 text-center align-top">
-                  <GradeBadge student={student} onClick={() => onStudent(student.student_id)} />
-                </td>
+                <th scope="col" key={student.student_id} data-column={student.student_id}
+                  className={cn('border-b border-border px-2 py-2 text-center align-top', column === student.student_id ? 'bg-secondary' : 'bg-background')}>
+                  <button type="button" className="mx-auto block h-8 max-w-full rounded text-xs font-medium leading-4 underline-offset-4 hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+                    title={student.name} aria-label={`Ver detalle de ${student.name}`} onClick={() => onStudent(student.student_id)}>
+                    <span className="line-clamp-2 wrap-break-word">{student.name}</span>
+                  </button>
+                  <MatrixGrade student={student} />
+                </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {matrix.rows.map((row) => (
-              <MatrixRowView
-                key={row.checkId}
-                row={row}
-                students={matrix.students}
-                selected={selected}
-                onPick={onPick}
-              />
-            ))}
+            {matrix.rows.map((row) => <MatrixRowView key={row.checkId} row={row} students={matrix.students}
+              selected={selected} onPick={onPick} column={column} />)}
           </tbody>
         </table>
       </div>
+    </div>
+  )
+}
+
+function MatrixGrade({ student }: { student: StudentResult }) {
+  const scale = useScale()
+  const score = scoreView(student.score, scale)
+  const appearance = gradeAppearance(student, scale.passMark)
+  const label = score.kind === 'provisional' ? 'Provisional' : appearance.label
+  return (
+    <div className="mt-1.5" title={score.note}>
+      <span className={cn('text-xl font-semibold leading-6 tabular-nums', appearance.color)}>
+        {score.value === null ? '—' : score.text}
+      </span>
+      {score.value !== null && <span className="ml-0.5 text-xs font-normal text-muted-foreground">/{scale.max}</span>}
+      <span className={`mt-0.5 block text-micro font-normal ${appearance.color}`}>{label}</span>
     </div>
   )
 }
@@ -607,31 +564,40 @@ function MatrixRowView({
   row,
   students,
   selected,
-  onPick
+  onPick,
+  column
 }: {
   row: MatrixRow
+  column: string | null
   students: StudentResult[]
   selected: Selection | null
   onPick: (selection: Selection) => void
 }) {
   return (
-    <tr className="border-b border-border last:border-0">
+    <tr className="group hover:bg-secondary/60 focus-within:bg-secondary/60">
       <th
         scope="row"
-        className="sticky left-0 z-10 max-w-xs truncate bg-background px-3 py-1.5 text-left text-xs font-normal"
-        title={`${row.group} · ${row.description}`}
+        className="sticky left-0 z-10 border-b border-r border-border bg-background px-3 py-1.5 text-left text-xs font-normal group-hover:bg-secondary group-focus-within:bg-secondary"
+        title={`${row.group} · ${row.description} · peso ${row.weight}`}
       >
-        {row.description}{' '}
-        <span className="text-muted-foreground">{t.results.matrixWeight(row.weight)}</span>
+        <span className="flex items-center gap-2">
+          <span className="min-w-0 flex-1 truncate">{row.description}</span>
+          {row.weight !== 1 && <span className="shrink-0 text-muted-foreground">{t.results.matrixWeight(row.weight)}</span>}
+          <span className="shrink-0 tabular-nums text-muted-foreground"
+            aria-label={`${row.cells.filter((check) => check?.status === 'PASS').length} de ${students.length} alumnos visibles han superado esta comprobación`}>
+            {row.cells.filter((check) => check?.status === 'PASS').length}/{students.length}
+          </span>
+        </span>
       </th>
       {row.cells.map((check, index) => {
         const student = students[index]
         if (!check) {
           return (
-            <td key={student.student_id} className="px-1 py-1.5 text-center">
+            <td key={student.student_id} data-column={student.student_id}
+              className={cn('border-b border-border px-1 py-1 text-center', column === student.student_id && 'bg-secondary/70')}>
               <span
                 className="inline-block rounded px-1.5 py-0.5 text-glyph text-muted-foreground"
-                title={t.results.legendMissing}
+                title={t.results.legendMissing} aria-label={t.results.legendMissing}
               >
                 ·
               </span>
@@ -641,15 +607,16 @@ function MatrixRowView({
         const active =
           selected?.studentId === student.student_id && selected.checkId === check.check_id
         return (
-          <td key={student.student_id} className="px-1 py-1.5 text-center">
+          <td key={student.student_id} data-column={student.student_id}
+            className={cn('border-b border-border px-1 py-1 text-center', column === student.student_id && 'bg-secondary/70')}>
             <button
               type="button"
               onClick={() => onPick({ studentId: student.student_id, checkId: check.check_id })}
               title={`${student.name} · ${row.description} · ${STATUS_TEXT[check.status]}${check.cause !== 'NONE' ? ` · ${CAUSE_TEXT[check.cause]}` : ''}`}
               aria-label={`${student.name}, ${row.description}: ${STATUS_TEXT[check.status]}`}
               className={cn(
-                'inline-flex h-6 w-7 items-center justify-center rounded text-glyph font-bold transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
-                cellTone(check.status),
+                'inline-flex h-6 w-7 items-center justify-center rounded text-xs font-semibold transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+                matrixCellTone(check.status),
                 active && 'ring-2 ring-ring'
               )}
             >
@@ -662,6 +629,11 @@ function MatrixRowView({
   )
 }
 
+function matrixCellTone(status: AcademicStatus): string {
+  return status === 'PASS' ? 'bg-success/10 text-success-strong' : status === 'FAIL'
+    ? 'bg-destructive/10 text-destructive-strong' : 'bg-warning/15 text-warning-strong'
+}
+
 /** The three academic states, spelled out once above the grid. */
 function Legend() {
   return (
@@ -670,8 +642,8 @@ function Legend() {
         <span key={status} className="flex items-center gap-1.5">
           <span
             className={cn(
-              'inline-flex h-5 w-6 items-center justify-center rounded text-glyph font-bold',
-              cellTone(status)
+              'inline-flex h-5 w-6 items-center justify-center rounded text-xs font-semibold',
+              matrixCellTone(status)
             )}
           >
             {GLYPH[status]}

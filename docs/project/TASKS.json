@@ -4029,6 +4029,45 @@
       ],
       "notes": "ADR no necesario. @tailwindcss/upgrade + @tailwindcss/vite. Correcciones a mano: variante 'outline' y rounded-[0.25rem] que la herramienta cambió; relleno de 1px en th/td; tres casos de space-y en Clases; cursor, placeholder y borde de v3. Corrección real de 5 alumnos en v3 y v4 con ui-refresh y el laboratorio: mismos píxeles salvo datos variables, tres ejecuciones. npm audit sin avisos de Tailwind; quedan 8 moderados de electron-builder. Anillo de foco verificado en CSS, no en imagen. Evidencias: docs/reviews/evidence/T190/RESULTADOS.md.",
       "completed": "2026-10-22"
+    },
+    {
+      "id": "T191",
+      "title": "Afinar Resultados: notas en cabecera, media visible y exploración de la matriz",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T190"
+      ],
+      "goal": "Que el profesor lea notas, dificultades y estados sin ruido y explore una clase de 5 o 30 alumnos. Petición explícita de Adrià.",
+      "scope": [
+        "Presentación de Resultados y controles compartidos por lista y matriz.",
+        "Media de las notas mostradas, también en el resumen de Analíticas; sin cambiar notas individuales ni motor.",
+        "Pruebas de filtros, ordenación, estados incompletos y verificación visual con datos ficticios."
+      ],
+      "out_of_scope": [
+        "Motor, contrato, calificaciones individuales, exportaciones e informes.",
+        "Rediseño global, dependencias nuevas o trabajo ajeno a Resultados."
+      ],
+      "acceptance": [
+        "La nota se muestra bajo el nombre en una sola cabecera, con texto semibold de 20 px, escala secundaria y estado legible sin depender del color. No hay fila Nota.",
+        "La media de 10,0; 6,7; 4,3; 2,9; 1,4 es 5,06. Solo entran notas finales de alumnos no excluidos, también con escala y umbral configurables.",
+        "Resumen de comprobación con más fallos reutiliza el cálculo existente; incidencias técnicas no cuentan como suspensos y los empates quedan explícitos.",
+        "Cada comprobación muestra superados/visibles. Filas y columnas tienen seguimiento visual, símbolos y foco accesibles.",
+        "Lista y matriz comparten filtros rápidos por alumno y orden por nombre, nota ascendente/descendente o número de fallos. Los filtros de comprobaciones siguen disponibles y claramente diferenciados.",
+        "La matriz conserva columnas de ancho legible, scroll horizontal, primera columna y cabecera fijas sin solaparse; nombres largos accesibles y detalle al pulsar el nombre.",
+        "typecheck, suite GUI, build, make check y comprobaciones documentales pasan; capturas y prueba de scroll en claro/oscuro con 5 y 30 alumnos y tamaños escritorio, portátil y móvil."
+      ],
+      "tests": [
+        "make check",
+        "make gui-check",
+        "make gui-build",
+        "make docs-check",
+        "make tools-check",
+        "Arnés visual gui/scripts/results-ui.ts"
+      ],
+      "notes": "Inicio desde 20eeba8, main y origin/main sincronizados (git fetch, 0/0). La media anterior convertía la media canónica mediante una escala no lineal. Se mantiene el modelo canónico y se corrige solo el resumen presentado. Completada: 549 tests GUI, tipos, build/preload y make check correctos; enlaces y herramientas correctos. Arnés Electron con 5/30 alumnos y 50 comprobaciones, 3 tamaños × 2 temas, scroll y esquina con desviación 0 px; filtros/órdenes/detalle y estados sin nota probados. Las pruebas de subprocesos requieren salir del aislamiento de esta sesión; no se alteran timeouts. Evidencias: docs/reviews/evidence/T191/RESULTADOS.md. Sin push.",
+      "completed": "2026-10-22"
     }
   ]
 }

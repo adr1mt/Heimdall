@@ -10,6 +10,7 @@ import type {
   StudentResult
 } from '../../../shared/artifact'
 import { toScale, type Scale } from './scale'
+import { gradeAppearance } from './grade-appearance'
 
 /**
  * The technical axis in words the teacher can act on. Every cause of the model
@@ -148,6 +149,38 @@ export function filterRun(
   }))
   if (!hasFilters(filters)) return rows
   return rows.filter((row) => row.checks.length > 0)
+}
+
+export type StudentFilter = 'all' | 'pass' | 'fail' | 'ungraded'
+export type StudentOrder = 'name' | 'grade-asc' | 'grade-desc' | 'failures'
+
+/** Student filters operate on full results, independently of check filters. */
+export function exploreResults(
+  rows: ReturnType<typeof filterRun>,
+  filter: StudentFilter,
+  order: StudentOrder,
+  passMark: number
+): ReturnType<typeof filterRun> {
+  const visible = rows.filter(({ student }) => {
+    if (filter === 'all') return true
+    const tone = gradeAppearance(student, passMark).tone
+    return filter === 'ungraded' ? tone === 'warning' : tone === filter
+  })
+  const final = (student: StudentResult): number | null =>
+    student.status !== 'EXCLUDED' && student.score.status === 'COMPLETE'
+      ? student.score.final_score : null
+  return visible.sort((a, b) => {
+    const byName = () => a.student.name.localeCompare(b.student.name, 'es', { numeric: true }) ||
+      a.student.student_id.localeCompare(b.student.student_id, 'es', { numeric: true })
+    if (order === 'name') return byName()
+    if (order === 'failures') {
+      return tally(b.student.checks).fail - tally(a.student.checks).fail || byName()
+    }
+    const left = final(a.student), right = final(b.student)
+    // Missing grades always go last, in both directions; never coerce them to zero.
+    if (left === null || right === null) return left === right ? byName() : left === null ? 1 : -1
+    return (order === 'grade-asc' ? left - right : right - left) || byName()
+  })
 }
 
 /** The causes actually present in a run, so the filter offers only those. */
