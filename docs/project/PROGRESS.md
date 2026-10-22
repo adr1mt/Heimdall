@@ -5,6 +5,9 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
+README actualizado con instalación AppImage, matriz e informes actuales,
+captura y ejemplos ficticios; distingue `main` de la versión publicada.
+
 **T193 · Informe individual más claro.** Nota discreta, resumen «Qué debes
 revisar» de hasta ocho fallos académicos y desglose completo más ligero.
 Se conservan nota, pesos, escala, privacidad y entrega. 556 pruebas GUI y tipos,
@@ -12,8 +15,7 @@ build y controles correctos; HTML ficticios en cuatro anchos y PDF A4 de una y
 ocho páginas revisados, también en gris sin fondos. Otros navegadores e impresión
 física no probados. [Ejemplos y evidencia](../reviews/evidence/T193/RESULTADOS.md).
 
-**T192 · Cabecera más compacta.** Retiradas las etiquetas visibles Aprobado y
-Suspenso de la matriz; se conservan nota, color, accesibilidad y avisos técnicos.
+**T192**: cabecera sin etiquetas Aprobado/Suspenso; conserva nota y avisos.
 
 **T189 · Comprobaciones con `sudo: true` (ADR-0032).** Kea 3 en Ubuntu 26.04
 deja `/etc/kea` solo a root. Antes los exámenes de 0227 llevaban la contraseña
@@ -23,8 +25,7 @@ suspenso. Laboratorio con sudo y fichero solo de root. Exámenes de 0227
 migrados; corrección real del servidor de Manuel Cadenas (2026-10-21):
 prova-guia-kea 100/100, ra1-dhcp-kea 34/100, sin fallos por permisos.
 
-**Versión 1.0.0 rehecha (2026-10-22).** AppImage sin libfuse2, con arranque
-en Ubuntu 24.04/26.04; publicaciones anteriores retiradas. T084 pendiente.
+**1.0.0 rehecha (2026-10-22).** AppImage sin FUSE probado en Ubuntu 24.04/26.04.
 
 ## Problemas conocidos y límites
 
@@ -55,6 +56,5 @@ en Ubuntu 24.04/26.04; publicaciones anteriores retiradas. T084 pendiente.
 ## Siguiente trabajo
 
 **T070**: rehacer exámenes del curso en formato nativo; desbloquea **T084**,
-examen real de aula que ejecuta Adrià. Consultar
-`python3 scripts/tasks.py T070` antes de empezar. **T023**, **T186** y
-**T187** siguen READY.
+examen real de aula que ejecuta Adrià. Consultar `python3 scripts/tasks.py T070`
+antes de empezar. **T023**, **T186** y **T187** siguen READY.

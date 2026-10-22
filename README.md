@@ -12,7 +12,7 @@
 <p align="center">
   <img alt="Go 1.26+" src="https://img.shields.io/badge/Go-1.26%2B-00ADD8?logo=go&logoColor=white">
   <img alt="Versión 1.0.0" src="https://img.shields.io/badge/versi%C3%B3n-1.0.0-blue">
-  <img alt="Dos dependencias" src="https://img.shields.io/badge/dependencias-2-brightgreen">
+  <img alt="Linux x64" src="https://img.shields.io/badge/Linux-x64-brightgreen?logo=linux&logoColor=white">
 </p>
 
 ---
@@ -40,6 +40,15 @@ descanso.
 ```bash
 sudo apt install ./Heimdall-1.0.0.deb
 ```
+
+Si prefieres el AppImage, dale permiso de ejecución y ábrelo:
+
+```bash
+chmod +x Heimdall-1.0.0.AppImage
+./Heimdall-1.0.0.AppImage
+```
+
+El AppImage publicado no necesita `libfuse2`.
 
 ### 1. Crea tu clase
 
@@ -81,6 +90,12 @@ En **Corregir** eliges la clase y tienes dos formas:
 fila por comprobación, una columna por alumno). Al pulsar una casilla ves qué
 se ejecutó, qué contestó la máquina y qué se esperaba.
 
+Puedes filtrar por **Aprobados**, **Suspensos** o **Sin evaluar**, buscar y
+ordenar por nombre, nota o número de comprobaciones falladas. La matriz
+mantiene visibles los nombres y las comprobaciones al desplazarte. El resumen
+destaca la comprobación con más fallos y calcula la media de las notas finales;
+las provisionales no entran en ella.
+
 El **modo proyector** agranda la letra y tapa las IP para enseñar el progreso
 en clase. **Analíticas** te dice quién necesita atención, qué comprobaciones
 falla más la clase y cómo se reparten las notas.
@@ -88,9 +103,11 @@ falla más la clase y cómo se reparten las notas.
 ### 5. Entrega las notas
 
 - **Enviar informes…**: cada alumno recibe en su carpeta personal, en su
-  máquina, una página con su nota y cada comprobación. Solo la suya: sin
+  máquina, un informe con su nota, un resumen **Qué debes revisar** con hasta
+  ocho comprobaciones falladas y el desglose completo. Solo el suyo: sin
   comandos, sin contraseña, sin datos de los demás. Heimdall te dice a quién
-  le ha llegado y por qué no a los demás.
+  le ha llegado y por qué no a los demás. Se puede abrir en el navegador e
+  imprimir en A4.
 - **CSV de Moodle** y **hoja de notas**, en la escala que elijas en Ajustes
   (sobre 10, sobre 100…).
 
@@ -208,21 +225,28 @@ La práctica: <describe aquí lo que tiene que haber configurado el alumno>.
 
 ## Así se ve
 
-![Pantalla de Resultados de Heimdall: la matriz de la clase, una fila por comprobación y una columna por alumno](docs/img/resultados.png)
+![Pantalla de Resultados de Heimdall: filtros, resumen de la clase y matriz con las notas en la cabecera](docs/reviews/evidence/T192/5-1440-light.png)
 
-La última alumna tiene la máquina apagada: sus comprobaciones salen **sin
-evaluar**, no suspensas, y se queda sin nota hasta que se pueda repetir. Los
-demás no se ven afectados.
+La matriz reúne las notas y las comprobaciones de toda la clase. Si una máquina
+está apagada, sus comprobaciones salen **sin evaluar** y el resto de la clase
+puede continuar.
 
-<sub>Captura real contra el laboratorio de pruebas (`testdata/portada`), con
-nombres ficticios. Todas las máquinas del laboratorio son la misma, de ahí que
-las columnas salgan iguales.</sub>
+<sub>Interfaz actual con datos ficticios de cinco alumnos y 50 comprobaciones;
+captura de la verificación visual de Resultados.</sub>
+
+También puedes ver un [informe individual de ejemplo](docs/reviews/evidence/T193/corto.html)
+y su [impresión en PDF](docs/reviews/evidence/T193/corto.pdf), con datos ficticios.
 
 ## Estado
 
 **Versión 1.0.0**: completa y empaquetada en `.deb` y AppImage con el motor
 dentro. Queda pendiente corregir con ella un examen real de aula de principio
 a fin.
+
+La rama `main` incluye mejoras posteriores en la matriz de resultados, los
+filtros, el cálculo de la media mostrada y los informes individuales que se
+describen y muestran aquí. Para tenerlas antes de la próxima publicación,
+consulta cómo [compilar desde el código fuente](docs/DESARROLLO.md).
 
 ## Documentación
 
