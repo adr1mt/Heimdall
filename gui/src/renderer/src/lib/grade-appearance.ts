@@ -13,7 +13,6 @@ export function gradeAppearance(student: StudentResult, passMark: number) {
       fill: 'bg-muted text-muted-foreground'
     }
   if (
-    student.checks.some((check) => check.status === 'UNEVALUATED') ||
     student.score.status !== 'COMPLETE' ||
     student.score.final_score === null
   ) {

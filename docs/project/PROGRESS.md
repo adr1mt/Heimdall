@@ -5,17 +5,11 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-README actualizado con instalación AppImage, matriz e informes actuales,
-captura y ejemplos ficticios; distingue `main` de la versión publicada.
-
-**T193 · Informe individual más claro.** Nota discreta, resumen «Qué debes
-revisar» de hasta ocho fallos académicos y desglose completo más ligero.
-Se conservan nota, pesos, escala, privacidad y entrega. 556 pruebas GUI y tipos,
-build y controles correctos; HTML ficticios en cuatro anchos y PDF A4 de una y
-ocho páginas revisados, también en gris sin fondos. Otros navegadores e impresión
-física no probados. [Ejemplos y evidencia](../reviews/evidence/T193/RESULTADOS.md).
-
-**T192**: cabecera sin etiquetas Aprobado/Suspenso; conserva nota y avisos.
+**Auditoría 2026-10-22, autorizada por Adrià:** T194–T201 desglosadas.
+**T194:** una nota final ya no se presenta incompleta por diagnósticos de peso
+cero pendientes; se conserva su incidencia técnica. Regresión antes/después,
+tipos, suite GUI y build/preload correctos. Siguiente: permisos T195/T196,
+validación de publicación y copias de clases/exámenes. Aula real sigue en T084.
 
 **T189 · Comprobaciones con `sudo: true` (ADR-0032).** Kea 3 en Ubuntu 26.04
 deja `/etc/kea` solo a root. Antes los exámenes de 0227 llevaban la contraseña

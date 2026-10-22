@@ -34,9 +34,19 @@ describe('grade presentation', () => {
       tone: 'warning'
     })
     expect(gradeAppearance(student('missing', null), 70).tone).toBe('warning')
-    expect(gradeAppearance(student('diagnostic', 100, 'COMPLETE', true), 70).tone).toBe('warning')
     expect(gradeAppearance(student('excluded', null, 'EXCLUDED'), 70).tone).toBe('neutral')
   })
+  it.each([[90, 'pass', 'Aprobado'], [40, 'fail', 'Suspenso']] as const)(
+    'keeps a final grade of %s definitive when a zero-weight diagnostic is pending',
+    (value, tone, label) => {
+      const result = student('diagnostic', value)
+      result.checks[0].weight = 1
+      result.checks.push({ ...result.checks[0], weight: 0, status: 'UNEVALUATED', cause: 'TIMEOUT' })
+      expect(gradeAppearance(result, 70)).toMatchObject({ tone, label })
+      expect(attentionStudents({ students: [result] } as RunResult, 70)).toEqual([result])
+      expect(result.checks[1]).toMatchObject({ status: 'UNEVALUATED', cause: 'TIMEOUT', weight: 0 })
+    }
+  )
 })
 
 describe('analytics presentation', () => {

@@ -4139,7 +4139,7 @@
       "id": "T194",
       "title": "No marcar incompleta una nota final por diagnósticos sin peso",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "No marcar incompleta una nota final por diagnósticos sin peso",
@@ -4155,7 +4155,8 @@
         "Regresión con diagnóstico de peso cero, aprobado, suspenso, nota provisional, sin evaluar y excluido; tipos y suite GUI correctos."
       ],
       "tests": [],
-      "notes": "Autorizada por Adrià el 2026-10-22 tras contrastar auditoría técnica. Commits separados por reparación; T084 sigue reservada al aula real."
+      "notes": "Regresión reproducida antes del arreglo: aprobado y suspenso finales aparecían incompletos con un diagnóstico de peso 0. La nota se presenta desde score; la incidencia se conserva en comprobaciones y atención. Tipos, suite GUI y build/preload correctos. No se cambia el motor ni el cálculo.",
+      "completed": "2026-10-22"
     },
     {
       "id": "T195",
