@@ -37,21 +37,22 @@ try {
         const answer = JSON.parse(data)
         if (answer.id === 1) {
           if (answer.error) reject(new Error(JSON.stringify(answer.error)))
-          else resolve(answer.result.result.value)
+          else if (answer.result?.exceptionDetails) reject(new Error(JSON.stringify(answer.result.exceptionDetails)))
+          else resolve(answer.result?.result?.value)
         }
       }
       socket.send(JSON.stringify({ id: 1, method: 'Runtime.evaluate', params: {
-        expression: '({title:document.title, api:typeof window.heimdall, text:document.body.innerText})', returnByValue: true
+        expression: '({title:document.title, api:typeof window.heimdall, text:document.body?.innerText ?? ""})', returnByValue: true
       } }))
     })
   }
   let page
   for (let attempt = 0; attempt < 30; attempt++) {
     page = await inspect()
-    if (page.api === 'object' && page.text.includes('Heimdall')) break
+    if (page?.api === 'object' && page.text.includes('Heimdall')) break
     await delay(100)
   }
-  assert.equal(page.api, 'object', `Preload unavailable: ${JSON.stringify(page)}`)
+  assert.equal(page?.api, 'object', `Preload unavailable: ${JSON.stringify(page)}\n${log}`)
   assert(page.text.includes('Heimdall'), 'Application shell not rendered')
   assert.equal(child.exitCode, null, 'Application exited')
   console.log(`Package ${mode}: renderer and preload OK (${page.title})`)

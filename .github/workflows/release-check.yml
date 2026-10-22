@@ -31,8 +31,9 @@ jobs:
       - name: Install Electron runtime for UI harnesses
         run: node node_modules/electron/install.js
         working-directory: gui
-      - run: make gui-check docs-check tools-check
+      - run: make gui-check gui-build docs-check tools-check
       - run: go test -race ./...
+      - run: make version
       - run: go install golang.org/x/vuln/cmd/govulncheck@v1.9.0
       - run: govulncheck ./...
       - name: Audit dependency tree
@@ -40,12 +41,6 @@ jobs:
           npm audit --registry=https://registry.npmjs.org --json > "$RUNNER_TEMP/npm-audit.json" || test "$?" -eq 1
           python3 ../scripts/check_npm_audit.py "$RUNNER_TEMP/npm-audit.json" package-lock.json
         working-directory: gui
-      - run: make lab lab-ra2
-      - run: make test
-      - run: make gui-dist
-      - run: xvfb-run -a make gui-paquete
-      - run: xvfb-run -a bash gui/scripts/release-check.sh
-      - run: bash gui/scripts/deb-install-lab.sh
       - name: Verify Chromium update transport
         working-directory: gui
         run: |
@@ -56,6 +51,12 @@ jobs:
         run: |
           node_modules/.bin/esbuild scripts/source-backup-lab.ts --bundle --platform=node --format=esm --outfile="$RUNNER_TEMP/source-backup-lab.mjs" --external:electron
           timeout --kill-after=2s 45s xvfb-run -a node_modules/electron/dist/electron "$RUNNER_TEMP/source-backup-lab.mjs" --no-sandbox
+      - run: make lab lab-ra2
+      - run: make test
+      - run: make gui-dist
+      - run: xvfb-run -a make gui-paquete
+      - run: xvfb-run -a bash gui/scripts/release-check.sh
+      - run: bash gui/scripts/deb-install-lab.sh
       - name: Stop disposable labs
         if: always()
         run: make lab-down lab-ra2-down
