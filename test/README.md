@@ -6,7 +6,9 @@ make lab-status  # ¿está escuchando?
 make lab-down    # lo borra
 ```
 
-Un solo contenedor, `alu1`, en **`127.1.2.3:2201`**. Nunca `127.0.0.x`: Teuton
+Dos contenedores: `alu1` en **`127.1.2.3:2201`** y `alu-sin-sudo`
+en **`127.1.2.3:2298`**, con el binario sudo retirado solo de esa máquina
+desechable. Nunca `127.0.0.x`: Teuton
 trata cualquier dirección que contenga `127.0.0.` como ejecución local (F-01) y
 el criterio A-11 comprueba que el motor nuevo no lo hace.
 
@@ -22,7 +24,8 @@ Ficticias, públicas y solo válidas dentro del contenedor:
 
 | usuario | contraseña |
 |---|---|
-| `alumno` | `HEIMDALL_SECRET_TEST_12345` |
+| `alumno` (ambas máquinas) | `HEIMDALL_SECRET_TEST_12345` |
+| `invitado` (sin privilegios sudo) | `HEIMDALL_SECRET_TEST_12345` |
 
 Nunca se usan credenciales reales en desarrollo ni en tests.
 
@@ -98,3 +101,8 @@ registra comando, síntoma y resultado de ambas ejecuciones.
 La [verificación de recuperación](../docs/audits/2026-10-03/RECUPERACION.md)
 registra el caso y su evidencia. Los límites del entorno no justifican debilitar
 pruebas ni afirmar que una suite pasó sin ejecutarla.
+
+La prueba de contraseña sudo incorrecta inicia primero SSH con la credencial
+válida, invalida la caché sudo y cambia solo la contraseña enviada por esa
+sesión a sudo. No altera la contraseña del usuario. Se comprueba un rechazo
+real y que el comando no corre ni se convierte en un suspenso.

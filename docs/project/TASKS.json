@@ -4262,7 +4262,7 @@
       "id": "T199",
       "title": "Probar rechazo sudo con contraseña incorrecta y sin sudo",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [],
       "goal": "Probar rechazo sudo con contraseña incorrecta y sin sudo",
@@ -4278,7 +4278,8 @@
         "Máquina sin sudo y usuario sin privilegios cubiertos sin depender de mensajes localizados; prueba SSH real."
       ],
       "tests": [],
-      "notes": "Autorizada por Adrià el 2026-10-22 tras contrastar auditoría técnica. Commits separados por reparación; T084 sigue reservada al aula real."
+      "notes": "SSH real: contraseña sudo incorrecta tras autenticación válida y caché invalidada, usuario sin privilegios y segundo contenedor sin binario sudo. El comando no corre, no se filtran credenciales y la negativa sigue UNEVALUATED/AUTH_FAILED. Pruebas sudo SSH y motor, make check y docs-check correctos.",
+      "completed": "2026-10-22"
     },
     {
       "id": "T200",

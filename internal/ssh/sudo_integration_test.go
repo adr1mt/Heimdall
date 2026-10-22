@@ -4,6 +4,7 @@ package ssh
 
 import (
 	"context"
+	"heimdall/internal/model"
 	"strings"
 	"testing"
 	"time"
@@ -114,5 +115,45 @@ func TestRunSudoPasswordNotInArgv(t *testing.T) {
 	}
 	if strings.Contains(ps.Stdout.Text, labPassword) {
 		t.Fatal("la contraseña aparece en el argv de algún proceso")
+	}
+}
+
+// Authenticate SSH successfully first, then send a genuinely incorrect sudo
+// password. This exercises PAM/sudo refusal without changing the lab account.
+func TestRunSudoRejectsAnIncorrectPasswordAfterSSHLogin(t *testing.T) {
+	s := dialLab(t)
+	s.Run(context.Background(), []string{"sudo", "-k"}, 10*time.Second)
+	const wrong = "HEIMDALL_WRONG_SUDO_TEST_ONLY"
+	s.cfg.Password = wrong
+	res, refused := s.RunSudo(context.Background(), []string{"printf", "COMMAND-MUST-NOT-RUN"}, 15*time.Second)
+	if refused == nil || res.Completed || strings.Contains(res.Stdout.Text, "COMMAND-MUST-NOT-RUN") {
+		t.Fatalf("incorrect sudo password: %+v, %v", res, refused)
+	}
+	if strings.Contains(res.Stdout.Text+res.Stderr.Text+refused.Detail, wrong) {
+		t.Fatal("incorrect password leaked")
+	}
+	status, cause, _ := model.Classify(res, nil, model.CauseAuthFailed)
+	if status != model.Unevaluated || cause != model.CauseAuthFailed {
+		t.Fatalf("refusal became academic: %s %s", status, cause)
+	}
+}
+
+func TestRunSudoOnAMachineWithoutSudo(t *testing.T) {
+	cfg := labConfig(t)
+	cfg.Port = 2298
+	s, err := Dial(context.Background(), cfg)
+	if err != nil {
+		t.Fatalf("Dial no-sudo lab (make lab): %v", err)
+	}
+	defer s.Close()
+	res, refused := s.RunSudo(context.Background(), []string{"printf", "COMMAND-MUST-NOT-RUN"}, 10*time.Second)
+	if refused == nil || res.Completed || res.ExitCode == nil || *res.ExitCode != 127 {
+		t.Fatalf("missing sudo: %+v, %v", res, refused)
+	}
+	if strings.Contains(res.Stdout.Text+res.Stderr.Text+refused.Detail, labPassword) {
+		t.Fatal("password leaked")
+	}
+	if strings.Contains(res.Stdout.Text, "COMMAND-MUST-NOT-RUN") {
+		t.Fatal("command ran without sudo")
 	}
 }

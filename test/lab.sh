@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Test SSH lab: one container, one command. Used by the integration suite.
+# Test SSH lab: two disposable containers, one command. Used by the integration suite.
 #
 # 127.1.2.3 on purpose, never 127.0.0.x: the old engine routed any address
 # containing "127.0.0." to local execution (F-01) and A-11 checks that we do
@@ -10,8 +10,10 @@ set -euo pipefail
 
 IMAGE=heimdall-lab-ssh
 NAME=alu1
+NO_SUDO_NAME=alu-sin-sudo
 HOST=127.1.2.3
 PORT=2201
+NO_SUDO_PORT=2298
 CONTAINERFILE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 die() { echo "lab: $*" >&2; exit 1; }
@@ -36,9 +38,14 @@ up() {
   # and a container's default hostname is a random id.
   podman run -d --replace --name "$NAME" --hostname "$NAME" \
     -p "$HOST:$PORT:22" "$IMAGE" >/dev/null
+  # A separate disposable machine really has no sudo binary. Never modify
+  # the shared lab while another test is using it.
+  podman run -d --replace --name "$NO_SUDO_NAME" --hostname "$NO_SUDO_NAME" \
+    -p "$HOST:$NO_SUDO_PORT:22" --entrypoint /bin/sh "$IMAGE" \
+    -c 'rm -f /usr/bin/sudo; exec /usr/sbin/sshd -D -e' >/dev/null
   for _ in $(seq 30); do
-    if (exec 3<>/dev/tcp/$HOST/$PORT) 2>/dev/null; then
-      echo "lab: $NAME listening on $HOST:$PORT"
+    if (exec 3<>/dev/tcp/$HOST/$PORT) 2>/dev/null && (exec 3<>/dev/tcp/$HOST/$NO_SUDO_PORT) 2>/dev/null; then
+      echo "lab: $NAME on $HOST:$PORT and $NO_SUDO_NAME on $HOST:$NO_SUDO_PORT"
       return 0
     fi
     sleep 0.5
@@ -48,12 +55,13 @@ up() {
 
 down() {
   podman rm -f "$NAME" >/dev/null 2>&1 || true
+  podman rm -f "$NO_SUDO_NAME" >/dev/null 2>&1 || true
   echo "lab: $NAME removed"
 }
 
 status() {
-  if (exec 3<>/dev/tcp/$HOST/$PORT) 2>/dev/null; then
-    echo "lab: up on $HOST:$PORT"
+  if (exec 3<>/dev/tcp/$HOST/$PORT) 2>/dev/null && (exec 3<>/dev/tcp/$HOST/$NO_SUDO_PORT) 2>/dev/null; then
+    echo "lab: up on $HOST:$PORT and $HOST:$NO_SUDO_PORT"
   else
     echo "lab: down"
     exit 1

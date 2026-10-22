@@ -13,7 +13,9 @@ tipos, suite GUI y build/preload correctos. **T195:** datos de clases privados
 corrupto intacto y enlaces rechazados. 562 pruebas GUI y controles correctos.
 **T196:** informes 0600 con dueño SSH, probado contra el laboratorio real;
 enlaces y directorios conservan la protección (ADR-0033). Siguiente:
-validación de publicación y copias de clases/exámenes. Aula real sigue en T084.
+validación de publicación y copias de clases/exámenes. **T199:** sudo probado
+con contraseña incorrecta real, usuario sin privilegios y máquina sin sudo;
+no se ejecuta el comando ni se convierte el rechazo en suspenso. Aula T084.
 
 **T189 · Comprobaciones con `sudo: true` (ADR-0032).** Kea 3 en Ubuntu 26.04
 deja `/etc/kea` solo a root. Antes los exámenes de 0227 llevaban la contraseña
@@ -33,8 +35,6 @@ prova-guia-kea 100/100, ra1-dhcp-kea 34/100, sin fallos por permisos.
   límite de 128 MB probado es del heap V8, no del RSS ni de cualquier examen.
 - Laboratorio en 127.1.2.3; arneses SSH y secretos se ejecutan secuencialmente.
 - Reintentos: mismo PLAN y máximo 50 eslabones. Modo examen: mínimo 5 min.
-- sudo: un fallo de contraseña real no se prueba en el laboratorio (misma
-  contraseña que la conexión); sí el usuario sin sudo y el fichero de root.
 - Hasta 2000 celdas y 1 MiB de metadatos resueltos; inventario hasta
   65536 bytes. PLAN no admitido se rechaza antes de SSH.
 - Copias conservan notas y procedencia, sin salidas. Recuperación no sobrescribe.
