@@ -4134,6 +4134,196 @@
       ],
       "completed": "2026-10-22",
       "notes": "Completada por petición explícita desde bef8e7c. Solo presentación del informe. 556 pruebas GUI, tipos, build/preload y make check correctos; enlaces y herramientas correctos. Seis ejemplos sintéticos, cuatro anchos sin desbordamientos ni solapamientos, sin red. PDF A4 de una y ocho páginas inspeccionados, también en gris sin fondos; contenido y márgenes verificados. Límites: otros navegadores e impresión física no probados. Evidencias: docs/reviews/evidence/T193/RESULTADOS.md. Sin push."
+    },
+    {
+      "id": "T194",
+      "title": "No marcar incompleta una nota final por diagnósticos sin peso",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "No marcar incompleta una nota final por diagnósticos sin peso",
+      "scope": [
+        "La presentación usa el estado y la nota final canónicos; los diagnósticos pendientes siguen visibles por separado.",
+        "Regresión con diagnóstico de peso cero, aprobado, suspenso, nota provisional, sin evaluar y excluido; tipos y suite GUI correctos."
+      ],
+      "out_of_scope": [
+        "Cambios ajenos al hallazgo; publicación remota antes de revisar artefactos."
+      ],
+      "acceptance": [
+        "La presentación usa el estado y la nota final canónicos; los diagnósticos pendientes siguen visibles por separado.",
+        "Regresión con diagnóstico de peso cero, aprobado, suspenso, nota provisional, sin evaluar y excluido; tipos y suite GUI correctos."
+      ],
+      "tests": [],
+      "notes": "Autorizada por Adrià el 2026-10-22 tras contrastar auditoría técnica. Commits separados por reparación; T084 sigue reservada al aula real."
+    },
+    {
+      "id": "T195",
+      "title": "Proteger las clases y sus credenciales con permisos privados",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Proteger las clases y sus credenciales con permisos privados",
+      "scope": [
+        "Directorio propio 0700 y clases y temporales 0600, también para instalaciones existentes y antes de leer datos corruptos.",
+        "No se pierden clases ni cambian sus datos; fallos de permisos son visibles y hay regresiones de lectura y escritura."
+      ],
+      "out_of_scope": [
+        "Cambios ajenos al hallazgo; publicación remota antes de revisar artefactos."
+      ],
+      "acceptance": [
+        "Directorio propio 0700 y clases y temporales 0600, también para instalaciones existentes y antes de leer datos corruptos.",
+        "No se pierden clases ni cambian sus datos; fallos de permisos son visibles y hay regresiones de lectura y escritura."
+      ],
+      "tests": [],
+      "notes": "Autorizada por Adrià el 2026-10-22 tras contrastar auditoría técnica. Commits separados por reparación; T084 sigue reservada al aula real."
+    },
+    {
+      "id": "T196",
+      "title": "Entregar informes privados en la máquina del alumno",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Entregar informes privados en la máquina del alumno",
+      "scope": [
+        "Informes nuevos y reemplazados con permisos 0600 y dueño de la conexión.",
+        "Prueba SSH real de permisos, conservación de escritura atómica y enlaces; decisión documentada sin reescribir ADR-0031."
+      ],
+      "out_of_scope": [
+        "Cambios ajenos al hallazgo; publicación remota antes de revisar artefactos."
+      ],
+      "acceptance": [
+        "Informes nuevos y reemplazados con permisos 0600 y dueño de la conexión.",
+        "Prueba SSH real de permisos, conservación de escritura atómica y enlaces; decisión documentada sin reescribir ADR-0031."
+      ],
+      "tests": [],
+      "notes": "Autorizada por Adrià el 2026-10-22 tras contrastar auditoría técnica. Commits separados por reparación; T084 sigue reservada al aula real."
+    },
+    {
+      "id": "T197",
+      "title": "Preparar la siguiente reparación como 1.0.1 sin reutilizar versiones",
+      "phase": 9,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T194",
+        "T195",
+        "T196",
+        "T198",
+        "T199",
+        "T200",
+        "T201"
+      ],
+      "goal": "Preparar la siguiente reparación como 1.0.1 sin reutilizar versiones",
+      "scope": [
+        "VERSION, GUI y lock coinciden en 1.0.1; pruebas de actualización desde ambas 1.0.0.",
+        "Paquetes construidos y comprobados; publicación externa pendiente de aprobación final con artefactos revisables."
+      ],
+      "out_of_scope": [
+        "Cambios ajenos al hallazgo; publicación remota antes de revisar artefactos."
+      ],
+      "acceptance": [
+        "VERSION, GUI y lock coinciden en 1.0.1; pruebas de actualización desde ambas 1.0.0.",
+        "Paquetes construidos y comprobados; publicación externa pendiente de aprobación final con artefactos revisables."
+      ],
+      "tests": [],
+      "notes": "Autorizada por Adrià el 2026-10-22 tras contrastar auditoría técnica. Commits separados por reparación; T084 sigue reservada al aula real."
+    },
+    {
+      "id": "T198",
+      "title": "Automatizar barreras de seguridad e integración antes de publicar",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Automatizar barreras de seguridad e integración antes de publicar",
+      "scope": [
+        "CI ejecuta detección de carreras Go y escaneos de vulnerabilidades Go/npm con política explícita para avisos existentes.",
+        "Workflow manual de validación de publicación levanta los laboratorios y ejecuta integración SSH y comprobación de paquetes; fallo impide dar la publicación por validada.",
+        "Validación local y límites de CI documentados; no se declara ejecutado un workflow remoto sin evidencia."
+      ],
+      "out_of_scope": [
+        "Cambios ajenos al hallazgo; publicación remota antes de revisar artefactos."
+      ],
+      "acceptance": [
+        "CI ejecuta detección de carreras Go y escaneos de vulnerabilidades Go/npm con política explícita para avisos existentes.",
+        "Workflow manual de validación de publicación levanta los laboratorios y ejecuta integración SSH y comprobación de paquetes; fallo impide dar la publicación por validada.",
+        "Validación local y límites de CI documentados; no se declara ejecutado un workflow remoto sin evidencia."
+      ],
+      "tests": [],
+      "notes": "Autorizada por Adrià el 2026-10-22 tras contrastar auditoría técnica. Commits separados por reparación; T084 sigue reservada al aula real."
+    },
+    {
+      "id": "T199",
+      "title": "Probar rechazo sudo con contraseña incorrecta y sin sudo",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Probar rechazo sudo con contraseña incorrecta y sin sudo",
+      "scope": [
+        "Sesión SSH válida recibe una contraseña sudo incorrecta sin alterar la contraseña real del usuario; rechazo no produce fallo académico ni filtra la credencial.",
+        "Máquina sin sudo y usuario sin privilegios cubiertos sin depender de mensajes localizados; prueba SSH real."
+      ],
+      "out_of_scope": [
+        "Cambios ajenos al hallazgo; publicación remota antes de revisar artefactos."
+      ],
+      "acceptance": [
+        "Sesión SSH válida recibe una contraseña sudo incorrecta sin alterar la contraseña real del usuario; rechazo no produce fallo académico ni filtra la credencial.",
+        "Máquina sin sudo y usuario sin privilegios cubiertos sin depender de mensajes localizados; prueba SSH real."
+      ],
+      "tests": [],
+      "notes": "Autorizada por Adrià el 2026-10-22 tras contrastar auditoría técnica. Commits separados por reparación; T084 sigue reservada al aula real."
+    },
+    {
+      "id": "T200",
+      "title": "Conservar copias recuperables de clases y exámenes al guardar",
+      "phase": 9,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T195"
+      ],
+      "goal": "Conservar copias recuperables de clases y exámenes al guardar",
+      "scope": [
+        "Antes de sobrescribir clases o YAML se conserva el contenido anterior en copias privadas y acotadas.",
+        "Recuperación accesible al profesor sin sobrescribir el original ni exponer contraseñas; copia fallida evita destruir la versión anterior y muestra el motivo.",
+        "Regresiones de recuperación, corrupción, retención y permisos; documentación y pruebas GUI."
+      ],
+      "out_of_scope": [
+        "Cambios ajenos al hallazgo; publicación remota antes de revisar artefactos."
+      ],
+      "acceptance": [
+        "Antes de sobrescribir clases o YAML se conserva el contenido anterior en copias privadas y acotadas.",
+        "Recuperación accesible al profesor sin sobrescribir el original ni exponer contraseñas; copia fallida evita destruir la versión anterior y muestra el motivo.",
+        "Regresiones de recuperación, corrupción, retención y permisos; documentación y pruebas GUI."
+      ],
+      "tests": [],
+      "notes": "Autorizada por Adrià el 2026-10-22 tras contrastar auditoría técnica. Commits separados por reparación; T084 sigue reservada al aula real."
+    },
+    {
+      "id": "T201",
+      "title": "Revisar exposición de Electron y arranque sin sandbox",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Revisar exposición de Electron y arranque sin sandbox",
+      "scope": [
+        "Evaluación de las rutas alcanzables desde Heimdall para los avisos Node del 21-oct y comprobación de Electron estable con parches.",
+        "Modo de arranque real del AppImage documentado y comprobación del paquete con y sin sandbox cuando el entorno lo permita; límites explícitos."
+      ],
+      "out_of_scope": [
+        "Cambios ajenos al hallazgo; publicación remota antes de revisar artefactos."
+      ],
+      "acceptance": [
+        "Evaluación de las rutas alcanzables desde Heimdall para los avisos Node del 21-oct y comprobación de Electron estable con parches.",
+        "Modo de arranque real del AppImage documentado y comprobación del paquete con y sin sandbox cuando el entorno lo permita; límites explícitos."
+      ],
+      "tests": [],
+      "notes": "Autorizada por Adrià el 2026-10-22 tras contrastar auditoría técnica. Commits separados por reparación; T084 sigue reservada al aula real."
     }
   ]
 }
