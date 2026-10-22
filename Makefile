@@ -83,7 +83,7 @@ gui-build:
 ## gui-dist: AppImage and .deb in gui/dist, with the engine inside. The
 ## teacher installs that and needs nothing else (T072).
 gui-dist: build
-	cd gui && npm run dist
+	cd gui && npm run dist -- --publish never
 
 ## gui-paquete: check the built package works on a machine with nothing
 ## installed (T072). Needs `make gui-dist` and `make lab`.
