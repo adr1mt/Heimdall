@@ -4407,7 +4407,7 @@
         "GitHub Actions Release validation",
         "SHA-256 local y digest de assets GitHub"
       ],
-      "notes": "Autorización explícita de Adrià el 2026-10-22: adelante con todo salvo probar en clase, que hará él. Incluye push, etiqueta y publicación. La prueba de aula permanece pendiente; no bloquea esta reparación. Primer recorrido remoto 39827851971: integración y seguridad correctas, empaquetado falla porque electron-builder intenta publicar implícitamente en CI sin token. make gui-dist pasa ahora --publish never, la misma orden usada para los paquetes locales comprobados; no se concede un token a la validación."
+      "notes": "Autorización explícita de Adrià el 2026-10-22: adelante con todo salvo probar en clase, que hará él. Incluye push, etiqueta y publicación. La prueba de aula permanece pendiente; no bloquea esta reparación. Primer recorrido remoto 39827851971: integración y seguridad correctas, empaquetado falla porque electron-builder intenta publicar implícitamente en CI sin token. make gui-dist pasa ahora --publish never, la misma orden usada para los paquetes locales comprobados; no se concede un token a la validación. Segundo recorrido 39828867559: construcción, paquetes e instalación Ubuntu correctos; falla el arnés Chromium porque npm ci no descarga automáticamente el binario Electron de desarrollo. Se añade su instalador oficial explícito antes de los arneses; no cambia la aplicación ni los paquetes."
     }
   ]
 }
