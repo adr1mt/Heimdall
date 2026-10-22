@@ -52,11 +52,12 @@ solo se abandona parada un minuto
 - Un informe que contenga el texto de la contraseña de la clase no se envía
   (p. ej. contraseña «alumno» y una descripción que dice «alumno»).
 - Parches 2026-10-22: go1.26.10, vite 7.3.7, Electron 43.8.3 (Node 24.22.0, aún
-  sin el parche del 21-oct). tailwindcss 3 arrastra `braces` (DoS solo en build).
+  sin el parche del 21-oct). tailwindcss 3 arrastra 5 avisos graves de npm audit,
+  solo en build; migración a v4 en T190.
 
 ## Siguiente trabajo
 
 **T070**: rehacer exámenes del curso en formato nativo; desbloquea **T084**,
 examen real de aula que ejecuta Adrià. Consultar
-`python3 scripts/tasks.py T070` antes de empezar. **T023**, **T186** y
-**T187** siguen READY.
+`python3 scripts/tasks.py T070` antes de empezar. **T023**, **T186**,
+**T187** y **T190** siguen READY.

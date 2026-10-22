@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated": "2026-10-21",
+  "updated": "2026-10-22",
   "status_values": [
     "BLOCKED",
     "READY",
@@ -3992,6 +3992,42 @@
       ],
       "completed": "2026-10-21",
       "notes": "ADR-0032. Detección por registro privado con nonce impreso por un texto fijo dentro de sudo; el comando recibe /dev/null. Sin causa nueva: AUTH_FAILED. Laboratorio con sudo, /etc/kea solo de root y usuario invitado sin sudo; lab.sh reconstruye la imagen si cambia el Containerfile. Corrección real del 2026-10-21: prova-guia-kea 100/100, ra1-dhcp-kea 34/100, todas las lecturas con sudo terminaron con 0."
+    },
+    {
+      "id": "T190",
+      "title": "Migrar la GUI a Tailwind CSS v4",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P2",
+      "depends_on": [],
+      "goal": "Quitar los avisos graves de npm audit, que vienen todos de Tailwind v3 (braces, micromatch, fast-glob, chokidar), sin cambiar cómo se ve ninguna pantalla. Solo afectan a la compilación, no a la app instalada.",
+      "scope": [
+        "gui/package.json",
+        "gui/package-lock.json",
+        "gui/electron.vite.config.ts",
+        "gui/tailwind.config.js",
+        "gui/postcss.config.js",
+        "gui/src/renderer/src/styles/globals.css",
+        "gui/src/renderer/"
+      ],
+      "acceptance": [
+        "Capturas de todas las pantallas con npm run screenshot antes del cambio, para comparar.",
+        "Migración con npx @tailwindcss/upgrade: tema en CSS (@import \"tailwindcss\", @theme), clases renombradas y dependencias actualizadas.",
+        "Compilación con el plugin de Tailwind para Vite en electron.vite.config.ts; fuera postcss.config.js, autoprefixer y tailwind.config.js.",
+        "Bordes: regla base que mantiene el color --border por defecto (v4 usa currentColor); ningún borde se oscurece.",
+        "Esquinas: los rounded sin sufijo conservan su radio; el renombrado a rounded-sm no toma el sm propio del proyecto (calc(var(--radius) - 4px)).",
+        "Foco: los ring sin anchura conservan el anillo de 3 px de v3.",
+        "Escala propia (glyph…marker-lg), colores con hsl(var(--x)) y sus opacidades (bg-warning/10), modo oscuro por clase y animación fade-in iguales que antes.",
+        "npm run typecheck, npm test y npm run build sin errores.",
+        "Capturas posteriores comparadas pantalla por pantalla con las previas, en claro y en oscuro, sin diferencias visibles.",
+        "npm audit sin ningún aviso de tailwindcss ni de sus dependencias. Los moderados de electron-builder (sprintf-js) quedan fuera de esta tarea."
+      ],
+      "tests": [
+        "cd gui && npm run typecheck && npm test && npm run build",
+        "cd gui && npm run screenshot (antes y después)",
+        "cd gui && npm audit"
+      ],
+      "notes": "Estimación: 2 h. npm audit fix --force no sirve: instala tailwindcss 4 sin migrar la configuración y rompe la compilación."
     }
   ]
 }
