@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { CorrectionClock } from '@/components/CorrectionClock'
 import {
   ArrowLeft,
   Check,
@@ -124,7 +125,7 @@ export default function ResultsView() {
     return exploreResults(filterRun(artifact, filters), studentFilter, order, passMark, hiddenIds)
   }, [artifact, filters, studentFilter, order, passMark, hiddenIds])
 
-  if (problem) {
+  if (problem && !artifact) {
     return (
       <div className="flex h-full flex-col">
         <ViewHeader title={t.results.title} />
@@ -212,6 +213,7 @@ export default function ResultsView() {
         }
       />
 
+      <CorrectionClock />
       <div className="min-h-0 flex-1 space-y-4 overflow-auto p-3 sm:p-6">
         {summary && (
           <section aria-label="Resumen de toda la corrección" className="space-y-2">

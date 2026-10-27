@@ -6,6 +6,7 @@ import { applyClosed, applyEvent, emptyRunState, type RunState } from '@/lib/run
 import { useResultsView } from './results-view'
 
 interface RunStore extends RunState {
+  revision: number
   /** The canonical artifact of the finished run: the source of truth. */
   artifact: RunResult | null
   /** Where that artifact lives, so a retry can name it to the engine. */
@@ -25,21 +26,22 @@ interface RunStore extends RunState {
 
 export const useRun = create<RunStore>((set) => ({
   ...emptyRunState(),
+  revision: 0,
   artifact: null,
   artifactPath: null,
   artifactProblem: null,
 
   setArtifact: (artifact, artifactPath) => {
     useResultsView.getState().bindSources(artifact.exam.path, artifact.inventory.path)
-    set({ artifact, artifactPath, artifactProblem: null })
+    set({ artifact, artifactPath, artifactProblem: null, problem: null })
   },
   artifactFailed: (artifactProblem) => set({ artifactProblem }),
 
   begin: () =>
-    set({ ...emptyRunState(), phase: 'starting', artifact: null, artifactPath: null, artifactProblem: null }),
+    set((state) => ({ ...emptyRunState(), revision: state.revision + 1, phase: 'starting', artifactProblem: null })),
   event: (event) => set((state) => applyEvent(state, event)),
   closed: (closed) => set((state) => applyClosed(state, closed)),
   cancelRequested: () => set({ cancelling: true }),
   fail: (problem) => set({ phase: 'finished', cancelling: false, problem }),
-  reset: () => set({ ...emptyRunState(), artifact: null, artifactPath: null, artifactProblem: null })
+  reset: () => set((state) => ({ ...emptyRunState(), revision: state.revision + 1, artifact: null, artifactPath: null, artifactProblem: null }))
 }))

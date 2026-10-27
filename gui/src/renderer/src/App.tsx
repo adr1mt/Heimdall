@@ -111,18 +111,28 @@ function AppBody() {
       // The round joins the session before anything else: what it is worth is
       // asked of the engine with the whole list (ADR-0020).
       if (useApp.getState().exam.active) useApp.getState().examRoundFinished(event.artifact)
+      const revision = useRun.getState().revision
       window.heimdall
         .readArtifact(event.artifact)
         .then((artifact) => {
+          if (revision !== useRun.getState().revision) return
+          if (artifact.status === 'CANCELLED' && useRun.getState().artifact) {
+            useRun.getState().artifactFailed('Corrección cancelada. Se conservan los resultados anteriores.')
+            return
+          }
           useRun.getState().setArtifact(artifact, event.artifact)
           useApp.getState().setView('results')
         })
         .catch((error) => {
+          if (revision !== useRun.getState().revision) return
           const problem = noticeFrom('No se pudo abrir el resultado', error)
           useRun.getState().artifactFailed(problem)
-          // Reading failed before navigation: show the reason in the current
-          // view too, including when the sidebar is hidden by the projector.
-          useApp.getState().setNotice(problem)
+          // Results has a quiet warning beside the clock. Other views still
+          // need a visible explanation when no previous result can be shown.
+          const app = useApp.getState()
+          if (!useRun.getState().artifact || (app.view !== 'results' && !app.projector)) {
+            app.setNotice(problem)
+          }
         })
     })
     const offClosed = window.heimdall.onRunClosed((closed) => {
