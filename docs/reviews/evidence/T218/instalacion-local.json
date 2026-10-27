@@ -1,0 +1,16 @@
+{
+  "app": "/home/adr1/Aplicaciones/Heimdall/Heimdall.AppImage",
+  "beforeAppSHA256": "a6a460b30ef7cb4a4b8f4b750d637691f4d6cd036c1707c16d493faf00b03b02",
+  "guiAsarSHA256": "688c14036a76bf2b2c1d5c55fa8b18126478d1987db34c0cb9eeed3b82dea7f0",
+  "originalExam": "/home/adr1/apps/0227/heimdall/ra1-dhcp-kea/examen.yaml",
+  "originalExamSHA256": "c7df9c653f97bab5728deae322ce9e78a8c00eeb692351aa83e5923541c476f8",
+  "exam": "/home/adr1/apps/0227/heimdall/ra1-v2/examen.yaml",
+  "revision": "cc653e10b6087ad31ce72344a361f53599376188cfef6aea560d67f2fb8f9811",
+  "examSHA256": "969736b789518d6906665d5e36da846df25e14d691e51be83b986c8ddae5ccd0",
+  "engineSHA256": "607db070ec191848e4b6db7df3290c15a694e525f6de2d070e604db8435c1c08",
+  "appSHA256": "4ee1b5e27fa0574fd1adbda7c9e68f94ce9eee17a74ae0e3d42235ee1aeadd52",
+  "name": "RA1 v2",
+  "sourceCopies": "/home/adr1/.config/heimdall-gui/copias-fuentes/exam-ra1-v2-8f66271b8e3f55a9",
+  "backupApp": "/home/adr1/Aplicaciones/Heimdall/Heimdall.AppImage.antes-ra1-v2-20261027T201306Z.bak",
+  "backupProjects": "/home/adr1/.config/heimdall-gui/projects.json.antes-ra1-v2-20261027T201306Z.bak"
+}

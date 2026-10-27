@@ -5,6 +5,9 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
+**T218 instalado:** RA1 v2 separado, 12 criterios/peso 19; siete Kea de peso 2,
+DNS DHCP 8.8.8.8 y solo forwarding guardado. Motor compatible con RA1 original;
+GUI instalada conservada. [Evidencia](../reviews/evidence/T218/RESULTADOS.md).
 **T217:** nombres breves en Lista/Matriz, iniciales si coinciden y apellidos
 si aún hay ambigüedad; ayuda/detalle mantienen el nombre completo. Columnas
 104 px. 620 pruebas GUI, motor, tipos/build y arneses correctos. Sin instalar.
@@ -18,8 +21,6 @@ T214 conserva la [instalación anterior](../reviews/evidence/T214/RESULTADOS.md)
 La privacidad entre alumnos requiere credenciales SSH propias; la contraseña
 común del aula no impide acceder a máquinas ajenas.
 
-**T210:** interfaz T208 instalada con motor T209 conservado y copia anterior.
-[Instalación](../reviews/evidence/T210/RESULTADOS.md).
 **T208:** ocultos, Evaluados y orden; [evidencia](../reviews/evidence/T208/RESULTADOS.md).
 **T209:** Kea con identidad del servicio; fallos técnicos separados de errores
 reales. AppImage/examen instalados con originales; requiere nueva corrección.

@@ -4967,6 +4967,39 @@
       ],
       "completed": "2026-10-27",
       "notes": "620 pruebas GUI, tipos/build y preload correctos; make check al inicio correcto. Electron aislado verifica iniciales, coincidencias, estabilidad tras ocultar/filtrar, nombre completo en ayuda/detalle y columnas de 104 px. Densidad, proyector e informes conservados. Evidencia: docs/reviews/evidence/T217/RESULTADOS.md. Sin instalar ni publicar."
+    },
+    {
+      "id": "T218",
+      "title": "Guardar RA1 v2 con DNS DHCP y corrección reducida",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T209"
+      ],
+      "goal": "Guardar y registrar RA1 v2 en Heimdall sin alterar el examen original.",
+      "scope": [
+        "Examen separado con 12 comprobaciones, peso 19 y las siete de Kea con peso 2.",
+        "DNS DHCP 8.8.8.8 mediante una revisión fija adicional, conservando el corrector original.",
+        "Encaminamiento: únicamente ip_forward=1 en la configuración persistente de sysctl.",
+        "Instalar el motor necesario conservando la interfaz instalada, registrar el examen y conservar copias."
+      ],
+      "out_of_scope": [
+        "NAT, comprobaciones del cliente, corregir alumnado, cambiar clases o notas, publicar y cambios paralelos de interfaz."
+      ],
+      "acceptance": [
+        "RA1 v2 válido sin clase; PLAN ficticio de 12 criterios/peso 19.",
+        "Kea comprueba 8.8.8.8 en v2 y 9.9.9.9 en el original, con regresión de herencia y codificación.",
+        "Único criterio de encaminamiento fwd-persistent; siete criterios Kea de peso 2; nombres acordados sin respuestas.",
+        "Examen guardado, registrado y recuperable; motor instalado compatible con ambos; interfaz instalada intacta."
+      ],
+      "tests": [
+        "make check ra1-check build",
+        "Validación nativa de ambos exámenes y PLAN ficticio v2",
+        "Verificación del motor empaquetado y de las copias locales"
+      ],
+      "completed": "2026-10-27",
+      "notes": "Examen RA1 v2 separado, guardado y registrado con copia recuperable. 12 comprobaciones/peso 19, siete Kea con peso 2; DNS 8.8.8.8 y solo forwarding guardado. Motor instalado preservando todos los archivos de la GUI y la revisión original. make check ra1-check build, validación sin clase de ambos exámenes, PLAN ficticio y paquete verificados. Evidencia: docs/reviews/evidence/T218/RESULTADOS.md. Requiere cerrar/abrir si estaba en ejecución; sin corregir alumnado ni publicar. T219 conserva su trabajo paralelo de instalación de interfaz."
     }
   ]
 }

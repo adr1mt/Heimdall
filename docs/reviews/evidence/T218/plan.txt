@@ -1,0 +1,7 @@
+Examen:         RA1 v2
+Aula:           Laboratorio ficticio RA1
+Alumnos:        1 evaluables
+Comprobaciones: 12
+Peso total:     19
+Concurrencia:   16 alumnos a la vez, 4 conexiones por máquina
+Hash del plan:  7f0ab7e742f52ac080492ff7a52b0211613b71b0792bb5d15afbae68eb2069e3

@@ -7,12 +7,33 @@ import (
 	"crypto/sha256"
 	_ "embed"
 	"fmt"
+	"strings"
 )
 
 //go:embed ra1.py
 var source string
 
 func Revision() string { return fmt.Sprintf("%x", sha256.Sum256([]byte(source))) }
+
+// RA1 v2 differs only in its required DHCP DNS. Keep the original program and
+// its revision intact so existing exams still grade against their own rubric.
+const originalDNS = "return option(root, parent, subnet, 'domain-name-servers', 6) == ['9.9.9.9']"
+const v2DNS = "return option(root, parent, subnet, 'domain-name-servers', 6) == ['8.8.8.8']"
+
+var sourceV2 = strings.Replace(source, originalDNS, v2DNS, 1)
+
+func RevisionV2() string { return fmt.Sprintf("%x", sha256.Sum256([]byte(sourceV2))) }
+
+func sourceForRevision(revision string) (string, bool) {
+	switch revision {
+	case Revision():
+		return source, true
+	case RevisionV2():
+		return sourceV2, true
+	default:
+		return "", false
+	}
+}
 
 var criteria = map[string]bool{}
 
@@ -34,7 +55,7 @@ func Validate(args []string) error {
 	if len(args) != 6 || args[0] != "ra1-dhcp" {
 		return fmt.Errorf("comprobador: se esperan [ra1-dhcp, revisión, criterio, interfaz externa, interfaz interna, IP de examen]")
 	}
-	if args[1] != Revision() {
+	if _, ok := sourceForRevision(args[1]); !ok {
 		return fmt.Errorf("comprobador: esta revisión requiere otra compilación de Heimdall; no se ejecutará ni calificará")
 	}
 	if !criteria[args[2]] {
@@ -51,5 +72,9 @@ func Validate(args []string) error {
 // Command is called only after full PLAN validation and substitution. -I
 // prevents student-controlled Python modules, PYTHONPATH and user site hooks.
 func Command(args []string) []string {
-	return append([]string{"python3", "-I", "-c", source}, args[2:]...)
+	program, ok := sourceForRevision(args[1])
+	if !ok {
+		return nil
+	}
+	return append([]string{"python3", "-I", "-c", program}, args[2:]...)
 }

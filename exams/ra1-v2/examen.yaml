@@ -1,0 +1,160 @@
+# Encaminament: només ip_forward guardat a sysctl. Sense NAT ni comprovació del valor actiu.
+examen: RA1 v2
+version: 1
+hosts:
+- host1
+por_defecto:
+  peso: 1
+  timeout: 20s
+  sudo: true
+grupos:
+- grupo: Xarxa
+  comprobaciones:
+  - id: net-externa-netplan
+    descripcion: Configuració de la xarxa externa
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - cc653e10b6087ad31ce72344a361f53599376188cfef6aea560d67f2fb8f9811
+    - net-externa-netplan
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+    peso: 1
+  - id: net-externa-gw
+    descripcion: Porta d’enllaç del servidor
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - cc653e10b6087ad31ce72344a361f53599376188cfef6aea560d67f2fb8f9811
+    - net-externa-gw
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+    peso: 1
+  - id: net-externa-dns
+    descripcion: DNS del servidor
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - cc653e10b6087ad31ce72344a361f53599376188cfef6aea560d67f2fb8f9811
+    - net-externa-dns
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+    peso: 1
+  - id: net-interna-netplan
+    descripcion: Configuració de la xarxa interna
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - cc653e10b6087ad31ce72344a361f53599376188cfef6aea560d67f2fb8f9811
+    - net-interna-netplan
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+    peso: 1
+- grupo: Kea
+  comprobaciones:
+  - id: kea-interficie
+    descripcion: Interfície del servei DHCP
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - cc653e10b6087ad31ce72344a361f53599376188cfef6aea560d67f2fb8f9811
+    - kea-interficie
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+    peso: 2
+  - id: kea-subxarxa
+    descripcion: Subxarxa del servei DHCP
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - cc653e10b6087ad31ce72344a361f53599376188cfef6aea560d67f2fb8f9811
+    - kea-subxarxa
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+    peso: 2
+  - id: kea-rang-final
+    descripcion: Rang d’assignació dinàmica
+    en: host1
+    peso: 2
+    comprobador:
+    - ra1-dhcp
+    - cc653e10b6087ad31ce72344a361f53599376188cfef6aea560d67f2fb8f9811
+    - kea-rang-final
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: kea-porta-enllac
+    descripcion: Porta d’enllaç dels clients
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - cc653e10b6087ad31ce72344a361f53599376188cfef6aea560d67f2fb8f9811
+    - kea-porta-enllac
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+    peso: 2
+  - id: kea-dns
+    descripcion: DNS dels clients
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - cc653e10b6087ad31ce72344a361f53599376188cfef6aea560d67f2fb8f9811
+    - kea-dns
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+    peso: 2
+  - id: kea-reserves
+    descripcion: Reserves d’adreces
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - cc653e10b6087ad31ce72344a361f53599376188cfef6aea560d67f2fb8f9811
+    - kea-reserves
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+    peso: 2
+  - id: kea-actiu
+    descripcion: Estat del servei DHCP
+    en: host1
+    peso: 2
+    comprobador:
+    - ra1-dhcp
+    - cc653e10b6087ad31ce72344a361f53599376188cfef6aea560d67f2fb8f9811
+    - kea-actiu
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+- grupo: Encaminament
+  comprobaciones:
+  - id: fwd-persistent
+    descripcion: Configuració de l’encaminament IPv4
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - cc653e10b6087ad31ce72344a361f53599376188cfef6aea560d67f2fb8f9811
+    - fwd-persistent
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+    peso: 1
