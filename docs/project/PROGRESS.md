@@ -5,17 +5,17 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T208:** ocultos temporales, Evaluados por conexión y filtros/orden en proyector.
-601 pruebas GUI, motor, build y Electron correctos; T208 pendiente de instalar.
-[Evidencia](../reviews/evidence/T208/RESULTADOS.md).
+**T210:** interfaz T208 instalada con motor T209 conservado, copia anterior y
+huellas verificadas. Cerrar/abrir al terminar de corregir; no se reinició.
+[Instalación](../reviews/evidence/T210/RESULTADOS.md).
 
-**T209:** validación Kea como usuario del servicio: evita el bloqueo AppArmor de
-root; acceso imposible técnico, errores reales conservados. 30 pruebas Python,
-Go y paquete correctos. AppImage/examen instalados con originales; cerrar/abrir
-y nueva corrección. GUI T208 sin incluir. [Evidencia](../reviews/evidence/T209/RESULTADOS.md).
+**T208:** ocultos, Evaluados y orden en proyector; 601 pruebas GUI y arnés correctos. [Evidencia](../reviews/evidence/T208/RESULTADOS.md).
 
-**T207:** RA1: 19 criterios/peso 24; cuatro reservas KEA juntas, peso 2.
-Examen/AppImage locales actualizados; originales conservados. [Evidencia](../reviews/evidence/T207/RESULTADOS.md).
+**T209:** Kea con identidad del servicio; acceso imposible técnico, errores
+reales conservados. 30 pruebas Python, Go y paquete correctos. AppImage/examen
+instalados con originales; requiere nueva corrección. [Evidencia](../reviews/evidence/T209/RESULTADOS.md).
+
+**T207:** RA1: 19 criterios/peso 24; cuatro reservas juntas, peso 2. [Evidencia](../reviews/evidence/T207/RESULTADOS.md).
 
 **T204 (histórico):** RA1 semántico (ADR-0036), ajustado en T205/T206/T207.
 [Pruebas, instalación y límites](../reviews/evidence/T204/RESULTADOS.md).

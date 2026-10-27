@@ -85,3 +85,7 @@ estadísticas generales siguen representando toda la corrección.
 
 Implementación compilada en el repositorio. **Pendiente instalar T208 cuando
 Adrià termine de corregir**; no hacer push, publicación ni reinicio automático.
+
+Actualización posterior: Adrià autorizó instalar inmediatamente; la instalación
+con copia anterior y motor T209 conservado queda registrada en
+[T210](../T210/RESULTADOS.md). No se reinició la instancia activa.

@@ -1,0 +1,16 @@
+{
+  "app": "/home/adr1/Aplicaciones/Heimdall/Heimdall.AppImage",
+  "package": "/home/adr1/apps/heimdall/gui/dist/Heimdall-1.0.1.AppImage",
+  "beforeAppSHA256": "d28d9df21beaf5733986c7ade0b26117a9225518879161af52385dfdb5423a54",
+  "packageSHA256": "3ceca27e408bdbac69c8b61e2161033235fc3bc68cc7c66dd84331381cfc97ce",
+  "engineSHA256": "687c418142b5d7774663ca972f15d40540aacd4a83995989e84acbe894406e2e",
+  "guiAsarSHA256": "6d5da6f0055884d83d4d3f2cc8178031b38c08e1ec4b0b83b7ca238a87d3f02f",
+  "engineVersion": "heimdall 1.0.1",
+  "sourceCommit": "475cc1f8c18dc100b6e73546ddee0484345a14c5",
+  "verifiedFiles": 25,
+  "resultChunk": "out/renderer/assets/Results-Cnqc9Y45.js",
+  "backupApp": "/home/adr1/Aplicaciones/Heimdall/Heimdall.AppImage.antes-controles-aula-2026-10-27.bak",
+  "installedAppSHA256": "3ceca27e408bdbac69c8b61e2161033235fc3bc68cc7c66dd84331381cfc97ce",
+  "installedAt": "2026-10-27T18:17:01.186839+00:00",
+  "runningInstanceRestarted": false
+}

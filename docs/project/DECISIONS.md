@@ -984,3 +984,10 @@ posteriores, incluso rechazo de sudo, sin inventar conexión a partir de nota,
 inventario, intentos de conexión o resultados anteriores. No cambia el contrato
 ni el motor. Se prepara y prueba separado de la aplicación instalada que Adrià
 sigue usando: no sustituirla ni reiniciarla durante esta sesión.
+
+## T210 · 2026-10-27 · Instalación local autorizada
+
+Tras la entrega T208 sin instalar, Adrià autoriza instalar ahora la interfaz.
+Se conserva el motor T209 y una copia íntegra del AppImage anterior; publicación
+atómica y huellas verificadas. La instancia activa no se cierra ni reinicia.
+No se modifican datos del profesor ni se publica una nueva versión.

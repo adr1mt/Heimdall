@@ -4710,6 +4710,40 @@
         "status": "COMPLETE"
       },
       "completed": "2026-10-27"
+    },
+    {
+      "id": "T210",
+      "title": "Instalar los controles de aula T208 conservando el motor T209",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T208",
+        "T209"
+      ],
+      "goal": "Instalar la interfaz nueva en el AppImage local sin interrumpir la corrección abierta ni perder la reparación Kea.",
+      "scope": [
+        "Construir AppImage con GUI T208 y el motor T209 ya instalado.",
+        "Verificar contenido, motor y arranque con perfil temporal antes de sustituir el ejecutable.",
+        "Conservar copia anterior, reemplazar de forma atómica y registrar huellas."
+      ],
+      "out_of_scope": [
+        "Cerrar o reiniciar la instancia activa, modificar perfiles, clases, exámenes, notas o máquinas del alumnado.",
+        "Publicar o cambiar versiones, etiquetas o remotos."
+      ],
+      "acceptance": [
+        "El AppImage contiene los controles T208 y un motor idéntico al T209 instalado.",
+        "Arranque empaquetado y preload correctos con un perfil ficticio, sin abrir datos reales.",
+        "Instalación local sustituida atómicamente; copia anterior íntegra y recuperable.",
+        "La instancia activa no se cierra ni reinicia; se indica la necesidad de volver a abrir para cargar cambios."
+      ],
+      "tests": [
+        "make check y gui-build",
+        "Inspección de AppImage, identidad del motor y controles empaquetados",
+        "Smoke empaquetado con perfil temporal y comprobación de huellas tras instalar"
+      ],
+      "notes": "Instalación autorizada de GUI T208 con motor T209 idéntico al instalado. make check, build, 25 ficheros empaquetados, AppRun y arranque con perfil temporal correctos. Sustitución atómica y copia anterior verificada. Instancia activa intacta: cerrar/abrir al finalizar la corrección. Manifest y evidencia: docs/reviews/evidence/T210/RESULTADOS.md. Sin publicación.",
+      "completed": "2026-10-27"
     }
   ]
 }
