@@ -1,0 +1,1 @@
+RA1 GUI OK: real renderer, sandboxed preload, packaged engine; fixed profiles validate and save exactly, without a class. Fictional data only.

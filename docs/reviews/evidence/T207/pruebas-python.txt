@@ -1,0 +1,11 @@
+python3 -B -m unittest discover -s test/exams/ra1 -p 'test_*.py'
+.....No se pudo comprobar: PermissionError: fixture access denied
+......No se pudo comprobar: PermissionError: denied
+No se pudo comprobar: Unavailable: unsupported
+bad config
+...............
+----------------------------------------------------------------------
+Ran 26 tests in 0.045s
+
+OK
+FAIL

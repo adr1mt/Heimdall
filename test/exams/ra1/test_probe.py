@@ -26,6 +26,15 @@ def tree(root):
     return root, {}, s, [(s, {})]
 
 
+def all_reservations():
+    root = good_kea()
+    root['subnet4'][0]['reservations'].extend([
+        {'hw-address': '02:27:01:10:00:02', 'ip-address': '10.23.96.11'},
+        {'hw-address': '02:27:01:20:00:01', 'ip-address': '10.23.96.50'},
+        {'hw-address': '02:27:01:20:00:02', 'ip-address': '10.23.96.51'}])
+    return root
+
+
 def meta(key, val, op='=='):
     return {'match': {'op': op, 'left': {'meta': {'key': key}}, 'right': val}}
 
@@ -55,6 +64,44 @@ class ProbeTests(unittest.TestCase):
     def check_kea(self, root, name):
         with patch.object(p, 'kea', return_value=tree(root)):
             return p.kea_check(name, 'lan0')
+
+    def test_grouped_reservations_require_all_four(self):
+        root = all_reservations()
+        self.assertTrue(self.check_kea(root, 'kea-reserves'))
+        for index in range(4):
+            missing = copy.deepcopy(root)
+            missing['subnet4'][0]['reservations'].pop(index)
+            self.assertFalse(self.check_kea(missing, 'kea-reserves'), index)
+            wrong = copy.deepcopy(root)
+            wrong['subnet4'][0]['reservations'][index]['ip-address'] = '10.23.96.99'
+            self.assertFalse(self.check_kea(wrong, 'kea-reserves'), index)
+
+    def test_grouped_reservations_accept_order_and_format_variants(self):
+        root = all_reservations()
+        root['subnet4'][0]['reservations'].reverse()
+        for indent in (None, 4):
+            text = json.dumps(root, indent=indent)
+            parsed = json.loads(p.uncomment('/* valid reservations */\n' + text))
+            self.assertTrue(self.check_kea(parsed, 'kea-reserves'))
+        root['reservations'] = root['subnet4'][0].pop('reservations')
+        root['reservations-global'] = True
+        self.assertTrue(self.check_kea(root, 'kea-reserves'))
+        root['reservations-global'] = False
+        self.assertFalse(self.check_kea(root, 'kea-reserves'))
+
+    def test_grouped_reservations_reject_crossed_and_conflicting_pairs(self):
+        root = all_reservations()
+        reservations = root['subnet4'][0]['reservations']
+        reservations[0]['ip-address'], reservations[1]['ip-address'] = reservations[1]['ip-address'], reservations[0]['ip-address']
+        self.assertFalse(self.check_kea(root, 'kea-reserves'))
+        root = all_reservations()
+        root['subnet4'][0]['reservations'].append(
+            {'hw-address': '02:27:01:20:00:02', 'ip-address': '10.23.96.99'})
+        self.assertFalse(self.check_kea(root, 'kea-reserves'))
+
+    def test_grouped_reservations_permission_failure_is_technical(self):
+        with patch.object(p, 'kea', side_effect=PermissionError('fixture access denied')):
+            self.assertEqual(p.main(['kea-reserves', 'wan0', 'lan0', '192.168.236.60']), 70)
 
     def test_reservation_format_order_and_whitespace(self):
         for text in ('{"hw-address":"02:27:01:10:00:01","ip-address":"10.23.96.10"}',

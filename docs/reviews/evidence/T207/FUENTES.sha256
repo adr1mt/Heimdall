@@ -1,0 +1,3 @@
+53db7a3287b7b3cfce1932cb4b9ef50ae73480c7adb470bf0ec25910ce149ac7  internal/probe/probe.go
+7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9  internal/probe/ra1.py
+4398e5ae98d8e4a10e5abb27fd8d5bddd824e505e007e27c52b4b832fa9625ea  exams/ra1-dhcp-kea/examen.yaml

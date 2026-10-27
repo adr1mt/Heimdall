@@ -947,3 +947,15 @@ Adrià asigna peso 2 a kea-porta-enllac y kea-dns, y retira client-concessio
 comprobaciones/peso 26. Resto de criterios y ejecución intactos; no se modifica
 el motor ni se evalúa registro o cliente. Copia cargada actualizada por el
 mecanismo nativo de versiones recuperables.
+
+## T207 · 2026-10-27 · Cuatro reservas en una comprobación de peso 2
+
+Adrià agrupa las reservas para reducir la lista del informe. El criterio cerrado
+kea-reserves comprueba las cuatro parejas MAC/IP sobre una misma lectura y el
+mismo ámbito; una ausente o incorrecta hace fallar el criterio completo, sin
+puntos parciales. Se reutilizan las reglas semánticas existentes, manteniendo
+los criterios individuales para sus regresiones históricas. El examen tiene
+19 comprobaciones/peso 24. Se actualiza la revisión SHA-256 del programa y la
+compilación local; no cambia la arquitectura declarativa de ADR-0036, el modelo
+de nota ni ningún otro criterio académico. Originales y versiones recuperables
+conservados; sin publicación remota ni evaluación del alumnado.

@@ -22,6 +22,7 @@ func init() {
 		"net-interna-ip", "net-interna-netplan", "net-interna-sense-gw", "net-sortida", "net-resolucio",
 		"kea-interficie", "kea-subxarxa", "kea-rang-inici", "kea-rang-final", "kea-porta-enllac", "kea-dns",
 		"kea-reserva-mail", "kea-reserva-web", "kea-reserva-impressora1", "kea-reserva-impressora2", "kea-actiu",
+		"kea-reserves",
 		"fwd-actiu", "fwd-persistent", "nft-anada", "nft-retorn", "nft-masquerade", "nft-carregat-masquerade",
 		"nft-carregat-anada", "nft-actiu", "nft-habilitat", "client-concessio",
 	} {

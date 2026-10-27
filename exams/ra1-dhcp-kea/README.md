@@ -3,9 +3,11 @@
 Copia mantenida del examen real de 0227. La copia registrada por el profesor está
 en `/home/adr1/apps/0227/heimdall/ra1-dhcp-kea/examen.yaml`.
 
-Tras el ajuste docente T206, contiene **22 comprobaciones y peso total 26**.
+Tras el ajuste docente T207, contiene **19 comprobaciones y peso total 24**.
 Gateway y DNS DHCP pesan 2 cada uno; se retira el registro de concesiones del
-cliente. Los demás criterios conservan sus IDs y pesos. El alumno recibe nombres
+cliente. Las cuatro reservas se agrupan en «Reserves KEA», de peso 2: deben
+estar las cuatro parejas MAC/IP correctas para aprobar, sin puntuación parcial.
+Los demás criterios conservan sus IDs y pesos. El alumno recibe nombres
 como «Rang KEA · capacitat» o «Xarxa de treball DHCP»; la siguiente tabla es documentación privada del profesor.
 No distribuir este directorio como material de examen.
 
@@ -27,10 +29,7 @@ No distribuir este directorio como material de examen.
 | Rang KEA · capacitat | Pool único 10.23.97.100–10.23.98.93, exactamente 250 direcciones | 2 |
 | Porta d'enllaç DHCP | Opción routers efectiva 10.23.97.1 | 2 |
 | DNS DHCP | Opción domain-name-servers efectiva 9.9.9.9 | 2 |
-| Reserva KEA · correu | Reserva MAC/IP del servidor mail | 1 |
-| Reserva KEA · web | Reserva MAC/IP del servidor web | 1 |
-| Reserva KEA · impressora 1 | Reserva MAC/IP de la impresora 1 | 1 |
-| Reserva KEA · impressora 2 | Reserva MAC/IP de la impresora 2 | 1 |
+| Reserves KEA | Las cuatro reservas MAC/IP de correo, web e impresoras correctas, cada una en su ámbito aplicable | 2 |
 | Servei KEA | Servicio Kea activo | 2 |
 | IP forwarding | Valor activo net.ipv4.ip_forward exactamente 1 | 1 |
 
@@ -56,7 +55,8 @@ Netplan se lee con `netplan get`, por lo que se admite modificar el YAML origina
 o crear otros. Kea se valida con `kea-dhcp4 -t` y se lee por estructura, admitiendo
 propiedades reordenadas, formato compacto, saltos de línea, comentarios,
 inclusiones y comas adicionales. Las reservas solo cuentan dentro de su ámbito
-y asociadas a su propia MAC. Las opciones admiten nombre o código, formato CSV
+y asociadas a su propia MAC. La comprobación agrupada evalúa las cuatro sobre
+una misma lectura: una ausente o incorrecta hace fallar el criterio de peso 2. Las opciones admiten nombre o código, formato CSV
 o hexadecimal e herencia de subred/red compartida/global.
 
 En encaminamiento se comprueba únicamente el valor activo de

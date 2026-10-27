@@ -310,3 +310,8 @@ El artefacto registra el perfil, la revisión y argumentos con el identificador
 repetir su fuente por alumno. El informe individual sigue publicando solo la
 descripción y el resultado. El alcance semántico y sus límites están en la
 documentación privada del examen.
+
+T207 amplía únicamente la lista cerrada de criterios con `kea-reserves`:
+comprueba conjuntamente las cuatro parejas MAC/IP del examen. Es una única
+aserción; si falta o es incorrecta alguna reserva, no obtiene el peso del criterio.
+Los criterios individuales históricos siguen disponibles en el programa fijo.

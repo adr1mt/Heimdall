@@ -38,6 +38,11 @@ func TestProbeResolutionAndVersionGate(t *testing.T) {
 	if c.Cmd[6] != c.Target.IP {
 		t.Fatal("host IP not substituted")
 	}
+	grouped := strings.ReplaceAll(exam, "net-externa-ip", "kea-reserves")
+	groupedPlan, err := Load(project(t, grouped, inv))
+	if err != nil || groupedPlan.Students[0].Checks[0].Cmd[3] != "kea-reserves" {
+		t.Fatalf("grouped reservation criterion not resolved: %v", err)
+	}
 	for _, change := range []struct{ from, to string }{
 		{probe.Revision(), "wrong-revision"},
 		{"net-externa-ip", "unknown-criterion"},

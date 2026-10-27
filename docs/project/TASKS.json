@@ -4584,6 +4584,52 @@
       },
       "completed": "2026-10-27",
       "notes": "Dos pesos cambiados de 1 a 2 y client-concessio retirado con su grupo vacío. 22 comprobaciones y peso 26. Comparación estructural, PLAN ficticio, gates y copia cargada con versiones recuperables correctos. Sin cambios de motor/AppImage ni evaluación real. Evidencia: docs/reviews/evidence/T206/RESULTADOS.md."
+    },
+    {
+      "id": "T207",
+      "title": "Agrupar las cuatro reservas KEA en un criterio de peso 2",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T206"
+      ],
+      "goal": "Reducir la lista pública a una sola comprobación de las cuatro parejas MAC/IP, con peso total 2.",
+      "scope": [
+        "Criterio cerrado kea-reserves que comprueba las cuatro reservas sobre una única lectura estructural.",
+        "Sustituir cuatro criterios por Reserves KEA, peso 2, y actualizar revisión del programa.",
+        "Pruebas positivas, cada reserva ausente o incorrecta, equivalencia de formato y fallos técnicos.",
+        "Actualizar motor/AppImage local y copia cargada con originales conservados."
+      ],
+      "out_of_scope": [
+        "Cambiar los demás objetivos o pesos, admitir scripts en YAML, modificar clases/notas o evaluar alumnado.",
+        "Publicar versiones remotas."
+      ],
+      "acceptance": [
+        "El examen contiene 19 criterios y peso total 24; exactamente una comprobación Reserves KEA de peso 2.",
+        "Las cuatro parejas MAC/IP deben ser correctas; una ausente, cruzada o incorrecta suspende el criterio completo, sin puntos parciales.",
+        "Orden y formato equivalentes siguen aceptándose; fallos técnicos conservan UNEVALUATED.",
+        "Los demás criterios conservan ID, peso, descripción y argumentos, excepto la revisión necesaria del programa fijo.",
+        "PLAN y suites pertinentes correctos; aplicación local y examen cargado actualizados con copias recuperables."
+      ],
+      "tests": [
+        "make check ra1-check",
+        "Pruebas de criterio agregado y PLAN ficticio",
+        "Build del motor y paquete local, revisión del motor empaquetado",
+        "Arnés de editor real"
+      ],
+      "review": {
+        "base": "82d35927ef50f2a2c061328534e6a4554f4104ba",
+        "head": "82d35927ef50f2a2c061328534e6a4554f4104ba",
+        "includes_uncommitted": true,
+        "task_ids": [
+          "T207"
+        ],
+        "report": "docs/reviews/evidence/T207/RESULTADOS.md",
+        "status": "COMPLETE"
+      },
+      "completed": "2026-10-27",
+      "notes": "Reserves KEA, peso 2, exige las cuatro parejas correctas sobre una única lectura. 19 comprobaciones/peso 24. 26 pruebas Python (cada reserva ausente/incorrecta y variantes), Go/race, PLAN ficticio, paquete y editor Electron real correctos. Motor fijo y revisión actualizados; AppImage y copia cargada instalados con originales y versiones recuperables. Reiniciar la aplicación. Sin publicación ni evaluación de aula. Evidencia: docs/reviews/evidence/T207/RESULTADOS.md."
     }
   ]
 }

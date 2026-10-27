@@ -45,7 +45,7 @@ void app.whenReady().then(async () => {
   await js('window.heimdall.writeExam('+JSON.stringify(examPath)+','+JSON.stringify(yaml)+')')
   assert.equal(readFileSync(examPath,'utf8'),yaml)
   assert.equal(await js('window.heimdall.readExam('+JSON.stringify(examPath)+')'),yaml)
-  console.log('T204 GUI OK: real renderer, sandboxed preload, packaged engine; 31 fixed profiles validate and save exactly, without a class. Fictional data only.')
+  console.log('RA1 GUI OK: real renderer, sandboxed preload, packaged engine; fixed profiles validate and save exactly, without a class. Fictional data only.')
  } catch(err) {console.error(err);process.exitCode=1}
  finally {win?.destroy();app.exit(process.exitCode??0)}
 })

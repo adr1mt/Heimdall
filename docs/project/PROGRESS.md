@@ -5,12 +5,12 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T206:** RA1 queda en 22 criterios/peso 26: gateway y DNS DHCP pesan 2;
-retirada la concesión del registro. Se mantiene solo ip_forward en encaminamiento.
-Copia cargada y versiones recuperables actualizadas. [Evidencia](../reviews/evidence/T206/RESULTADOS.md).
+**T207:** RA1: 19 criterios/peso 24; «Reserves KEA» agrupa las cuatro parejas
+MAC/IP con peso 2, sin puntos parciales. Examen y AppImage locales actualizados;
+reiniciar Heimdall. Originales conservados. [Evidencia](../reviews/evidence/T207/RESULTADOS.md).
 
 **T204 (histórico):** reparación semántica de RA1 (31 criterios/peso 35).
-Selección, nombres y pesos vigentes ajustados después en T205/T206.
+Selección, nombres y pesos vigentes ajustados después en T205/T206/T207.
 Comprobador fijo versionado (ADR-0036); fallo técnico sin suspenso. Laboratorio
 real 31/31, 29 variantes, SSH 100/100 y sin Python sin nota; 22 pruebas Python,
 583 GUI, Go/race y editor real correctos. AppImage local reemplazado, originales
@@ -19,7 +19,7 @@ y versiones recuperables conservados. Cerrar/abrir Heimdall para cargarlo.
 **T203:** validar/guardar sin clase e Inicio con nombre actualizado; incluida en
 la compilación local. [Evidencia](../reviews/evidence/T203/RESULTADOS.md).
 **T187:** éxitos verdes 5 s y errores persistentes; incluida en compilación local.
-[Evidencia](../reviews/evidence/T187/RESULTADOS.md). T187/T203/T204/T205/T206 sin publicar.
+[Evidencia](../reviews/evidence/T187/RESULTADOS.md). T187/T203/T204/T205/T206/T207 sin publicar.
 Auditoría anterior autorizada por Adrià:
 - **T194:** nota final completa aunque quede un diagnóstico sin peso.
 - **T195/T196:** clases e informes privados; originales/enlaces conservados.

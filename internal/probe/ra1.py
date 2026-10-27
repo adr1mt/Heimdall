@@ -228,7 +228,7 @@ def kea_check(criterion, internal):
              'kea-reserva-web': ('02:27:01:10:00:02', '10.23.96.11'),
              'kea-reserva-impressora1': ('02:27:01:20:00:01', '10.23.96.50'),
              'kea-reserva-impressora2': ('02:27:01:20:00:02', '10.23.96.51')}
-    mac, address = pairs[criterion]
+    required_pairs = pairs.values() if criterion == 'kea-reserves' else (pairs[criterion],)
     if 'hw-address' not in root.get('host-reservation-identifiers', ['hw-address']):
         return False
     reservations = []
@@ -238,8 +238,11 @@ def kea_check(criterion, internal):
         reservations.extend(root.get('reservations', []))
     def normalized_mac(value):
         return ':'.join(f'{int(x, 16):02x}' for x in value.strip().split(':')) if value else ''
-    matching = [r for r in reservations if normalized_mac(r.get('hw-address', '')) == mac]
-    return bool(matching) and all(r.get('ip-address') == address for r in matching)
+    for mac, address in required_pairs:
+        matching = [r for r in reservations if normalized_mac(r.get('hw-address', '')) == mac]
+        if not matching or any(r.get('ip-address') != address for r in matching):
+            return False
+    return True
 
 
 def interface_config(config, interface, links):
