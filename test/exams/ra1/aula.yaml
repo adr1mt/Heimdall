@@ -1,0 +1,19 @@
+aula: Laboratorio ficticio RA1
+version: 1
+comun:
+  hosts:
+    host1:
+      puerto: 2299
+      usuario: prueba
+      password_ref: "${AULA_PASSWORD}"
+  timeouts:
+    conexion: 10s
+    alumno: 2m
+alumnos:
+- id: qa-ra1
+  nombre: Alumno ficticio RA1
+  if_ext: enp1s0
+  if_int: enp2s0
+  hosts:
+    host1:
+      ip: 127.1.2.3

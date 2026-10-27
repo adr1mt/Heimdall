@@ -257,7 +257,7 @@ func (e *Exam) applyDefaults() {
 			check := &e.Groups[g].Checks[c]
 			// A valor: check runs nothing, so a default sudo does not reach it;
 			// only one the teacher wrote on the check itself is an error.
-			if check.Sudo == nil && e.Defaults.Sudo != nil && len(check.Cmd) > 0 {
+			if check.Sudo == nil && e.Defaults.Sudo != nil && (len(check.Cmd) > 0 || len(check.Probe) > 0) {
 				sudo := *e.Defaults.Sudo
 				check.Sudo = &sudo
 			}

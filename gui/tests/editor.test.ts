@@ -281,3 +281,26 @@ it.each(['0','0.5','1'])('preserves numeric weight %s in open/save cycle',(peso)
  expect(parse(examYaml(exam))).toEqual(exam)
  expect(examYaml(exam)).toContain(`peso: ${peso}`)
 })
+
+it('preserves bounded checker profiles through the visual editor', () => {
+  const yaml = `examen: RA1
+version: 1
+hosts: [host1]
+grupos:
+- grupo: DHCP
+  comprobaciones:
+  - id: reserva
+    descripcion: DHCP · 01
+    en: host1
+    sudo: true
+    comprobador: [ra1-dhcp, revision, kea-reserva-mail, wan0, lan0, "192.168.236.60"]
+    igual_a: OK
+`
+  const exam = parse(yaml)
+  expect(exam.grupos[0].comprobaciones[0].cmd[0]).toBe('heimdall:comprobador')
+  const written = examYaml(exam)
+  expect(written).toContain('comprobador:')
+  expect(written).not.toContain('cmd:')
+  expect(parse(written)).toEqual(exam)
+  expect(readExam(yaml.replace('    igual_a:', '    cmd: [hostname]\n    igual_a:'))).toHaveProperty('problem')
+})

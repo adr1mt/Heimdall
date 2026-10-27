@@ -1,0 +1,1481 @@
+{
+  "schema_version": 1,
+  "run_id": "01M5Z4ZS5KFBVH8G2M7Y2SW8CX",
+  "engine_version": "1.0.1",
+  "started_at": "2026-10-27T18:02:07.539422464+01:00",
+  "finished_at": "2026-10-27T18:02:09.854754064+01:00",
+  "status": "PARTIAL",
+  "exam": {
+    "path": "/tmp/heimdall-ra1-ssh/examen.yaml",
+    "sha256": "b6164793f7ebb2292fa89fe7888bfe7d61f66894208c9df3b209a2e71919fd05",
+    "version": "1"
+  },
+  "inventory": {
+    "path": "/tmp/heimdall-ra1-ssh/aula.yaml",
+    "sha256": "20e00069259df35d9eaf0e6998cd159237ec363a94d8d7c1f25bd5ecb4210940",
+    "version": "1"
+  },
+  "plan_hash": "16aef69a95bd88aad4d8dd3b1a4336578c22dd38ece69b7849b41ec2cb3cc3ac",
+  "plan": {
+    "evidence_bytes_per_field": 65536,
+    "check_count": 31,
+    "total_weight": 35,
+    "check_ids": [
+      "net-externa-ip",
+      "net-externa-estatica",
+      "net-externa-netplan",
+      "net-externa-gw",
+      "net-externa-dns",
+      "net-interna-ip",
+      "net-interna-netplan",
+      "net-interna-sense-gw",
+      "net-sortida",
+      "net-resolucio",
+      "kea-interficie",
+      "kea-subxarxa",
+      "kea-rang-inici",
+      "kea-rang-final",
+      "kea-porta-enllac",
+      "kea-dns",
+      "kea-reserva-mail",
+      "kea-reserva-web",
+      "kea-reserva-impressora1",
+      "kea-reserva-impressora2",
+      "kea-actiu",
+      "fwd-actiu",
+      "fwd-persistent",
+      "nft-anada",
+      "nft-retorn",
+      "nft-masquerade",
+      "nft-carregat-masquerade",
+      "nft-carregat-anada",
+      "nft-actiu",
+      "nft-habilitat",
+      "client-concessio"
+    ],
+    "concurrency": 16,
+    "host_concurrency": 4
+  },
+  "students": [
+    {
+      "student_id": "qa-ra1",
+      "name": "Alumno ficticio RA1",
+      "status": "NOT_EVALUATED",
+      "started_at": "2026-10-27T18:02:07.539620494+01:00",
+      "finished_at": "2026-10-27T18:02:09.851911201+01:00",
+      "score": {
+        "obtained": 0,
+        "evaluable": 0,
+        "total": 35,
+        "unevaluated": 35,
+        "provisional_score": null,
+        "final_score": null,
+        "status": "NOT_EVALUATED"
+      },
+      "checks": [
+        {
+          "check_id": "net-externa-ip",
+          "group": "Xarxa",
+          "description": "Xarxa · 01",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-externa-ip",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:07.668859487+01:00",
+            "duration_ms": 66,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "net-externa-estatica",
+          "group": "Xarxa",
+          "description": "Xarxa · 02",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-externa-estatica",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:07.73571904+01:00",
+            "duration_ms": 70,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "net-externa-netplan",
+          "group": "Xarxa",
+          "description": "Xarxa · 03",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-externa-netplan",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:07.805759073+01:00",
+            "duration_ms": 66,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "net-externa-gw",
+          "group": "Xarxa",
+          "description": "Xarxa · 04",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-externa-gw",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:07.871842944+01:00",
+            "duration_ms": 69,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "net-externa-dns",
+          "group": "Xarxa",
+          "description": "Xarxa · 05",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-externa-dns",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:07.941396939+01:00",
+            "duration_ms": 71,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "net-interna-ip",
+          "group": "Xarxa",
+          "description": "Xarxa · 06",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-interna-ip",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:08.012500238+01:00",
+            "duration_ms": 74,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "net-interna-netplan",
+          "group": "Xarxa",
+          "description": "Xarxa · 07",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-interna-netplan",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:08.087058188+01:00",
+            "duration_ms": 66,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "net-interna-sense-gw",
+          "group": "Xarxa",
+          "description": "Xarxa · 08",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-interna-sense-gw",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:08.153572884+01:00",
+            "duration_ms": 68,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "net-sortida",
+          "group": "Xarxa",
+          "description": "Xarxa · 09",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-sortida",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:08.222532996+01:00",
+            "duration_ms": 68,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "net-resolucio",
+          "group": "Xarxa",
+          "description": "Xarxa · 10",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-resolucio",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:08.291485038+01:00",
+            "duration_ms": 64,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "kea-interficie",
+          "group": "DHCP",
+          "description": "DHCP · 01",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-interficie",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:08.356190246+01:00",
+            "duration_ms": 65,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "kea-subxarxa",
+          "group": "DHCP",
+          "description": "DHCP · 02",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-subxarxa",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:08.421581711+01:00",
+            "duration_ms": 65,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "kea-rang-inici",
+          "group": "DHCP",
+          "description": "DHCP · 03",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-rang-inici",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:08.486685747+01:00",
+            "duration_ms": 72,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "kea-rang-final",
+          "group": "DHCP",
+          "description": "DHCP · 04",
+          "weight": 2,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-rang-final",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:08.559426496+01:00",
+            "duration_ms": 83,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "kea-porta-enllac",
+          "group": "DHCP",
+          "description": "DHCP · 05",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-porta-enllac",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:08.643258367+01:00",
+            "duration_ms": 68,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "kea-dns",
+          "group": "DHCP",
+          "description": "DHCP · 06",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-dns",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:08.711846228+01:00",
+            "duration_ms": 75,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "kea-reserva-mail",
+          "group": "DHCP",
+          "description": "DHCP · 07",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-reserva-mail",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:08.787439834+01:00",
+            "duration_ms": 64,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "kea-reserva-web",
+          "group": "DHCP",
+          "description": "DHCP · 08",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-reserva-web",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:08.851633169+01:00",
+            "duration_ms": 69,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "kea-reserva-impressora1",
+          "group": "DHCP",
+          "description": "DHCP · 09",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-reserva-impressora1",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:08.921426309+01:00",
+            "duration_ms": 71,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "kea-reserva-impressora2",
+          "group": "DHCP",
+          "description": "DHCP · 10",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-reserva-impressora2",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:08.992888081+01:00",
+            "duration_ms": 72,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "kea-actiu",
+          "group": "DHCP",
+          "description": "DHCP · 11",
+          "weight": 2,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-actiu",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:09.065431982+01:00",
+            "duration_ms": 71,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "fwd-actiu",
+          "group": "Encaminament",
+          "description": "Encaminament · 01",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "fwd-actiu",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:09.137207112+01:00",
+            "duration_ms": 68,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "fwd-persistent",
+          "group": "Encaminament",
+          "description": "Encaminament · 02",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "fwd-persistent",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:09.205524489+01:00",
+            "duration_ms": 66,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "nft-anada",
+          "group": "Encaminament",
+          "description": "Encaminament · 03",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "nft-anada",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:09.271649496+01:00",
+            "duration_ms": 70,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "nft-retorn",
+          "group": "Encaminament",
+          "description": "Encaminament · 04",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "nft-retorn",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:09.342397474+01:00",
+            "duration_ms": 75,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "nft-masquerade",
+          "group": "Encaminament",
+          "description": "Encaminament · 05",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "nft-masquerade",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:09.417482507+01:00",
+            "duration_ms": 65,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "nft-carregat-masquerade",
+          "group": "Encaminament",
+          "description": "Encaminament · 06",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "nft-carregat-masquerade",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:09.483456676+01:00",
+            "duration_ms": 69,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "nft-carregat-anada",
+          "group": "Encaminament",
+          "description": "Encaminament · 07",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "nft-carregat-anada",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:09.55276042+01:00",
+            "duration_ms": 69,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "nft-actiu",
+          "group": "Encaminament",
+          "description": "Encaminament · 08",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "nft-actiu",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:09.622332492+01:00",
+            "duration_ms": 70,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "nft-habilitat",
+          "group": "Encaminament",
+          "description": "Encaminament · 09",
+          "weight": 1,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "nft-habilitat",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:09.692830424+01:00",
+            "duration_ms": 86,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        },
+        {
+          "check_id": "client-concessio",
+          "group": "Client",
+          "description": "Client · 01",
+          "weight": 3,
+          "status": "UNEVALUATED",
+          "cause": "ENGINE_ERROR",
+          "detail": "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "client-concessio",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T18:02:09.779063256+01:00",
+            "duration_ms": 72,
+            "completed": true,
+            "exit_code": 127,
+            "overflow": false,
+            "stdout": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "heimdall-command: 1: python3: not found\n",
+              "bytes": 40,
+              "bytes_total": 40,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": null
+        }
+      ]
+    }
+  ],
+  "warnings": [
+    {
+      "scope": "student:qa-ra1/host:host1",
+      "code": "HOST_KEY_ACCEPTED",
+      "message": "la identidad de 127.1.2.3:2299 se ha aceptado y anotado para esta ejecución: SHA256:xfM1fk68aG0l8rm1xeLNdvENGzR1Ix9+GbxB2rvd5us"
+    }
+  ]
+}

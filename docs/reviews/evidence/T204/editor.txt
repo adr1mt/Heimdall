@@ -1,0 +1,1 @@
+T204 GUI OK: real renderer, sandboxed preload, packaged engine; 31 fixed profiles validate and save exactly, without a class. Fictional data only.

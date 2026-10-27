@@ -917,3 +917,15 @@ ADR-0035 añade `check --exam-only` para validar y guardar el examen sin consult
 clases. Comparte reglas con el PLAN, admite campos del alumnado pendientes y
 rechaza errores propios del examen. La resolución completa de examen × aula
 sigue siendo obligatoria antes de corregir.
+
+## T204 · 2026-10-27 · Corrección semántica del examen RA1
+
+ADR-0036: perfil nativo cerrado `ra1-dhcp`, con revisión SHA-256 del programa
+incorporado, argumentos literales y 31 criterios conocidos. El examen sigue
+siendo declarativo, sin fuente Python ni shell del profesor. Fallos del
+comprobador se clasifican antes de la aserción, sin modificar Classify ni los
+comandos ordinarios. Programa remoto aislado (`python3 -I`); nftables guardado se
+carga únicamente en un espacio de red privado del proceso. IDs y peso 35
+conservados, descripciones públicas neutras. Copia cargada y AppImage local
+actualizados con originales y versiones recuperables; sin publicación ni aula.
+Evidencia: docs/reviews/evidence/T204/RESULTADOS.md. T070/T084 siguen pendientes.

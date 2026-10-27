@@ -288,3 +288,25 @@ inválida** (F-02, F-06, C-14):
 Cuando todo pasa, el PLAN publica: número de comprobaciones, peso total, hash
 del examen, hash del inventario y lista de alumnos. Ese número es el que la GUI
 ya no tendrá que adivinar (`c14-check`).
+
+## Comprobador cerrado del examen RA1 (ADR-0036)
+
+`comprobador:` es alternativa a `cmd:` y `valor:`. Su lista contiene exactamente
+seis textos: `ra1-dhcp`, SHA-256 de la revisión del programa fijo del motor,
+criterio conocido, interfaz externa, interfaz interna e IP de examen. No hay
+código del profesor, rutas de scripts ni expresiones en ese campo. El examen
+mantenido en [exams/ra1-dhcp-kea](../../exams/ra1-dhcp-kea/README.md) contiene la
+revisión correcta. El PLAN rechaza otra revisión antes de abrir conexiones.
+
+Se aplican `en:`, `sudo:`, `peso:` y `timeout:` como en un comando. Las tres
+últimas posiciones permiten las referencias habituales del alumnado y hosts.
+La aserción es obligatoriamente `igual_a: OK`; una respuesta académica del
+programa es OK o FAIL. Cualquier otra respuesta, dependencia o permiso ausente
+es un error técnico sin nota final, no un suspenso. Los comandos ordinarios
+conservan sus reglas, sin códigos de salida técnicos añadidos de forma global.
+
+El artefacto registra el perfil, la revisión y argumentos con el identificador
+`heimdall:comprobador`. Esa revisión identifica el programa incorporado sin
+repetir su fuente por alumno. El informe individual sigue publicando solo la
+descripción y el resultado. El alcance semántico y sus límites están en la
+documentación privada del examen.

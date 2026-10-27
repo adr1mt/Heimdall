@@ -129,6 +129,7 @@ suite se ejecuta aparte.
 | Leer resultados | [CLI](../cmd/heimdall/artifact.go), [lector GUI](../gui/src/main/artifact.ts) | [lector](../gui/tests/artifact-reader.test.ts), ADR-0027 |
 | Informe individual del alumno | [HTML](../gui/src/renderer/src/lib/report.ts), [escala](../gui/src/renderer/src/lib/scale.ts) | [pruebas](../gui/tests/report.test.ts), [ejemplos y verificación](reviews/evidence/T193/RESULTADOS.md), ADR-0031 |
 | Validar resultados | [JSON Go](../internal/model/validate_json.go), [modelo Go](../internal/model/validate.go), [GUI](../gui/src/shared/artifact.ts) | [corpus compartido](../testdata/artifacts/corpus.json), [Go](../cmd/heimdall/artifact_corpus_test.go), [GUI](../gui/tests/artifact-corpus.test.ts) |
+| Comprobar el examen RA1 | [perfil fijo](../internal/probe/probe.go), [programa remoto](../internal/probe/ra1.py), [examen](../exams/ra1-dhcp-kea/README.md) | [laboratorio y pruebas](../test/exams/ra1/README.md), ADR-0036; `make ra1-check` |
 | Copiar, retener, recuperar | [backup.ts](../gui/src/main/backup.ts), incluye `BackupChain` | [copias](../gui/tests/backups.test.ts), [recuperación](../gui/tests/backup-recovery.test.ts), ADR-0026 |
 | Reintentar y consolidar | [reintentos](../cmd/heimdall/retry.go), [consolidación](../cmd/heimdall/consolidate.go) | ADR-0018 y ADR-0019 |
 | Sesión de examen | [CLI](../cmd/heimdall/session.go), [GUI](../gui/src/main/session.ts) | ADR-0020; arnés `gui/scripts/examen-lab.ts` |

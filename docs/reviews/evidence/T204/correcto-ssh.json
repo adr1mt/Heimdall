@@ -1,0 +1,1605 @@
+{
+  "schema_version": 1,
+  "run_id": "01M5Z4VHFN6TS7ST9S64XCDGTM",
+  "engine_version": "1.0.1",
+  "started_at": "2026-10-27T17:59:48.598347797+01:00",
+  "finished_at": "2026-10-27T17:59:54.441161806+01:00",
+  "status": "COMPLETE",
+  "exam": {
+    "path": "/tmp/heimdall-ra1-ssh/examen.yaml",
+    "sha256": "b6164793f7ebb2292fa89fe7888bfe7d61f66894208c9df3b209a2e71919fd05",
+    "version": "1"
+  },
+  "inventory": {
+    "path": "/tmp/heimdall-ra1-ssh/aula.yaml",
+    "sha256": "20e00069259df35d9eaf0e6998cd159237ec363a94d8d7c1f25bd5ecb4210940",
+    "version": "1"
+  },
+  "plan_hash": "16aef69a95bd88aad4d8dd3b1a4336578c22dd38ece69b7849b41ec2cb3cc3ac",
+  "plan": {
+    "evidence_bytes_per_field": 65536,
+    "check_count": 31,
+    "total_weight": 35,
+    "check_ids": [
+      "net-externa-ip",
+      "net-externa-estatica",
+      "net-externa-netplan",
+      "net-externa-gw",
+      "net-externa-dns",
+      "net-interna-ip",
+      "net-interna-netplan",
+      "net-interna-sense-gw",
+      "net-sortida",
+      "net-resolucio",
+      "kea-interficie",
+      "kea-subxarxa",
+      "kea-rang-inici",
+      "kea-rang-final",
+      "kea-porta-enllac",
+      "kea-dns",
+      "kea-reserva-mail",
+      "kea-reserva-web",
+      "kea-reserva-impressora1",
+      "kea-reserva-impressora2",
+      "kea-actiu",
+      "fwd-actiu",
+      "fwd-persistent",
+      "nft-anada",
+      "nft-retorn",
+      "nft-masquerade",
+      "nft-carregat-masquerade",
+      "nft-carregat-anada",
+      "nft-actiu",
+      "nft-habilitat",
+      "client-concessio"
+    ],
+    "concurrency": 16,
+    "host_concurrency": 4
+  },
+  "students": [
+    {
+      "student_id": "qa-ra1",
+      "name": "Alumno ficticio RA1",
+      "status": "OK",
+      "started_at": "2026-10-27T17:59:48.598777175+01:00",
+      "finished_at": "2026-10-27T17:59:54.436243492+01:00",
+      "score": {
+        "obtained": 35,
+        "evaluable": 35,
+        "total": 35,
+        "unevaluated": 0,
+        "provisional_score": 100,
+        "final_score": 100,
+        "status": "COMPLETE"
+      },
+      "checks": [
+        {
+          "check_id": "net-externa-ip",
+          "group": "Xarxa",
+          "description": "Xarxa · 01",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-externa-ip",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:48.857662056+01:00",
+            "duration_ms": 574,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "net-externa-estatica",
+          "group": "Xarxa",
+          "description": "Xarxa · 02",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-externa-estatica",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:49.431721773+01:00",
+            "duration_ms": 505,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "net-externa-netplan",
+          "group": "Xarxa",
+          "description": "Xarxa · 03",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-externa-netplan",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:49.937656394+01:00",
+            "duration_ms": 359,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "net-externa-gw",
+          "group": "Xarxa",
+          "description": "Xarxa · 04",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-externa-gw",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:50.297440968+01:00",
+            "duration_ms": 255,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "net-externa-dns",
+          "group": "Xarxa",
+          "description": "Xarxa · 05",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-externa-dns",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:50.553136305+01:00",
+            "duration_ms": 279,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "net-interna-ip",
+          "group": "Xarxa",
+          "description": "Xarxa · 06",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-interna-ip",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:50.832347768+01:00",
+            "duration_ms": 200,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "net-interna-netplan",
+          "group": "Xarxa",
+          "description": "Xarxa · 07",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-interna-netplan",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:51.032578891+01:00",
+            "duration_ms": 232,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "net-interna-sense-gw",
+          "group": "Xarxa",
+          "description": "Xarxa · 08",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-interna-sense-gw",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:51.265291029+01:00",
+            "duration_ms": 193,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "net-sortida",
+          "group": "Xarxa",
+          "description": "Xarxa · 09",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-sortida",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:51.458437477+01:00",
+            "duration_ms": 113,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "net-resolucio",
+          "group": "Xarxa",
+          "description": "Xarxa · 10",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "net-resolucio",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:51.572198389+01:00",
+            "duration_ms": 105,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "kea-interficie",
+          "group": "DHCP",
+          "description": "DHCP · 01",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-interficie",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:51.677912619+01:00",
+            "duration_ms": 141,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "kea-subxarxa",
+          "group": "DHCP",
+          "description": "DHCP · 02",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-subxarxa",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:51.819655418+01:00",
+            "duration_ms": 126,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "kea-rang-inici",
+          "group": "DHCP",
+          "description": "DHCP · 03",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-rang-inici",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:51.946217467+01:00",
+            "duration_ms": 124,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "kea-rang-final",
+          "group": "DHCP",
+          "description": "DHCP · 04",
+          "weight": 2,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-rang-final",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:52.070638806+01:00",
+            "duration_ms": 127,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "kea-porta-enllac",
+          "group": "DHCP",
+          "description": "DHCP · 05",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-porta-enllac",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:52.198612175+01:00",
+            "duration_ms": 134,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "kea-dns",
+          "group": "DHCP",
+          "description": "DHCP · 06",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-dns",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:52.332843144+01:00",
+            "duration_ms": 120,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "kea-reserva-mail",
+          "group": "DHCP",
+          "description": "DHCP · 07",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-reserva-mail",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:52.452969053+01:00",
+            "duration_ms": 127,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "kea-reserva-web",
+          "group": "DHCP",
+          "description": "DHCP · 08",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-reserva-web",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:52.580320718+01:00",
+            "duration_ms": 164,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "kea-reserva-impressora1",
+          "group": "DHCP",
+          "description": "DHCP · 09",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-reserva-impressora1",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:52.744597298+01:00",
+            "duration_ms": 168,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "kea-reserva-impressora2",
+          "group": "DHCP",
+          "description": "DHCP · 10",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-reserva-impressora2",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:52.913455192+01:00",
+            "duration_ms": 131,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "kea-actiu",
+          "group": "DHCP",
+          "description": "DHCP · 11",
+          "weight": 2,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "kea-actiu",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:53.044693462+01:00",
+            "duration_ms": 142,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "fwd-actiu",
+          "group": "Encaminament",
+          "description": "Encaminament · 01",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "fwd-actiu",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:53.186869078+01:00",
+            "duration_ms": 109,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "fwd-persistent",
+          "group": "Encaminament",
+          "description": "Encaminament · 02",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "fwd-persistent",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:53.296231428+01:00",
+            "duration_ms": 149,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "nft-anada",
+          "group": "Encaminament",
+          "description": "Encaminament · 03",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "nft-anada",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:53.445412705+01:00",
+            "duration_ms": 151,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "nft-retorn",
+          "group": "Encaminament",
+          "description": "Encaminament · 04",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "nft-retorn",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:53.597263277+01:00",
+            "duration_ms": 123,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "nft-masquerade",
+          "group": "Encaminament",
+          "description": "Encaminament · 05",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "nft-masquerade",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:53.720797914+01:00",
+            "duration_ms": 128,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "nft-carregat-masquerade",
+          "group": "Encaminament",
+          "description": "Encaminament · 06",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "nft-carregat-masquerade",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:53.849224253+01:00",
+            "duration_ms": 110,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "nft-carregat-anada",
+          "group": "Encaminament",
+          "description": "Encaminament · 07",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "nft-carregat-anada",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:53.959581142+01:00",
+            "duration_ms": 119,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "nft-actiu",
+          "group": "Encaminament",
+          "description": "Encaminament · 08",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "nft-actiu",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:54.079049002+01:00",
+            "duration_ms": 112,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "nft-habilitat",
+          "group": "Encaminament",
+          "description": "Encaminament · 09",
+          "weight": 1,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "nft-habilitat",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:54.191246026+01:00",
+            "duration_ms": 123,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        },
+        {
+          "check_id": "client-concessio",
+          "group": "Client",
+          "description": "Client · 01",
+          "weight": 3,
+          "status": "PASS",
+          "cause": "NONE",
+          "execution": {
+            "host": "host1",
+            "address": "127.1.2.3:2299",
+            "user": "prueba",
+            "transport": "ssh",
+            "command": [
+              "heimdall:comprobador",
+              "ra1-dhcp",
+              "d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe",
+              "client-concessio",
+              "enp1s0",
+              "enp2s0",
+              "192.168.236.60"
+            ],
+            "started_at": "2026-10-27T17:59:54.314282386+01:00",
+            "duration_ms": 121,
+            "completed": true,
+            "exit_code": 0,
+            "overflow": false,
+            "stdout": {
+              "text": "OK\n",
+              "bytes": 3,
+              "bytes_total": 3,
+              "truncated": false
+            },
+            "stderr": {
+              "text": "",
+              "bytes": 0,
+              "bytes_total": 0,
+              "truncated": false
+            },
+            "connect_attempts": 1,
+            "command_attempts": 1,
+            "remote_process": "FINISHED"
+          },
+          "assertion": {
+            "kind": "equals",
+            "expected": "OK",
+            "found": "OK",
+            "matched": true
+          }
+        }
+      ]
+    }
+  ],
+  "warnings": [
+    {
+      "scope": "student:qa-ra1/host:host1",
+      "code": "HOST_KEY_ACCEPTED",
+      "message": "la identidad de 127.1.2.3:2299 se ha aceptado y anotado para esta ejecución: SHA256:xfM1fk68aG0l8rm1xeLNdvENGzR1Ix9+GbxB2rvd5us"
+    }
+  ]
+}

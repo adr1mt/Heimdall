@@ -93,6 +93,7 @@ func referenceParts(ref string) (kind, name string, err error) {
 
 func validateCheckReferences(check Check, declared map[string]bool) error {
 	values := append([]string{check.Value}, check.Cmd...)
+	values = append(values, check.Probe...)
 	for _, value := range []*string{check.Contains, check.NotContains, check.Equals} {
 		if value != nil {
 			values = append(values, *value)

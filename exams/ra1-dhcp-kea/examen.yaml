@@ -1,0 +1,362 @@
+# Comprobador fijo y versionado. Véase README.md; sin código ejecutable en el examen.
+examen: 0227 · RA1 · DHCP amb Kea per a 250 equips
+version: 1
+hosts:
+- host1
+por_defecto:
+  peso: 1
+  timeout: 20s
+  sudo: true
+grupos:
+- grupo: Xarxa
+  comprobaciones:
+  - id: net-externa-ip
+    descripcion: Xarxa · 01
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - net-externa-ip
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: net-externa-estatica
+    descripcion: Xarxa · 02
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - net-externa-estatica
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: net-externa-netplan
+    descripcion: Xarxa · 03
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - net-externa-netplan
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: net-externa-gw
+    descripcion: Xarxa · 04
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - net-externa-gw
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: net-externa-dns
+    descripcion: Xarxa · 05
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - net-externa-dns
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: net-interna-ip
+    descripcion: Xarxa · 06
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - net-interna-ip
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: net-interna-netplan
+    descripcion: Xarxa · 07
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - net-interna-netplan
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: net-interna-sense-gw
+    descripcion: Xarxa · 08
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - net-interna-sense-gw
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: net-sortida
+    descripcion: Xarxa · 09
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - net-sortida
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: net-resolucio
+    descripcion: Xarxa · 10
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - net-resolucio
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+- grupo: DHCP
+  comprobaciones:
+  - id: kea-interficie
+    descripcion: DHCP · 01
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - kea-interficie
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: kea-subxarxa
+    descripcion: DHCP · 02
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - kea-subxarxa
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: kea-rang-inici
+    descripcion: DHCP · 03
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - kea-rang-inici
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: kea-rang-final
+    descripcion: DHCP · 04
+    en: host1
+    peso: 2
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - kea-rang-final
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: kea-porta-enllac
+    descripcion: DHCP · 05
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - kea-porta-enllac
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: kea-dns
+    descripcion: DHCP · 06
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - kea-dns
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: kea-reserva-mail
+    descripcion: DHCP · 07
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - kea-reserva-mail
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: kea-reserva-web
+    descripcion: DHCP · 08
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - kea-reserva-web
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: kea-reserva-impressora1
+    descripcion: DHCP · 09
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - kea-reserva-impressora1
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: kea-reserva-impressora2
+    descripcion: DHCP · 10
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - kea-reserva-impressora2
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: kea-actiu
+    descripcion: DHCP · 11
+    en: host1
+    peso: 2
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - kea-actiu
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+- grupo: Encaminament
+  comprobaciones:
+  - id: fwd-actiu
+    descripcion: Encaminament · 01
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - fwd-actiu
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: fwd-persistent
+    descripcion: Encaminament · 02
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - fwd-persistent
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: nft-anada
+    descripcion: Encaminament · 03
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - nft-anada
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: nft-retorn
+    descripcion: Encaminament · 04
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - nft-retorn
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: nft-masquerade
+    descripcion: Encaminament · 05
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - nft-masquerade
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: nft-carregat-masquerade
+    descripcion: Encaminament · 06
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - nft-carregat-masquerade
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: nft-carregat-anada
+    descripcion: Encaminament · 07
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - nft-carregat-anada
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: nft-actiu
+    descripcion: Encaminament · 08
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - nft-actiu
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+  - id: nft-habilitat
+    descripcion: Encaminament · 09
+    en: host1
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - nft-habilitat
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK
+- grupo: Client
+  comprobaciones:
+  - id: client-concessio
+    descripcion: Client · 01
+    en: host1
+    peso: 3
+    comprobador:
+    - ra1-dhcp
+    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
+    - client-concessio
+    - ${alumno.if_ext}
+    - ${alumno.if_int}
+    - ${host1.ip}
+    igual_a: OK

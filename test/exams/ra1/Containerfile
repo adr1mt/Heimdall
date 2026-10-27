@@ -1,0 +1,9 @@
+FROM docker.io/library/ubuntu:26.04
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 python3-yaml kea-dhcp4-server netplan.io nftables iproute2 \
+    systemd systemd-sysv systemd-resolved dbus openssh-server sudo busybox procps && \
+    rm -rf /var/lib/apt/lists/* && mkdir -p /run/sshd && \
+    useradd -m -s /bin/bash prueba && echo 'prueba:RA1_TEST_ONLY_827' | chpasswd && \
+    usermod -aG sudo prueba && ssh-keygen -A && systemctl enable ssh
+CMD ["/sbin/init"]

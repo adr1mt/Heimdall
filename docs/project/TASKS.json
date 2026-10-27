@@ -4450,6 +4450,53 @@
       ],
       "completed": "2026-10-22",
       "notes": "ADR-0035: check --exam-only comparte reglas y referencias con el PLAN, sin leer aulas; editor e IPC sin clases. Guardado exacto y copias conservadas, errores propios del examen visibles. Inicio deriva el nombre actual del fichero. 582 pruebas GUI, tipos/build, make check/build, race plan/CLI, docs/tools y arnés Electron real correctos. Pruebas de procesos locales y arnés fuera del aislamiento por EPERM/timeouts; sin aula real ni publicación. Evidencia: docs/reviews/evidence/T203/RESULTADOS.md."
+    },
+    {
+      "id": "T204",
+      "title": "Corregir el examen RA1 con comprobaciones semánticas y nombres neutros",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Corregir el examen real RA1 sin penalizar formatos equivalentes ni convertir fallos del corrector en suspensos.",
+      "scope": [
+        "Comprobador nativo acotado para los 31 criterios existentes; programa remoto fijo, sin código en YAML.",
+        "Leer Kea como estructura, Netplan combinado y activo, sysctl efectivo y reglas nftables estructuradas.",
+        "Conservar IDs y pesos, neutralizar descripciones y documentar cobertura del cliente.",
+        "Pruebas positivas, negativas, fallos técnicos y laboratorio aislado; actualizar copia cargada con original conservado."
+      ],
+      "out_of_scope": [
+        "Cambiar el enunciado, publicar versiones remotas o corregir alumnado real.",
+        "Dar por verificados datos del cliente inaccesible o cualquier expresión nftables no soportada."
+      ],
+      "acceptance": [
+        "El examen conserva 31 criterios, sus IDs y peso total 35; nombres visibles sin valores ni pistas de solución.",
+        "Reservas equivalentes en una línea, reordenadas o multilínea aprueban; comentarios y parejas cruzadas no.",
+        "Netplan permite uno o varios YAML y contrasta persistencia con estado activo.",
+        "Kea exige interfaz exclusiva y un pool único del rango exacto; opciones en ámbito aplicable.",
+        "nftables admite orden y formato equivalentes y rechaza reglas inaplicables; carga del fichero solo en espacio de red aislado.",
+        "Falta de Python, permisos o capacidad del corrector producen UNEVALUATED sin nota final falsa; YAML antiguo conserva hashes y comportamiento.",
+        "Pruebas y aplicación local verificadas antes de sustituir el examen; copia original recuperable."
+      ],
+      "tests": [
+        "make check",
+        "make gui-check",
+        "Pruebas Python del comprobador",
+        "Laboratorio Ubuntu aislado",
+        "Validación del PLAN y paquete local"
+      ],
+      "notes": "ADR-0036. 31 IDs y peso 35 conservados, descripciones neutras. Programa remoto fijo con revisión SHA-256; ausencia de Python, permisos o respuestas desconocidas no se califican. 22 pruebas Python, Go/race, 583 GUI y arnés Electron real correctos. Ubuntu 26.04/Kea 3.0.3: 31/31 y 29 variantes; SSH real 100/100 y sin Python 31 UNEVALUATED sin nota. AppImage local y examen registrado actualizados con originales y versiones recuperables; requiere cerrar/abrir la instancia antigua. Sin publicación ni aula real; T070/T084 pendientes. Evidencia y límites: docs/reviews/evidence/T204/RESULTADOS.md.",
+      "review": {
+        "base": "07d7c4e698b1d7573592938db3487ce763070655",
+        "head": "07d7c4e698b1d7573592938db3487ce763070655",
+        "includes_uncommitted": true,
+        "task_ids": [
+          "T204"
+        ],
+        "report": "docs/reviews/evidence/T204/RESULTADOS.md",
+        "status": "COMPLETE"
+      },
+      "completed": "2026-10-27"
     }
   ]
 }

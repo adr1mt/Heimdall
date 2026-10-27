@@ -117,7 +117,9 @@ function readCheck(value: unknown): Check {
     id: text(raw.id),
     descripcion: text(raw.descripcion),
     en: text(raw.en),
-    cmd: Array.isArray(raw.cmd) ? raw.cmd.map(text) : [],
+    cmd: Array.isArray(raw.comprobador)
+      ? ['heimdall:comprobador', ...raw.comprobador.map(text)]
+      : Array.isArray(raw.cmd) ? raw.cmd.map(text) : [],
     valor: text(raw.valor),
     assertion: readAssertion(raw),
     peso: text(raw.peso),
@@ -154,12 +156,14 @@ function formatProblem(doc: unknown): string | null {
       const group=object(value,path,['grupo','comprobaciones']);field(group,'grupo',path,'string')
       for(const [j,value] of array(group.comprobaciones,`${path}.comprobaciones`).entries()) {
         const at=`${path}.comprobaciones[${j+1}]`
-        const c=object(value,at,['id','descripcion','en','cmd','valor','peso','timeout','sudo',...ASSERTIONS])
+        const c=object(value,at,['id','descripcion','en','cmd','comprobador','valor','peso','timeout','sudo',...ASSERTIONS])
         for(const key of ['id','descripcion','en','valor','timeout','contiene','igual_a','no_contiene']) field(c,key,at,'string')
         field(c,'peso',at,'number');field(c,'exit_code',at,'integer');field(c,'sudo',at,'boolean')
         for(const arg of array(c.cmd,`${at}.cmd`)) if(typeof arg!=='string') throw new Error(`${at}.cmd: cada argumento debe ser texto.`)
+        for(const arg of array(c.comprobador,`${at}.comprobador`)) if(typeof arg!=='string') throw new Error(`${at}.comprobador: cada argumento debe ser texto.`)
         if(ASSERTIONS.filter(key=>c[key]!==undefined).length!==1) throw new Error(`${at}: debe tener exactamente una aserción.`)
         if(c.cmd!==undefined && c.valor!==undefined) throw new Error(`${at}: cmd y valor no pueden aparecer juntos.`)
+        if(c.comprobador!==undefined && (c.cmd!==undefined || c.valor!==undefined)) throw new Error(`${at}: comprobador no puede combinarse con cmd ni valor.`)
         if(c.cerca_de!==undefined) {
           const near=object(c.cerca_de,`${at}.cerca_de`,['ancla','lineas','contiene'])
           field(near,'ancla',`${at}.cerca_de`,'string');field(near,'contiene',`${at}.cerca_de`,'string');field(near,'lineas',`${at}.cerca_de`,'integer')
@@ -235,7 +239,8 @@ function writeCheck(check: Check): Record<string, unknown> {
     if (check.peso.trim()) out.peso = weight(check.peso)
     if (check.timeout.trim()) out.timeout = check.timeout.trim()
     if (check.sudo !== undefined) out.sudo = check.sudo
-    out.cmd = check.cmd
+    if (check.cmd[0] === 'heimdall:comprobador') out.comprobador = check.cmd.slice(1)
+    else out.cmd = check.cmd
   } else {
     if (check.peso.trim()) out.peso = weight(check.peso)
     out.valor = check.valor
