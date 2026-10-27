@@ -929,3 +929,13 @@ carga únicamente en un espacio de red privado del proceso. IDs y peso 35
 conservados, descripciones públicas neutras. Copia cargada y AppImage local
 actualizados con originales y versiones recuperables; sin publicación ni aula.
 Evidencia: docs/reviews/evidence/T204/RESULTADOS.md. T070/T084 siguen pendientes.
+
+## T205 · 2026-10-27 · RA1 comprueba solo forwarding activo en encaminamiento
+
+Adrià limita expresamente la corrección de encaminamiento a ip_forward=1 activo.
+Se retiran persistencia y los siete criterios nftables (incluidos NAT y
+masquerade). Quedan 23 criterios/peso 27, sin redistribución de pesos restantes.
+Las descripciones orientan sin dar valores: Rang KEA, Xarxa de treball DHCP,
+reservas por equipo, etc. Solo cambia la selección declarativa; el motor fijo y
+sus pruebas históricas no cambian. Copia cargada actualizada con versiones
+recuperables; sin publicación ni cambios de clases/notas/enunciado.

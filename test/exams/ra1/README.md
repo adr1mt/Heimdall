@@ -41,8 +41,11 @@ interna al contenedor es 192.168.236.60. No modificar el examen registrado real.
 
 La contraseña pública del contenedor es `RA1_TEST_ONLY_827`. Se facilita al motor
 por el sobre stdin `{"schema":1,"secrets":{"AULA_PASSWORD":"RA1_TEST_ONLY_827"}}`.
-La ejecución real correcta debe dar 31 PASS, peso 35 y nota 100. Quitando
-provisionalmente Python solo dentro del contenedor debe dar 31 UNEVALUATED y
+La ejecución real correcta debe dar 23 PASS, peso 27 y nota 100. Quitando
+provisionalmente Python solo dentro del contenedor debe dar 23 UNEVALUATED y
 ninguna nota final. Restaurar el intérprete en `finally` antes de continuar.
 
-No confundir estos resultados con una prueba del aula real (T084).
+T205 retira NAT/nftables y persistencia de forwarding del examen mantenido.
+El programa fijo y sus pruebas históricas de T204 se conservan;
+`lab_variants.py` también prueba capacidades históricas no seleccionadas por el
+examen actual. No confundir estos resultados con una prueba del aula real (T084).

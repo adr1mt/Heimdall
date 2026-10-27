@@ -4497,6 +4497,51 @@
         "status": "COMPLETE"
       },
       "completed": "2026-10-27"
+    },
+    {
+      "id": "T205",
+      "title": "Limitar encaminamiento del examen RA1 a ip_forward y aclarar nombres",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T204"
+      ],
+      "goal": "Aplicar la preferencia docente: comprobar solo ip_forward activo en encaminamiento y usar descripciones orientativas sin respuestas.",
+      "scope": [
+        "Retirar del examen fwd-persistent y todas las comprobaciones nftables.",
+        "Cambiar las descripciones por nombres como Rang KEA y Xarxa de treball DHCP.",
+        "Actualizar la copia cargada mediante versiones recuperables y documentar el nuevo denominador."
+      ],
+      "out_of_scope": [
+        "Cambiar el motor, su programa fijo o la aplicación instalada.",
+        "Corregir alumnado real, cambiar el enunciado o redistribuir el peso de criterios retirados."
+      ],
+      "acceptance": [
+        "El examen contiene 23 comprobaciones y peso total 27; el único criterio de encaminamiento es fwd-actiu.",
+        "No se ejecuta ninguna comprobación nftables, NAT, masquerade o persistencia de forwarding.",
+        "Los 23 criterios conservados mantienen IDs, argumentos, revisión y pesos; solo cambian sus descripciones.",
+        "Descripciones algo más informativas sin IP, MAC, solución numérica del rango ni valores esperados.",
+        "Validación nativa del examen y PLAN ficticio correctos; original recuperable y copia instalada idéntica."
+      ],
+      "tests": [
+        "make check",
+        "heimdall check --exam-only",
+        "heimdall check con inventario ficticio",
+        "Comparación de criterios, pesos, comandos y descripciones antes/después"
+      ],
+      "review": {
+        "base": "d312c27ce4cbf0589f91baf50186614926e1a4f2",
+        "head": "d312c27ce4cbf0589f91baf50186614926e1a4f2",
+        "includes_uncommitted": true,
+        "task_ids": [
+          "T205"
+        ],
+        "report": "docs/reviews/evidence/T205/RESULTADOS.md",
+        "status": "COMPLETE"
+      },
+      "completed": "2026-10-27",
+      "notes": "Petición expresa de Adrià: solo ip_forward activo; sin NAT/masquerade/nftables ni persistencia. 23 criterios y peso 27, pesos y ejecución restantes conservados. Nombres orientativos sin valores esperados. PLAN ficticio y gates correctos; copia cargada actualizada mediante versiones recuperables. Motor/AppImage sin cambios. Evidencia: docs/reviews/evidence/T205/RESULTADOS.md."
     }
   ]
 }

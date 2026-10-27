@@ -1,0 +1,8 @@
+{
+  "source": "/home/adr1/apps/0227/heimdall/ra1-dhcp-kea/examen.yaml",
+  "sourceCopies": "/home/adr1/.config/heimdall-gui/copias-fuentes/exam-ra1-dhcp-kea-eca10bdab23e01bb",
+  "beforeSHA256": "a93e01cbd444cb312e853526bca75ef1788bb4e4a3b5776aae090768082f08f8",
+  "afterSHA256": "dfaa1665d851d2b79523a60988651d3090c741200da94f200ed4b8884c19af7b",
+  "engineChanged": false,
+  "applicationChanged": false
+}

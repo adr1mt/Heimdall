@@ -1,4 +1,5 @@
-# Comprobador fijo y versionado. Véase README.md; sin código ejecutable en el examen.
+# Encaminament: només ip_forward actiu. Sense comprovacions de NAT ni nftables.
+# Comprobador fijo y versionado. Véase README.md.
 examen: 0227 · RA1 · DHCP amb Kea per a 250 equips
 version: 1
 hosts:
@@ -11,7 +12,7 @@ grupos:
 - grupo: Xarxa
   comprobaciones:
   - id: net-externa-ip
-    descripcion: Xarxa · 01
+    descripcion: Adreça de la xarxa d'examen
     en: host1
     comprobador:
     - ra1-dhcp
@@ -22,7 +23,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: net-externa-estatica
-    descripcion: Xarxa · 02
+    descripcion: Adreçament estàtic del servidor
     en: host1
     comprobador:
     - ra1-dhcp
@@ -33,7 +34,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: net-externa-netplan
-    descripcion: Xarxa · 03
+    descripcion: Netplan de la xarxa d'examen
     en: host1
     comprobador:
     - ra1-dhcp
@@ -44,7 +45,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: net-externa-gw
-    descripcion: Xarxa · 04
+    descripcion: Porta d'enllaç del servidor
     en: host1
     comprobador:
     - ra1-dhcp
@@ -55,7 +56,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: net-externa-dns
-    descripcion: Xarxa · 05
+    descripcion: DNS del servidor
     en: host1
     comprobador:
     - ra1-dhcp
@@ -66,7 +67,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: net-interna-ip
-    descripcion: Xarxa · 06
+    descripcion: Adreça de la xarxa de treball DHCP
     en: host1
     comprobador:
     - ra1-dhcp
@@ -77,7 +78,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: net-interna-netplan
-    descripcion: Xarxa · 07
+    descripcion: Xarxa de treball DHCP
     en: host1
     comprobador:
     - ra1-dhcp
@@ -88,7 +89,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: net-interna-sense-gw
-    descripcion: Xarxa · 08
+    descripcion: Configuració de la xarxa de treball
     en: host1
     comprobador:
     - ra1-dhcp
@@ -99,7 +100,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: net-sortida
-    descripcion: Xarxa · 09
+    descripcion: Sortida del servidor
     en: host1
     comprobador:
     - ra1-dhcp
@@ -110,7 +111,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: net-resolucio
-    descripcion: Xarxa · 10
+    descripcion: Resolució de noms del servidor
     en: host1
     comprobador:
     - ra1-dhcp
@@ -123,7 +124,7 @@ grupos:
 - grupo: DHCP
   comprobaciones:
   - id: kea-interficie
-    descripcion: DHCP · 01
+    descripcion: Interfície del servei DHCP
     en: host1
     comprobador:
     - ra1-dhcp
@@ -134,7 +135,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: kea-subxarxa
-    descripcion: DHCP · 02
+    descripcion: Xarxa DHCP a KEA
     en: host1
     comprobador:
     - ra1-dhcp
@@ -145,7 +146,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: kea-rang-inici
-    descripcion: DHCP · 03
+    descripcion: Rang KEA · inici
     en: host1
     comprobador:
     - ra1-dhcp
@@ -156,7 +157,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: kea-rang-final
-    descripcion: DHCP · 04
+    descripcion: Rang KEA · capacitat
     en: host1
     peso: 2
     comprobador:
@@ -168,7 +169,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: kea-porta-enllac
-    descripcion: DHCP · 05
+    descripcion: Porta d'enllaç DHCP
     en: host1
     comprobador:
     - ra1-dhcp
@@ -179,7 +180,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: kea-dns
-    descripcion: DHCP · 06
+    descripcion: DNS DHCP
     en: host1
     comprobador:
     - ra1-dhcp
@@ -190,7 +191,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: kea-reserva-mail
-    descripcion: DHCP · 07
+    descripcion: Reserva KEA · correu
     en: host1
     comprobador:
     - ra1-dhcp
@@ -201,7 +202,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: kea-reserva-web
-    descripcion: DHCP · 08
+    descripcion: Reserva KEA · web
     en: host1
     comprobador:
     - ra1-dhcp
@@ -212,7 +213,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: kea-reserva-impressora1
-    descripcion: DHCP · 09
+    descripcion: Reserva KEA · impressora 1
     en: host1
     comprobador:
     - ra1-dhcp
@@ -223,7 +224,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: kea-reserva-impressora2
-    descripcion: DHCP · 10
+    descripcion: Reserva KEA · impressora 2
     en: host1
     comprobador:
     - ra1-dhcp
@@ -234,7 +235,7 @@ grupos:
     - ${host1.ip}
     igual_a: OK
   - id: kea-actiu
-    descripcion: DHCP · 11
+    descripcion: Servei KEA
     en: host1
     peso: 2
     comprobador:
@@ -248,7 +249,7 @@ grupos:
 - grupo: Encaminament
   comprobaciones:
   - id: fwd-actiu
-    descripcion: Encaminament · 01
+    descripcion: IP forwarding
     en: host1
     comprobador:
     - ra1-dhcp
@@ -258,98 +259,10 @@ grupos:
     - ${alumno.if_int}
     - ${host1.ip}
     igual_a: OK
-  - id: fwd-persistent
-    descripcion: Encaminament · 02
-    en: host1
-    comprobador:
-    - ra1-dhcp
-    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
-    - fwd-persistent
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
-    - ${host1.ip}
-    igual_a: OK
-  - id: nft-anada
-    descripcion: Encaminament · 03
-    en: host1
-    comprobador:
-    - ra1-dhcp
-    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
-    - nft-anada
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
-    - ${host1.ip}
-    igual_a: OK
-  - id: nft-retorn
-    descripcion: Encaminament · 04
-    en: host1
-    comprobador:
-    - ra1-dhcp
-    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
-    - nft-retorn
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
-    - ${host1.ip}
-    igual_a: OK
-  - id: nft-masquerade
-    descripcion: Encaminament · 05
-    en: host1
-    comprobador:
-    - ra1-dhcp
-    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
-    - nft-masquerade
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
-    - ${host1.ip}
-    igual_a: OK
-  - id: nft-carregat-masquerade
-    descripcion: Encaminament · 06
-    en: host1
-    comprobador:
-    - ra1-dhcp
-    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
-    - nft-carregat-masquerade
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
-    - ${host1.ip}
-    igual_a: OK
-  - id: nft-carregat-anada
-    descripcion: Encaminament · 07
-    en: host1
-    comprobador:
-    - ra1-dhcp
-    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
-    - nft-carregat-anada
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
-    - ${host1.ip}
-    igual_a: OK
-  - id: nft-actiu
-    descripcion: Encaminament · 08
-    en: host1
-    comprobador:
-    - ra1-dhcp
-    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
-    - nft-actiu
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
-    - ${host1.ip}
-    igual_a: OK
-  - id: nft-habilitat
-    descripcion: Encaminament · 09
-    en: host1
-    comprobador:
-    - ra1-dhcp
-    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
-    - nft-habilitat
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
-    - ${host1.ip}
-    igual_a: OK
 - grupo: Client
   comprobaciones:
   - id: client-concessio
-    descripcion: Client · 01
+    descripcion: Concessió DHCP del client
     en: host1
     peso: 3
     comprobador:

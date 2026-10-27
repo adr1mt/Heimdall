@@ -3,39 +3,36 @@
 Copia mantenida del examen real de 0227. La copia registrada por el profesor está
 en `/home/adr1/apps/0227/heimdall/ra1-dhcp-kea/examen.yaml`.
 
-Conserva los 31 IDs y pesos originales (total 35). El alumno recibe solo nombres
-como «DHCP · 04»; la siguiente tabla es documentación privada del profesor.
+Tras el ajuste docente T205, contiene **23 comprobaciones y peso total 27**.
+Los criterios conservados mantienen sus IDs y pesos. El alumno recibe nombres
+como «Rang KEA · capacitat» o «Xarxa de treball DHCP»; la siguiente tabla es documentación privada del profesor.
 No distribuir este directorio como material de examen.
 
 | Descripción pública | Criterio privado |
 |---|---|
-| Xarxa · 01 | IP externa presente en estado activo y configuración Netplan combinada |
-| Xarxa · 02 | IP externa estática, DHCP desactivado y duración ilimitada |
-| Xarxa · 03 | IP externa persistente y activa mediante Netplan |
-| Xarxa · 04 | Gateway 192.168.236.1 guardado y activo en la interfaz externa |
-| Xarxa · 05 | DNS 192.168.236.1 guardado y activo en la interfaz externa |
-| Xarxa · 06 | IP interna 10.23.97.1/8 guardada y activa |
-| Xarxa · 07 | IP interna persistente y activa, con DHCP desactivado |
-| Xarxa · 08 | Interfaz interna sin default route guardada ni activa, ni DHCP |
-| Xarxa · 09 | La ruta hacia 9.9.9.9 usa la interfaz externa |
-| Xarxa · 10 | El servidor resuelve upc.edu |
-| DHCP · 01 | Kea declara exclusivamente la interfaz interna |
-| DHCP · 02 | Subred aplicable 10.0.0.0/8 |
-| DHCP · 03 | Un único pool, comenzando en 10.23.97.100 |
-| DHCP · 04 | Pool único 10.23.97.100–10.23.98.93, exactamente 250 direcciones |
-| DHCP · 05 | Opción routers efectiva para la subred: 10.23.97.1 |
-| DHCP · 06 | Opción domain-name-servers efectiva: 9.9.9.9 |
-| DHCP · 07–10 | Parejas MAC/IP de mail, web e impresoras en reservas aplicables |
-| DHCP · 11 | Servicio Kea activo |
-| Encaminament · 01 | Forwarding IPv4 activo |
-| Encaminament · 02 | Última asignación efectiva de arranque de forwarding es exactamente 1 |
-| Encaminament · 03 | Reglas guardadas permiten el tráfico hacia fuera |
-| Encaminament · 04 | Reglas guardadas permiten las respuestas establecidas |
-| Encaminament · 05 | Reglas guardadas aplican masquerade hacia fuera |
-| Encaminament · 06 | Reglas activas aplican masquerade hacia fuera |
-| Encaminament · 07 | Reglas activas permiten el tráfico hacia fuera |
-| Encaminament · 08–09 | Servicio nftables activo y habilitado |
-| Client · 01 | Registro memfile de Kea contiene una concesión vigente, no eliminada, del rango y la subred aplicables |
+| Adreça de la xarxa d'examen | IP externa guardada y activa |
+| Adreçament estàtic del servidor | IP externa estática, DHCP desactivado y duración ilimitada |
+| Netplan de la xarxa d'examen | Netplan combinado coherente con la IP externa activa |
+| Porta d'enllaç del servidor | Gateway externo 192.168.236.1 guardado y activo |
+| DNS del servidor | DNS externo 192.168.236.1 guardado y activo |
+| Adreça de la xarxa de treball DHCP | IP interna 10.23.97.1/8 guardada y activa |
+| Xarxa de treball DHCP | Netplan interno guardado y activo, con DHCP desactivado |
+| Configuració de la xarxa de treball | Interfaz interna sin default route guardada ni activa, ni DHCP |
+| Sortida del servidor | Ruta hacia 9.9.9.9 por la interfaz externa |
+| Resolució de noms del servidor | El servidor resuelve upc.edu |
+| Interfície del servei DHCP | Kea declara exclusivamente la interfaz interna |
+| Xarxa DHCP a KEA | Subred aplicable 10.0.0.0/8 |
+| Rang KEA · inici | Pool único comenzando en 10.23.97.100 |
+| Rang KEA · capacitat | Pool único 10.23.97.100–10.23.98.93, exactamente 250 direcciones |
+| Porta d'enllaç DHCP | Opción routers efectiva 10.23.97.1 |
+| DNS DHCP | Opción domain-name-servers efectiva 9.9.9.9 |
+| Reserva KEA · correu | Reserva MAC/IP del servidor mail |
+| Reserva KEA · web | Reserva MAC/IP del servidor web |
+| Reserva KEA · impressora 1 | Reserva MAC/IP de la impresora 1 |
+| Reserva KEA · impressora 2 | Reserva MAC/IP de la impresora 2 |
+| Servei KEA | Servicio Kea activo |
+| IP forwarding | Valor activo net.ipv4.ip_forward exactamente 1 |
+| Concessió DHCP del client | Concesión vigente del rango en el registro memfile de Kea |
 
 ## Cómo se corrige
 
@@ -62,15 +59,10 @@ inclusiones y comas adicionales. Las reservas solo cuentan dentro de su ámbito
 y asociadas a su propia MAC. Las opciones admiten nombre o código, formato CSV
 o hexadecimal e herencia de subred/red compartida/global.
 
-Para nftables se leen reglas JSON. Las guardadas se cargan en un nuevo espacio
-de red exclusivo del proceso comprobador, reproduciendo nombres e índices de
-interfaces. Se consultan en una transacción posterior a su carga. Nunca se
-cargan en la red real del alumno. Se admiten condiciones de interfaces por nombre
-o índice, orden alternativo, conjuntos, prefijos IPv4, estado de conexión,
-contadores, saltos y retornos. Se respetan hooks, políticas y descartes previos.
-Se prueban flujos TCP/80, UDP/53 e ICMP de ambos extremos del pool y de una reserva;
-no se certifica la equivalencia de cualquier programa nftables. Una expresión
-relevante desconocida queda sin evaluar.
+En encaminamiento se comprueba únicamente el valor activo de
+`net.ipv4.ip_forward`. No se exige su persistencia ni se consulta, carga o evalúa
+nftables, NAT o masquerade. Al no seleccionarse esos criterios, esta versión del
+examen no crea espacios de red de prueba al corregir.
 
 ## Límites que no deben confundirse con una comprobación completa
 
@@ -85,9 +77,6 @@ relevante desconocida queda sin evaluar.
   que el alumno haya iniciado con otro archivo o no haya recargado.
 - La selección por nombre/MAC de interfaces Netplan está soportada. Selecciones
   adicionales no interpretables se dejan sin evaluar.
-- La persistencia de sysctl se consulta en la configuración combinada de
-  `systemd-sysctl`. Un `/etc/sysctl.conf` aislado que el arranque no incluya no
-  prueba persistencia.
 
 ## Mantenimiento y validación
 
