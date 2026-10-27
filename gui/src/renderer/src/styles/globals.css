@@ -134,6 +134,7 @@
 
 @layer base {
   :root {
+    font-size: calc(16px * var(--ui-scale, 1));
     --background: 220 27% 98%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
@@ -278,7 +279,55 @@
   }
 }
 
-/* Give case descriptions the space and hierarchy needed at classroom distance. */
+/* Teacher layout prioritizes names and grades; projector sizing stays independent. */
+.app-sidebar { width: 13rem; }
+.app-sidebar[data-collapsed='true'] { width: 3.75rem; }
+.app-sidebar[data-collapsed='true'] .sidebar-label,
+.app-sidebar[data-collapsed='true'] .sidebar-brand img { display: none; }
+.app-sidebar[data-collapsed='true'] .sidebar-brand { justify-content: center; padding-inline: 0; }
+.app-sidebar[data-collapsed='true'] nav,
+.app-sidebar[data-collapsed='true'] .sidebar-footer { padding-inline: 0.5rem; }
+.app-sidebar[data-collapsed='true'] nav button,
+.app-sidebar[data-collapsed='true'] .sidebar-footer button,
+.app-sidebar[data-collapsed='true'] .sidebar-footer summary { justify-content: center; padding-inline: 0.5rem; }
+.app-sidebar[data-collapsed='true'] .teacher-display button { padding-inline: 0.5rem; }
+.app-sidebar { overflow-y: auto; scrollbar-width: thin; }
+/* Popovers must escape the rail's scroll container without clipping. */
+.teacher-display[open] > div { position: fixed; left: 0.75rem; bottom: 7rem; }
+.teacher-results { --matrix-check-width: clamp(15rem, 24vw, 22rem); }
+.teacher-results .results-summary { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr) minmax(0, 1fr); }
+.teacher-results .summary-reading { align-items: center; }
+.teacher-results .summary-hardest > p:first-child { font-size: 0.6875rem; letter-spacing: normal; text-transform: none; }
+.teacher-results .summary-hardest > p:nth-child(2) { margin-top: 0; }
+.teacher-results .student-list { grid-template-columns: repeat(auto-fit, minmax(min(100%, 32rem), 1fr)); }
+.teacher-results .student-row { border-bottom-color: hsl(var(--border)); border-radius: 0; }
+.teacher-results .student-row-main { min-height: 3.25rem; }
+.teacher-results .student-grade { align-items: center; gap: 0.5rem; }
+.teacher-results .student-grade > span:first-child { font-size: 0.6875rem; }
+.teacher-results .matrix-viewport { max-height: max(12rem, calc(100dvh - 19rem)); scrollbar-gutter: stable; }
+.teacher-results .results-matrix thead th { padding-block: 0.375rem; }
+.teacher-results .results-matrix thead button { height: auto; min-height: 2rem; }
+.teacher-results .matrix-student-name { display: block; -webkit-line-clamp: unset; }
+.teacher-results .matrix-student-summary { display: flex; align-items: center; justify-content: center; gap: 0.25rem; }
+.teacher-results .matrix-student-summary > div { margin-top: 0; }
+.teacher-results .results-matrix tbody th { padding-block: 0.375rem; }
+.teacher-results .case-name { font-size: 0.875rem; line-height: 1.35; }
+.correct-view .pending-students { grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); }
+.correct-view .correct-context { align-items: stretch; }
+.correct-view .exam-strip > div { min-width: 0; }
+@media (max-width: 1100px) {
+  .teacher-results .results-summary { grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr); }
+  .teacher-results .summary-hardest { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.5rem; }
+  .teacher-results .summary-hardest > p:nth-child(2) { min-width: 0; }
+}
+@media (max-width: 700px) {
+  .teacher-results .results-summary { grid-template-columns: minmax(0, 1fr); }
+  .teacher-results .summary-hardest { display: block; }
+  .teacher-results .student-row-main { flex-wrap: wrap; }
+  .teacher-results .student-row-main > span:nth-child(2) { flex-basis: 60%; }
+}
+
+/* Case descriptions expand only for classroom distance. */
 .results-matrix tbody th { container-type: inline-size; }
 .case-name { font-size: clamp(1rem, 4.5cqi, 1.5rem); font-weight: 500; line-height: 1.25; }
 .projector-content .results-matrix { width: auto !important; }

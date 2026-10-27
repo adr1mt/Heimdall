@@ -99,5 +99,5 @@ window.resultsConnections = () => {
   useRun.getState().setArtifact(run, '/tmp/ficticio-connections.json')
 }
 window.resultsFixture(5)
-const root = createRoot(document.getElementById('root')!)
+export const root = createRoot(document.getElementById('root')!)
 root.render(<ResultsView />)

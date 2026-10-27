@@ -1,0 +1,90 @@
+[
+  {
+    "delivery": "single recipient, named confirmation, persistent row state, explicit bulk resend and Desktop help PASS",
+    "refresh": "grades retained on begin/failure, countdown and replacement PASS"
+  },
+  {
+    "count": 5,
+    "width": 1440,
+    "geometry": {
+      "count": 5,
+      "checks": 50,
+      "viewport": {
+        "width": 1440,
+        "height": 623.046875
+      },
+      "table": {
+        "right": 359.40625,
+        "bottom": 887.25
+      },
+      "fits": true,
+      "horizontal": 0,
+      "vertical": 0,
+      "font": "30px",
+      "zoom": "25 %"
+    }
+  },
+  {
+    "count": 5,
+    "width": 1024,
+    "geometry": {
+      "count": 5,
+      "checks": 50,
+      "viewport": {
+        "width": 1024,
+        "height": 441.046875
+      },
+      "table": {
+        "right": 189.8125,
+        "bottom": 756.15625
+      },
+      "fits": true,
+      "horizontal": 0,
+      "vertical": 0,
+      "font": "30px",
+      "zoom": "17 %"
+    }
+  },
+  {
+    "count": 30,
+    "width": 1440,
+    "geometry": {
+      "count": 30,
+      "checks": 50,
+      "viewport": {
+        "width": 1440,
+        "height": 623.046875
+      },
+      "table": {
+        "right": 1065.84375,
+        "bottom": 887.25
+      },
+      "fits": true,
+      "horizontal": 0,
+      "vertical": 0,
+      "font": "30px",
+      "zoom": "25 %"
+    }
+  },
+  {
+    "count": 30,
+    "width": 1024,
+    "geometry": {
+      "count": 30,
+      "checks": 50,
+      "viewport": {
+        "width": 1024,
+        "height": 441.046875
+      },
+      "table": {
+        "right": 674.71875,
+        "bottom": 759.4375
+      },
+      "fits": true,
+      "horizontal": 0,
+      "vertical": 0,
+      "font": "30px",
+      "zoom": "16 %"
+    }
+  }
+]

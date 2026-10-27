@@ -170,22 +170,21 @@ export default function ResultsView() {
       />
     )
 
-  const overview = <div className="space-y-3">
+  const overview = <div className="results-overview space-y-2">
         {summary && projector && <details className="text-xs">
           <summary className="cursor-pointer py-1 text-muted-foreground">Resumen de toda la corrección · {summary.passed} aprobados</summary>
           <KpiStrip summary={summary} average={average} mostFailed={mostFailed} />
         </details>}
         {summary && !projector && (
-          <section aria-label="Resumen de toda la corrección" className="space-y-2">
-            <p className="text-xs text-muted-foreground">Resumen de toda la corrección</p>
+          <section aria-label="Resumen de toda la corrección">
             <KpiStrip summary={summary} average={average} mostFailed={mostFailed} />
           </section>
         )}
 
-        <div className="space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="space-y-1">
+          <div className="results-filters flex flex-wrap items-center gap-2">
             <Input
-              className="w-full sm:w-64"
+              className="h-8 w-full sm:w-56"
               aria-label={t.results.filterText}
               placeholder={t.results.filterText}
               value={filters.text}
@@ -219,7 +218,7 @@ export default function ResultsView() {
             </label>
             {exploring && <Button variant="ghost" size="sm" onClick={clearFilters}>Restablecer</Button>}
           </div>
-          <div className="flex flex-wrap items-start gap-x-4 gap-y-2">
+          <div className="flex flex-wrap items-start gap-x-4 gap-y-1">
             <p role="status" className="py-1 text-xs text-muted-foreground">
               {rows.length} de {artifact.students.length} alumnos · {hiddenStudents.length} ocultos
               {filtering && ' · Filtros activos'}
@@ -243,11 +242,7 @@ export default function ResultsView() {
                 </div>
               </details>
             )}
-          </div>
-          {studentFilter === 'evaluated' && (
-            <p className="text-xs text-muted-foreground">Se pudo conectar con su máquina; puede haber comprobaciones pendientes.</p>
-          )}
-          <details className="text-xs">
+          <details className="min-w-0 py-1 text-xs">
             <summary className="cursor-pointer text-muted-foreground">
               Filtrar comprobaciones y ver estados{hasFilters(filters) ? ' · filtros activos' : ''}
             </summary>
@@ -273,12 +268,16 @@ export default function ResultsView() {
             </div>
             <States />
           </details>
+          </div>
+          {studentFilter === 'evaluated' && (
+            <p className="text-xs text-muted-foreground">Se pudo conectar con su máquina; puede haber comprobaciones pendientes.</p>
+          )}
         </div>
 
   </div>
 
   return (
-    <div className="flex h-full flex-col">
+    <div className={cn('flex h-full flex-col', !projector && 'teacher-results')}>
       <ViewHeader
         title={t.results.title}
         meta={
@@ -301,7 +300,6 @@ export default function ResultsView() {
             {!projector && (
               <>
                 <ReportsButton artifactPath={artifactPath} />
-                <RunMoodleButton />
                 <details className="relative">
                   <summary
                     className="cursor-pointer rounded px-2 py-1 text-sm"
@@ -309,7 +307,8 @@ export default function ResultsView() {
                   >
                     •••
                   </summary>
-                  <div className="absolute right-0 z-30 w-max rounded-md border border-border bg-popover p-2">
+                  <div className="absolute right-0 z-30 w-max space-y-2 rounded-md border border-border bg-popover p-2">
+                    <RunMoodleButton />
                     <ExportButton />
                   </div>
                 </details>
@@ -321,12 +320,12 @@ export default function ResultsView() {
 
       <CorrectionClock />
       <ResultsCanvas projector={projector} overview={overview}>
-      <div className="space-y-4 p-3 sm:p-6">
+      <div className="results-body space-y-3 p-3 sm:p-4">
         {rows.length === 0 ? (
           <p className="text-sm text-muted-foreground">{hiddenStudents.length === artifact.students.length
             ? 'Todos los alumnos están ocultos. Puedes recuperarlos desde Ocultos.' : t.results.noMatches}</p>
         ) : mode === 'list' ? (
-          <div className="grid gap-1.5 xl:grid-cols-2">
+          <div className="student-list grid gap-x-4 gap-y-1 xl:grid-cols-2">
             {rows.map(({ student }) => (
               <StudentRow
                 key={student.student_id}
@@ -379,7 +378,7 @@ function ResultsCanvas({ projector, overview, children }: { projector: boolean; 
   return projector ? <>
     <div className="max-h-[40%] shrink-0 overflow-auto px-3 pt-2">{overview}</div>
     <ProjectorCanvas>{children}</ProjectorCanvas>
-  </> : <div className="min-h-0 flex-1 overflow-auto"><div className="px-3 pt-3 sm:px-6 sm:pt-6">{overview}</div>{children}</div>
+  </> : <div className="results-scroll min-h-0 flex-1 overflow-auto"><div className="px-3 pt-3 sm:px-4">{overview}</div>{children}</div>
 }
 
 /** Class-wide summary, independent of the current exploration filters. */
@@ -391,20 +390,21 @@ function KpiStrip({ summary, average, mostFailed }: {
   const scale = useScale()
   const hardest = mostFailed[0]
   return (
-    <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3">
-      <Reading
-        value={`${summary.passed}/${summary.graded}`}
-        label={t.results.kpiPassed}
-        hint={t.results.kpiPassedHint(summary.graded, summary.students)}
-        color={summary.graded === 0 ? 'text-muted-foreground' : 'text-foreground'}
-      />
+    <div className="results-summary grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3">
+      <div className="summary-counts flex flex-wrap content-center items-center gap-x-2 gap-y-1 bg-background px-3 py-2 text-sm">
+        <span><strong className="tnum">{summary.passed}</strong> aprobados</span>
+        <span aria-hidden="true">·</span>
+        <span><strong className="tnum">{summary.graded - summary.passed}</strong> suspensos</span>
+        <span aria-hidden="true">·</span>
+        <span><strong className="tnum">{summary.students - summary.graded}</strong> sin evaluar</span>
+      </div>
       <Reading
         value={averageText(average)}
         label={t.results.kpiAverage}
         color={average === null ? 'text-muted-foreground' : 'text-foreground'}
         hint={average === null ? t.results.kpiNoGrades : `Media de ${summary.graded} notas finales · sobre ${scale.max}`}
       />
-      <div className="min-w-0 bg-background px-4 py-3">
+      <div className="summary-hardest min-w-0 bg-background px-3 py-2">
         <p className="text-micro uppercase tracking-[0.09em] text-muted-foreground">Comprobación con más fallos</p>
         <p className="mt-1 truncate text-sm font-semibold" title={mostFailed.map((check) => `${check.description} (${check.checkId})`).join(' · ')}>
           {hardest ? hardest.description : 'Ninguna comprobación fallada'}
@@ -454,8 +454,8 @@ function Reading({
   color?: string
 }) {
   return (
-    <div className="flex items-baseline gap-3 bg-background px-4 py-3">
-      <span className={cn('text-2xl font-semibold tabular-nums', color)}>{value}</span>
+    <div className="summary-reading flex items-baseline gap-2 bg-background px-3 py-2">
+      <span className={cn('text-lg font-semibold tabular-nums', color)}>{value}</span>
       <span className="min-w-0">
         <span className="block text-micro uppercase tracking-[0.09em] text-muted-foreground">
           {label}
@@ -485,14 +485,14 @@ function MatrixView({ rows, selected, onPick, onStudent, onHide }: {
       <div className="matrix-viewport max-h-[65vh] overflow-auto rounded-md border border-border focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
         role="region" aria-label="Matriz de resultados, desplazamiento horizontal y vertical" tabIndex={0}>
         <table className="results-matrix min-w-full table-fixed border-separate border-spacing-0 text-left"
-          style={{ width: `calc(clamp(10rem, 38vw, 40rem) + ${matrix.students.length * 9}rem)` }}
+          style={{ width: `calc(var(--matrix-check-width, clamp(10rem, 38vw, 40rem)) + ${matrix.students.length * 9}rem)` }}
           onPointerOver={(event) => setColumn((event.target as HTMLElement).closest<HTMLElement>('[data-column]')?.dataset.column ?? null)}
           onPointerLeave={() => setColumn(null)}
           onFocusCapture={(event) => setColumn(event.target.closest<HTMLElement>('[data-column]')?.dataset.column ?? null)}
           onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setColumn(null) }}>
           <caption className="sr-only">Notas por alumno y comprobaciones superadas por los alumnos visibles</caption>
           <colgroup>
-            <col style={{ width: 'clamp(10rem, 38vw, 40rem)' }} />
+            <col style={{ width: 'var(--matrix-check-width, clamp(10rem, 38vw, 40rem))' }} />
             {matrix.students.map((student) => <col key={student.student_id} style={{ width: '9rem' }} />)}
           </colgroup>
           <thead className="sticky top-0 z-20">
@@ -506,10 +506,12 @@ function MatrixView({ rows, selected, onPick, onStudent, onHide }: {
                   className={cn('border-b border-border px-2 py-2 text-center align-top', column === student.student_id ? 'bg-secondary' : 'bg-background')}>
                   <button type="button" className="mx-auto block h-8 max-w-full rounded text-xs font-medium leading-4 underline-offset-4 hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
                     title={student.name} aria-label={`Ver detalle de ${student.name}`} onClick={() => onStudent(student.student_id)}>
-                    <span className="line-clamp-2 wrap-break-word">{student.name}</span>
+                    <span className="matrix-student-name line-clamp-2 wrap-break-word">{student.name}</span>
                   </button>
-                  <MatrixGrade student={student} />
-                  <HideStudentButton student={student} onHide={() => onHide(student.student_id)} />
+                  <div className="matrix-student-summary">
+                    <MatrixGrade student={student} />
+                    <HideStudentButton student={student} onHide={() => onHide(student.student_id)} />
+                  </div>
                 </th>
               ))}
             </tr>
@@ -1174,10 +1176,9 @@ function PendingRow({ row }: { row: Pending }) {
 /** A compact row; technical incidents remain distinct from academic failure. */
 function HideStudentButton({ student, onHide }: { student: StudentResult; onHide: () => void }) {
   return (
-    <Button variant="ghost" size="sm" onClick={onHide}
+    <Button variant="ghost" size="sm" onClick={onHide} className="h-8 w-8 shrink-0 px-0"
       aria-label={`Ocultar a ${student.name}`} title="Ocultar alumno durante la sesión">
       <EyeOff className="h-3.5 w-3.5" aria-hidden="true" />
-      Ocultar
     </Button>
   )
 }
@@ -1186,16 +1187,17 @@ function StudentRow({ student, onToggle, onHide }: {
   student: StudentResult; onToggle: () => void; onHide: () => void
 }) {
   const scale = useScale()
+  const projector = useApp((s) => s.projector)
   const counts = tally(student.checks)
   const appearance = gradeAppearance(student, scale.passMark)
   const cause = student.checks.find((check) => check.cause !== 'NONE')?.cause
   return (
-    <div className="flex items-center gap-1 rounded-md border border-transparent hover:border-border">
+    <div className="student-row flex items-center gap-1 rounded-md border border-transparent hover:border-border">
       <button
         type="button"
         onClick={onToggle}
         aria-label={`Ver detalle: ${student.name}`}
-        className="flex min-w-0 flex-1 flex-wrap items-center gap-3 rounded-md px-3 py-3 text-left hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+        className="student-row-main flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-2 text-left hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
       >
         <span
           className={cn(
@@ -1221,7 +1223,7 @@ function StudentRow({ student, onToggle, onHide }: {
           )}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-medium">{student.name}</span>
+          <span className="student-name block wrap-break-word text-sm font-medium">{student.name}</span>
           <Meter
             className="mt-1"
             value={counts.pass}
@@ -1233,12 +1235,12 @@ function StudentRow({ student, onToggle, onHide }: {
         <span className="text-micro text-muted-foreground">
           {counts.pass}/{student.checks.length}
         </span>
-        <span className="flex shrink-0 items-center gap-2">
+        <span className="student-grade flex shrink-0 items-center gap-2">
           <span className={cn('text-xs font-medium', appearance.color)}>{appearance.label}</span>
           <GradeBadge student={student} large />
         </span>
       </button>
-      {!useApp.getState().projector && <ReportsButton artifactPath={useRun.getState().artifactPath} studentId={student.student_id} />}
+      {!projector && <ReportsButton artifactPath={useRun.getState().artifactPath} studentId={student.student_id} compact />}
       <HideStudentButton student={student} onHide={onHide} />
     </div>
   )

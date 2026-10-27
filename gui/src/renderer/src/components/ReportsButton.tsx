@@ -18,7 +18,7 @@ interface Prepared {
 }
 
 /** Single and bulk sends share confirmation, generation, receipts and the IPC. */
-export function ReportsButton({ artifactPath, studentId }: { artifactPath: string | null; studentId?: string }) {
+export function ReportsButton({ artifactPath, studentId, compact = false }: { artifactPath: string | null; studentId?: string; compact?: boolean }) {
   const artifact = useRun((s) => s.artifact)
   const phase = useRun((s) => s.phase)
   const project = useApp((s) => s.project)
@@ -61,12 +61,13 @@ export function ReportsButton({ artifactPath, studentId }: { artifactPath: strin
   return (
     <>
       <Button variant={studentId ? 'ghost' : 'outline'} size="sm"
+        className={compact ? 'h-8 w-8 shrink-0 px-0' : undefined}
         disabled={sending || preparing || working || alreadySent}
         aria-label={student ? (alreadySent ? `Informe enviado a ${student.name}` : `Enviar informe a ${student.name}`) : undefined}
-        title={alreadySent ? 'Ya enviado para esta corrección. El envío general permite reenviarlo tras confirmarlo.' : undefined}
+        title={alreadySent ? 'Ya enviado para esta corrección. El envío general permite reenviarlo tras confirmarlo.' : student ? `Enviar informe a ${student.name}` : undefined}
         onClick={() => void ask()}>
         {sending || preparing ? <Spinner /> : alreadySent ? <Check className="h-4 w-4" /> : <Send className="h-4 w-4" />}
-        {studentId ? (alreadySent ? 'Enviado' : 'Enviar informe') : sending ? t.reports.sending : t.reports.button}
+        {!compact && (studentId ? (alreadySent ? 'Enviado' : 'Enviar informe') : sending ? t.reports.sending : t.reports.button)}
       </Button>
       <ConfirmDialog open={prepared !== null} title={student ? '¿Enviar el informe a este alumno?' : t.reports.title}
         confirmLabel={t.reports.yes} onConfirm={() => { if (prepared) void deliver(prepared) }} onCancel={() => setPrepared(null)}>

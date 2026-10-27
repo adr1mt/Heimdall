@@ -28,6 +28,10 @@ export interface EditorDraft {
 type Navigation = { view: View } | { project: OpenProject | null }
 
 interface AppState {
+  uiZoom: number
+  sidebar: 'auto' | 'expanded' | 'collapsed'
+  setUiZoom: (percent: number) => void
+  setSidebar: (mode: 'auto' | 'expanded' | 'collapsed') => void
   editorDraft: EditorDraft | null
   pendingNavigation: Navigation | null
   setEditorDraft: (draft: EditorDraft | null) => void
@@ -128,6 +132,19 @@ const savedScale: ScaleId =
   localStorage.getItem('heimdall-scale') === 'hundred' ? 'hundred' : DEFAULT_SCALE
 const savedProjector = localStorage.getItem('heimdall-projector') === '1'
 const savedClassId = localStorage.getItem('heimdall-class-id')
+const savedUiZoom = clampUiZoom(Number(localStorage.getItem('heimdall-ui-zoom') ?? 100))
+const savedSidebar = localStorage.getItem('heimdall-sidebar')
+
+function clampUiZoom(percent: number): number {
+  return Number.isFinite(percent) ? Math.min(120, Math.max(80, Math.round(percent / 10) * 10)) : 100
+}
+
+function applyUiZoom(percent: number): void {
+  if (typeof document !== 'undefined') {
+    document.documentElement.style.setProperty('--ui-scale', String(percent / 100))
+  }
+}
+applyUiZoom(savedUiZoom)
 const savedPassMark = readPassMark(localStorage.getItem('heimdall-pass-mark'))
 
 /**
@@ -177,6 +194,18 @@ applyProjector(savedProjector)
 let noticeTimer: ReturnType<typeof setTimeout> | undefined
 
 export const useApp = create<AppState>((set, get) => ({
+  uiZoom: savedUiZoom,
+  sidebar: savedSidebar === 'expanded' || savedSidebar === 'collapsed' ? savedSidebar : 'auto',
+  setUiZoom: (percent) => {
+    const uiZoom = clampUiZoom(percent)
+    localStorage.setItem('heimdall-ui-zoom', String(uiZoom))
+    applyUiZoom(uiZoom)
+    set({ uiZoom })
+  },
+  setSidebar: (sidebar) => {
+    localStorage.setItem('heimdall-sidebar', sidebar)
+    set({ sidebar })
+  },
   editorDraft: null,
   pendingNavigation: null,
   setEditorDraft: (editorDraft) => set({ editorDraft }),

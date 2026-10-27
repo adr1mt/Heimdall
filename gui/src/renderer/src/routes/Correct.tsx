@@ -181,7 +181,7 @@ export default function CorrectView() {
   const examSession = useExamSession()
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="correct-view flex h-full flex-col">
       <ViewHeader
         title={t.correct.title}
         actions={
@@ -203,8 +203,8 @@ export default function CorrectView() {
           )
         }
       />
-      <div className="min-h-0 flex-1 space-y-5 overflow-auto p-6">
-        <div className="grid gap-4 md:grid-cols-2">
+      <div className="correct-content min-h-0 flex-1 space-y-3 overflow-auto p-4">
+        <div className="correct-context grid gap-3 md:grid-cols-2">
           <ExamCard
             name={examPath ? (described.exam?.name ?? t.home.unnamed) : null}
             meta={described.exam?.checks == null ? null : t.home.examMeta(described.exam.checks)}
@@ -246,13 +246,13 @@ export default function CorrectView() {
         {exam.active && (
           <>
             <ExamStrip exam={exam} percent={percent} session={examSession.session} />
-            {!examSession.session && group && <PendingStudents group={group} />}
           </>
         )}
 
-        <SessionPanel {...examSession} />
-
         {run.phase !== 'idle' && <RunPanel percent={percent} />}
+
+        {exam.active && !examSession.session && run.students.length === 0 && group && <PendingStudents group={group} />}
+        <SessionPanel {...examSession} />
       </div>
 
       <ConfirmDialog
@@ -281,14 +281,14 @@ function ExamCard({
 }) {
   return (
     <Card>
-      <CardContent className="space-y-2 pt-5">
+      <CardContent className="space-y-1 p-3">
         <div className="flex items-center gap-2 text-micro uppercase tracking-[0.09em] text-muted-foreground">
           <FileText className="h-4 w-4" />
           {t.correct.exam}
         </div>
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <div className="min-w-0">
-            <p className="truncate text-name font-semibold">
+            <p className="wrap-break-word text-sm font-semibold">
               {name ?? <span className="text-muted-foreground">{t.correct.examNone}</span>}
             </p>
             {name && meta && <p className="text-xs text-muted-foreground">{meta}</p>}
@@ -329,14 +329,14 @@ function ClassCard({
 }) {
   return (
     <Card>
-      <CardContent className="space-y-3 pt-5">
+      <CardContent className="space-y-1 p-3">
         <div className="flex items-center gap-2 text-micro uppercase tracking-[0.09em] text-muted-foreground">
           <Users className="h-4 w-4" />
           {t.correct.classroom}
         </div>
 
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <p className="min-w-0 truncate text-name font-semibold">
+          <p className="min-w-0 wrap-break-word text-sm font-semibold">
             {group ? (
               groupLine(group)
             ) : (
@@ -395,15 +395,15 @@ function ExamControl({
 
   return (
     <section
-      className="max-w-xl space-y-3 rounded-md border border-border bg-card p-4"
+      className="exam-control flex flex-wrap items-center gap-x-4 gap-y-2 rounded-md border border-border bg-card p-3"
       aria-label="Modo examen"
     >
-      <h2 className="flex items-center gap-2 text-sm font-semibold">
+      <h2 className="flex shrink-0 items-center gap-2 text-sm font-semibold">
         <Timer className="h-4 w-4 text-primary" />
         Modo examen
       </h2>
-      <p className="text-xs text-muted-foreground">
-        Reevalúa la clase automáticamente mientras el alumnado trabaja.
+      <p className="exam-control-description min-w-0 flex-1 text-xs text-muted-foreground">
+        Reevalúa la clase automáticamente. Se conserva la mejor nota completa de cada alumno.
       </p>
       {!exam.active && (
         <div className="flex flex-wrap items-center gap-2">
@@ -422,11 +422,8 @@ function ExamControl({
           </Segmented>
         </div>
       )}
-      <p className="text-xs text-muted-foreground">
-        Se conserva la mejor nota completa de cada alumno.
-      </p>
       <Button
-        className="w-full"
+        size="sm"
         variant={exam.active ? 'destructive' : 'outline'}
         disabled={!exam.active && disabled}
         onClick={() => (exam.active ? onStop() : onStart(minutes))}
@@ -469,7 +466,7 @@ function ExamStrip({
   const active = tally ? tally.graded + tally.open - tally.finished : null
 
   return (
-    <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-5">
+    <div className="exam-strip grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-5">
       <Reading
         value={String(exam.passes)}
         label={t.exam.roundLabel}
@@ -498,13 +495,13 @@ function ExamStrip({
 /** The roster is visible before the first correction, just as in Teuton GUI. */
 function PendingStudents({ group }: { group: ClassGroup }) {
   return (
-    <section className="space-y-3">
+    <section className="space-y-2">
       <SectionTitle>
         Alumnos a evaluar{' '}
         <span className="ml-2 text-muted-foreground">{group.students.length}</span>
       </SectionTitle>
       <p className="text-xs text-muted-foreground">Se evaluará toda la clase.</p>
-      <div className="grid max-w-3xl gap-2 sm:grid-cols-2">
+      <div className="pending-students grid gap-1.5">
         {group.students.map((student, index) => (
           <div
             key={student.id}
@@ -521,8 +518,8 @@ function PendingStudents({ group }: { group: ClassGroup }) {
 
 function Reading({ value, label, hint }: { value: string; label: string; hint?: string }) {
   return (
-    <div className="bg-background px-4 py-3">
-      <div className="text-figure font-bold tabular-nums">{value}</div>
+    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 bg-background px-3 py-2">
+      <div className="text-xl font-semibold tabular-nums">{value}</div>
       <div className="text-micro uppercase tracking-[0.09em] text-muted-foreground">{label}</div>
       {hint && <div className="text-xs text-muted-foreground">{hint}</div>}
     </div>
@@ -811,7 +808,7 @@ function StudentRow({ student, checks }: { student: StudentProgress; checks: num
   return (
     <div className="space-y-1.5 rounded-md border border-border p-3">
       <div className="flex items-center justify-between gap-2">
-        <span className="truncate text-sm font-medium">{student.name}</span>
+        <span className="min-w-0 wrap-break-word text-sm font-medium">{student.name}</span>
         <Badge variant={badge}>{label}</Badge>
       </div>
       {!student.excluded && (

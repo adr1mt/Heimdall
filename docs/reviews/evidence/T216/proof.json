@@ -1,0 +1,178 @@
+[
+  {
+    "width": 1366,
+    "height": 768,
+    "zoom": 80,
+    "list": {
+      "names": 14,
+      "firstRow": 201.484375,
+      "visibleRows": 14,
+      "clipped": false,
+      "rootOverflow": false,
+      "font": "12.8px"
+    }
+  },
+  {
+    "width": 1366,
+    "zoom": 80,
+    "matrix": {
+      "columns": 14,
+      "checkFont": "11.2px",
+      "rowHeight": 40.8125,
+      "viewportWidth": 1162,
+      "horizontal": true,
+      "rootOverflow": false,
+      "firstColumn": 281.609375
+    }
+  },
+  {
+    "width": 1366,
+    "height": 768,
+    "zoom": 100,
+    "list": {
+      "names": 14,
+      "firstRow": 250.84375,
+      "visibleRows": 14,
+      "clipped": false,
+      "rootOverflow": false,
+      "font": "16px"
+    }
+  },
+  {
+    "width": 1366,
+    "zoom": 100,
+    "matrix": {
+      "columns": 14,
+      "checkFont": "14px",
+      "rowHeight": 50.78125,
+      "viewportWidth": 1114,
+      "horizontal": true,
+      "rootOverflow": false,
+      "firstColumn": 327.828125
+    }
+  },
+  {
+    "width": 1366,
+    "height": 768,
+    "zoom": 120,
+    "list": {
+      "names": 14,
+      "firstRow": 319.125,
+      "visibleRows": 6,
+      "clipped": false,
+      "rootOverflow": false,
+      "font": "19.2px"
+    }
+  },
+  {
+    "width": 1366,
+    "zoom": 120,
+    "matrix": {
+      "columns": 14,
+      "checkFont": "16.8px",
+      "rowHeight": 60.71875,
+      "viewportWidth": 1066,
+      "horizontal": true,
+      "rootOverflow": false,
+      "firstColumn": 327.828125
+    }
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "zoom": 80,
+    "list": {
+      "names": 14,
+      "firstRow": 215.265625,
+      "visibleRows": 14,
+      "clipped": false,
+      "rootOverflow": false,
+      "font": "12.8px"
+    }
+  },
+  {
+    "width": 1024,
+    "zoom": 80,
+    "matrix": {
+      "columns": 14,
+      "checkFont": "11.2px",
+      "rowHeight": 40.8125,
+      "viewportWidth": 938,
+      "horizontal": true,
+      "rootOverflow": false,
+      "firstColumn": 245.765625
+    }
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "zoom": 100,
+    "list": {
+      "names": 14,
+      "firstRow": 267.84375,
+      "visibleRows": 8,
+      "clipped": false,
+      "rootOverflow": false,
+      "font": "16px"
+    }
+  },
+  {
+    "width": 1024,
+    "zoom": 100,
+    "matrix": {
+      "columns": 14,
+      "checkFont": "14px",
+      "rowHeight": 50.78125,
+      "viewportWidth": 920,
+      "horizontal": true,
+      "rootOverflow": false,
+      "firstColumn": 245.75
+    }
+  },
+  {
+    "width": 1024,
+    "height": 768,
+    "zoom": 120,
+    "list": {
+      "names": 14,
+      "firstRow": 387.296875,
+      "visibleRows": 5,
+      "clipped": false,
+      "rootOverflow": false,
+      "font": "19.2px"
+    }
+  },
+  {
+    "width": 1024,
+    "zoom": 120,
+    "matrix": {
+      "columns": 14,
+      "checkFont": "16.8px",
+      "rowHeight": 60.71875,
+      "viewportWidth": 892,
+      "horizontal": true,
+      "rootOverflow": false,
+      "firstColumn": 288
+    }
+  },
+  {
+    "projectorFit14": {
+      "horizontal": 0,
+      "vertical": 0,
+      "lastRight": 1020.34375,
+      "viewportRight": 1024
+    }
+  },
+  {
+    "persistence": "reload PASS",
+    "sidebar": "automatic and manual PASS",
+    "sticky": {
+      "headerTop": 284.84375,
+      "left": 77,
+      "viewportLeft": 76
+    },
+    "keyboard": "PASS",
+    "refresh": "begin/failure PASS",
+    "projector": "independent zoom and fit PASS"
+  }
+]

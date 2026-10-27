@@ -1,4 +1,4 @@
-import { Component, lazy, Suspense, useEffect, type ErrorInfo, type ReactNode } from 'react'
+import { Component, lazy, Suspense, useEffect, useState, type ErrorInfo, type ReactNode } from 'react'
 import {
   AlertTriangle,
   BarChart3,
@@ -14,6 +14,9 @@ import {
   Monitor,
   Moon,
   Play,
+  PanelLeftClose,
+  PanelLeftOpen,
+  SlidersHorizontal,
   Settings as SettingsIcon,
   Sun,
   Users,
@@ -66,6 +69,16 @@ export default function App() {
 
 function AppBody() {
   const { theme, view, setView, toggleTheme } = useApp()
+  const sidebar = useApp((s) => s.sidebar)
+  const setSidebar = useApp((s) => s.setSidebar)
+  const [narrow, setNarrow] = useState(() => window.matchMedia('(max-width: 1180px)').matches)
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 1180px)')
+    const update = () => setNarrow(query.matches)
+    query.addEventListener('change', update)
+    return () => query.removeEventListener('change', update)
+  }, [])
+  const collapsed = sidebar === 'collapsed' || (sidebar === 'auto' && narrow)
   const notice = useApp((s) => s.notice)
   const noticeKind = useApp((s) => s.noticeKind)
   const setNotice = useApp((s) => s.setNotice)
@@ -198,10 +211,16 @@ function AppBody() {
       {/* Al proyectar desaparece entera: la barra es del profesor, no de la
           clase, y en la pared solo roba sitio a lo que se está mirando. */}
       {!projector && (
-      <aside className="flex w-60 flex-col bg-sidebar text-sidebar-foreground">
-        <div className="flex items-center gap-2.5 px-5 pb-4 pt-5">
+      <aside className="app-sidebar flex shrink-0 flex-col bg-sidebar text-sidebar-foreground" data-collapsed={collapsed}>
+        <div className="sidebar-brand flex items-center gap-2 px-3 py-3">
           <img src={logo} alt="" className="h-8 w-8 object-contain" />
-          <div className="text-sm font-semibold tracking-tight">{t.app.name}</div>
+          <div className="sidebar-label flex-1 text-sm font-semibold tracking-tight">{t.app.name}</div>
+          <button className="sidebar-toggle rounded p-2 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-primary"
+            aria-label={collapsed ? 'Expandir menú lateral' : 'Contraer menú lateral'} aria-expanded={!collapsed}
+            title={collapsed ? 'Expandir menú lateral' : 'Contraer menú lateral'}
+            onClick={() => setSidebar(collapsed ? 'expanded' : 'collapsed')}>
+            {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+          </button>
         </div>
 
         <nav aria-label="Secciones principales" className="flex flex-1 flex-col gap-0.5 px-3">
@@ -216,7 +235,7 @@ function AppBody() {
           ))}
         </nav>
 
-        <div className="space-y-3 px-4 pb-4">
+        <div className="sidebar-footer space-y-2 px-3 pb-3">
           {/* Ajustes y Ayuda al pie: no son parte de corregir nada. */}
           <div className="flex flex-col gap-0.5 border-t border-white/10 pt-3">
             {NAV_FOOTER.map((entry) => (
@@ -230,19 +249,22 @@ function AppBody() {
             ))}
           </div>
           <EngineBadge />
+          <TeacherDisplay />
           <ProjectorToggle />
           <button
             onClick={toggleTheme}
+            aria-label={theme === 'dark' ? t.theme.toLight : t.theme.toDark}
+            title={theme === 'dark' ? t.theme.toLight : t.theme.toDark}
             className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs text-sidebar-foreground/70 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
           >
             {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            {theme === 'dark' ? t.theme.toLight : t.theme.toDark}
+            <span className="sidebar-label">{theme === 'dark' ? t.theme.toLight : t.theme.toDark}</span>
           </button>
         </div>
       </aside>
       )}
 
-      <main className="flex flex-1 flex-col overflow-hidden bg-background">
+      <main className="min-w-0 flex flex-1 flex-col overflow-hidden bg-background">
         {/* Sin barra lateral hay que poder salir igual, y con una sola acción. */}
         {projector && <ProjectorExit />}
         {update && !projector && (
@@ -325,8 +347,9 @@ function NavButton({
       disabled={!open}
       aria-disabled={!open}
       aria-current={active ? 'page' : undefined}
+      aria-label={entry.label}
       title={
-        entry.ready ? (waiting ? t.nav.needProject(entry.label) : undefined) : comingSoon(entry.id)
+        entry.ready ? (waiting ? t.nav.needProject(entry.label) : entry.label) : comingSoon(entry.id)
       }
       onClick={() => onPick(entry.id)}
       className={cn(
@@ -340,10 +363,10 @@ function NavButton({
       {active && (
         <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-primary" />
       )}
-      <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
-      {entry.label}
+      <Icon className="h-[18px] w-[18px] shrink-0" aria-hidden="true" />
+      <span className="sidebar-label">{entry.label}</span>
       {!entry.ready && (
-        <span className="ml-auto text-glyph uppercase tracking-[0.09em] text-sidebar-foreground/40">
+        <span className="sidebar-label ml-auto text-glyph uppercase tracking-[0.09em] text-sidebar-foreground/40">
           {t.nav.soonBadge}
         </span>
       )}
@@ -363,6 +386,7 @@ function ProjectorToggle() {
     <button
       onClick={toggleProjector}
       aria-pressed={projector}
+      aria-label={projector ? t.projector.off : t.projector.on}
       title={projector ? t.projector.hintOn : t.projector.hintOff}
       className={cn(
         'flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary',
@@ -372,8 +396,37 @@ function ProjectorToggle() {
       )}
     >
       <Monitor className="h-4 w-4 shrink-0" />
-      {projector ? t.projector.off : t.projector.on}
+      <span className="sidebar-label">{projector ? t.projector.off : t.projector.on}</span>
     </button>
+  )
+}
+
+function TeacherDisplay() {
+  const { uiZoom, setUiZoom, sidebar, setSidebar } = useApp()
+  return (
+    <details className="teacher-display relative">
+      <summary aria-label="Vista del profesor" title="Vista del profesor"
+        className="flex cursor-pointer list-none items-center gap-2 rounded-md px-3 py-2 text-xs hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-primary">
+        <SlidersHorizontal className="h-4 w-4 shrink-0" />
+        <span className="sidebar-label">Vista profesor · {uiZoom} %</span>
+      </summary>
+      <div className="absolute bottom-full left-0 z-50 mb-2 w-60 space-y-3 rounded-md border border-border bg-popover p-3 text-sm text-popover-foreground">
+        <label className="flex items-center justify-between gap-2">Escala de interfaz
+          <select aria-label="Escala de interfaz" value={uiZoom} onChange={(e) => setUiZoom(Number(e.target.value))}
+            className="h-8 rounded border border-input bg-background px-2 focus-visible:ring-2 focus-visible:ring-ring">
+            {[80, 90, 100, 110, 120].map((value) => <option key={value} value={value}>{value} %</option>)}
+          </select>
+        </label>
+        <button className="rounded px-2 py-1 text-xs hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setUiZoom(100)}>Restablecer al 100 %</button>
+        <label className="flex items-center justify-between gap-2">Menú lateral
+          <select aria-label="Menú lateral" value={sidebar} onChange={(e) => setSidebar(e.target.value as typeof sidebar)}
+            className="h-8 rounded border border-input bg-background px-2 focus-visible:ring-2 focus-visible:ring-ring">
+            <option value="auto">Automático</option><option value="expanded">Expandido</option><option value="collapsed">Iconos</option>
+          </select>
+        </label>
+        <p className="text-xs text-muted-foreground">El proyector tiene sus propios controles de zoom.</p>
+      </div>
+    </details>
   )
 }
 
@@ -403,27 +456,29 @@ function EngineBadge() {
 
   if (!engine) {
     return (
-      <div className="flex items-center gap-2 rounded-md bg-white/5 px-3 py-2 text-xs text-sidebar-foreground/60">
+      <div role="status" title={t.engine.checking} aria-label={t.engine.checking} className="flex items-center gap-2 rounded-md bg-white/5 px-3 py-2 text-xs text-sidebar-foreground/60">
         <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
-        <span className="truncate">{t.engine.checking}</span>
+        <span className="sidebar-label truncate">{t.engine.checking}</span>
       </div>
     )
   }
 
   return engine.found ? (
-    <div className="flex items-center gap-2 rounded-md bg-sidebar-success/10 px-3 py-2 text-xs text-sidebar-success">
+    <div role="status" title={`${t.engine.ready} · ${engine.version}`} aria-label={`${t.engine.ready} · ${engine.version}`} className="flex items-center gap-2 rounded-md bg-sidebar-success/10 px-3 py-2 text-xs text-sidebar-success">
       <CheckCircle2 className="h-4 w-4 shrink-0" />
-      <span className="truncate">
+      <span className="sidebar-label truncate">
         {t.engine.ready} · {engine.version}
       </span>
     </div>
   ) : (
     <button
       onClick={() => setView('settings')}
+      aria-label={t.engine.missing}
+      title={t.engine.missing}
       className="flex w-full items-center gap-2 rounded-md bg-sidebar-destructive/10 px-3 py-2 text-left text-xs text-sidebar-destructive transition-colors hover:bg-sidebar-destructive/20 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-sidebar-foreground"
     >
       <AlertTriangle className="h-4 w-4 shrink-0" />
-      <span className="truncate">{t.engine.missing}</span>
+      <span className="sidebar-label truncate">{t.engine.missing}</span>
     </button>
   )
 }

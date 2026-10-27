@@ -123,7 +123,7 @@ conexión con su máquina en la corrección abierta, incluidos los que quedaron
 incompletos. No equivale a tener nota final; una corrección que solo lee el
 inventario no demuestra conexión.
 
-Pulsa **Ocultar** junto a un alumno para apartarlo de la lista y de la matriz,
+Pulsa el icono del ojo tachado (**Ocultar**) junto a un alumno para apartarlo de la lista y de la matriz,
 por ejemplo si hoy no ha venido. **Ocultos (N)** permite mostrarlo de nuevo,
 uno a uno o con **Mostrar todos**. La selección se conserva al cambiar de
 vista, entrar o salir del proyector y volver a corregir. Se reinicia al
@@ -139,7 +139,7 @@ estados están plegados.
 Desde ahí se exportan:
 
 - la **hoja de notas**, en el menú de más opciones;
-- el **CSV de Moodle**, para subirlo.
+- el **CSV de Moodle**, también en más opciones (**•••**), para subirlo.
 
 Y con **«Enviar informes…»** cada alumno recibe en su máquina, en su carpeta
 personal, una página con su nota y cada comprobación como correcta, fallada o
@@ -264,6 +264,23 @@ puede leerlas. No se envían a Internet. Son distintas de las copias de notas y
 no protegen frente a perder el disco entero: conserva también una copia del
 equipo. Los archivos fuente de más de 4 MiB no se reemplazan automáticamente.
 
+
+## Trabajar desde el portátil
+
+El menú lateral puede contraerse a iconos con el botón de su parte superior.
+En ventanas estrechas se contrae automáticamente hasta que elijas otra opción.
+Cada icono mantiene el nombre de su acción al pasar el ratón o usar un lector
+de pantalla. **Vista profesor** (icono de controles al pie) permite elegir
+menú automático, expandido o de iconos y una escala de interfaz entre 80 % y
+120 %. Ambas preferencias se recuerdan al volver a abrir Heimdall; puedes
+restablecer la escala al 100 %. El zoom del proyector es independiente.
+
+La lista da prioridad al nombre completo y usa iconos para **Enviar informe**
+y **Ocultar**. La matriz conserva la columna de comprobaciones y las cabeceras
+al desplazarse dentro de ella; también puedes enfocarla con Tab y desplazarte
+con las flechas. El resumen distingue **aprobados**, **suspensos** y **sin evaluar**
+sin contar una incidencia técnica como suspenso. En Corregir, el contexto y el
+modo examen ocupan menos espacio y el progreso aparece antes del listado.
 
 ## Proyectar resultados y consultar informes desde Ubuntu Desktop
 

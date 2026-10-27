@@ -4900,6 +4900,42 @@
       ],
       "completed": "2026-10-27",
       "notes": "Nombre fijo informe.html en envíos individual/masivo, títulos y permisos conservados; nombres anteriores siguen válidos en CLI. Registro nuevo evita bloqueo por recibos anteriores. 609 tests GUI, Go, tipos, build y paquete correctos. Instalado con copia anterior y perfil real intacto. No se envían informes reales automáticamente. Evidencia: docs/reviews/evidence/T215/RESULTADOS.md."
+    },
+    {
+      "id": "T216",
+      "title": "Densidad adaptable para portátil y controles de vista del profesor",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T211",
+        "T212",
+        "T215"
+      ],
+      "goal": "Dar prioridad a las notas y nombres en el portátil, conservando la identidad visual y el modo proyector.",
+      "scope": [
+        "Barra lateral contraíble y automática en ventanas estrechas; escala del profesor 80–120 % persistente.",
+        "Resultados: resumen explícito, filtros compactos, lista con nombres completos y matriz proporcionada con desplazamiento propio.",
+        "Corregir: contexto y modo examen compactos, progreso y alumnos a todo el ancho."
+      ],
+      "out_of_scope": [
+        "Cambiar notas, contrato, persistencia de resultados, instalar o publicar."
+      ],
+      "acceptance": [
+        "Barra lateral contraíble con nombres accesibles, preferencia persistente y adaptación automática inicial al ancho.",
+        "Escala de interfaz 80–120 % persistente, con reinicio a 100 % y sin alterar el zoom de proyector.",
+        "Lista prioriza nombres completos y acciones secundarias compactas; resumen muestra aprobados, suspensos y sin evaluar.",
+        "Matriz compacta conserva columna inicial y cabecera fijas, nombres legibles y desplazamiento horizontal/vertical por teclado.",
+        "Corregir utiliza el ancho disponible y reduce contexto/modo examen para dar espacio al progreso.",
+        "Verificación Electron aislada a 1366×768 y 1024×768, escala 80/100/120, temas y proyector; suite GUI, tipos, build y motor correctos."
+      ],
+      "tests": [
+        "make check",
+        "make gui-check gui-build",
+        "Arnés Electron aislado de densidad y regresión de resultados/proyector"
+      ],
+      "completed": "2026-10-27",
+      "notes": "615 pruebas GUI, tipos, build/preload, motor, enlaces y herramientas correctos. Electron aislado verifica portátil 1366×768/1024×768, escala 80/100/120, preferencias persistentes, nombres completos, matriz fija, refresco y proyector de 5/14/30 alumnos. Ajuste del proyector sin oscilación. Evidencia: docs/reviews/evidence/T216/RESULTADOS.md. Sin instalar ni publicar."
     }
   ]
 }

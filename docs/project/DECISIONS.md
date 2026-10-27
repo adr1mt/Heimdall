@@ -1029,3 +1029,18 @@ y escritura atómica. El motor mantiene aceptación de nombres nativos antiguos.
 Las marcas de entregas con nombres anteriores no bloquean el nuevo nombre.
 Actualización instalada con copia de T214, sin cerrar ni reiniciar la instancia
 activa ni enviar informes reales automáticamente.
+
+
+## T216 · 2026-10-27 · Densidad del portátil y vista profesor
+
+Se conserva la identidad visual. En profesor: lateral de 208 px o 60 px a
+100 %, automático hasta 1180 px salvo preferencia manual; escala 80–120 %
+persistente independiente del proyector. Nombres completos en Lista, iconos
+para acciones secundarias y exportaciones en más opciones. La matriz reserva
+una columna proporcionada a las comprobaciones, mantiene cabeceras y permite
+desplazamiento sin forzar a todos los alumnos dentro de la pantalla. El resumen
+separa aprobados, suspensos y sin evaluar sobre toda la corrección.
+Corregir da prioridad al progreso y utiliza todo el ancho del listado.
+El ajuste de proyector mide un ancho estable para evitar realimentar el zoom.
+No cambia evaluación ni retención de resultados; conserva T212 y hace explícito
+que las notas visibles siguen pendientes de actualizar. Sin instalación.

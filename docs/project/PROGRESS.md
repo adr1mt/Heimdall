@@ -5,12 +5,12 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T211–T213:** zoom y ajuste reactivo en proyector, casos más legibles,
-resultados conservados durante refresco/fallo y franja de tiempos. Envío
-individual confirmado y registrado; masivo conservado y reintento solo a
-fallidos. Ayuda SFTP/SCP para abrir HTML desde Desktop (ADR-0037).
-608 pruebas GUI, motor, build y arneses aislados correctos.
-[Evidencia y límites](../reviews/evidence/T211-T213/RESULTADOS.md).
+**T216:** portátil compacto: lateral contraíble/automático, escala 80–120 %
+persistente, nombres completos, matriz proporcionada y resumen explícito.
+Corregir prioriza progreso; proyector sin oscilación al ajustar muchas columnas.
+615 pruebas GUI, motor, tipos, build y arneses aislados correctos.
+[Evidencia y límites](../reviews/evidence/T216/RESULTADOS.md). Sin instalar.
+T211–T213 conserva [su evidencia](../reviews/evidence/T211-T213/RESULTADOS.md).
 **T215 instalado:** todos reciben su informe como `informe.html`; el siguiente
 envío sustituye al anterior. [Instalación](../reviews/evidence/T215/RESULTADOS.md).
 Copia anterior conservada. Cerrar/abrir al terminar de corregir; sin reinicio.

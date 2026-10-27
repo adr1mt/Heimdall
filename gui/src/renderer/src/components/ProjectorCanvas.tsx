@@ -24,6 +24,8 @@ export function ProjectorCanvas({ children }: { children: ReactNode }) {
     return () => observer.disconnect()
   }, [fit])
   const effective = fit ? layout.scale : zoom
+  // Measure an unscaled, stable width. Dividing it by the fitted zoom feeds
+  // each measurement back into the next and can oscillate with many columns.
   return (
     <>
       <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-border px-6 py-2" aria-label="Tamaño del proyector">
@@ -38,7 +40,7 @@ export function ProjectorCanvas({ children }: { children: ReactNode }) {
       </div>
       <div ref={viewport} className="min-h-0 flex-1 overflow-auto">
         <div ref={content} className={fit ? 'projector-content projector-fit' : 'projector-content'}
-          style={{ zoom: effective, width: fit && layout.width ? layout.width / effective : undefined }}>{children}</div>
+          style={{ zoom: effective, width: fit && layout.width ? layout.width : undefined }}>{children}</div>
       </div>
     </>
   )
