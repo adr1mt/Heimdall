@@ -36,6 +36,9 @@ Cerrar y abrir cuando termine cualquier corrección para cargar las mejoras.
 
 ## Git
 
-Commit de instalación y push normal a `origin/main` en curso. Se registrará
-su confirmación tras comprobar el remoto. No hay publicación, etiqueta ni
-cambio de versión nominal. Esta comprobación local no certifica aula ni CI.
+Commit de instalación `e8fe97fd61487a7f9683f00fc61fb4c2881225ab` subido mediante
+push normal a `origin/main`. `git ls-remote origin refs/heads/main` confirmó
+exactamente esa revisión. Incluye los commits de interfaz y el commit T218 ya
+terminado en la misma rama. El cierre documental se guarda después de esta
+confirmación. No hay publicación, etiqueta ni cambio de versión nominal.
+Esta comprobación local no certifica aula ni CI.

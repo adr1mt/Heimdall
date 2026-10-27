@@ -22,5 +22,8 @@
   "runningInstanceRestarted": false,
   "engineVersion": "heimdall 1.0.1",
   "smoke": "Package auto: renderer and preload OK (Heimdall)",
-  "status": "INSTALLED_VERIFIED"
+  "status": "INSTALLED_VERIFIED",
+  "pushedInstallationCommit": "e8fe97fd61487a7f9683f00fc61fb4c2881225ab",
+  "remoteRef": "origin/main",
+  "pushConfirmedAt": "2026-10-27T20:16:57.723776+00:00"
 }

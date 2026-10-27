@@ -7,8 +7,8 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 **T219 instalado:** interfaz compacta T216/T217, nombres abreviados y escala
 persistente. Motor RA1 v2 T218 conservado idéntico. Copia anterior verificada;
-620 pruebas GUI, tipos/build y arranque empaquetado correctos. Commit/push en
-curso. [Instalación](../reviews/evidence/T219/RESULTADOS.md). Cerrar/abrir al terminar.
+620 pruebas GUI, tipos/build y arranque empaquetado correctos. Push confirmado
+en main. [Instalación](../reviews/evidence/T219/RESULTADOS.md). Cerrar/abrir al terminar.
 **T218:** RA1 v2 separado, 12 criterios/peso 19; siete Kea de peso 2,
 DNS DHCP 8.8.8.8 y forwarding guardado. [Evidencia](../reviews/evidence/T218/RESULTADOS.md).
 **T216/T217:** [densidad](../reviews/evidence/T216/RESULTADOS.md) y

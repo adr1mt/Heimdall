@@ -5005,7 +5005,7 @@
       "id": "T219",
       "title": "Reinstalar la interfaz compacta y subir los commits autorizados",
       "phase": 9,
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T216",
@@ -5032,7 +5032,9 @@
         "GUI tipos, suite y build",
         "Contenido del AppImage y smoke-package con perfil temporal",
         "Huellas de instalación/copia y verificación del remoto"
-      ]
+      ],
+      "completed": "2026-10-27",
+      "notes": "Interfaz T216/T217 instalada desde 1364223 conservando idéntico el motor RA1 v2 de T218. 620 pruebas GUI, tipos/build, 26 archivos de paquete, dependencias, AppRun y arranque con perfil temporal correctos. Copia anterior y huellas verificadas; instancia activa intacta. Commit e8fe97f subido y confirmado en origin/main. Evidencia: docs/reviews/evidence/T219/RESULTADOS.md. Sin etiquetas ni publicación."
     }
   ]
 }
