@@ -4830,6 +4830,42 @@
       ],
       "completed": "2026-10-27",
       "notes": "Envío individual confirmado, bloqueo y registro persistente compartidos con masivo; reintento solo a fallidos. Una sola conexión al alumno elegido probada. Ayuda SFTP y SCP sin servicios nuevos; aislamiento depende de credenciales SSH propias, ADR-0037. 608 pruebas GUI, motor y build correctos; evidencia: docs/reviews/evidence/T211-T213/RESULTADOS.md."
+    },
+    {
+      "id": "T214",
+      "title": "Instalar las mejoras de proyector, refresco e informes individuales",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T211",
+        "T212",
+        "T213"
+      ],
+      "goal": "Instalar la compilación autorizada por el usuario conservando una copia recuperable y la instancia activa.",
+      "scope": [
+        "Construir AppImage desde 016d704 con motor actualizado.",
+        "Verificar contenido, motor y arranque con perfil temporal.",
+        "Sustituir atómicamente la instalación y conservar la anterior."
+      ],
+      "out_of_scope": [
+        "Cerrar o reiniciar la aplicación activa, tocar datos reales o máquinas del alumnado.",
+        "Publicar versiones, etiquetas o cambiar remotos."
+      ],
+      "acceptance": [
+        "El paquete incluye los controles e informes T211–T213 y motor idéntico al compilado.",
+        "Arranque empaquetado y preload correctos con un perfil temporal vacío.",
+        "Instalación coincide con el paquete verificado; copia anterior íntegra.",
+        "Instancia activa intacta; indicar cierre y reapertura cuando termine de corregir."
+      ],
+      "tests": [
+        "make check build",
+        "gui-build y electron-builder AppImage",
+        "Comprobación de contenidos y smoke-package con perfil temporal",
+        "Verificación SHA-256 de instalación y copia"
+      ],
+      "completed": "2026-10-27",
+      "notes": "AppImage T211–T213 instalado tras verificar 26 ficheros GUI, motor compilado y arranque con perfil temporal. Sustitución atómica, copia anterior y huellas verificadas; instancia activa intacta. Cerrar/abrir al finalizar la corrección. Sin publicación. Evidencia: docs/reviews/evidence/T214/RESULTADOS.md."
     }
   ]
 }

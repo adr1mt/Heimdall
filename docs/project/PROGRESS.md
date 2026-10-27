@@ -11,7 +11,9 @@ individual confirmado y registrado; masivo conservado y reintento solo a
 fallidos. Ayuda SFTP/SCP para abrir HTML desde Desktop (ADR-0037).
 608 pruebas GUI, motor, build y arneses aislados correctos.
 [Evidencia y límites](../reviews/evidence/T211-T213/RESULTADOS.md).
-**Sin instalar ni publicar**: la aplicación instalada sigue siendo T210.
+**T214 instalado** con motor nuevo y copia anterior verificada.
+[Instalación](../reviews/evidence/T214/RESULTADOS.md). Cerrar/abrir al terminar
+de corregir para cargar las mejoras; no se reinició la instancia activa.
 La privacidad entre alumnos requiere credenciales SSH propias; la contraseña
 común del aula no impide acceder a máquinas ajenas.
 

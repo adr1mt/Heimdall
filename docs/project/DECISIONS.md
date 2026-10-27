@@ -1009,3 +1009,12 @@ sin servidor web ni nuevas dependencias. Se conserva el HTML original.
 Los permisos privados no aíslan máquinas con contraseñas comunes conocidas
 por todo el grupo: esa garantía requiere credenciales SSH propias.
 No se instala ni reinicia la aplicación del profesor en esta solicitud.
+
+
+## T214 · 2026-10-27 · Instalación autorizada de las mejoras de aula
+
+Adrià pide instalar T211–T213. AppImage construido desde 016d704 con motor
+actualizado, incluyendo la entrega selectiva; conserva la reparación Kea.
+Verificados contenido, arranque con perfil temporal, copia anterior y huellas.
+Sustitución atómica sin cerrar ni reiniciar la instancia activa. La autorización
+es de instalación local, sin publicación ni cambio de remotos.

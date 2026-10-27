@@ -1,0 +1,16 @@
+{
+  "app": "/home/adr1/Aplicaciones/Heimdall/Heimdall.AppImage",
+  "package": "/home/adr1/apps/heimdall/gui/dist/Heimdall-1.0.1.AppImage",
+  "beforeAppSHA256": "3ceca27e408bdbac69c8b61e2161033235fc3bc68cc7c66dd84331381cfc97ce",
+  "packageSHA256": "9b779708be8c964f3be8241755fe2c8f42fffd6889d7e70b31729467af29dece",
+  "engineSHA256": "74a9014ae86cccc15d04ad3eee343b19608deb299c85e52e143ec8ed9d0ec91c",
+  "guiAsarSHA256": "c5e39fa4f1ca2facf0051a1e751d34ef8120936ed5901b91a99c79afcd8126fc",
+  "sourceCommit": "016d704",
+  "verifiedFiles": 26,
+  "resultChunk": "Results-Cch2R40U.js",
+  "runningInstanceRestarted": false,
+  "backupApp": "/home/adr1/Aplicaciones/Heimdall/Heimdall.AppImage.antes-zoom-informes-2026-10-27.bak",
+  "installedAppSHA256": "9b779708be8c964f3be8241755fe2c8f42fffd6889d7e70b31729467af29dece",
+  "installedAt": "2026-10-27T19:31:21.112008+00:00",
+  "engineVersion": "heimdall 1.0.1"
+}

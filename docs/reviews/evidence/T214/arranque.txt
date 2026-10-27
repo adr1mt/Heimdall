@@ -1,0 +1,1 @@
+Package auto: renderer and preload OK (Heimdall)
