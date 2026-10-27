@@ -294,7 +294,10 @@
 .app-sidebar { overflow-y: auto; scrollbar-width: thin; }
 /* Popovers must escape the rail's scroll container without clipping. */
 .teacher-display[open] > div { position: fixed; left: 0.75rem; bottom: 7rem; }
-.teacher-results { --matrix-check-width: clamp(15rem, 24vw, 22rem); }
+.teacher-results {
+  --matrix-check-width: clamp(15rem, 24vw, 22rem);
+  --matrix-student-width: 6.5rem;
+}
 .teacher-results .results-summary { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr) minmax(0, 1fr); }
 .teacher-results .summary-reading { align-items: center; }
 .teacher-results .summary-hardest > p:first-child { font-size: 0.6875rem; letter-spacing: normal; text-transform: none; }

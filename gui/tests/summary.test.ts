@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { t } from '@/i18n/es'
-import { DEFAULT_PASS_MARK, averageText, classSummary, displayedAverage, needsAttention, shortName } from '@/lib/summary'
+import { DEFAULT_PASS_MARK, averageText, classSummary, displayedAverage, needsAttention, shortName, studentShortNames } from '@/lib/summary'
 import { scaleOf, toScale } from '@/lib/scale'
 import { buildMatrix } from '@/lib/matrix'
 import type { CheckResult, RunResult, StudentResult } from '../src/shared/artifact'
@@ -132,6 +132,39 @@ describe('resumen de la clase', () => {
   it('acorta el nombre sin confundir a dos alumnos', () => {
     expect(shortName('Ana Ferrer')).toBe('Ana')
     expect(shortName('Ana Bonet', ['Ana'])).toBe('Ana B.')
+  })
+})
+
+describe('etiquetas breves de alumnos', () => {
+  const labels = (names: string[]) => [...studentShortNames(names.map((name, i) => ({ student_id: `s${i}`, name }))).values()]
+
+  it('usa solo el nombre cuando es único y todas las iniciales cuando se repite', () => {
+    expect(labels(['Biel Manjon Lopez', 'Ana Ferrer Soler', 'Ana Bonet Ruiz']))
+      .toEqual(['Biel', 'Ana F. S.', 'Ana B. R.'])
+  })
+
+  it('amplía los apellidos si las iniciales también coinciden', () => {
+    expect(labels(['Ana Pérez Soler', 'Ana Puig Serra', 'Biel Lopez']))
+      .toEqual(['Ana Pérez Soler', 'Ana Puig Serra', 'Biel'])
+  })
+
+  it('distingue nombres completos idénticos por el identificador', () => {
+    expect(labels(['Ana Pérez', 'Ana Pérez', 'Ana Bonet']))
+      .toEqual(['Ana Pérez (s0)', 'Ana Pérez (s1)', 'Ana B.'])
+  })
+
+  it('tolera espacios, mayúsculas y nombres sin apellidos', () => {
+    expect(labels(['  Ana   Ferrer Soler ', 'ana Bonet Ruiz', 'Biel', 'Biel', '']))
+      .toEqual(['Ana F. S.', 'ana B. R.', 'Biel (s2)', 'Biel (s3)', 's4'])
+    expect(labels(['Ana', 'Ana Ferrer'])).toEqual(['Ana', 'Ana F.'])
+  })
+
+  it('conserva las etiquetas por identidad independientemente del orden', () => {
+    const students = [{ student_id: 'a', name: 'Ana Ferrer' }, { student_id: 'b', name: 'Ana Bonet' }]
+    const forward = studentShortNames(students)
+    const reverse = studentShortNames([...students].reverse())
+    for (const student of students) expect(forward.get(student.student_id)).toBe(reverse.get(student.student_id))
+    expect(students[0].name).toBe('Ana Ferrer')
   })
 })
 

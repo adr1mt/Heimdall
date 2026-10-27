@@ -275,8 +275,14 @@ menú automático, expandido o de iconos y una escala de interfaz entre 80 % y
 120 %. Ambas preferencias se recuerdan al volver a abrir Heimdall; puedes
 restablecer la escala al 100 %. El zoom del proyector es independiente.
 
-La lista da prioridad al nombre completo y usa iconos para **Enviar informe**
-y **Ocultar**. La matriz conserva la columna de comprobaciones y las cabeceras
+Lista y Matriz muestran solo el nombre de pila; si se repite en la clase,
+añaden las iniciales de las palabras restantes. Si las iniciales también
+coinciden, muestran los apellidos completos, y si todo el nombre coincide,
+añaden el identificador. El abreviado se mantiene aunque filtres u ocultes
+alumnos. Al pasar el ratón o abrir el detalle puedes consultar el nombre
+completo. Los informes y exportaciones mantienen los nombres completos.
+La lista usa iconos para **Enviar informe** y **Ocultar**. La matriz conserva
+la columna de comprobaciones y las cabeceras
 al desplazarse dentro de ella; también puedes enfocarla con Tab y desplazarte
 con las flechas. El resumen distingue **aprobados**, **suspensos** y **sin evaluar**
 sin contar una incidencia técnica como suspenso. En Corregir, el contexto y el

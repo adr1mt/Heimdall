@@ -94,12 +94,40 @@ export function averageText(average: number | null): string {
 }
 
 /**
- * The name a narrow matrix column has room for. Two students sharing a first
- * name keep enough of the second to be told apart.
+ * A first name, with initials when it is shared by classmates. Names are
+ * stored as one string, so only whitespace boundaries are used here.
  */
 export function shortName(name: string, taken: string[] = []): string {
   const parts = name.trim().split(/\s+/)
   const first = parts[0] ?? name
-  if (parts.length === 1 || !taken.includes(first)) return first
-  return `${first} ${parts[1].charAt(0)}.`
+  if (parts.length === 1 || !taken.some((value) => nameKey(value) === nameKey(first))) return first
+  return `${first} ${parts.slice(1).map((part) => `${[...part][0].toUpperCase()}.`).join(' ')}`
+}
+
+function nameKey(name: string): string {
+  return name.normalize('NFKC').toLowerCase()
+}
+
+/** Compute over the entire class, never the currently filtered/visible rows. */
+export function studentShortNames(students: Pick<StudentResult, 'student_id' | 'name'>[]): Map<string, string> {
+  const names = students.map((student) => student.name.trim().replace(/\s+/g, ' '))
+  const firsts = names.map((name) => name.split(' ')[0])
+  const counts = (values: string[]): Map<string, number> => {
+    const result = new Map<string, number>()
+    for (const value of values) result.set(nameKey(value), (result.get(nameKey(value)) ?? 0) + 1)
+    return result
+  }
+  const firstCounts = counts(firsts)
+  const repeated = [...firstCounts].filter(([, count]) => count > 1).map(([first]) => first)
+  const labels = names.map((name, i) => shortName(name, repeated) || students[i].student_id)
+  const labelCounts = counts(labels)
+  const fullCounts = counts(names)
+  return new Map(students.map((student, i) => {
+    let label = labels[i]
+    if (labelCounts.get(nameKey(label))! > 1) {
+      label = names[i] || student.student_id
+      if (fullCounts.get(nameKey(names[i]))! > 1) label += ` (${student.student_id})`
+    }
+    return [student.student_id, label]
+  }))
 }

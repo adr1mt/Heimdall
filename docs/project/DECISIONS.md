@@ -1044,3 +1044,16 @@ Corregir da prioridad al progreso y utiliza todo el ancho del listado.
 El ajuste de proyector mide un ancho estable para evitar realimentar el zoom.
 No cambia evaluación ni retención de resultados; conserva T212 y hace explícito
 que las notas visibles siguen pendientes de actualizar. Sin instalación.
+
+
+## T217 · 2026-10-27 · Nombres breves estables en resultados
+
+A petición del usuario, Lista y Matriz usan el nombre de pila y añaden las
+iniciales de las palabras restantes cuando coincide. El modelo solo almacena
+un nombre completo: se usa la primera palabra, sin adivinar nombres compuestos.
+Si coinciden también las iniciales, se recuperan los apellidos completos; ante
+nombres completos idénticos se añade el identificador. Se compara sin distinguir
+mayúsculas y tras normalizar espacios. El cálculo se hace sobre toda la clase
+para evitar que cambien los nombres al ocultar, filtrar u ordenar. Ayuda, lector
+de pantalla, detalle, informes y exportaciones conservan el nombre completo.
+Columnas de profesor de 6,5 rem (104 px al 100 %). No modifica datos guardados.

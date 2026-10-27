@@ -5,12 +5,12 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T216:** portátil compacto: lateral contraíble/automático, escala 80–120 %
-persistente, nombres completos, matriz proporcionada y resumen explícito.
-Corregir prioriza progreso; proyector sin oscilación al ajustar muchas columnas.
-615 pruebas GUI, motor, tipos, build y arneses aislados correctos.
-[Evidencia y límites](../reviews/evidence/T216/RESULTADOS.md). Sin instalar.
-T211–T213 conserva [su evidencia](../reviews/evidence/T211-T213/RESULTADOS.md).
+**T217:** nombres breves en Lista/Matriz, iniciales si coinciden y apellidos
+si aún hay ambigüedad; ayuda/detalle mantienen el nombre completo. Columnas
+104 px. 620 pruebas GUI, motor, tipos/build y arneses correctos. Sin instalar.
+[Evidencia](../reviews/evidence/T217/RESULTADOS.md).
+**T216:** portátil compacto, escala 80–120 %, lateral contraíble y proyector
+estable. [Evidencia y límites](../reviews/evidence/T216/RESULTADOS.md). Sin instalar.
 **T215 instalado:** todos reciben su informe como `informe.html`; el siguiente
 envío sustituye al anterior. [Instalación](../reviews/evidence/T215/RESULTADOS.md).
 Copia anterior conservada. Cerrar/abrir al terminar de corregir; sin reinicio.

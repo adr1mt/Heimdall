@@ -12,6 +12,7 @@ declare global {
   interface Window {
     densityResults: (checks?: number) => void
     densityCorrect: (busy?: boolean) => void
+    densityNames: () => void
   }
 }
 const noEvents = () => () => undefined
@@ -52,6 +53,15 @@ window.densityCorrect = (busy = false) => {
       done: i < 7 ? 4 : 0, pass: i < 7 ? 4 : 0, fail: 0, unevaluated: 0, excluded: false, status: null, score: null })) : [],
     start: null, done: busy ? 28 : 0, end: null })
   useApp.setState({ view: 'correct', exam: { ...EXAM_OFF, active: true, passes: 1 } })
+}
+window.densityNames = () => {
+  window.densityResults()
+  const artifact = structuredClone(useRun.getState().artifact!)
+  const names = ['Ana Ferrer Soler', 'Ana Bonet Ruiz', 'Biel Montserrat Lopez', 'Alex Pérez Soler',
+    'Alex Puig Serra', 'Carla Gil', 'Diego Diaz', 'Elena Vera', 'Hugo Serra', 'Iván Roca',
+    'Javier Vidal', 'Kelvin Camp', 'Luis Soler', 'Marc Ariza']
+  artifact.students.forEach((student, i) => { student.name = names[i] })
+  useRun.getState().setArtifact(artifact, '/tmp/ficticio.json')
 }
 window.densityResults()
 root.render(<App />)

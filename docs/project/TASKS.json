@@ -4936,6 +4936,37 @@
       ],
       "completed": "2026-10-27",
       "notes": "615 pruebas GUI, tipos, build/preload, motor, enlaces y herramientas correctos. Electron aislado verifica portátil 1366×768/1024×768, escala 80/100/120, preferencias persistentes, nombres completos, matriz fija, refresco y proyector de 5/14/30 alumnos. Ajuste del proyector sin oscilación. Evidencia: docs/reviews/evidence/T216/RESULTADOS.md. Sin instalar ni publicar."
+    },
+    {
+      "id": "T217",
+      "title": "Abreviar nombres de alumnos sin confundir coincidencias",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T216"
+      ],
+      "goal": "Ahorrar espacio en resultados con nombre e iniciales solo cuando sea necesario.",
+      "scope": [
+        "Etiquetas de alumnos en Lista y Matriz, anchura de columnas y ayuda de nombre completo."
+      ],
+      "out_of_scope": [
+        "Modificar nombres guardados, notas, informes, exportaciones, instalar o publicar."
+      ],
+      "acceptance": [
+        "Nombre de pila cuando sea único; si se repite, nombre e iniciales de las palabras restantes.",
+        "Si también coinciden las iniciales, apellidos completos; si coincide el nombre completo, identificador para distinguirlos.",
+        "Etiquetas estables sobre toda la clase aunque se filtre u oculte; nombre completo accesible en ayuda, lector y detalle.",
+        "Matriz del profesor reduce columnas de 144 a 104 px al 100 %; Lista usa las mismas etiquetas y proyector las conserva.",
+        "Pruebas de coincidencias y regresión, tipos/build, motor y verificación Electron aislada correctos."
+      ],
+      "tests": [
+        "Pruebas GUI y tipos/build",
+        "make check",
+        "Arnés de resultados y nombres aislado"
+      ],
+      "completed": "2026-10-27",
+      "notes": "620 pruebas GUI, tipos/build y preload correctos; make check al inicio correcto. Electron aislado verifica iniciales, coincidencias, estabilidad tras ocultar/filtrar, nombre completo en ayuda/detalle y columnas de 104 px. Densidad, proyector e informes conservados. Evidencia: docs/reviews/evidence/T217/RESULTADOS.md. Sin instalar ni publicar."
     }
   ]
 }

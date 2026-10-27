@@ -63,7 +63,7 @@ import {
   toCsv
 } from '@/lib/export'
 
-import { averageText, classSummary, displayedAverage, type ClassSummary } from '@/lib/summary'
+import { averageText, classSummary, displayedAverage, studentShortNames, type ClassSummary } from '@/lib/summary'
 import { failingChecks, type FailingCheck } from '@/lib/analytics'
 import { buildMatrix, type MatrixRow } from '@/lib/matrix'
 import { attemptsText, chainTally, chainText, fromRunText } from '@/lib/chain'
@@ -107,6 +107,7 @@ export default function ResultsView() {
 
   const mask = useMask(artifact)
   const causes = useMemo(() => (artifact ? causesIn(artifact) : []), [artifact])
+  const names = useMemo(() => studentShortNames(artifact?.students ?? []), [artifact])
   const summary = useMemo(
     () => (artifact ? classSummary(artifact, passMark) : null),
     [artifact, passMark]
@@ -330,6 +331,7 @@ export default function ResultsView() {
               <StudentRow
                 key={student.student_id}
                 student={student}
+                name={names.get(student.student_id)!}
                 onHide={() => hideStudent(student.student_id)}
                 onToggle={() => {
                   setOpenStudent(student.student_id)
@@ -341,6 +343,7 @@ export default function ResultsView() {
         ) : (
           <MatrixView
             rows={rows}
+            names={names}
             selected={selected}
             onPick={(selection) => {
               setSelected(selection)
@@ -467,8 +470,9 @@ function Reading({
 }
 
 /** Compact comparison table; the scroll container owns both sticky axes. */
-function MatrixView({ rows, selected, onPick, onStudent, onHide }: {
+function MatrixView({ rows, names, selected, onPick, onStudent, onHide }: {
   rows: { student: StudentResult; checks: CheckResult[] }[]
+  names: Map<string, string>
   selected: Selection | null
   onPick: (selection: Selection) => void
   onStudent: (id: string) => void
@@ -485,7 +489,7 @@ function MatrixView({ rows, selected, onPick, onStudent, onHide }: {
       <div className="matrix-viewport max-h-[65vh] overflow-auto rounded-md border border-border focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
         role="region" aria-label="Matriz de resultados, desplazamiento horizontal y vertical" tabIndex={0}>
         <table className="results-matrix min-w-full table-fixed border-separate border-spacing-0 text-left"
-          style={{ width: `calc(var(--matrix-check-width, clamp(10rem, 38vw, 40rem)) + ${matrix.students.length * 9}rem)` }}
+          style={{ width: `calc(var(--matrix-check-width, clamp(10rem, 38vw, 40rem)) + ${matrix.students.length} * var(--matrix-student-width, 9rem))` }}
           onPointerOver={(event) => setColumn((event.target as HTMLElement).closest<HTMLElement>('[data-column]')?.dataset.column ?? null)}
           onPointerLeave={() => setColumn(null)}
           onFocusCapture={(event) => setColumn(event.target.closest<HTMLElement>('[data-column]')?.dataset.column ?? null)}
@@ -493,7 +497,7 @@ function MatrixView({ rows, selected, onPick, onStudent, onHide }: {
           <caption className="sr-only">Notas por alumno y comprobaciones superadas por los alumnos visibles</caption>
           <colgroup>
             <col style={{ width: 'var(--matrix-check-width, clamp(10rem, 38vw, 40rem))' }} />
-            {matrix.students.map((student) => <col key={student.student_id} style={{ width: '9rem' }} />)}
+            {matrix.students.map((student) => <col key={student.student_id} style={{ width: 'var(--matrix-student-width, 9rem)' }} />)}
           </colgroup>
           <thead className="sticky top-0 z-20">
             <tr>
@@ -506,7 +510,7 @@ function MatrixView({ rows, selected, onPick, onStudent, onHide }: {
                   className={cn('border-b border-border px-2 py-2 text-center align-top', column === student.student_id ? 'bg-secondary' : 'bg-background')}>
                   <button type="button" className="mx-auto block h-8 max-w-full rounded text-xs font-medium leading-4 underline-offset-4 hover:underline focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
                     title={student.name} aria-label={`Ver detalle de ${student.name}`} onClick={() => onStudent(student.student_id)}>
-                    <span className="matrix-student-name line-clamp-2 wrap-break-word">{student.name}</span>
+                    <span className="matrix-student-name line-clamp-2 wrap-break-word">{names.get(student.student_id)}</span>
                   </button>
                   <div className="matrix-student-summary">
                     <MatrixGrade student={student} />
@@ -1183,8 +1187,8 @@ function HideStudentButton({ student, onHide }: { student: StudentResult; onHide
   )
 }
 
-function StudentRow({ student, onToggle, onHide }: {
-  student: StudentResult; onToggle: () => void; onHide: () => void
+function StudentRow({ student, name, onToggle, onHide }: {
+  student: StudentResult; name: string; onToggle: () => void; onHide: () => void
 }) {
   const scale = useScale()
   const projector = useApp((s) => s.projector)
@@ -1197,6 +1201,7 @@ function StudentRow({ student, onToggle, onHide }: {
         type="button"
         onClick={onToggle}
         aria-label={`Ver detalle: ${student.name}`}
+        title={student.name}
         className="student-row-main flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-2 text-left hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
       >
         <span
@@ -1223,7 +1228,7 @@ function StudentRow({ student, onToggle, onHide }: {
           )}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="student-name block wrap-break-word text-sm font-medium">{student.name}</span>
+          <span className="student-name block wrap-break-word text-sm font-medium">{name}</span>
           <Meter
             className="mt-1"
             value={counts.pass}
