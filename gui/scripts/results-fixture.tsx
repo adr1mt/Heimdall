@@ -1,13 +1,19 @@
 // Isolated visual fixture. All names and results are fictitious; no IPC or disk writes.
 import React from 'react'
 import { createRoot } from 'react-dom/client'
+import { flushSync } from 'react-dom'
 import ResultsView from '../src/renderer/src/routes/Results'
 import { useRun } from '../src/renderer/src/stores/run'
 import { useApp } from '../src/renderer/src/stores/app'
 import { validRun } from '../tests/fixtures/valid-run'
 
 declare global {
-  interface Window { resultsFixture: (count: number, incomplete?: boolean) => void }
+  interface Window {
+    resultsFixture: (count: number, incomplete?: boolean) => void
+    resultsProjector: (on: boolean) => void
+    resultsRemount: () => void
+    resultsConnections: () => void
+  }
 }
 window.resultsFixture = (count, incomplete = false) => {
   const run = validRun()
@@ -28,10 +34,46 @@ window.resultsFixture = (count, incomplete = false) => {
       checks: run.plan.check_ids.map((id, j) => ({ ...base.checks[0], check_id: id,
         description: j === 0 ? 'Puerto SSH' : `Comprobación de redes ${j + 1}`,
         status: missing ? 'UNEVALUATED' : j < passed ? 'PASS' : 'FAIL',
-        cause: missing ? 'CONNECT_FAILED' : 'NONE' })) }
+        cause: missing ? 'CONNECT_FAILED' : 'NONE',
+        execution: missing ? null : { ...base.checks[0].execution!, transport: 'ssh',
+          address: '192.0.2.10', user: 'ficticio', host: 'servidor.aula', command: ['hostname'],
+          command_attempts: 1, connect_attempts: 1 },
+        assertion: missing ? null : { ...base.checks[0].assertion!, matched: j < passed } })) }
   })
-  useApp.setState({ scale: 'ten', passMark: 70, projector: false })
+  if (useApp.getState().projector) useApp.getState().toggleProjector()
+  useApp.setState({ scale: 'ten', passMark: 70 })
   useRun.getState().setArtifact(run, '/tmp/ficticio.json')
 }
+window.resultsProjector = (on) => {
+  if (useApp.getState().projector !== on) useApp.getState().toggleProjector()
+}
+window.resultsRemount = () => {
+  flushSync(() => root.render(null))
+  flushSync(() => root.render(<ResultsView />))
+}
+window.resultsConnections = () => {
+  window.resultsFixture(5, true)
+  const run = structuredClone(useRun.getState().artifact!)
+  run.run_id = 'fixture-connections'
+  run.status = 'PARTIAL'
+  // One partial evaluation, one connected machine with only timeouts,
+  // one SSH authentication refusal and one unreachable machine.
+  const partial = run.students[1]
+  partial.status = 'PARTIAL'
+  partial.score = { ...partial.score, evaluable: 49, unevaluated: 1, final_score: null,
+    provisional_score: Math.round(100 * partial.score.obtained / 49), status: 'INCOMPLETE' }
+  partial.checks[49] = { ...partial.checks[49], status: 'UNEVALUATED', cause: 'TIMEOUT', assertion: null,
+    execution: { ...partial.checks[49].execution!, completed: false, exit_code: null } }
+  for (const [i, cause] of [[2, 'TIMEOUT'], [3, 'AUTH_FAILED']] as const) {
+    const student = run.students[i]
+    student.status = 'NOT_EVALUATED'
+    student.score = { ...student.score, obtained: 0, evaluable: 0, unevaluated: 50,
+      final_score: null, provisional_score: null, status: 'NOT_EVALUATED' }
+    student.checks = student.checks.map((check) => ({ ...check, status: 'UNEVALUATED', cause, assertion: null,
+      execution: i === 2 ? { ...check.execution!, completed: false, exit_code: null } : null }))
+  }
+  useRun.getState().setArtifact(run, '/tmp/ficticio-connections.json')
+}
 window.resultsFixture(5)
-createRoot(document.getElementById('root')!).render(<ResultsView />)
+const root = createRoot(document.getElementById('root')!)
+root.render(<ResultsView />)

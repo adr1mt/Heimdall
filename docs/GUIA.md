@@ -117,7 +117,24 @@ siempre se puede enseñar; una avería también.
 La lista y la matriz muestran aprobados en verde, suspensos en rojo y
 comprobaciones pendientes en ámbar. Pulsa el nombre de un alumno para ver
 sus comprobaciones agrupadas, y cada comprobación para abrir su evidencia.
-Los filtros y la explicación de los estados están plegados.
+La búsqueda, los filtros de alumnos y **Ordenar** están disponibles también
+en el modo proyector. **Evaluados** muestra a quienes tienen evidencia de
+conexión con su máquina en la corrección abierta, incluidos los que quedaron
+incompletos. No equivale a tener nota final; una corrección que solo lee el
+inventario no demuestra conexión.
+
+Pulsa **Ocultar** junto a un alumno para apartarlo de la lista y de la matriz,
+por ejemplo si hoy no ha venido. **Ocultos (N)** permite mostrarlo de nuevo,
+uno a uno o con **Mostrar todos**. La selección se conserva al cambiar de
+vista, entrar o salir del proyector y volver a corregir. Se reinicia al
+cambiar de clase o examen, o cerrar la aplicación. **Restablecer** limpia
+filtros y orden, pero conserva los ocultos.
+
+Ocultar solo cambia estas vistas: no modifica la clase, las notas, a quién
+se corrige ni las exportaciones o informes. El resumen general sigue
+incluyendo toda la corrección; los recuentos de la matriz se refieren a los
+alumnos visibles. Los filtros de comprobaciones y la explicación de los
+estados están plegados.
 
 Desde ahí se exportan:
 

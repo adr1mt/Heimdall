@@ -3,6 +3,7 @@ import type { RunResult } from '../../../shared/artifact'
 import type { EngineEvent } from '../../../shared/events'
 import type { RunClosed } from '../../../shared/types'
 import { applyClosed, applyEvent, emptyRunState, type RunState } from '@/lib/run-state'
+import { useResultsView } from './results-view'
 
 interface RunStore extends RunState {
   /** The canonical artifact of the finished run: the source of truth. */
@@ -28,7 +29,10 @@ export const useRun = create<RunStore>((set) => ({
   artifactPath: null,
   artifactProblem: null,
 
-  setArtifact: (artifact, artifactPath) => set({ artifact, artifactPath, artifactProblem: null }),
+  setArtifact: (artifact, artifactPath) => {
+    useResultsView.getState().bindSources(artifact.exam.path, artifact.inventory.path)
+    set({ artifact, artifactPath, artifactProblem: null })
+  },
   artifactFailed: (artifactProblem) => set({ artifactProblem }),
 
   begin: () =>

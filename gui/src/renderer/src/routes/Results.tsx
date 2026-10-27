@@ -4,6 +4,7 @@ import {
   Check,
   AlertTriangle,
   Download,
+  EyeOff,
   Grid3x3,
   Layers,
   List,
@@ -27,9 +28,9 @@ import {
 } from '@/components/ui'
 import { useApp, useScale, messageOf, noticeFrom } from '@/stores/app'
 import { useRun } from '@/stores/run'
+import { useResultsView } from '@/stores/results-view'
 import {
   CAUSE_TEXT,
-  NO_FILTERS,
   REMOTE_TEXT,
   STATUS_TEXT,
   STUDENT_TEXT,
@@ -45,7 +46,6 @@ import {
   tally,
   truncationNote,
   type Filters,
-  type StudentFilter,
   type StudentOrder,
   type Pending
 } from '@/lib/results'
@@ -88,8 +88,6 @@ interface Selection {
  * failing everybody». They are the same data and the same filters: switching
  * is a question, not a navigation.
  */
-type Mode = 'list' | 'matrix'
-
 export default function ResultsView() {
   const artifact = useRun((s) => s.artifact)
   const projector = useApp((s) => s.projector)
@@ -97,10 +95,8 @@ export default function ResultsView() {
   const problem = useRun((s) => s.artifactProblem)
   const scale = useScale()
   const passMark = scale.passMark
-  const [filters, setFilters] = useState<Filters>(NO_FILTERS)
-  const [studentFilter, setStudentFilter] = useState<StudentFilter>('all')
-  const [order, setOrder] = useState<StudentOrder>('name')
-  const [mode, setMode] = useState<Mode>('list')
+  const { filters, setFilters, studentFilter, setStudentFilter, order, setOrder,
+    mode, setMode, hiddenIds, hideStudent, showStudent, showAll, clearFilters } = useResultsView()
   const [selected, setSelected] = useState<Selection | null>(null)
   const [openStudent, setOpenStudent] = useState<string | null>(null)
 
@@ -125,9 +121,8 @@ export default function ResultsView() {
   // Both views share the same student ordering and check filters.
   const rows = useMemo(() => {
     if (!artifact) return []
-    if (projector) return artifact.students.map((student) => ({ student, checks: student.checks }))
-    return exploreResults(filterRun(artifact, filters), studentFilter, order, passMark)
-  }, [artifact, filters, studentFilter, order, passMark, projector])
+    return exploreResults(filterRun(artifact, filters), studentFilter, order, passMark, hiddenIds)
+  }, [artifact, filters, studentFilter, order, passMark, hiddenIds])
 
   if (problem) {
     return (
@@ -157,12 +152,7 @@ export default function ResultsView() {
   )
   const filtering = hasFilters(filters) || studentFilter !== 'all'
   const exploring = filtering || order !== 'name'
-
-  function clear(): void {
-    setFilters(NO_FILTERS)
-    setStudentFilter('all')
-    setOrder('name')
-  }
+  const hiddenStudents = artifact.students.filter((student) => hiddenIds.includes(student.student_id))
 
   const detailed = artifact.students.find((student) => student.student_id === openStudent)
   if (detailed)
@@ -223,88 +213,116 @@ export default function ResultsView() {
       />
 
       <div className="min-h-0 flex-1 space-y-4 overflow-auto p-3 sm:p-6">
-        {summary && <KpiStrip summary={summary} average={average} mostFailed={mostFailed} />}
+        {summary && (
+          <section aria-label="Resumen de toda la corrección" className="space-y-2">
+            <p className="text-xs text-muted-foreground">Resumen de toda la corrección</p>
+            <KpiStrip summary={summary} average={average} mostFailed={mostFailed} />
+          </section>
+        )}
 
-        {!projector && (
-          <div className="space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <Input
-                className="w-full sm:w-64"
-                aria-label={t.results.filterText}
-                placeholder={t.results.filterText}
-                value={filters.text}
-                onChange={(e) => setFilters({ ...filters, text: e.target.value })}
-              />
-              <Segmented aria-label="Filtrar alumnos">
-                {([
-                  ['all', 'Todos'], ['pass', 'Aprobados'], ['fail', 'Suspensos'], ['ungraded', 'Sin evaluar']
-                ] as const).map(([value, label]) => (
-                  <SegmentedItem key={value} active={studentFilter === value}
-                    onClick={() => setStudentFilter(value)}
-                    title={value === 'ungraded' ? 'Sin nota final o con comprobaciones pendientes' : label}>
-                    {label}
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Input
+              className="w-full sm:w-64"
+              aria-label={t.results.filterText}
+              placeholder={t.results.filterText}
+              value={filters.text}
+              onChange={(e) => setFilters({ ...filters, text: e.target.value })}
+            />
+            <Segmented aria-label="Filtrar alumnos" className="max-w-full flex-wrap">
+              {([
+                ['all', 'Todos'], ['evaluated', 'Evaluados'], ['pass', 'Aprobados'], ['fail', 'Suspensos'], ['ungraded', 'Sin evaluar']
+              ] as const).map(([value, label]) => (
+                <SegmentedItem key={value} active={studentFilter === value}
+                  onClick={() => setStudentFilter(value)}
+                  title={value === 'evaluated' ? 'Se pudo conectar con su máquina; puede haber comprobaciones pendientes'
+                    : value === 'ungraded' ? 'Sin nota final o con comprobaciones pendientes' : label}>
+                  {label}
+                </SegmentedItem>
+              ))}
+            </Segmented>
+            <label className="flex items-center gap-2 text-xs text-muted-foreground sm:ml-auto">
+              Ordenar
+              <select
+                className={cn('h-8 max-w-full rounded-md border border-input bg-background px-2 text-xs text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring', order !== 'name' && 'border-primary')}
+                aria-label="Ordenar alumnos"
+                value={order}
+                onChange={(e) => setOrder(e.target.value as StudentOrder)}
+              >
+                <option value="name">Nombre</option>
+                <option value="grade-asc">Nota: menor a mayor</option>
+                <option value="grade-desc">Nota: mayor a menor</option>
+                <option value="failures">Más comprobaciones falladas</option>
+              </select>
+            </label>
+            {exploring && <Button variant="ghost" size="sm" onClick={clearFilters}>Restablecer</Button>}
+          </div>
+          <div className="flex flex-wrap items-start gap-x-4 gap-y-2">
+            <p role="status" className="py-1 text-xs text-muted-foreground">
+              {rows.length} de {artifact.students.length} alumnos · {hiddenStudents.length} ocultos
+              {filtering && ' · Filtros activos'}
+              {order !== 'name' && ' · Orden personalizado'}
+            </p>
+            {hiddenStudents.length > 0 && (
+              <details className="w-full text-xs sm:w-auto">
+                <summary className="w-fit cursor-pointer rounded px-2 py-1 text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring">
+                  Ocultos ({hiddenStudents.length})
+                </summary>
+                <div className="mt-2 max-h-64 space-y-1 overflow-auto rounded-md border border-border p-2">
+                  <p className="px-2 py-1 text-muted-foreground">Solo se ocultan en estas vistas durante la sesión.</p>
+                  <Button variant="ghost" size="sm" onClick={showAll}>Mostrar todos</Button>
+                  {hiddenStudents.map((student) => (
+                    <div key={student.student_id} className="flex items-center gap-3 px-2 py-1">
+                      <span className="min-w-0 flex-1 wrap-break-word">{student.name}</span>
+                      <Button variant="ghost" size="sm" aria-label={`Mostrar a ${student.name}`}
+                        onClick={() => showStudent(student.student_id)}>Mostrar</Button>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            )}
+          </div>
+          {studentFilter === 'evaluated' && (
+            <p className="text-xs text-muted-foreground">Se pudo conectar con su máquina; puede haber comprobaciones pendientes.</p>
+          )}
+          <details className="text-xs">
+            <summary className="cursor-pointer text-muted-foreground">
+              Filtrar comprobaciones y ver estados{hasFilters(filters) ? ' · filtros activos' : ''}
+            </summary>
+            <div className="my-2 flex flex-wrap items-center gap-2">
+              <Segmented aria-label="Filtrar comprobaciones">
+                {(['ALL', 'PASS', 'FAIL', 'UNEVALUATED'] as const).map((status) => (
+                  <SegmentedItem key={status} active={filters.status === status}
+                    onClick={() => setFilters({ ...filters, status })}
+                    title={status === 'ALL' ? t.results.filterAll : STATE_TEXT[status]}>
+                    {status === 'ALL' ? t.results.filterAll : STATUS_TEXT[status]}
                   </SegmentedItem>
                 ))}
               </Segmented>
-              <label className="flex items-center gap-2 text-xs text-muted-foreground sm:ml-auto">
-                Ordenar
-                <select
-                  className={cn('h-8 max-w-full rounded-md border border-input bg-background px-2 text-xs text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring', order !== 'name' && 'border-primary')}
-                  aria-label="Ordenar alumnos"
-                  value={order}
-                  onChange={(e) => setOrder(e.target.value as StudentOrder)}
-                >
-                  <option value="name">Nombre</option>
-                  <option value="grade-asc">Nota: menor a mayor</option>
-                  <option value="grade-desc">Nota: mayor a menor</option>
-                  <option value="failures">Más comprobaciones falladas</option>
+              {causes.length > 0 && (
+                <select className="h-8 rounded-md border border-input bg-background px-2 text-xs"
+                  aria-label={t.results.filterCause} value={filters.cause}
+                  onChange={(e) => setFilters({ ...filters, cause: e.target.value as Filters['cause'] })}>
+                  <option value="ALL">{t.results.filterCause}: {t.results.filterAll.toLowerCase()}</option>
+                  {causes.map((cause) => <option key={cause} value={cause}>{CAUSE_TEXT[cause]}</option>)}
                 </select>
-              </label>
-              {exploring && <Button variant="ghost" size="sm" onClick={clear}>Restablecer</Button>}
+              )}
+              <span className="ml-auto text-micro text-muted-foreground">{originText(artifact)}</span>
             </div>
-            {exploring && (
-              <p role="status" className="text-xs text-muted-foreground">
-                {rows.length} de {artifact.students.length} alumnos · {filtering ? 'Filtros activos' : 'Todos los alumnos'}
-                {order !== 'name' && ' · Orden personalizado'}
-              </p>
-            )}
-            <details className="text-xs">
-              <summary className="cursor-pointer text-muted-foreground">
-                Filtrar comprobaciones y ver estados{hasFilters(filters) ? ' · filtros activos' : ''}
-              </summary>
-              <div className="my-2 flex flex-wrap items-center gap-2">
-                <Segmented aria-label="Filtrar comprobaciones">
-                  {(['ALL', 'PASS', 'FAIL', 'UNEVALUATED'] as const).map((status) => (
-                    <SegmentedItem key={status} active={filters.status === status}
-                      onClick={() => setFilters({ ...filters, status })}
-                      title={status === 'ALL' ? t.results.filterAll : STATE_TEXT[status]}>
-                      {status === 'ALL' ? t.results.filterAll : STATUS_TEXT[status]}
-                    </SegmentedItem>
-                  ))}
-                </Segmented>
-                {causes.length > 0 && (
-                  <select className="h-8 rounded-md border border-input bg-background px-2 text-xs"
-                    aria-label={t.results.filterCause} value={filters.cause}
-                    onChange={(e) => setFilters({ ...filters, cause: e.target.value as Filters['cause'] })}>
-                    <option value="ALL">{t.results.filterCause}: {t.results.filterAll.toLowerCase()}</option>
-                    {causes.map((cause) => <option key={cause} value={cause}>{CAUSE_TEXT[cause]}</option>)}
-                  </select>
-                )}
-                <span className="ml-auto text-micro text-muted-foreground">{originText(artifact)}</span>
-              </div>
-              <States />
-            </details>
-          </div>
-        )}
+            <States />
+          </details>
+        </div>
 
         {rows.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{t.results.noMatches}</p>
+          <p className="text-sm text-muted-foreground">{hiddenStudents.length === artifact.students.length
+            ? 'Todos los alumnos están ocultos. Puedes recuperarlos desde Ocultos.' : t.results.noMatches}</p>
         ) : mode === 'list' ? (
           <div className="grid gap-1.5 xl:grid-cols-2">
             {rows.map(({ student }) => (
               <StudentRow
                 key={student.student_id}
                 student={student}
+                onHide={() => hideStudent(student.student_id)}
                 onToggle={() => {
                   setOpenStudent(student.student_id)
                   setSelected(null)
@@ -321,6 +339,7 @@ export default function ResultsView() {
               setOpenStudent(selection.studentId)
             }}
             onStudent={setOpenStudent}
+            onHide={hideStudent}
           />
         )}
 
@@ -431,11 +450,12 @@ function Reading({
 }
 
 /** Compact comparison table; the scroll container owns both sticky axes. */
-function MatrixView({ rows, selected, onPick, onStudent }: {
+function MatrixView({ rows, selected, onPick, onStudent, onHide }: {
   rows: { student: StudentResult; checks: CheckResult[] }[]
   selected: Selection | null
   onPick: (selection: Selection) => void
   onStudent: (id: string) => void
+  onHide: (id: string) => void
 }) {
   const matrix = useMemo(() => buildMatrix(rows), [rows])
   const [column, setColumn] = useState<string | null>(null)
@@ -472,6 +492,7 @@ function MatrixView({ rows, selected, onPick, onStudent }: {
                     <span className="line-clamp-2 wrap-break-word">{student.name}</span>
                   </button>
                   <MatrixGrade student={student} />
+                  <HideStudentButton student={student} onHide={() => onHide(student.student_id)} />
                 </th>
               ))}
             </tr>
@@ -1229,59 +1250,74 @@ function PendingRow({ row }: { row: Pending }) {
 }
 
 /** A compact row; technical incidents remain distinct from academic failure. */
-function StudentRow({ student, onToggle }: { student: StudentResult; onToggle: () => void }) {
+function HideStudentButton({ student, onHide }: { student: StudentResult; onHide: () => void }) {
+  return (
+    <Button variant="ghost" size="sm" onClick={onHide}
+      aria-label={`Ocultar a ${student.name}`} title="Ocultar alumno durante la sesión">
+      <EyeOff className="h-3.5 w-3.5" aria-hidden="true" />
+      Ocultar
+    </Button>
+  )
+}
+
+function StudentRow({ student, onToggle, onHide }: {
+  student: StudentResult; onToggle: () => void; onHide: () => void
+}) {
   const scale = useScale()
   const counts = tally(student.checks)
   const appearance = gradeAppearance(student, scale.passMark)
   const cause = student.checks.find((check) => check.cause !== 'NONE')?.cause
   return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-label={`Ver detalle: ${student.name}`}
-      className="flex w-full items-center gap-3 rounded-md px-3 py-3 text-left hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
-    >
-      <span
-        className={cn(
-          'flex h-6 w-6 shrink-0 items-center justify-center rounded',
-          appearance.tone === 'pass'
-            ? 'bg-success text-success-foreground'
-            : appearance.tone === 'fail'
-              ? 'bg-destructive text-destructive-foreground'
-              : appearance.tone === 'neutral'
-                ? 'bg-muted text-muted-foreground'
-                : 'bg-warning/15 text-warning-strong'
-        )}
-        title={appearance.label}
+    <div className="flex items-center gap-1 rounded-md border border-transparent hover:border-border">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-label={`Ver detalle: ${student.name}`}
+        className="flex min-w-0 flex-1 flex-wrap items-center gap-3 rounded-md px-3 py-3 text-left hover:bg-accent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
       >
-        {appearance.tone === 'pass' ? (
-          <Check className="h-4 w-4" />
-        ) : appearance.tone === 'fail' ? (
-          <X className="h-4 w-4" />
-        ) : appearance.tone === 'neutral' ? (
-          <span>—</span>
-        ) : (
-          <AlertTriangle className="h-4 w-4" />
-        )}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-medium">{student.name}</span>
-        <Meter
-          className="mt-1"
-          value={counts.pass}
-          total={student.checks.length}
-          tone={appearance.tone}
-        />
-        {cause && <span className="block text-micro text-warning-strong">{CAUSE_TEXT[cause]}</span>}
-      </span>
-      <span className="text-micro text-muted-foreground">
-        {counts.pass}/{student.checks.length}
-      </span>
-      <span className="flex shrink-0 items-center gap-2">
-        <span className={cn('text-xs font-medium', appearance.color)}>{appearance.label}</span>
-        <GradeBadge student={student} large />
-      </span>
-    </button>
+        <span
+          className={cn(
+            'flex h-6 w-6 shrink-0 items-center justify-center rounded',
+            appearance.tone === 'pass'
+              ? 'bg-success text-success-foreground'
+              : appearance.tone === 'fail'
+                ? 'bg-destructive text-destructive-foreground'
+                : appearance.tone === 'neutral'
+                  ? 'bg-muted text-muted-foreground'
+                  : 'bg-warning/15 text-warning-strong'
+          )}
+          title={appearance.label}
+        >
+          {appearance.tone === 'pass' ? (
+            <Check className="h-4 w-4" />
+          ) : appearance.tone === 'fail' ? (
+            <X className="h-4 w-4" />
+          ) : appearance.tone === 'neutral' ? (
+            <span>—</span>
+          ) : (
+            <AlertTriangle className="h-4 w-4" />
+          )}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-sm font-medium">{student.name}</span>
+          <Meter
+            className="mt-1"
+            value={counts.pass}
+            total={student.checks.length}
+            tone={appearance.tone}
+          />
+          {cause && <span className="block text-micro text-warning-strong">{CAUSE_TEXT[cause]}</span>}
+        </span>
+        <span className="text-micro text-muted-foreground">
+          {counts.pass}/{student.checks.length}
+        </span>
+        <span className="flex shrink-0 items-center gap-2">
+          <span className={cn('text-xs font-medium', appearance.color)}>{appearance.label}</span>
+          <GradeBadge student={student} large />
+        </span>
+      </button>
+      <HideStudentButton student={student} onHide={onHide} />
+    </div>
   )
 }
 

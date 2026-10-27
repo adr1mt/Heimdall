@@ -13,6 +13,7 @@ import {
 } from '@/lib/exam'
 
 import { canOpen, type View } from '@/lib/nav'
+import { useResultsView } from './results-view'
 
 export type { View }
 export type Theme = 'dark' | 'light'
@@ -224,6 +225,9 @@ export const useApp = create<AppState>((set, get) => ({
   setProject: (project) => {
     const draft = get().editorDraft
     if (draft && draft.text !== draft.savedText) { set({ pendingNavigation: { project } }); return }
+    if (project?.dir !== get().project?.dir || project?.examPath !== get().project?.examPath) {
+      useResultsView.getState().reset()
+    }
     set({
       editorDraft: null,
       project,
@@ -234,6 +238,7 @@ export const useApp = create<AppState>((set, get) => ({
     })
   },
   setClassId: (classId) => {
+    if (classId !== get().classId) useResultsView.getState().reset()
     if (classId) localStorage.setItem('heimdall-class-id', classId)
     else localStorage.removeItem('heimdall-class-id')
     set({ classId })

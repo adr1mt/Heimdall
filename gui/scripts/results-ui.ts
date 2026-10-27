@@ -18,8 +18,9 @@ writeFileSync(join(base, 'fixture.js'), readFileSync('/tmp/heimdall-results-fixt
 writeFileSync(join(base, 'index.html'), '<html><head><meta charset="utf-8"><link rel="stylesheet" href="style.css"></head><body><div id="root"></div><script src="fixture.js"></script></body></html>')
 const wait = () => new Promise((r) => setTimeout(r, 200))
 app.whenReady().then(async () => {
-  const win = new BrowserWindow({ width: 1440, height: 900, show: true,
-    webPreferences: { contextIsolation: true, nodeIntegration: false, zoomFactor: 1 } })
+  const win = new BrowserWindow({ width: 1440, height: 900, show: process.env.RESULTS_UI_VISIBLE === '1',
+    webPreferences: { contextIsolation: true, nodeIntegration: false, zoomFactor: 1,
+      backgroundThrottling: false, offscreen: process.env.RESULTS_UI_VISIBLE !== '1' } })
   const errors: string[] = []
   win.webContents.on('console-message', (event) => {
     if (event.level === 'error') { errors.push(event.message); console.error(event.message) }
@@ -42,6 +43,14 @@ app.whenReady().then(async () => {
   const headers = () => js("[...document.querySelectorAll('thead th[data-column]')].map(e=>e.dataset.column)")
   const choose = async (value: string) => {
     await js(`(()=>{const e=document.querySelector('select[aria-label="Ordenar alumnos"]');e.value=${JSON.stringify(value)};e.dispatchEvent(new Event('change',{bubbles:true}))})()`)
+    await wait()
+  }
+  const labelled = async (label: string) => {
+    await js(`(()=>{const e=[...document.querySelectorAll('button')].find(e=>e.getAttribute('aria-label')===${JSON.stringify(label)});if(!e)throw Error('Missing action: '+${JSON.stringify(label)});e.click()})()`)
+    await wait()
+  }
+  const openHidden = async () => {
+    await js(`(()=>{const e=[...document.querySelectorAll('summary')].find(e=>e.textContent.trim().startsWith('Ocultos ('));if(!e)throw Error('Missing hidden students');e.parentElement.open=true})()`)
     await wait()
   }
   const proof: unknown[] = []
@@ -114,6 +123,73 @@ app.whenReady().then(async () => {
     await click('Aprobados')
     assert.deepEqual(await headers(), ['demo-1'], 'Check and student filters intersect')
     proof.push({ interactions: 'pass/fail/ungraded, list/matrix, all four orders, detail/back, reset, combined filters: PASS' })
+
+    await click('Restablecer')
+    await js('window.resultsFixture(5)'); await wait()
+    await labelled('Ocultar a Ana Demo 1')
+    assert.equal((await headers()).length, 4, 'Hide matrix column')
+    await click('Lista')
+    assert.equal(await js(`document.querySelectorAll('button[aria-label^="Ver detalle:"]').length`), 4)
+    assert.equal(await js(`document.querySelectorAll('button button').length`), 0, 'Independent hide/detail buttons')
+    await labelled('Ocultar a Carla Demo 3')
+    await js('window.resultsRemount()'); await wait()
+    assert.equal(await js(`document.querySelectorAll('button[aria-label^="Ver detalle:"]').length`), 3, 'Survives remount/navigation')
+    await click('Matriz')
+    const visible = await headers()
+    await js('window.resultsProjector(true)'); await wait()
+    assert.deepEqual(await headers(), visible, 'Projector preserves hidden students')
+    for (const order of ['name', 'grade-asc', 'grade-desc', 'failures']) {
+      await choose(order)
+      const projected = await headers()
+      await js('window.resultsProjector(false)'); await wait()
+      assert.deepEqual(await headers(), projected, `Same order outside projector: ${order}`)
+      await js('window.resultsProjector(true)'); await wait()
+    }
+    await click('Restablecer')
+    assert.equal((await headers()).length, 3, 'Reset does not restore hidden students')
+    await openHidden()
+    await labelled('Mostrar a Ana Demo 1')
+    assert.equal((await headers()).length, 4, 'Restore one in projector')
+    await openHidden(); await click('Mostrar todos')
+    assert.equal((await headers()).length, 5)
+    await js('window.resultsConnections()'); await wait()
+    await click('Evaluados')
+    assert.deepEqual(await headers(), ['demo-0', 'demo-1', 'demo-2'], 'Includes partial and timeout after SSH; excludes failed auth and connect')
+    await js('window.resultsProjector(true)'); await wait()
+    assert.deepEqual(await headers(), ['demo-0', 'demo-1', 'demo-2'])
+    await choose('grade-asc')
+    assert.deepEqual(await headers(), ['demo-0', 'demo-1', 'demo-2'], 'Missing final grades remain last')
+    await shot('projector-evaluated')
+    await click('Lista')
+    assert.equal(await js(`document.querySelectorAll('button[aria-label^="Ver detalle:"]').length`), 3)
+    await labelled('Ver detalle: Ana Demo 1')
+    assert.equal(await js(`document.body.innerText.includes('192.0.2.10') || document.body.innerText.includes('servidor.aula')`), false, 'Machine details masked')
+    await click('Volver')
+    win.setSize(1024, 768)
+    await shot('projector-list')
+    assert.equal(await js('document.documentElement.scrollWidth <= innerWidth'), true, 'List hide controls fit')
+    await labelled('Ocultar a Ana Demo 1')
+    await labelled('Ocultar a Bruno Demo con un nombre y dos apellidos muy largos')
+    await labelled('Ocultar a Carla Demo 3')
+    assert.equal(await js(`document.querySelectorAll('button[aria-label^="Ver detalle:"]').length`), 0)
+    await click('Restablecer')
+    assert.equal(await js(`document.querySelectorAll('button[aria-label^="Ver detalle:"]').length`), 2, 'Only disconnected students remain after reset')
+    await labelled('Ocultar a Diego Demo 4')
+    await labelled('Ocultar a Elena Demo 5')
+    assert.ok(await js(`document.body.innerText.includes('Todos los alumnos están ocultos')`))
+    await openHidden()
+    win.setSize(1024, 768)
+    await js(`document.documentElement.classList.add('dark')`); await wait()
+    await shot('projector-all-hidden')
+    assert.equal(await js('document.documentElement.scrollWidth <= innerWidth'), true, 'Projector controls fit')
+    await click('Mostrar todos')
+    assert.equal(await js(`document.querySelectorAll('button[aria-label^="Ver detalle:"]').length`), 5)
+    await labelled('Ocultar a Ana Demo 1')
+    await js('window.resultsFixture(5)'); await wait()
+    assert.equal(await js(`document.querySelectorAll('button[aria-label^="Ver detalle:"]').length`), 4, 'New correction preserves hiding')
+    await js('window.resultsRemount()'); await wait()
+    assert.equal(await js(`document.querySelectorAll('button[aria-label^="Ver detalle:"]').length`), 4)
+    proof.push({ sessionControls: 'hide/list/matrix/remount/new run, restore one/all/empty, evaluated SSH/partial/timeout, all projector orders, masked detail: PASS' })
     writeFileSync(join(out, 'proof.json'), JSON.stringify(proof, null, 2))
   }
   assert.deepEqual(errors, [], 'Renderer errors')

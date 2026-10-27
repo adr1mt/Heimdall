@@ -5,18 +5,21 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
+**T208:** ocultos temporales, Evaluados por conexión y filtros/orden en proyector.
+601 pruebas GUI, motor, build y Electron correctos; T208 pendiente de instalar.
+[Evidencia](../reviews/evidence/T208/RESULTADOS.md).
+
 **T209:** validación Kea como usuario del servicio: evita el bloqueo AppArmor de
 root; acceso imposible técnico, errores reales conservados. 30 pruebas Python,
 Go y paquete correctos. AppImage/examen instalados con originales; cerrar/abrir
 y nueva corrección. GUI T208 sin incluir. [Evidencia](../reviews/evidence/T209/RESULTADOS.md).
 
-**T207:** RA1: 19 criterios/peso 24, reservas agrupadas; instalación local con
-originales. [Evidencia](../reviews/evidence/T207/RESULTADOS.md).
+**T207:** RA1: 19 criterios/peso 24; cuatro reservas KEA juntas, peso 2.
+Examen/AppImage locales actualizados; originales conservados. [Evidencia](../reviews/evidence/T207/RESULTADOS.md).
 
-**T204 (histórico):** RA1 semántico, ajustado en T205/T206/T207. Comprobador fijo,
-pruebas y originales conservados. [Evidencia](../reviews/evidence/T204/RESULTADOS.md).
-**T203:** validar/guardar sin clase e Inicio con nombre actualizado; incluida en
-la compilación local. [Evidencia](../reviews/evidence/T203/RESULTADOS.md).
+**T204 (histórico):** RA1 semántico (ADR-0036), ajustado en T205/T206/T207.
+[Pruebas, instalación y límites](../reviews/evidence/T204/RESULTADOS.md).
+**T203:** editor sin clase e Inicio actualizados; compilado. [Evidencia](../reviews/evidence/T203/RESULTADOS.md).
 **T187:** éxitos verdes 5 s y errores persistentes; incluida en compilación local.
 [Evidencia](../reviews/evidence/T187/RESULTADOS.md). T187/T203/T204/T205/T206/T207 sin publicar.
 Auditoría anterior autorizada por Adrià:
@@ -33,7 +36,6 @@ T204 conserva ese número nominal; se distingue por revisión de comprobador y
 huellas de instalación. No equivale a una publicación ni a validación de aula.
 
 ## Problemas conocidos y límites
-
 - RA1 no evalúa el cliente ni su registro. Kea valida archivo guardado;
   gateway/DNS son opciones declaradas, no la configuración efectiva del cliente.
 - Si un consumidor no lee, puede faltar progreso y `run.end`; el resultado
@@ -53,7 +55,6 @@ huellas de instalación. No equivale a una publicación ni a validación de aula
   pendiente. npm: 8 moderados build con excepción específica.
 
 ## Siguiente trabajo
-
 T070 sigue READY: T204 repara solo RA1, no todos los exámenes. T084 queda para
 prueba de aula de Adrià. T023 y T186 siguen READY. No hay publicación autorizada
 para estos cambios nuevos.

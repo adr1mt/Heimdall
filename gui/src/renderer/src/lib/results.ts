@@ -151,18 +151,29 @@ export function filterRun(
   return rows.filter((row) => row.checks.length > 0)
 }
 
-export type StudentFilter = 'all' | 'pass' | 'fail' | 'ungraded'
+export type StudentFilter = 'all' | 'evaluated' | 'pass' | 'fail' | 'ungraded'
 export type StudentOrder = 'name' | 'grade-asc' | 'grade-desc' | 'failures'
+
+/** Evidence of an authenticated SSH connection in this run, regardless of grade. */
+export function hasSSHConnection(student: StudentResult): boolean {
+  return student.status !== 'EXCLUDED' && student.checks.some(({ execution }) =>
+    execution?.transport === 'ssh' && execution.command_attempts > 0
+  )
+}
 
 /** Student filters operate on full results, independently of check filters. */
 export function exploreResults(
   rows: ReturnType<typeof filterRun>,
   filter: StudentFilter,
   order: StudentOrder,
-  passMark: number
+  passMark: number,
+  hiddenIds: readonly string[] = []
 ): ReturnType<typeof filterRun> {
+  const hidden = new Set(hiddenIds)
   const visible = rows.filter(({ student }) => {
+    if (hidden.has(student.student_id)) return false
     if (filter === 'all') return true
+    if (filter === 'evaluated') return hasSSHConnection(student)
     const tone = gradeAppearance(student, passMark).tone
     return filter === 'ungraded' ? tone === 'warning' : tone === filter
   })

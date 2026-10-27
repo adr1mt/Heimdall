@@ -969,3 +969,18 @@ La imposibilidad de acceso queda técnica y los errores reales siguen fallando.
 La revisión nueva se instala junto con el examen, con originales conservados y
 sin incorporar la GUI pendiente T208. Hace falta reiniciar y volver a corregir.
 Pruebas y límites: docs/reviews/evidence/T209/RESULTADOS.md.
+
+## T208 · 2026-10-27 · Selección visual de alumnos para el aula
+
+Lista, matriz y proyector comparten filtros, orden y ocultos durante la sesión.
+Ocultar es solo presentación: no elimina alumnos ni altera correcciones, notas,
+resúmenes generales, exportaciones o informes. «Restablecer» no recupera ocultos;
+«Ocultos (N)» permite recuperar uno o todos expresamente. Cambiar clase/examen o
+reiniciar la aplicación limpia esta selección, sin persistirla en disco. Las
+rutas de origen separan también resultados históricos de otra clase/examen.
+«Evaluados» exige evidencia SSH con al menos un intento de comando después de
+autenticar en la corrección abierta; incluye incompletos y fallos técnicos
+posteriores, incluso rechazo de sudo, sin inventar conexión a partir de nota,
+inventario, intentos de conexión o resultados anteriores. No cambia el contrato
+ni el motor. Se prepara y prueba separado de la aplicación instalada que Adrià
+sigue usando: no sustituirla ni reiniciarla durante esta sesión.

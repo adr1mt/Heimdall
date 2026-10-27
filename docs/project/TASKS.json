@@ -4662,6 +4662,54 @@
       ],
       "notes": "Validación con identidad/grupos del servicio; errores de acceso técnicos y diagnóstico de Kea preservado. 30 pruebas Python y suite Go correctas. Primera revisión probada por SSH: acceso reparado, configuración inválida detectada. Repetición de revisión final rechazada por auto-review; mejora de diagnóstico probada localmente. AppImage construido desde el instalado sin T208, motor/examen actualizados y originales conservados. Requiere cerrar/abrir y nueva corrección. Sin publicación. Evidencia: docs/reviews/evidence/T209/RESULTADOS.md.",
       "completed": "2026-10-27"
+    },
+    {
+      "id": "T208",
+      "title": "Ocultar alumnos y conservar filtros y orden en el proyector",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T191"
+      ],
+      "goal": "Adaptar Resultados al uso en aula con ocultación temporal, filtro Evaluados y controles compartidos en lista, matriz y proyector.",
+      "scope": [
+        "Ocultar y recuperar alumnos individualmente o todos, solo en memoria durante la sesión.",
+        "Compartir filtros, orden y modo entre vistas y navegación; reiniciar al cambiar de clase o examen.",
+        "Filtro Evaluados basado en evidencia SSH de la corrección abierta, incluidos incompletos.",
+        "Pruebas puras, de estado y arnés Electron aislado con datos ficticios."
+      ],
+      "out_of_scope": [
+        "Modificar motor, contrato, notas, informes, exportaciones o alcance de corrección.",
+        "Instalar, sustituir, reiniciar o interactuar con la aplicación que el profesor usa para corregir.",
+        "Evaluar alumnado, publicar o cambiar remotos."
+      ],
+      "acceptance": [
+        "Ocultar desde lista y matriz afecta ambas vistas; Ocultos (N) permite recuperar uno o todos incluso sin alumnos visibles.",
+        "Ocultos y exploración sobreviven a navegación, detalle, proyector y nuevas correcciones del mismo examen/clase; se reinician al cambiar de contexto o arrancar otra aplicación.",
+        "Evaluados exige ejecución SSH con command_attempts > 0 en la corrección abierta; incluye incidencias posteriores a autenticar y excluye conexión fallida, credenciales SSH rechazadas, solo inventario y evidencia solo anterior.",
+        "Proyector mantiene filtros y los cuatro órdenes, con controles accesibles y protección de datos técnicos conservada.",
+        "Restablecer limpia filtros y orden sin recuperar ocultos; contador visible y resumen general claramente identificado.",
+        "Notas, resultados guardados y exportaciones son iguales al ocultar; suites GUI y motor, build y revisión visual aislada correctos."
+      ],
+      "tests": [
+        "make check",
+        "make gui-check gui-build",
+        "Pruebas de conexión, filtros y ciclo de estado visual",
+        "Arnés results-ui aislado: lista/matriz, proyector, recuperación, navegación y datos ficticios"
+      ],
+      "notes": "Ocultos y exploración en memoria, comunes a lista/matriz/proyector. Evaluados exige evidencia SSH de la corrección abierta e incluye incompletos; notas y CSV intactos. 601 pruebas GUI, motor base, build y arnés Electron aislado correctos. No instalado ni reiniciado: Adrià sigue corrigiendo. Cambios T209 simultáneos conservados fuera del alcance. Evidencia: docs/reviews/evidence/T208/RESULTADOS.md.",
+      "review": {
+        "base": "c6a566c614c7b1e400aeaa7b5bda7ed7f3039616",
+        "head": "c6a566c614c7b1e400aeaa7b5bda7ed7f3039616",
+        "includes_uncommitted": true,
+        "task_ids": [
+          "T208"
+        ],
+        "report": "docs/reviews/evidence/T208/RESULTADOS.md",
+        "status": "COMPLETE"
+      },
+      "completed": "2026-10-27"
     }
   ]
 }
