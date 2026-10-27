@@ -959,3 +959,13 @@ los criterios individuales para sus regresiones históricas. El examen tiene
 compilación local; no cambia la arquitectura declarativa de ADR-0036, el modelo
 de nota ni ningún otro criterio académico. Originales y versiones recuperables
 conservados; sin publicación remota ni evaluación del alumnado.
+
+## T209 · 2026-10-27 · Validación de Kea bajo AppArmor
+
+La validación usa User/Group del servicio, con grupos suplementarios y abandono
+de root antes de leer y ejecutar Kea. Se evita el bloqueo de AppArmor sobre los
+permisos especiales de root; no se debilitan permisos ni políticas del alumno.
+La imposibilidad de acceso queda técnica y los errores reales siguen fallando.
+La revisión nueva se instala junto con el examen, con originales conservados y
+sin incorporar la GUI pendiente T208. Hace falta reiniciar y volver a corregir.
+Pruebas y límites: docs/reviews/evidence/T209/RESULTADOS.md.

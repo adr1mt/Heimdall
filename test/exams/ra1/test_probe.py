@@ -6,6 +6,7 @@ import tempfile
 import subprocess
 import sys
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 SPEC = importlib.util.spec_from_file_location('ra1', Path(__file__).resolve().parents[3] / 'internal/probe/ra1.py')
@@ -47,6 +48,62 @@ def nft_data(rules, hook='forward', policy='drop'):
 
 
 class ProbeTests(unittest.TestCase):
+    def test_kea_identity_uses_service_user_group_and_supplementary_groups(self):
+        account = SimpleNamespace(pw_name='_kea', pw_uid=105, pw_gid=107)
+        for user, group, expected_gid in (('_kea', '', 107), ('105', '108', 108),
+                                           ('_kea', 'service-group', 108)):
+            with self.subTest(user=user, group=group), \
+                 patch.object(p, 'output', side_effect=[user, group]), \
+                 patch.object(p.pwd, 'getpwnam', return_value=account), \
+                 patch.object(p.pwd, 'getpwuid', return_value=account), \
+                 patch.object(p.grp, 'getgrnam', return_value=SimpleNamespace(gr_gid=108)), \
+                 patch.object(p.os, 'geteuid', return_value=0), \
+                 patch.object(p.os, 'initgroups') as groups, \
+                 patch.object(p.os, 'setgid') as gid, patch.object(p.os, 'setuid') as uid:
+                p.kea_identity()
+                groups.assert_called_once_with('_kea', expected_gid)
+                gid.assert_called_once_with(expected_gid)
+                uid.assert_called_once_with(105)
+
+    def test_kea_identity_root_service_and_missing_privilege(self):
+        with patch.object(p, 'output', side_effect=['', '']), patch.object(p.os, 'setuid') as uid:
+            p.kea_identity()
+            uid.assert_not_called()
+        with patch.object(p, 'output', side_effect=['_kea', '']), \
+             patch.object(p.pwd, 'getpwnam', return_value=SimpleNamespace(pw_gid=107)), \
+             patch.object(p.os, 'geteuid', return_value=1000):
+            with self.assertRaises(p.Unavailable):
+                p.kea_identity()
+
+    def test_kea_real_parser_keeps_invalid_config_academic_and_access_technical(self):
+        text = json.dumps({'Dhcp4': good_kea()})
+        for code, stdout, stderr, expected in (
+            (0, '', '', 'OK'),
+            (1, 'INFO backend registered\n' * 500, 'Error encountered: subnet configuration failed: pool outside subnet', 'FAIL'),
+            (1, '', 'Syntax check failed with: Unable to open file /etc/kea/kea-dhcp4.conf', 'TECHNICAL'),
+            (1, 'Syntax check failed with: Unable to open file /etc/kea/include.conf', '', 'TECHNICAL')):
+            with self.subTest(expected=expected), patch.object(p, 'kea_identity'), \
+                 patch.object(p, 'output', return_value=''), patch.object(p, 'read', return_value=text), \
+                 patch.object(p, 'run', return_value=subprocess.CompletedProcess([], code, stdout, stderr)), \
+                 patch('sys.stdout', new_callable=__import__('io').StringIO) as captured:
+                status = p.main(['kea-interficie', 'wan0', 'lan0', '192.168.236.60'])
+                self.assertEqual(status, 70 if expected == 'TECHNICAL' else 0)
+                self.assertEqual(captured.getvalue(), '' if expected == 'TECHNICAL' else expected + '\n')
+                if expected == 'FAIL':
+                    with self.assertRaises(p.Incorrect) as failure:
+                        p.kea()
+                    self.assertIn('pool outside subnet', str(failure.exception))
+
+    def test_kea_reads_after_dropping_privileges_and_unreadable_is_technical(self):
+        events = []
+        with patch.object(p, 'output', return_value=''), \
+             patch.object(p, 'kea_identity', side_effect=lambda: events.append('identity')), \
+             patch.object(p, 'read', side_effect=lambda path: events.append('read') or (_ for _ in ()).throw(PermissionError('denied'))), \
+             patch.object(p, 'run') as run:
+            self.assertEqual(p.main(['kea-interficie', 'wan0', 'lan0', '192.168.236.60']), 70)
+            self.assertEqual(events, ['identity', 'read'])
+            run.assert_not_called()
+
     def test_proc_scalar_and_bounded_file_reads(self):
         # A huge read request against procfs can fail in the kernel even for
         # a two-byte sysctl. Exercise the real read path with small chunks.

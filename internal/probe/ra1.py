@@ -12,6 +12,8 @@ import ipaddress as ip
 import json
 import os
 from pathlib import Path
+import pwd
+import grp
 import re
 import selectors
 import shutil
@@ -146,19 +148,44 @@ def uncomment(text, cwd=Path('/'), stack=()):
     return re.sub(r'("(?:[^"\\]|\\.)*")|,\s*(?=[}\]])', lambda m: m[1] or '', result)
 
 
+def kea_identity():
+    """This checker process serves one criterion; drop to the service identity."""
+    user = output(['systemctl', 'show', 'kea-dhcp4-server', '-p', 'User', '--value']).strip()
+    group = output(['systemctl', 'show', 'kea-dhcp4-server', '-p', 'Group', '--value']).strip()
+    if not user and not group:
+        return  # Older packages run Kea as root.
+    account = pwd.getpwuid(int(user)) if user.isdecimal() else pwd.getpwnam(user or 'root')
+    gid = (int(group) if group.isdecimal() else grp.getgrnam(group).gr_gid) if group else account.pw_gid
+    if os.geteuid() != 0:
+        raise Unavailable('La validación de Kea necesita sudo para usar la identidad del servicio')
+    os.initgroups(account.pw_name, gid)
+    os.setgid(gid)
+    os.setuid(account.pw_uid)
+
+
 def kea():
     path = '/etc/kea/kea-dhcp4.conf'
-    text = read(path)
     cwd_text = output(['systemctl', 'show', 'kea-dhcp4-server', '-p', 'WorkingDirectory', '--value']).strip()
     cwd = Path(cwd_text or '/')
     if not cwd.is_absolute():
         raise Unavailable("Directorio de trabajo de Kea no interpretable")
+    kea_identity()
+    text = read(path)
+    # Read includes before invoking Kea, under the same service identity.
+    expanded = uncomment(text, cwd)
     # The actual Kea parser decides whether its extended JSON is valid.
     p = run(['kea-dhcp4', '-t', path], academic=True, cwd=cwd)
     if p.returncode:
-        raise Incorrect("Kea rechaza su configuración: " + (p.stderr + p.stdout)[-500:])
+        detail = (p.stdout + '\n' + p.stderr)[-1500:]
+        # Kea's fixed parser diagnostic (not an academic assertion or a
+        # localized OS error). LC_ALL=C is set by run(). A MAC policy may
+        # deny Kea even when the Python reader can open the same file.
+        if 'Unable to open file' in p.stderr + p.stdout:
+            raise Unavailable('Kea no puede abrir su configuración; revisa permisos/AppArmor: ' +
+                              detail)
+        raise Incorrect("Kea rechaza su configuración: " + detail)
     try:
-        root = json.loads(uncomment(text, cwd))['Dhcp4']
+        root = json.loads(expanded)['Dhcp4']
     except (ValueError, KeyError, TypeError) as e:
         raise Incorrect("Configuración de Kea inválida: " + str(e))
     if not isinstance(root, dict):

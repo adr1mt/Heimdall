@@ -16,7 +16,7 @@ grupos:
     en: host1
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-externa-ip
     - ${alumno.if_ext}
     - ${alumno.if_int}
@@ -27,7 +27,7 @@ grupos:
     en: host1
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-externa-estatica
     - ${alumno.if_ext}
     - ${alumno.if_int}
@@ -38,7 +38,7 @@ grupos:
     en: host1
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-externa-netplan
     - ${alumno.if_ext}
     - ${alumno.if_int}
@@ -49,7 +49,7 @@ grupos:
     en: host1
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-externa-gw
     - ${alumno.if_ext}
     - ${alumno.if_int}
@@ -60,7 +60,7 @@ grupos:
     en: host1
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-externa-dns
     - ${alumno.if_ext}
     - ${alumno.if_int}
@@ -71,7 +71,7 @@ grupos:
     en: host1
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-interna-ip
     - ${alumno.if_ext}
     - ${alumno.if_int}
@@ -82,7 +82,7 @@ grupos:
     en: host1
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-interna-netplan
     - ${alumno.if_ext}
     - ${alumno.if_int}
@@ -93,7 +93,7 @@ grupos:
     en: host1
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-interna-sense-gw
     - ${alumno.if_ext}
     - ${alumno.if_int}
@@ -104,7 +104,7 @@ grupos:
     en: host1
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-sortida
     - ${alumno.if_ext}
     - ${alumno.if_int}
@@ -115,7 +115,7 @@ grupos:
     en: host1
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-resolucio
     - ${alumno.if_ext}
     - ${alumno.if_int}
@@ -128,7 +128,7 @@ grupos:
     en: host1
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - kea-interficie
     - ${alumno.if_ext}
     - ${alumno.if_int}
@@ -139,7 +139,7 @@ grupos:
     en: host1
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - kea-subxarxa
     - ${alumno.if_ext}
     - ${alumno.if_int}
@@ -150,7 +150,7 @@ grupos:
     en: host1
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - kea-rang-inici
     - ${alumno.if_ext}
     - ${alumno.if_int}
@@ -162,7 +162,7 @@ grupos:
     peso: 2
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - kea-rang-final
     - ${alumno.if_ext}
     - ${alumno.if_int}
@@ -173,7 +173,7 @@ grupos:
     en: host1
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - kea-porta-enllac
     - ${alumno.if_ext}
     - ${alumno.if_int}
@@ -185,7 +185,7 @@ grupos:
     en: host1
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - kea-dns
     - ${alumno.if_ext}
     - ${alumno.if_int}
@@ -197,7 +197,7 @@ grupos:
     en: host1
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - kea-reserves
     - ${alumno.if_ext}
     - ${alumno.if_int}
@@ -210,7 +210,7 @@ grupos:
     peso: 2
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - kea-actiu
     - ${alumno.if_ext}
     - ${alumno.if_int}
@@ -223,7 +223,7 @@ grupos:
     en: host1
     comprobador:
     - ra1-dhcp
-    - 7a3b55fdd7e9a43a25d22948f5cf52da4202bacd07420816a2e25de6e46d8dd9
+    - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - fwd-actiu
     - ${alumno.if_ext}
     - ${alumno.if_int}

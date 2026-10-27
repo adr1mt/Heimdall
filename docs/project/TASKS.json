@@ -4630,6 +4630,38 @@
       },
       "completed": "2026-10-27",
       "notes": "Reserves KEA, peso 2, exige las cuatro parejas correctas sobre una única lectura. 19 comprobaciones/peso 24. 26 pruebas Python (cada reserva ausente/incorrecta y variantes), Go/race, PLAN ficticio, paquete y editor Electron real correctos. Motor fijo y revisión actualizados; AppImage y copia cargada instalados con originales y versiones recuperables. Reiniciar la aplicación. Sin publicación ni evaluación de aula. Evidencia: docs/reviews/evidence/T207/RESULTADOS.md."
+    },
+    {
+      "id": "T209",
+      "title": "Validar Kea con la identidad del servicio bajo AppArmor",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P0",
+      "depends_on": [
+        "T207"
+      ],
+      "goal": "Eliminar falsos suspensos de Kea al validar como root en Ubuntu 26.04 durante el examen.",
+      "scope": [
+        "Validación con usuario/grupo del servicio y errores de acceso técnicos.",
+        "Revisión versionada, regresiones, motor e instalación local con copia recuperable."
+      ],
+      "out_of_scope": [
+        "Cambiar notas, criterios, pesos o configuración del alumnado.",
+        "Incluir cambios GUI de T208 o publicar versiones."
+      ],
+      "acceptance": [
+        "Kea se valida con la identidad del servicio y grupos suplementarios correctos; servicios sin User conservan root.",
+        "Fallo de acceso es técnico y una configuración realmente inválida conserva FAIL con diagnóstico.",
+        "Pruebas Python y Go correctas; AppImage local y examen cargado tienen la misma revisión nueva.",
+        "Conservar AppImage/examen anteriores; no reiniciar ni modificar máquinas del alumnado."
+      ],
+      "tests": [
+        "make check ra1-check build",
+        "Validación SSH en solo lectura",
+        "Reempaquetado del GUI instalado sin cambios T208 y comprobación de huellas"
+      ],
+      "notes": "Validación con identidad/grupos del servicio; errores de acceso técnicos y diagnóstico de Kea preservado. 30 pruebas Python y suite Go correctas. Primera revisión probada por SSH: acceso reparado, configuración inválida detectada. Repetición de revisión final rechazada por auto-review; mejora de diagnóstico probada localmente. AppImage construido desde el instalado sin T208, motor/examen actualizados y originales conservados. Requiere cerrar/abrir y nueva corrección. Sin publicación. Evidencia: docs/reviews/evidence/T209/RESULTADOS.md.",
+      "completed": "2026-10-27"
     }
   ]
 }

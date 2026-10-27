@@ -1,0 +1,11 @@
+{
+  "exam": "/home/adr1/apps/0227/heimdall/ra1-dhcp-kea/examen.yaml",
+  "app": "/home/adr1/Aplicaciones/Heimdall/Heimdall.AppImage",
+  "backupApp": "/home/adr1/Aplicaciones/Heimdall/Heimdall.AppImage.antes-kea-validacion-2026-10-27.bak",
+  "backupExam": "/home/adr1/apps/0227/heimdall/ra1-dhcp-kea/examen.yaml.antes-kea-validacion-2026-10-27.bak",
+  "revision": "e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862",
+  "beforeExamSHA256": "4398e5ae98d8e4a10e5abb27fd8d5bddd824e505e007e27c52b4b832fa9625ea",
+  "examSHA256": "c7df9c653f97bab5728deae322ce9e78a8c00eeb692351aa83e5923541c476f8",
+  "appSHA256": "d28d9df21beaf5733986c7ade0b26117a9225518879161af52385dfdb5423a54",
+  "guiAsarSHA256": "23f983e295fdbb7f67eea06e3223c63c48edfb514a443c47791100b47fe15921"
+}

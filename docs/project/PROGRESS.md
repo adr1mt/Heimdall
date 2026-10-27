@@ -5,17 +5,16 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T207:** RA1: 19 criterios/peso 24; «Reserves KEA» agrupa las cuatro parejas
-MAC/IP con peso 2, sin puntos parciales. Examen y AppImage locales actualizados;
-reiniciar Heimdall. Originales conservados. [Evidencia](../reviews/evidence/T207/RESULTADOS.md).
+**T209:** validación Kea como usuario del servicio: evita el bloqueo AppArmor de
+root; acceso imposible técnico, errores reales conservados. 30 pruebas Python,
+Go y paquete correctos. AppImage/examen instalados con originales; cerrar/abrir
+y nueva corrección. GUI T208 sin incluir. [Evidencia](../reviews/evidence/T209/RESULTADOS.md).
 
-**T204 (histórico):** reparación semántica de RA1 (31 criterios/peso 35).
-Selección, nombres y pesos vigentes ajustados después en T205/T206/T207.
-Comprobador fijo versionado (ADR-0036); fallo técnico sin suspenso. Laboratorio
-real 31/31, 29 variantes, SSH 100/100 y sin Python sin nota; 22 pruebas Python,
-583 GUI, Go/race y editor real correctos. AppImage local reemplazado, originales
-y versiones recuperables conservados. Cerrar/abrir Heimdall para cargarlo.
-[Pruebas, instalación y límites](../reviews/evidence/T204/RESULTADOS.md).
+**T207:** RA1: 19 criterios/peso 24, reservas agrupadas; instalación local con
+originales. [Evidencia](../reviews/evidence/T207/RESULTADOS.md).
+
+**T204 (histórico):** RA1 semántico, ajustado en T205/T206/T207. Comprobador fijo,
+pruebas y originales conservados. [Evidencia](../reviews/evidence/T204/RESULTADOS.md).
 **T203:** validar/guardar sin clase e Inicio con nombre actualizado; incluida en
 la compilación local. [Evidencia](../reviews/evidence/T203/RESULTADOS.md).
 **T187:** éxitos verdes 5 s y errores persistentes; incluida en compilación local.
