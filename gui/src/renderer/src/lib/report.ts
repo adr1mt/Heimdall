@@ -30,12 +30,9 @@ export function studentReports(run: RunResult, scale: Scale, examTitle: string):
   )
 }
 
-/**
- * The file left in each student's home directory: one per exam, so sending
- * the same exam again replaces it and another exam sits next to it (ADR-0031).
- */
-export function reportFileName(examTitle: string): string {
-  return `informe-${slug(examTitle) || 'examen'}.html`
+/** The latest report always uses the same name in the student's home. */
+export function reportFileName(): string {
+  return 'informe.html'
 }
 
 /**
@@ -229,17 +226,6 @@ function esc(text: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;')
-}
-
-/** A name as it goes into a file name, readable and safe in any system. */
-function slug(text: string): string {
-  return text
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .slice(0, 60)
-    .replace(/^-+|-+$/g, '')
 }
 
 // Light only and system fonts only: the page is printed and opened offline,

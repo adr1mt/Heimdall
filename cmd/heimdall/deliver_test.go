@@ -89,12 +89,12 @@ func TestDeliverSendsEachStudentOnlyTheirOwnReport(t *testing.T) {
 	ids := []string{"alu1", "alu2", "alu3"}
 	reports := map[string]string{"alu1": "pagina de alu1", "alu2": "pagina de alu2", "alu3": "pagina de alu3"}
 	out := deliver(context.Background(), deliverRun(ids, ids...), deliverPlan(ids...), reports,
-		map[string]string{"AULA_PASSWORD": deliverSecret}, "informe-red.html")
+		map[string]string{"AULA_PASSWORD": deliverSecret}, "informe.html")
 
 	want := map[string]string{
-		"127.1.2.3:2201/informe-red.html": "pagina de alu1",
-		"127.1.2.3:2202/informe-red.html": "pagina de alu2",
-		"127.1.2.3:2203/informe-red.html": "pagina de alu3",
+		"127.1.2.3:2201/informe.html": "pagina de alu1",
+		"127.1.2.3:2202/informe.html": "pagina de alu2",
+		"127.1.2.3:2203/informe.html": "pagina de alu3",
 	}
 	if len(home.written) != len(want) {
 		t.Fatalf("escrito = %v", home.written)
@@ -177,7 +177,7 @@ func TestDeliverNeverSendsAPasswordAndNeverInterpretsTheReport(t *testing.T) {
 
 // Only a report file name is accepted: no path, no hidden file, no shell.
 func TestDeliverRefusesAnythingButAReportName(t *testing.T) {
-	for _, name := range []string{"../informe-x.html", "informe-x.html; rm -rf ~", ".bashrc", "informe-.html", "informe-X.html", "/etc/passwd", "informe-x.sh", "informe-x"} {
+	for _, name := range []string{"../informe-x.html", "informe-x.html; rm -rf ~", ".bashrc", "informe-.html", "informe-X.html", "/etc/passwd", "informe-x.sh", "informe-x", "informe.html/subfile", "informe.html; id", "Informe.html", "otro.html"} {
 		var stdout, stderr strings.Builder
 		if got := run([]string{"deliver", "--artifact=x.json", "--file=" + name}, &stdout, &stderr); got != exitInvalidConfig {
 			t.Errorf("%q: exit = %d", name, got)
@@ -186,8 +186,12 @@ func TestDeliverRefusesAnythingButAReportName(t *testing.T) {
 			t.Errorf("%q: stderr = %q", name, stderr.String())
 		}
 	}
-	if !deliverName.MatchString("informe-practica-3-dns.html") {
-		t.Error("un nombre válido se rechazó")
+	for _, name := range []string{"informe.html", "informe-practica-3-dns.html"} {
+		var stdout, stderr strings.Builder
+		run([]string{"deliver", "--artifact=x.json", "--file=" + name}, &stdout, &stderr)
+		if !deliverName.MatchString(name) || strings.Contains(stderr.String(), "no es un nombre de informe") {
+			t.Errorf("un nombre válido se rechazó: %s: %s", name, stderr.String())
+		}
 	}
 }
 
@@ -248,7 +252,7 @@ func TestDeliverOnlyRequestedStudent(t *testing.T) {
 	home := withFakeHome(t, nil)
 	ids := []string{"alu1", "alu2", "alu3"}
 	out := deliver(context.Background(), deliverRun(ids, ids...), deliverPlan(ids...),
-		map[string]string{"alu2": "solo alu2"}, map[string]string{"AULA_PASSWORD": deliverSecret}, "informe-red.html")
+		map[string]string{"alu2": "solo alu2"}, map[string]string{"AULA_PASSWORD": deliverSecret}, "informe.html")
 	if len(out.Students) != 1 || out.Students[0].StudentID != "alu2" || !out.Students[0].Delivered {
 		t.Fatalf("entrega individual: %+v", out)
 	}

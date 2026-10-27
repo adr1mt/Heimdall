@@ -253,13 +253,16 @@ una decisión de ejecución, no de nota. `--session` no se combina con `--retry`
 La única escritura en las máquinas del alumnado (ADR-0031):
 
 ```
-heimdall deliver --secrets=stdin --artifact=<resultado.json> --file=informe-<examen>.html
+heimdall deliver --secrets=stdin --artifact=<resultado.json> --file=informe.html
 ```
 
 Por `stdin` llegan la línea de secretos y, detrás, `{"schema":1,"reports":
 {"<student_id>":"<html>"}}`. El motor rehace el PLAN del examen y el aula del
 resultado y exige el mismo `plan_hash`; cada informe va solo a la máquina de
 su alumno, que tiene que presentar la identidad anotada en esa corrección.
+La GUI usa siempre `informe.html`; se reemplaza el último informe enviado,
+aunque sea de otro examen. El motor conserva los nombres anteriores válidos
+`informe-<examen>.html` (ADR-0038).
 Las claves de `reports` seleccionan los destinatarios (ADR-0037): solo se
 contacta con ellos y solo ellos aparecen en la respuesta. Enviar todas las
 claves conserva el envío masivo.

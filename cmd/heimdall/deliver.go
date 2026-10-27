@@ -38,7 +38,7 @@ const reportsReadTimeout = 10 * time.Second
 
 // deliverName is the only kind of file Heimdall writes on a student's machine
 // (ADR-0031): no path, no hidden file, nothing but a report.
-var deliverName = regexp.MustCompile(`^informe-[a-z0-9]+(-[a-z0-9]+)*\.html$`)
+var deliverName = regexp.MustCompile(`^informe(-[a-z0-9]+(-[a-z0-9]+)*)?\.html$`)
 
 // homeWriter is what delivering needs from a session. Tests replace the dialer.
 type homeWriter interface {
@@ -78,12 +78,12 @@ func deliverCmd(args []string, stdout, stderr io.Writer) int {
 	fs.SetOutput(stderr)
 	secretsMode := fs.String("secrets", "env", "canal de los secretos: stdin o env")
 	artifactPath := fs.String("artifact", "", "resultado de la corrección cuyos informes se envían")
-	name := fs.String("file", "", "nombre del fichero en la carpeta personal: informe-<examen>.html")
+	name := fs.String("file", "", "nombre del fichero en la carpeta personal: informe.html")
 	if err := fs.Parse(args); err != nil {
 		return exitInvalidConfig
 	}
 	if fs.NArg() != 0 || *artifactPath == "" || *name == "" {
-		fmt.Fprintln(stderr, "uso: heimdall deliver [--secrets=stdin|env] --artifact=<resultado.json> --file=informe-<examen>.html")
+		fmt.Fprintln(stderr, "uso: heimdall deliver [--secrets=stdin|env] --artifact=<resultado.json> --file=informe.html")
 		return exitInvalidConfig
 	}
 	fail := func(format string, a ...any) int {
@@ -91,7 +91,7 @@ func deliverCmd(args []string, stdout, stderr io.Writer) int {
 		return exitInvalidConfig
 	}
 	if len(*name) > 120 || !deliverName.MatchString(*name) {
-		return fail("%q no es un nombre de informe: se espera informe-<letras, cifras y guiones>.html", *name)
+		return fail("%q no es un nombre de informe: se espera informe.html o informe-<letras, cifras y guiones>.html", *name)
 	}
 
 	run, err := readArtifact(*artifactPath)

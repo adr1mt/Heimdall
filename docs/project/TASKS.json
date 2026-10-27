@@ -4866,6 +4866,40 @@
       ],
       "completed": "2026-10-27",
       "notes": "AppImage T211–T213 instalado tras verificar 26 ficheros GUI, motor compilado y arranque con perfil temporal. Sustitución atómica, copia anterior y huellas verificadas; instancia activa intacta. Cerrar/abrir al finalizar la corrección. Sin publicación. Evidencia: docs/reviews/evidence/T214/RESULTADOS.md."
+    },
+    {
+      "id": "T215",
+      "title": "Entregar siempre el informe como informe.html",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T214"
+      ],
+      "goal": "Simplificar la consulta del alumno con un nombre fijo en los envíos individual y masivo e instalar el cambio autorizado en el contexto de aula.",
+      "scope": [
+        "Generación de nombre, aceptación acotada en el motor y ayuda coherente.",
+        "Registro de envíos nuevo para no confundir entregas anteriores con el nuevo nombre.",
+        "Compilación, verificación e instalación local recuperable."
+      ],
+      "out_of_scope": [
+        "Cambiar notas, contenido del HTML, destinatarios, credenciales o evaluar alumnado.",
+        "Borrar informes anteriores, publicar o reiniciar la aplicación activa."
+      ],
+      "acceptance": [
+        "Envío individual y masivo usan informe.html, conservando el título del examen dentro del HTML.",
+        "Motor acepta informe.html y nombres anteriores; rechaza rutas y nombres arbitrarios.",
+        "Último envío sustituye informe.html de forma atómica con permisos 0600 existentes.",
+        "Marcas de envíos con el nombre anterior no bloquean entregar el nuevo archivo.",
+        "Ayuda y confirmación indican el nombre fijo y su sustitución; AppImage instalado con copia anterior y pruebas correctas."
+      ],
+      "tests": [
+        "make check build",
+        "Suite GUI, tipos y build",
+        "Prueba empaquetada con perfil temporal y comprobación SHA-256"
+      ],
+      "completed": "2026-10-27",
+      "notes": "Nombre fijo informe.html en envíos individual/masivo, títulos y permisos conservados; nombres anteriores siguen válidos en CLI. Registro nuevo evita bloqueo por recibos anteriores. 609 tests GUI, Go, tipos, build y paquete correctos. Instalado con copia anterior y perfil real intacto. No se envían informes reales automáticamente. Evidencia: docs/reviews/evidence/T215/RESULTADOS.md."
     }
   ]
 }

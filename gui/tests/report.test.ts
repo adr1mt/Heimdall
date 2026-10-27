@@ -142,16 +142,14 @@ describe('student reports (T185)', () => {
     expect(html).not.toContain('<small>/ 10</small>')
   })
 
-  it('gives each student their own page, one file name per exam, and says who is left out', () => {
+  it('gives each student their own page, one fixed file name for every exam, and says who is left out', () => {
     const r = run()
     const pages = studentReports(r, scale, 'Examen')
     for (const student of r.students.filter((s) => s.status !== 'EXCLUDED')) {
       expect(pages[student.student_id]).toBe(studentReport(r, student, scale, 'Examen'))
     }
     expect(Object.keys(pages)).not.toContain('c3')
-    expect(reportFileName('Examen RA2 · Redes')).toBe('informe-examen-ra2-redes.html')
-    expect(reportFileName('«»')).toBe('informe-examen.html')
-    expect(reportFileName(`${'a'.repeat(59)} b`)).toMatch(/^informe-a+\.html$/)
+    expect(reportFileName()).toBe('informe.html')
     expect(reportsSummary(r)).toContain('2 alumnos')
     expect(reportsSummary(r)).toContain('1 excluidos sin informe')
   })

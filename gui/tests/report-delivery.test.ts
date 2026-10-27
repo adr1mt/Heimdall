@@ -52,3 +52,14 @@ it('restores successful deliveries after reopening the renderer', async () => {
   expect(reopened.getState().receipts.R1).toEqual(['a'])
   await expect(reopened.getState().send('R1', '/a', 'informe-x.html', { a: 'A' }, true)).rejects.toThrow('ya se ha enviado')
 })
+
+it('does not mistake old per-exam deliveries for delivery of informe.html', async () => {
+  vi.stubGlobal('localStorage', { getItem: (key: string) => key === 'heimdall-report-deliveries' ? JSON.stringify({ R1: ['a'] }) : null, setItem })
+  vi.resetModules()
+  const upgraded = (await import('../src/renderer/src/stores/report-delivery')).useReportDelivery
+  expect(upgraded.getState().receipts).toEqual({})
+  sendReports.mockResolvedValue({ file: 'informe.html', students: [delivered('a', true)] })
+  await upgraded.getState().send('R1', '/a', 'informe.html', { a: 'own page' }, true)
+  expect(sendReports).toHaveBeenCalledWith('/a', 'informe.html', { a: 'own page' })
+  expect(upgraded.getState().receipts.R1).toEqual(['a'])
+})

@@ -1,6 +1,7 @@
 # ADR-0031 · El informe de cada alumno se deja en su máquina
 
 - Estado: **aceptada** · 2026-10-16
+- Decisión de nombre por examen sustituida por [ADR-0038](0038-nombre-fijo-del-informe.md).
 - Amplía ADR-0009, ADR-0011, ADR-0017 y ADR-0024; tarea T188
 - Contexto: petición de Adrià (2026-10-16), informe por alumno de T185
 

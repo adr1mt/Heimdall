@@ -143,7 +143,7 @@ Desde ahí se exportan:
 
 Y con **«Enviar informes…»** cada alumno recibe en su máquina, en su carpeta
 personal, una página con su nota y cada comprobación como correcta, fallada o
-«no se pudo comprobar» (`informe-<examen>.html`; si ya estaba, se sustituye).
+«no se pudo comprobar» (`informe.html`; cada envío sustituye el anterior, aunque sea de otro examen).
 Solo la suya: sin comandos, salidas de las máquinas, contraseña ni datos de
 otros alumnos. Se envía solo cuando lo pulsas, y solo a la máquina que se
 corrigió: si el examen o la clase han cambiado desde entonces, hay que volver
@@ -290,18 +290,18 @@ envío parcial solo vuelve a intentarlo con los que faltan.
 
 Para abrir el HTML en el equipo con escritorio:
 
-1. En **Ubuntu Desktop**, abre **Archivos → Otras ubicaciones**.
-2. En **Conectar al servidor**, escribe `sftp://USUARIO@SERVIDOR:PUERTO` con
+1. En **Ubuntu Desktop**, abre **Archivos** y pulsa **Ctrl+L**.
+2. Escribe `sftp://USUARIO@SERVIDOR:PUERTO` con
    los mismos usuario, servidor y puerto que ya usas para SSH.
 3. Introduce la contraseña de tu cuenta y entra en tu carpeta personal.
-4. Copia `informe-<examen>.html` a **Descargas** del equipo Desktop y abre esa
+4. Copia `informe.html` a **Descargas** del equipo Desktop y abre esa
    copia con Firefox. Se mantiene el formato completo, incluso sin conexión.
 
 Alternativa desde la terminal de **Desktop**, usando tus propios datos y el
 nombre exacto del archivo que indica el profesor:
 
 ```bash
-scp -P PUERTO USUARIO@SERVIDOR:informe-examen.html ~/Descargas/
+scp -P PUERTO USUARIO@SERVIDOR:informe.html ~/Descargas/
 ```
 
 No ejecutes esta descarga dentro de la sesión SSH: el destino debe ser

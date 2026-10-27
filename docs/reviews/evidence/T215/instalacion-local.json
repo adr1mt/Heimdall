@@ -1,0 +1,18 @@
+{
+  "app": "/home/adr1/Aplicaciones/Heimdall/Heimdall.AppImage",
+  "package": "/home/adr1/apps/heimdall/gui/dist/Heimdall-1.0.1.AppImage",
+  "beforeAppSHA256": "9b779708be8c964f3be8241755fe2c8f42fffd6889d7e70b31729467af29dece",
+  "packageSHA256": "a6a460b30ef7cb4a4b8f4b750d637691f4d6cd036c1707c16d493faf00b03b02",
+  "engineSHA256": "240311b13375b8c62ebc7ccc7145ab8282b6f2e4f7546211d6bede550ca24075",
+  "guiAsarSHA256": "688c14036a76bf2b2c1d5c55fa8b18126478d1987db34c0cb9eeed3b82dea7f0",
+  "sourceCommit": "7f28731",
+  "includesUncommitted": true,
+  "task": "T215",
+  "verifiedFiles": 26,
+  "resultChunk": "Results-BfME9pvI.js",
+  "runningInstanceRestarted": false,
+  "backupApp": "/home/adr1/Aplicaciones/Heimdall/Heimdall.AppImage.antes-informe-fijo-2026-10-27.bak",
+  "installedAppSHA256": "a6a460b30ef7cb4a4b8f4b750d637691f4d6cd036c1707c16d493faf00b03b02",
+  "installedAt": "2026-10-27T19:46:42.220801+00:00",
+  "engineVersion": "heimdall 1.0.1"
+}

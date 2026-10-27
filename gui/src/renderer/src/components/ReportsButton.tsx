@@ -43,7 +43,7 @@ export function ReportsButton({ artifactPath, studentId }: { artifactPath: strin
       if (useRun.getState().artifact?.run_id !== artifact.run_id) return
       const pages = student ? { [student.student_id]: studentReport(artifact, student, scale, title) } : studentReports(artifact, scale, title)
       const sentCount = Object.keys(pages).filter((id) => receipts[artifact.run_id]?.includes(id)).length
-      setPrepared({ runId: artifact.run_id, path: artifactPath, file: reportFileName(title), pages,
+      setPrepared({ runId: artifact.run_id, path: artifactPath, file: reportFileName(), pages,
         summary: student ? `Destinatario: ${student.name} (${student.student_id}). Recibirá únicamente su informe de esta corrección.`
           : `${reportsSummary(artifact)}${sentCount ? `. ${sentCount} ya enviados: se volverán a enviar si confirmas.` : ''}` })
     } catch (error) { useApp.getState().setNotice(noticeFrom(t.reports.failed, error)) }
@@ -72,7 +72,7 @@ export function ReportsButton({ artifactPath, studentId }: { artifactPath: strin
         confirmLabel={t.reports.yes} onConfirm={() => { if (prepared) void deliver(prepared) }} onCancel={() => setPrepared(null)}>
         {prepared && <span className="block space-y-2">
           <span className="block">{prepared.summary}</span>
-          <span className="block">{t.reports.where(prepared.file)}</span>
+          <span className="block">{t.reports.where(prepared.file)} El último envío sustituye el informe anterior.</span>
           <span className="block">El alumno puede copiar este HTML desde Ubuntu Desktop con Archivos, usando su conexión SSH.</span>
           <span className="block text-xs text-muted-foreground">{t.export.scale(scale.label)}</span>
         </span>}

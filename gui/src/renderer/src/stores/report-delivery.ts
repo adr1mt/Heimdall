@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import type { Delivery } from '../../../shared/types'
 
-const STORAGE_KEY = 'heimdall-report-deliveries'
+// Old receipts refer to per-exam file names and must not block the new name.
+const STORAGE_KEY = 'heimdall-report-deliveries-informe-html'
 type Receipts = Record<string, string[]>
 function readReceipts(): Receipts {
   try {

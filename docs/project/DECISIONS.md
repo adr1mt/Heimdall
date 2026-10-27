@@ -1018,3 +1018,14 @@ actualizado, incluyendo la entrega selectiva; conserva la reparación Kea.
 Verificados contenido, arranque con perfil temporal, copia anterior y huellas.
 Sustitución atómica sin cerrar ni reiniciar la instancia activa. La autorización
 es de instalación local, sin publicación ni cambio de remotos.
+
+
+## T215 · 2026-10-27 · Informe con nombre fijo
+
+Adrià pide que todos reciban `informe.html`. ADR-0038 sustituye el nombre por
+examen; el contenido sigue siendo individual y el título del examen permanece.
+El siguiente envío reemplaza el último informe, con los mismos permisos 0600
+y escritura atómica. El motor mantiene aceptación de nombres nativos antiguos.
+Las marcas de entregas con nombres anteriores no bloquean el nuevo nombre.
+Actualización instalada con copia de T214, sin cerrar ni reiniciar la instancia
+activa ni enviar informes reales automáticamente.
