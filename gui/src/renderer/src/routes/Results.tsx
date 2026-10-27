@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { ProjectorCanvas } from '@/components/ProjectorCanvas'
 import { CorrectionClock } from '@/components/CorrectionClock'
 import {
   ArrowLeft,
@@ -169,51 +170,12 @@ export default function ResultsView() {
       />
     )
 
-  return (
-    <div className="flex h-full flex-col">
-      <ViewHeader
-        title={t.results.title}
-        meta={
-          <MetaChip>
-            {artifact.students.length} alumnos · {artifact.plan.check_count} comprobaciones
-          </MetaChip>
-        }
-        actions={
-          <>
-            <Segmented>
-              <SegmentedItem active={mode === 'list'} onClick={() => setMode('list')}>
-                <List className="h-3.5 w-3.5" />
-                {t.results.modeList}
-              </SegmentedItem>
-              <SegmentedItem active={mode === 'matrix'} onClick={() => setMode('matrix')}>
-                <Grid3x3 className="h-3.5 w-3.5" />
-                {t.results.modeMatrix}
-              </SegmentedItem>
-            </Segmented>
-            {!projector && (
-              <>
-                <ReportsButton artifactPath={artifactPath} />
-                <RunMoodleButton />
-                <details className="relative">
-                  <summary
-                    className="cursor-pointer rounded px-2 py-1 text-sm"
-                    aria-label="Más opciones"
-                  >
-                    •••
-                  </summary>
-                  <div className="absolute right-0 z-30 w-max rounded-md border border-border bg-popover p-2">
-                    <ExportButton />
-                  </div>
-                </details>
-              </>
-            )}
-          </>
-        }
-      />
-
-      <CorrectionClock />
-      <div className="min-h-0 flex-1 space-y-4 overflow-auto p-3 sm:p-6">
-        {summary && (
+  const overview = <div className="space-y-3">
+        {summary && projector && <details className="text-xs">
+          <summary className="cursor-pointer py-1 text-muted-foreground">Resumen de toda la corrección · {summary.passed} aprobados</summary>
+          <KpiStrip summary={summary} average={average} mostFailed={mostFailed} />
+        </details>}
+        {summary && !projector && (
           <section aria-label="Resumen de toda la corrección" className="space-y-2">
             <p className="text-xs text-muted-foreground">Resumen de toda la corrección</p>
             <KpiStrip summary={summary} average={average} mostFailed={mostFailed} />
@@ -313,6 +275,53 @@ export default function ResultsView() {
           </details>
         </div>
 
+  </div>
+
+  return (
+    <div className="flex h-full flex-col">
+      <ViewHeader
+        title={t.results.title}
+        meta={
+          <MetaChip>
+            {artifact.students.length} alumnos · {artifact.plan.check_count} comprobaciones
+          </MetaChip>
+        }
+        actions={
+          <>
+            <Segmented>
+              <SegmentedItem active={mode === 'list'} onClick={() => setMode('list')}>
+                <List className="h-3.5 w-3.5" />
+                {t.results.modeList}
+              </SegmentedItem>
+              <SegmentedItem active={mode === 'matrix'} onClick={() => setMode('matrix')}>
+                <Grid3x3 className="h-3.5 w-3.5" />
+                {t.results.modeMatrix}
+              </SegmentedItem>
+            </Segmented>
+            {!projector && (
+              <>
+                <ReportsButton artifactPath={artifactPath} />
+                <RunMoodleButton />
+                <details className="relative">
+                  <summary
+                    className="cursor-pointer rounded px-2 py-1 text-sm"
+                    aria-label="Más opciones"
+                  >
+                    •••
+                  </summary>
+                  <div className="absolute right-0 z-30 w-max rounded-md border border-border bg-popover p-2">
+                    <ExportButton />
+                  </div>
+                </details>
+              </>
+            )}
+          </>
+        }
+      />
+
+      <CorrectionClock />
+      <ResultsCanvas projector={projector} overview={overview}>
+      <div className="space-y-4 p-3 sm:p-6">
         {rows.length === 0 ? (
           <p className="text-sm text-muted-foreground">{hiddenStudents.length === artifact.students.length
             ? 'Todos los alumnos están ocultos. Puedes recuperarlos desde Ocultos.' : t.results.noMatches}</p>
@@ -361,8 +370,16 @@ export default function ResultsView() {
           </Foldaway>
         )}
       </div>
+      </ResultsCanvas>
     </div>
   )
+}
+
+function ResultsCanvas({ projector, overview, children }: { projector: boolean; overview: ReactNode; children: ReactNode }) {
+  return projector ? <>
+    <div className="max-h-[40%] shrink-0 overflow-auto px-3 pt-2">{overview}</div>
+    <ProjectorCanvas>{children}</ProjectorCanvas>
+  </> : <div className="min-h-0 flex-1 overflow-auto"><div className="px-3 pt-3 sm:px-6 sm:pt-6">{overview}</div>{children}</div>
 }
 
 /** Class-wide summary, independent of the current exploration filters. */
@@ -465,17 +482,17 @@ function MatrixView({ rows, selected, onPick, onStudent, onHide }: {
         <Legend />
         <span className="text-xs text-muted-foreground">Pulsa un nombre para ver su detalle</span>
       </div>
-      <div className="max-h-[65vh] overflow-auto rounded-md border border-border focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+      <div className="matrix-viewport max-h-[65vh] overflow-auto rounded-md border border-border focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
         role="region" aria-label="Matriz de resultados, desplazamiento horizontal y vertical" tabIndex={0}>
-        <table className="min-w-full table-fixed border-separate border-spacing-0 text-left"
-          style={{ width: `calc(clamp(10rem, 25vw, 18rem) + ${matrix.students.length * 9}rem)` }}
+        <table className="results-matrix min-w-full table-fixed border-separate border-spacing-0 text-left"
+          style={{ width: `calc(clamp(10rem, 38vw, 40rem) + ${matrix.students.length * 9}rem)` }}
           onPointerOver={(event) => setColumn((event.target as HTMLElement).closest<HTMLElement>('[data-column]')?.dataset.column ?? null)}
           onPointerLeave={() => setColumn(null)}
           onFocusCapture={(event) => setColumn(event.target.closest<HTMLElement>('[data-column]')?.dataset.column ?? null)}
           onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setColumn(null) }}>
           <caption className="sr-only">Notas por alumno y comprobaciones superadas por los alumnos visibles</caption>
           <colgroup>
-            <col style={{ width: 'clamp(10rem, 25vw, 18rem)' }} />
+            <col style={{ width: 'clamp(10rem, 38vw, 40rem)' }} />
             {matrix.students.map((student) => <col key={student.student_id} style={{ width: '9rem' }} />)}
           </colgroup>
           <thead className="sticky top-0 z-20">
@@ -605,7 +622,7 @@ function MatrixRowView({
         title={`${row.group} · ${row.description} · peso ${row.weight}`}
       >
         <span className="flex items-center gap-2">
-          <span className="min-w-0 flex-1 truncate">{row.description}</span>
+          <span className="case-name min-w-0 flex-1 line-clamp-2 wrap-break-word">{row.description}</span>
           {row.weight !== 1 && <span className="shrink-0 text-muted-foreground">{t.results.matrixWeight(row.weight)}</span>}
           <span className="shrink-0 tabular-nums text-muted-foreground"
             aria-label={`${row.cells.filter((check) => check?.status === 'PASS').length} de ${students.length} alumnos visibles han superado esta comprobación`}>

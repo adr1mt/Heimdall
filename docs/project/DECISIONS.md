@@ -991,3 +991,21 @@ Tras la entrega T208 sin instalar, Adrià autoriza instalar ahora la interfaz.
 Se conserva el motor T209 y una copia íntegra del AppImage anterior; publicación
 atómica y huellas verificadas. La instancia activa no se cierra ni reinicia.
 No se modifican datos del profesor ni se publica una nueva versión.
+
+
+## T211–T213 · 2026-10-27 · Resultados persistentes e informes de aula
+
+La solicitud explícita agrupa proyector, retención, tiempos y entrega de
+informes; se implementa completa y se separan retención, contrato de entrega
+y presentación en commits locales. La evaluación y las notas no cambian.
+Un resultado nuevo validado sustituye al anterior; el progreso tiene su
+propio estado. Cambiar clase/examen invalida lecturas pendientes.
+
+ADR-0037 amplía la entrega para que las claves de reports seleccionen los
+destinatarios. Registro local acotado de éxitos y bloqueo común evitan dobles
+clics; el masivo permite reenvío confirmado y reintenta solo fallidos.
+La consulta Desktop usa el gestor de archivos por SFTP o SCP y Firefox,
+sin servidor web ni nuevas dependencias. Se conserva el HTML original.
+Los permisos privados no aíslan máquinas con contraseñas comunes conocidas
+por todo el grupo: esa garantía requiere credenciales SSH propias.
+No se instala ni reinicia la aplicación del profesor en esta solicitud.

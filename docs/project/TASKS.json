@@ -4744,6 +4744,92 @@
       ],
       "notes": "Instalación autorizada de GUI T208 con motor T209 idéntico al instalado. make check, build, 25 ficheros empaquetados, AppRun y arranque con perfil temporal correctos. Sustitución atómica y copia anterior verificada. Instancia activa intacta: cerrar/abrir al finalizar la corrección. Manifest y evidencia: docs/reviews/evidence/T210/RESULTADOS.md. Sin publicación.",
       "completed": "2026-10-27"
+    },
+    {
+      "id": "T211",
+      "title": "Zoom, ajuste a pantalla y legibilidad de resultados",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T210"
+      ],
+      "goal": "Zoom, ajuste a pantalla y legibilidad de resultados",
+      "scope": [
+        "Solicitud explícita del usuario de 2026-10-27; implementación y validación local."
+      ],
+      "out_of_scope": [
+        "Cambiar evaluación, instalar, publicar, tocar máquinas reales o remotos."
+      ],
+      "acceptance": [
+        "Proyector ofrece +/−, porcentaje y Ajustar a pantalla en lista y matriz; recalcula al redimensionar y filtrar.",
+        "Nombres de casos grandes, adaptativos y de dos líneas; mantiene controles y datos técnicos ocultos."
+      ],
+      "tests": [
+        "make check",
+        "make gui-check gui-build",
+        "Arnés Electron aislado con datos ficticios"
+      ],
+      "completed": "2026-10-27",
+      "notes": "Proyector con zoom manual y ajuste reactivo; filtros y reloj conservan tamaño. Casos adaptativos de dos líneas. Arneses Electron aislados en lista/matriz, temas y tamaños; evidencia: docs/reviews/evidence/T211-T213/RESULTADOS.md. Sin instalación ni publicación."
+    },
+    {
+      "id": "T212",
+      "title": "Conservar resultados durante las correcciones y mostrar sus tiempos",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T210"
+      ],
+      "goal": "Conservar resultados durante las correcciones y mostrar sus tiempos",
+      "scope": [
+        "Solicitud explícita del usuario de 2026-10-27; implementación y validación local."
+      ],
+      "out_of_scope": [
+        "Cambiar evaluación, instalar, publicar, tocar máquinas reales o remotos."
+      ],
+      "acceptance": [
+        "Inicio, fallo de arranque, flujo incompleto y lectura fallida conservan el último resultado del mismo contexto.",
+        "Resultado validado reemplaza el anterior; cambio de examen/clase limpia el contexto.",
+        "Reloj, cuenta atrás, estado y última corrección visibles sin borrar notas."
+      ],
+      "tests": [
+        "make check",
+        "make gui-check gui-build",
+        "Arnés Electron aislado con datos ficticios"
+      ],
+      "completed": "2026-10-27",
+      "notes": "Resultado y ruta se conservan durante refresco y fallo; contexto limpio al cambiar clase/examen y protección contra lecturas antiguas. Reloj, cuenta atrás y aviso discreto. Pruebas de estado y Electron correctas. Evidencia: docs/reviews/evidence/T211-T213/RESULTADOS.md."
+    },
+    {
+      "id": "T213",
+      "title": "Enviar un informe individual y facilitar su apertura desde Ubuntu Desktop",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T210"
+      ],
+      "goal": "Enviar un informe individual y facilitar su apertura desde Ubuntu Desktop",
+      "scope": [
+        "Solicitud explícita del usuario de 2026-10-27; implementación y validación local."
+      ],
+      "out_of_scope": [
+        "Cambiar evaluación, instalar, publicar, tocar máquinas reales o remotos."
+      ],
+      "acceptance": [
+        "Cada fila permite confirmar y enviar solo su informe; estado compartido con envío masivo evita dobles clics y duplicados accidentales.",
+        "Entrega parcial conserva identidad SSH, privacidad y envío masivo existente; nota intacta.",
+        "Ayuda de Ubuntu Desktop permite copiar el HTML por SFTP/SCP con SSH existente sin servicio nuevo."
+      ],
+      "tests": [
+        "make check",
+        "make gui-check gui-build",
+        "Arnés Electron aislado con datos ficticios"
+      ],
+      "completed": "2026-10-27",
+      "notes": "Envío individual confirmado, bloqueo y registro persistente compartidos con masivo; reintento solo a fallidos. Una sola conexión al alumno elegido probada. Ayuda SFTP y SCP sin servicios nuevos; aislamiento depende de credenciales SSH propias, ADR-0037. 608 pruebas GUI, motor y build correctos; evidencia: docs/reviews/evidence/T211-T213/RESULTADOS.md."
     }
   ]
 }

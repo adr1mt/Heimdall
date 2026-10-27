@@ -277,3 +277,18 @@
     background: transparent;
   }
 }
+
+/* Give case descriptions the space and hierarchy needed at classroom distance. */
+.results-matrix tbody th { container-type: inline-size; }
+.case-name { font-size: clamp(1rem, 4.5cqi, 1.5rem); font-weight: 500; line-height: 1.25; }
+.projector-content .results-matrix { width: auto !important; }
+.projector-content .results-matrix col:first-child { width: clamp(24rem, 40vw, 40rem) !important; }
+.projector-content .results-matrix col:not(:first-child) { width: 6rem !important; }
+.projector-content .results-matrix thead button { height: auto; min-height: 2rem; }
+.projector-fit .matrix-viewport { max-height: none; overflow: visible; }
+.projector-fit .results-matrix { min-width: max(100%, 36rem); }
+.projector-fit .results-matrix thead { position: static; }
+.projector-fit .results-matrix th { position: static; }
+.projector-fit .results-matrix { width: 100% !important; }
+.projector-fit .results-matrix tbody th { padding-block: 1px; }
+.projector-fit .results-matrix tbody td { padding-block: 1px; }

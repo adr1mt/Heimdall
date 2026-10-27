@@ -2,6 +2,9 @@ import { create } from 'zustand'
 import { NO_FILTERS, type Filters, type StudentFilter, type StudentOrder } from '@/lib/results'
 
 interface ResultsViewState {
+  projectorZoom: number
+  projectorFit: boolean
+  setProjectorScale: (zoom: number, fit: boolean) => void
   scope: string | null
   filters: Filters
   studentFilter: StudentFilter
@@ -21,6 +24,8 @@ interface ResultsViewState {
 }
 
 const defaults = () => ({
+  projectorZoom: 1,
+  projectorFit: false,
   scope: null as string | null,
   filters: { ...NO_FILTERS },
   studentFilter: 'all' as StudentFilter,
@@ -32,6 +37,7 @@ const defaults = () => ({
 // Presentation only: never persisted or passed to a correction or export.
 export const useResultsView = create<ResultsViewState>((set, get) => ({
   ...defaults(),
+  setProjectorScale: (projectorZoom, projectorFit) => set({ projectorZoom, projectorFit }),
   setFilters: (filters) => set({ filters }),
   setStudentFilter: (studentFilter) => set({ studentFilter }),
   setOrder: (order) => set({ order }),

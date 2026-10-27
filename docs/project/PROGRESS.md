@@ -5,35 +5,31 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T210:** interfaz T208 instalada con motor T209 conservado, copia anterior y
-huellas verificadas. Cerrar/abrir al terminar de corregir; no se reinició.
+**T211–T213:** zoom y ajuste reactivo en proyector, casos más legibles,
+resultados conservados durante refresco/fallo y franja de tiempos. Envío
+individual confirmado y registrado; masivo conservado y reintento solo a
+fallidos. Ayuda SFTP/SCP para abrir HTML desde Desktop (ADR-0037).
+608 pruebas GUI, motor, build y arneses aislados correctos.
+[Evidencia y límites](../reviews/evidence/T211-T213/RESULTADOS.md).
+**Sin instalar ni publicar**: la aplicación instalada sigue siendo T210.
+La privacidad entre alumnos requiere credenciales SSH propias; la contraseña
+común del aula no impide acceder a máquinas ajenas.
+
+**T210:** interfaz T208 instalada con motor T209 conservado y copia anterior.
 [Instalación](../reviews/evidence/T210/RESULTADOS.md).
-
-**T208:** ocultos, Evaluados y orden en proyector; 601 pruebas GUI y arnés correctos. [Evidencia](../reviews/evidence/T208/RESULTADOS.md).
-
-**T209:** Kea con identidad del servicio; acceso imposible técnico, errores
-reales conservados. 30 pruebas Python, Go y paquete correctos. AppImage/examen
-instalados con originales; requiere nueva corrección. [Evidencia](../reviews/evidence/T209/RESULTADOS.md).
-
-**T207:** RA1: 19 criterios/peso 24; cuatro reservas juntas, peso 2. [Evidencia](../reviews/evidence/T207/RESULTADOS.md).
-
-**T204 (histórico):** RA1 semántico (ADR-0036), ajustado en T205/T206/T207.
-[Pruebas, instalación y límites](../reviews/evidence/T204/RESULTADOS.md).
-**T203:** editor sin clase e Inicio actualizados; compilado. [Evidencia](../reviews/evidence/T203/RESULTADOS.md).
-**T187:** éxitos verdes 5 s y errores persistentes; incluida en compilación local.
-[Evidencia](../reviews/evidence/T187/RESULTADOS.md). T187/T203/T204/T205/T206/T207 sin publicar.
-Auditoría anterior autorizada por Adrià:
-- **T194:** nota final completa aunque quede un diagnóstico sin peso.
-- **T195/T196:** clases e informes privados; originales/enlaces conservados.
-- **T199:** rechazo real de sudo sin ejecutar ni producir suspenso.
-- **T201:** actualizador por red Chromium; [evidencia](../reviews/evidence/T201/RESULTADOS.md).
-- **T198:** controles, paquetes e instalación Ubuntu 24/26 correctos;
-  [evidencia](../reviews/evidence/T198/RESULTADOS.md).
-- **T200:** versiones recuperables privadas; [evidencia](../reviews/evidence/T200/RESULTADOS.md).
-**T197/T202:** versión pública 1.0.1 (`a5ccaf9`), controles remotos y assets
-verificados. [Publicación](../releases/1.0.1/PUBLICACION.md). La compilación local
-T204 conserva ese número nominal; se distingue por revisión de comprobador y
-huellas de instalación. No equivale a una publicación ni a validación de aula.
+**T208:** ocultos, Evaluados y orden; [evidencia](../reviews/evidence/T208/RESULTADOS.md).
+**T209:** Kea con identidad del servicio; fallos técnicos separados de errores
+reales. AppImage/examen instalados con originales; requiere nueva corrección.
+[Evidencia](../reviews/evidence/T209/RESULTADOS.md).
+**T204–T207:** RA1 semántico, 19 criterios/peso 24; cuatro reservas juntas,
+peso 2. [Último ajuste](../reviews/evidence/T207/RESULTADOS.md).
+**T203:** editor sin clase e Inicio actualizados; compilado.
+**T187:** éxitos verdes 5 s y errores persistentes, compilados.
+**T194–T201:** nota final sin diagnósticos sin peso, clases/informes privados,
+sudo y actualizador endurecidos, versiones recuperables y paquetes verificados.
+**T197/T202:** pública 1.0.1 (`a5ccaf9`), [publicación](../releases/1.0.1/PUBLICACION.md).
+Las compilaciones locales conservan ese número nominal; no equivalen a una
+publicación ni a validación de aula. T187/T203–T213 sin publicar.
 
 ## Problemas conocidos y límites
 - RA1 no evalúa el cliente ni su registro. Kea valida archivo guardado;

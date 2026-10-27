@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client'
 import { flushSync } from 'react-dom'
 import ResultsView from '../src/renderer/src/routes/Results'
 import { useRun } from '../src/renderer/src/stores/run'
+import { useReportDelivery } from '../src/renderer/src/stores/report-delivery'
 import { useApp } from '../src/renderer/src/stores/app'
 import { validRun } from '../tests/fixtures/valid-run'
 
@@ -13,9 +14,32 @@ declare global {
     resultsProjector: (on: boolean) => void
     resultsRemount: () => void
     resultsConnections: () => void
+    resultsRefresh: (kind: string) => void
+    resultsDeliveryCalls: string[][]
+  }
+}
+window.resultsDeliveryCalls = []
+window.heimdall = { readExam: async () => null,
+  sendReports: async (_path: string, file: string, reports: Record<string, string>) => {
+    window.resultsDeliveryCalls.push(Object.keys(reports))
+    return { file, students: Object.keys(reports).map((id) => ({ student_id: id, name: id, delivered: true })) }
+  }
+} as unknown as typeof window.heimdall
+window.resultsRefresh = (kind) => {
+  const state = useRun.getState()
+  if (kind === 'begin') {
+    useApp.setState({ exam: { active: true, nextAt: null, everyMinutes: 5, passes: 1 } })
+    state.begin()
+  } else if (kind === 'fail') {
+    state.fail('Fallo ficticio de conexión')
+    useApp.setState({ exam: { active: true, nextAt: Date.now() + 300000, everyMinutes: 5, passes: 1 } })
+  } else {
+    state.setArtifact({ ...state.artifact!, run_id: 'updated', finished_at: new Date().toISOString() }, '/tmp/updated.json')
+    useRun.setState({ phase: 'finished', problem: null })
   }
 }
 window.resultsFixture = (count, incomplete = false) => {
+  useReportDelivery.setState({ receipts: {}, sending: false })
   const run = validRun()
   run.run_id = `fixture-${count}-${incomplete}`
   run.plan = { ...run.plan, check_count: 50, total_weight: 50,
@@ -32,7 +56,7 @@ window.resultsFixture = (count, incomplete = false) => {
         total: 50, unevaluated: missing ? 50 : 0, status: missing ? 'NOT_EVALUATED' : 'COMPLETE',
         final_score: missing ? null : passed * 2, provisional_score: missing ? null : passed * 2 },
       checks: run.plan.check_ids.map((id, j) => ({ ...base.checks[0], check_id: id,
-        description: j === 0 ? 'Puerto SSH' : `Comprobación de redes ${j + 1}`,
+        description: j === 0 ? 'Comprobar que el servidor DHCP tiene configurado el rango de direcciones y las reservas de la práctica' : `Comprobación de redes ${j + 1}`,
         status: missing ? 'UNEVALUATED' : j < passed ? 'PASS' : 'FAIL',
         cause: missing ? 'CONNECT_FAILED' : 'NONE',
         execution: missing ? null : { ...base.checks[0].execution!, transport: 'ssh',

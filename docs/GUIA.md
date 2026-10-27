@@ -263,3 +263,56 @@ Estas copias contienen los datos y la contraseña de la clase y solo tu usuario
 puede leerlas. No se envían a Internet. Son distintas de las copias de notas y
 no protegen frente a perder el disco entero: conserva también una copia del
 equipo. Los archivos fuente de más de 4 MiB no se reemplazan automáticamente.
+
+
+## Proyectar resultados y consultar informes desde Ubuntu Desktop
+
+En el proyector, **+ / −** ajustan el tamaño y **Ajustar a pantalla** muestra
+el contenido completo, incluidos todos los casos y alumnos visibles. Se
+recalcula al cambiar el tamaño de ventana o filtrar. Si el grupo o el examen
+son muy grandes, ajustar todo exige reducir el tamaño: usa + o los filtros
+para leer una parte desde lejos. Los nombres de casos aprovechan una columna
+más ancha y admiten dos líneas; el nombre completo sigue en su ayuda.
+
+Mientras se corrige, se mantienen las últimas notas validadas. La franja de
+tiempos muestra la hora actual, el estado, la cuenta atrás del modo examen y
+la última corrección completada. Si falla el arranque o la lectura, o se
+cancela, las notas anteriores siguen visibles y se muestra el aviso. Cambiar
+de examen o de clase limpia esos resultados para no confundir contextos.
+
+Cada fila del modo lista tiene **Enviar informe**. Antes de enviar se
+confirman nombre e identificador; el destinatario recibe solo su informe.
+**Enviado** identifica la entrega de esa corrección, también cuando vino del
+envío masivo. El registro se conserva en este equipo para las últimas 100
+correcciones. Una corrección nueva permite otro envío. El envío general sigue
+disponible y avisa si va a reenviar informes ya entregados. Reintentar un
+envío parcial solo vuelve a intentarlo con los que faltan.
+
+Para abrir el HTML en el equipo con escritorio:
+
+1. En **Ubuntu Desktop**, abre **Archivos → Otras ubicaciones**.
+2. En **Conectar al servidor**, escribe `sftp://USUARIO@SERVIDOR:PUERTO` con
+   los mismos usuario, servidor y puerto que ya usas para SSH.
+3. Introduce la contraseña de tu cuenta y entra en tu carpeta personal.
+4. Copia `informe-<examen>.html` a **Descargas** del equipo Desktop y abre esa
+   copia con Firefox. Se mantiene el formato completo, incluso sin conexión.
+
+Alternativa desde la terminal de **Desktop**, usando tus propios datos y el
+nombre exacto del archivo que indica el profesor:
+
+```bash
+scp -P PUERTO USUARIO@SERVIDOR:informe-examen.html ~/Descargas/
+```
+
+No ejecutes esta descarga dentro de la sesión SSH: el destino debe ser
+Ubuntu Desktop. Si utilizas un salto SSH o un túnel, aplica el mismo acceso
+a la copia. Un servidor que deshabilite SFTP puede seguir permitiendo la copia
+con `scp -O` si admite el protocolo SCP tradicional.
+
+No hay enlaces públicos ni un servidor web nuevo. Cada HTML contiene solo
+los resultados de su alumno y tiene permisos privados. El acceso se protege
+con su cuenta SSH; para impedir que otro alumno entre en ella, la cuenta o
+máquina necesita credenciales propias. Una contraseña común de aula conocida
+por todos no protege frente al acceso a máquinas ajenas (ADR-0037).
+
+Documentación de referencia: [conectar con Archivos de Ubuntu](https://help.ubuntu.com/stable/ubuntu-help/nautilus-connect.html.en) y [opciones de SCP de OpenSSH](https://man.openbsd.org/scp).
