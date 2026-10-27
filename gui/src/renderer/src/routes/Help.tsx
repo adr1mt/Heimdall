@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { ReportAccessHelp } from '@/components/ReportAccessHelp'
 import { ViewHeader } from '@/components/ui'
 
 const sections = [
@@ -14,6 +15,7 @@ const sections = [
   ['historico', 'Histórico y copias'],
   ['notas', 'Escala de notas'],
   ['moodle', 'Exportar a Moodle'],
+  ['informes-desktop', 'Abrir informes'],
   ['problemas', 'Problemas frecuentes']
 ] as const
 const example = `examen: "Servicios de red"
@@ -226,6 +228,9 @@ export default function HelpView() {
               comandos, salidas de las máquinas ni datos de otros alumnos, y dice a quién le ha
               llegado y a quién no.
             </p>
+          </Block>
+          <Block id="informes-desktop" title="Informes en Ubuntu Desktop">
+            <ReportAccessHelp />
           </Block>
           <Block id="problemas" title="Problemas frecuentes">
             <dl className="space-y-3">

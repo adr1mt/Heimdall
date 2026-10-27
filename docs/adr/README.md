@@ -43,3 +43,5 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 - [ADR-0035 · Validación del examen independiente de la clase](0035-validar-examen-sin-clase.md).
 
 - [ADR-0036 · Comprobador fijo y versionado para RA1](0036-comprobador-acotado-ra1.md).
+
+- [ADR-0037 · Informes individuales y acceso desde Ubuntu Desktop](0037-informes-individuales-y-acceso-desktop.md).

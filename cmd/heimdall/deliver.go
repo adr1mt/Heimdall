@@ -214,7 +214,7 @@ func deliver(ctx context.Context, run *model.RunResult, p *plan.Plan, reports, s
 
 	out := delivery{Kind: "delivery", DeliveryVersion: deliveryVersion, RunID: run.RunID, File: name}
 	for _, s := range run.Students {
-		if s.Status != model.StudentExcluded {
+		if _, requested := reports[s.StudentID]; requested && s.Status != model.StudentExcluded {
 			out.Students = append(out.Students, studentDelivery{StudentID: s.StudentID, Name: s.Name})
 		}
 	}

@@ -260,6 +260,9 @@ Por `stdin` llegan la línea de secretos y, detrás, `{"schema":1,"reports":
 {"<student_id>":"<html>"}}`. El motor rehace el PLAN del examen y el aula del
 resultado y exige el mismo `plan_hash`; cada informe va solo a la máquina de
 su alumno, que tiene que presentar la identidad anotada en esa corrección.
+Las claves de `reports` seleccionan los destinatarios (ADR-0037): solo se
+contacta con ellos y solo ellos aparecen en la respuesta. Enviar todas las
+claves conserva el envío masivo.
 Imprime una línea con `kind: "delivery"`, `delivery_version: 1` y, por alumno,
 `delivered` y `reason`. Sale con `0` si llegó a todos, `3` si a alguno no y `2`
 si la petición no es válida, con el motivo en `stderr`. No escribe nada en

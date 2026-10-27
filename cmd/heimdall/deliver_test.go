@@ -242,3 +242,17 @@ func TestIdentitiesComeFromTheCorrection(t *testing.T) {
 		t.Errorf("identidades = %v", got)
 	}
 }
+
+// Selecting one report must not open connections to the rest of the class.
+func TestDeliverOnlyRequestedStudent(t *testing.T) {
+	home := withFakeHome(t, nil)
+	ids := []string{"alu1", "alu2", "alu3"}
+	out := deliver(context.Background(), deliverRun(ids, ids...), deliverPlan(ids...),
+		map[string]string{"alu2": "solo alu2"}, map[string]string{"AULA_PASSWORD": deliverSecret}, "informe-red.html")
+	if len(out.Students) != 1 || out.Students[0].StudentID != "alu2" || !out.Students[0].Delivered {
+		t.Fatalf("entrega individual: %+v", out)
+	}
+	if len(home.dialed) != 1 || home.dialed[0].Port != 2202 || len(home.written) != 1 {
+		t.Fatalf("se contactó con otro alumno: %d conexiones, %d escrituras", len(home.dialed), len(home.written))
+	}
+}
