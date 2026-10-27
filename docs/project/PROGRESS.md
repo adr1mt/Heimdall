@@ -5,12 +5,12 @@ Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 
 ## Última sesión
 
-**T205:** RA1 queda en 23 criterios/peso 27; solo ip_forward activo en
-encaminamiento. Sin NAT/nftables/persistencia. Nombres orientativos sin respuestas;
-copia cargada y versiones recuperables actualizadas. [Evidencia](../reviews/evidence/T205/RESULTADOS.md).
+**T206:** RA1 queda en 22 criterios/peso 26: gateway y DNS DHCP pesan 2;
+retirada la concesión del registro. Se mantiene solo ip_forward en encaminamiento.
+Copia cargada y versiones recuperables actualizadas. [Evidencia](../reviews/evidence/T206/RESULTADOS.md).
 
 **T204 (histórico):** reparación semántica de RA1 (31 criterios/peso 35).
-Selección y nombres vigentes ajustados después en T205.
+Selección, nombres y pesos vigentes ajustados después en T205/T206.
 Comprobador fijo versionado (ADR-0036); fallo técnico sin suspenso. Laboratorio
 real 31/31, 29 variantes, SSH 100/100 y sin Python sin nota; 22 pruebas Python,
 583 GUI, Go/race y editor real correctos. AppImage local reemplazado, originales
@@ -19,7 +19,7 @@ y versiones recuperables conservados. Cerrar/abrir Heimdall para cargarlo.
 **T203:** validar/guardar sin clase e Inicio con nombre actualizado; incluida en
 la compilación local. [Evidencia](../reviews/evidence/T203/RESULTADOS.md).
 **T187:** éxitos verdes 5 s y errores persistentes; incluida en compilación local.
-[Evidencia](../reviews/evidence/T187/RESULTADOS.md). T187/T203/T204/T205 sin publicar.
+[Evidencia](../reviews/evidence/T187/RESULTADOS.md). T187/T203/T204/T205/T206 sin publicar.
 Auditoría anterior autorizada por Adrià:
 - **T194:** nota final completa aunque quede un diagnóstico sin peso.
 - **T195/T196:** clases e informes privados; originales/enlaces conservados.
@@ -35,8 +35,8 @@ huellas de instalación. No equivale a una publicación ni a validación de aula
 
 ## Problemas conocidos y límites
 
-- RA1 no accede al cliente: constata concesión vigente en memfile, no prefijo,
-  gateway, DNS ni resolución efectivos. Kea valida archivo guardado.
+- RA1 no evalúa el cliente ni su registro. Kea valida archivo guardado;
+  gateway/DNS son opciones declaradas, no la configuración efectiva del cliente.
 - Si un consumidor no lee, puede faltar progreso y `run.end`; el resultado
   guardado mantiene la nota. La GUI trata un flujo sin cierre como incompleto.
 - Copias de notas: 128 MB es heap V8 probado, no RSS ni cualquier examen.

@@ -939,3 +939,11 @@ Las descripciones orientan sin dar valores: Rang KEA, Xarxa de treball DHCP,
 reservas por equipo, etc. Solo cambia la selección declarativa; el motor fijo y
 sus pruebas históricas no cambian. Copia cargada actualizada con versiones
 recuperables; sin publicación ni cambios de clases/notas/enunciado.
+
+## T206 · 2026-10-27 · Mayor peso de gateway/DNS DHCP, sin registro del cliente
+
+Adrià asigna peso 2 a kea-porta-enllac y kea-dns, y retira client-concessio
+(peso anterior 3). El grupo Client desaparece al quedar vacío. Quedan 22
+comprobaciones/peso 26. Resto de criterios y ejecución intactos; no se modifica
+el motor ni se evalúa registro o cliente. Copia cargada actualizada por el
+mecanismo nativo de versiones recuperables.

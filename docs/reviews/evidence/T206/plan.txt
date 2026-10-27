@@ -1,0 +1,7 @@
+Examen:         0227 · RA1 · DHCP amb Kea per a 250 equips
+Aula:           Laboratorio ficticio RA1
+Alumnos:        1 evaluables
+Comprobaciones: 22
+Peso total:     26
+Concurrencia:   16 alumnos a la vez, 4 conexiones por máquina
+Hash del plan:  90823ae7a9d237c2c7d3aba034770dfbabf05a0b2c4fc434c880c43716ff42c1

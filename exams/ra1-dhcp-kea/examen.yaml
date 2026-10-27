@@ -179,6 +179,7 @@ grupos:
     - ${alumno.if_int}
     - ${host1.ip}
     igual_a: OK
+    peso: 2
   - id: kea-dns
     descripcion: DNS DHCP
     en: host1
@@ -190,6 +191,7 @@ grupos:
     - ${alumno.if_int}
     - ${host1.ip}
     igual_a: OK
+    peso: 2
   - id: kea-reserva-mail
     descripcion: Reserva KEA · correu
     en: host1
@@ -255,20 +257,6 @@ grupos:
     - ra1-dhcp
     - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
     - fwd-actiu
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
-    - ${host1.ip}
-    igual_a: OK
-- grupo: Client
-  comprobaciones:
-  - id: client-concessio
-    descripcion: Concessió DHCP del client
-    en: host1
-    peso: 3
-    comprobador:
-    - ra1-dhcp
-    - d06d111abdc6e4253a3fbdf76765c58770f69145d911cea5cc8a22296531babe
-    - client-concessio
     - ${alumno.if_ext}
     - ${alumno.if_int}
     - ${host1.ip}

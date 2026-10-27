@@ -4542,6 +4542,48 @@
       },
       "completed": "2026-10-27",
       "notes": "Petición expresa de Adrià: solo ip_forward activo; sin NAT/masquerade/nftables ni persistencia. 23 criterios y peso 27, pesos y ejecución restantes conservados. Nombres orientativos sin valores esperados. PLAN ficticio y gates correctos; copia cargada actualizada mediante versiones recuperables. Motor/AppImage sin cambios. Evidencia: docs/reviews/evidence/T205/RESULTADOS.md."
+    },
+    {
+      "id": "T206",
+      "title": "Aumentar pesos de gateway y DNS DHCP y retirar el registro del cliente",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T205"
+      ],
+      "goal": "Aplicar los pesos solicitados por el profesor y eliminar la comprobación de la concesión registrada.",
+      "scope": [
+        "Peso 2 para kea-porta-enllac y kea-dns.",
+        "Retirar client-concessio y el grupo Client vacío.",
+        "Actualizar copia cargada, documentación y denominador, con versiones recuperables."
+      ],
+      "out_of_scope": [
+        "Cambiar motor, programa fijo, aplicación, clases, notas o enunciado."
+      ],
+      "acceptance": [
+        "22 comprobaciones y peso total 26.",
+        "Gateway y DNS DHCP tienen peso 2; no existe client-concessio.",
+        "Todos los demás criterios mantienen contenido, pesos y orden.",
+        "Validación nativa del examen y PLAN ficticio correctos; copia cargada idéntica y anterior recuperable."
+      ],
+      "tests": [
+        "make check",
+        "heimdall check --exam-only",
+        "PLAN ficticio y comparación estructural"
+      ],
+      "review": {
+        "base": "8c11e2b8b052e462eab75cea091fb29b323f53cb",
+        "head": "8c11e2b8b052e462eab75cea091fb29b323f53cb",
+        "includes_uncommitted": true,
+        "task_ids": [
+          "T206"
+        ],
+        "report": "docs/reviews/evidence/T206/RESULTADOS.md",
+        "status": "COMPLETE"
+      },
+      "completed": "2026-10-27",
+      "notes": "Dos pesos cambiados de 1 a 2 y client-concessio retirado con su grupo vacío. 22 comprobaciones y peso 26. Comparación estructural, PLAN ficticio, gates y copia cargada con versiones recuperables correctos. Sin cambios de motor/AppImage ni evaluación real. Evidencia: docs/reviews/evidence/T206/RESULTADOS.md."
     }
   ]
 }

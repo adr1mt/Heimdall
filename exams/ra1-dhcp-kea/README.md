@@ -3,36 +3,36 @@
 Copia mantenida del examen real de 0227. La copia registrada por el profesor está
 en `/home/adr1/apps/0227/heimdall/ra1-dhcp-kea/examen.yaml`.
 
-Tras el ajuste docente T205, contiene **23 comprobaciones y peso total 27**.
-Los criterios conservados mantienen sus IDs y pesos. El alumno recibe nombres
+Tras el ajuste docente T206, contiene **22 comprobaciones y peso total 26**.
+Gateway y DNS DHCP pesan 2 cada uno; se retira el registro de concesiones del
+cliente. Los demás criterios conservan sus IDs y pesos. El alumno recibe nombres
 como «Rang KEA · capacitat» o «Xarxa de treball DHCP»; la siguiente tabla es documentación privada del profesor.
 No distribuir este directorio como material de examen.
 
-| Descripción pública | Criterio privado |
-|---|---|
-| Adreça de la xarxa d'examen | IP externa guardada y activa |
-| Adreçament estàtic del servidor | IP externa estática, DHCP desactivado y duración ilimitada |
-| Netplan de la xarxa d'examen | Netplan combinado coherente con la IP externa activa |
-| Porta d'enllaç del servidor | Gateway externo 192.168.236.1 guardado y activo |
-| DNS del servidor | DNS externo 192.168.236.1 guardado y activo |
-| Adreça de la xarxa de treball DHCP | IP interna 10.23.97.1/8 guardada y activa |
-| Xarxa de treball DHCP | Netplan interno guardado y activo, con DHCP desactivado |
-| Configuració de la xarxa de treball | Interfaz interna sin default route guardada ni activa, ni DHCP |
-| Sortida del servidor | Ruta hacia 9.9.9.9 por la interfaz externa |
-| Resolució de noms del servidor | El servidor resuelve upc.edu |
-| Interfície del servei DHCP | Kea declara exclusivamente la interfaz interna |
-| Xarxa DHCP a KEA | Subred aplicable 10.0.0.0/8 |
-| Rang KEA · inici | Pool único comenzando en 10.23.97.100 |
-| Rang KEA · capacitat | Pool único 10.23.97.100–10.23.98.93, exactamente 250 direcciones |
-| Porta d'enllaç DHCP | Opción routers efectiva 10.23.97.1 |
-| DNS DHCP | Opción domain-name-servers efectiva 9.9.9.9 |
-| Reserva KEA · correu | Reserva MAC/IP del servidor mail |
-| Reserva KEA · web | Reserva MAC/IP del servidor web |
-| Reserva KEA · impressora 1 | Reserva MAC/IP de la impresora 1 |
-| Reserva KEA · impressora 2 | Reserva MAC/IP de la impresora 2 |
-| Servei KEA | Servicio Kea activo |
-| IP forwarding | Valor activo net.ipv4.ip_forward exactamente 1 |
-| Concessió DHCP del client | Concesión vigente del rango en el registro memfile de Kea |
+| Descripción pública | Criterio privado | Peso |
+|---|---|---:|
+| Adreça de la xarxa d'examen | IP externa guardada y activa | 1 |
+| Adreçament estàtic del servidor | IP externa estática, DHCP desactivado y duración ilimitada | 1 |
+| Netplan de la xarxa d'examen | Netplan combinado coherente con la IP externa activa | 1 |
+| Porta d'enllaç del servidor | Gateway externo 192.168.236.1 guardado y activo | 1 |
+| DNS del servidor | DNS externo 192.168.236.1 guardado y activo | 1 |
+| Adreça de la xarxa de treball DHCP | IP interna 10.23.97.1/8 guardada y activa | 1 |
+| Xarxa de treball DHCP | Netplan interno guardado y activo, con DHCP desactivado | 1 |
+| Configuració de la xarxa de treball | Interfaz interna sin default route guardada ni activa, ni DHCP | 1 |
+| Sortida del servidor | Ruta hacia 9.9.9.9 por la interfaz externa | 1 |
+| Resolució de noms del servidor | El servidor resuelve upc.edu | 1 |
+| Interfície del servei DHCP | Kea declara exclusivamente la interfaz interna | 1 |
+| Xarxa DHCP a KEA | Subred aplicable 10.0.0.0/8 | 1 |
+| Rang KEA · inici | Pool único comenzando en 10.23.97.100 | 1 |
+| Rang KEA · capacitat | Pool único 10.23.97.100–10.23.98.93, exactamente 250 direcciones | 2 |
+| Porta d'enllaç DHCP | Opción routers efectiva 10.23.97.1 | 2 |
+| DNS DHCP | Opción domain-name-servers efectiva 9.9.9.9 | 2 |
+| Reserva KEA · correu | Reserva MAC/IP del servidor mail | 1 |
+| Reserva KEA · web | Reserva MAC/IP del servidor web | 1 |
+| Reserva KEA · impressora 1 | Reserva MAC/IP de la impresora 1 | 1 |
+| Reserva KEA · impressora 2 | Reserva MAC/IP de la impresora 2 | 1 |
+| Servei KEA | Servicio Kea activo | 2 |
+| IP forwarding | Valor activo net.ipv4.ip_forward exactamente 1 | 1 |
 
 ## Cómo se corrige
 
@@ -66,13 +66,9 @@ examen no crea espacios de red de prueba al corregir.
 
 ## Límites que no deben confundirse con una comprobación completa
 
-- No hay acceso al cliente ni su MAC en la clase. Se constata una concesión
-  vigente del rango en el registro de Kea; no se identifica inequívocamente al
-  cliente del alumno ni se prueban su prefijo, gateway, DNS o resolución efectiva.
-- La concesión se comprueba en el registro CSV memfile, incluyendo sus archivos
-  de compactación. Otra base de datos queda sin evaluar.
+- No se evalúa el cliente ni se consultan sus concesiones o el registro de Kea.
 - Los criterios de configuración Kea comprueban el archivo guardado y válido;
-  el servicio activo y la concesión son criterios distintos. No se afirma que
+  el servicio activo es un criterio distinto. No se afirma que
   cada valor del archivo coincida con la configuración interna de un proceso
   que el alumno haya iniciado con otro archivo o no haya recargado.
 - La selección por nombre/MAC de interfaces Netplan está soportada. Selecciones
