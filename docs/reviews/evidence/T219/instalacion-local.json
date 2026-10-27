@@ -1,0 +1,26 @@
+{
+  "task": "T219",
+  "sourceCommit": "1364223c8840300b5889462c13aee669d278d0b9",
+  "stage": "/tmp/heimdall-t219-oxwthtfg",
+  "app": "/home/adr1/Aplicaciones/Heimdall/Heimdall.AppImage",
+  "beforeAppSHA256": "4ee1b5e27fa0574fd1adbda7c9e68f94ce9eee17a74ae0e3d42235ee1aeadd52",
+  "engineSHA256": "607db070ec191848e4b6db7df3290c15a694e525f6de2d070e604db8435c1c08",
+  "verifiedFiles": 26,
+  "package": "/tmp/heimdall-t219-oxwthtfg/source/gui/dist/Heimdall-1.0.1.AppImage",
+  "packageSHA256": "1c9be66319b05a4487ebc03f2d928c2d49f3fea0c78974e2b9179788d6dd4375",
+  "guiAsarSHA256": "75db293bcde11235f55d096dbf0060882125acf2574ce07a0268f042957a9ce1",
+  "dependenciesVerified": [
+    "@monaco-editor/loader",
+    "argparse",
+    "@monaco-editor/react",
+    "js-yaml"
+  ],
+  "resultChunk": "/out/renderer/assets/Results-D8M7BC_u.js",
+  "backupApp": "/home/adr1/Aplicaciones/Heimdall/Heimdall.AppImage.antes-compacto-nombres-2026-10-27.bak",
+  "installedAppSHA256": "1c9be66319b05a4487ebc03f2d928c2d49f3fea0c78974e2b9179788d6dd4375",
+  "installedAt": "2026-10-27T20:15:50.161070+00:00",
+  "runningInstanceRestarted": false,
+  "engineVersion": "heimdall 1.0.1",
+  "smoke": "Package auto: renderer and preload OK (Heimdall)",
+  "status": "INSTALLED_VERIFIED"
+}

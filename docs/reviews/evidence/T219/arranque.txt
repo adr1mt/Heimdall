@@ -1,0 +1,2 @@
+Package auto: renderer and preload OK (Heimdall)
+AppRun: user namespaces available/unavailable and explicit fallback verified.

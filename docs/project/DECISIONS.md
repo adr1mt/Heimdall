@@ -1057,3 +1057,15 @@ mayúsculas y tras normalizar espacios. El cálculo se hace sobre toda la clase
 para evitar que cambien los nombres al ocultar, filtrar u ordenar. Ayuda, lector
 de pantalla, detalle, informes y exportaciones conservan el nombre completo.
 Columnas de profesor de 6,5 rem (104 px al 100 %). No modifica datos guardados.
+
+
+## T219 · 2026-10-27 · Reinstalación y push autorizados
+
+Adrià pide reinstalar, commit y push. GUI construida desde 1364223 en un árbol
+temporal confirmado, sin incorporar el código en curso del motor. Se conserva
+exactamente el motor que T218 ya había instalado, con su huella verificada.
+AppImage, dependencias, 26 archivos GUI, AppRun y arranque con perfil temporal
+comprobados antes de sustituir. Copia anterior sincronizada y sustitución
+atómica con comprobación de concurrencia. No se reinicia la instancia activa,
+no se cambian perfiles, notas, clases o exámenes. Se autoriza push normal a main;
+no publicación, etiquetas ni cambio de versión nominal.

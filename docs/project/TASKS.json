@@ -5000,6 +5000,39 @@
       ],
       "completed": "2026-10-27",
       "notes": "Examen RA1 v2 separado, guardado y registrado con copia recuperable. 12 comprobaciones/peso 19, siete Kea con peso 2; DNS 8.8.8.8 y solo forwarding guardado. Motor instalado preservando todos los archivos de la GUI y la revisión original. make check ra1-check build, validación sin clase de ambos exámenes, PLAN ficticio y paquete verificados. Evidencia: docs/reviews/evidence/T218/RESULTADOS.md. Requiere cerrar/abrir si estaba en ejecución; sin corregir alumnado ni publicar. T219 conserva su trabajo paralelo de instalación de interfaz."
+    },
+    {
+      "id": "T219",
+      "title": "Reinstalar la interfaz compacta y subir los commits autorizados",
+      "phase": 9,
+      "status": "IN_PROGRESS",
+      "priority": "P1",
+      "depends_on": [
+        "T216",
+        "T217"
+      ],
+      "goal": "Instalar las mejoras de portátil y nombres breves, conservar recuperación y hacer commit/push a petición del usuario.",
+      "scope": [
+        "Construcción desde el código confirmado de la GUI, conservando el motor instalado.",
+        "Verificación del paquete y arranque con perfil temporal; sustitución atómica y copia anterior.",
+        "Commit local de instalación y push normal a la rama remota configurada."
+      ],
+      "out_of_scope": [
+        "Cerrar correcciones activas, tocar perfiles, alumnado, notas o exámenes.",
+        "Incorporar cambios sin terminar de T218, etiquetas o publicar una versión."
+      ],
+      "acceptance": [
+        "El AppImage incorpora T216/T217 y conserva exactamente el motor instalado; si cambia durante el empaquetado se revalida antes de sustituir.",
+        "Paquete, preload y arranque aislado correctos; copia recuperable y huellas de instalación verificadas.",
+        "Instancia activa conservada; indicar cierre/reapertura para cargar mejoras.",
+        "Commit de instalación separado de cambios paralelos y push sin forzar confirmado en el remoto."
+      ],
+      "tests": [
+        "make check",
+        "GUI tipos, suite y build",
+        "Contenido del AppImage y smoke-package con perfil temporal",
+        "Huellas de instalación/copia y verificación del remoto"
+      ]
     }
   ]
 }
