@@ -89,7 +89,8 @@ export function studentReport(
   run: RunResult,
   student: StudentResult,
   scale: Scale,
-  examTitle: string
+  examTitle: string,
+  finalRound?: number
 ): string {
   const counts: Record<Tone, number> = { pass: 0, fail: 0, unchecked: 0 }
   for (const check of student.checks) counts[TONE[check.status]]++
@@ -191,11 +192,12 @@ export function studentReport(
 <div class="head">
 <div class="who">
 <p class="exam">${exam}</p>
+${finalRound ? `<p class="date">Informe final · Mejor nota de la sesión · Vuelta ${finalRound}</p>` : ''}
 <h1>${name}</h1>
 <p class="date">${esc(dateText(run.finished_at))}</p>
 </div>
 <div class="grade ${verdict.tone}">
-<p class="label">Nota</p>
+<p class="label">${finalRound ? 'Nota final' : 'Nota'}</p>
 <p class="value"><span>${grade}</span>${final === null ? '' : `<small>/ ${scale.max}</small>`}</p>
 <p class="verdict">${verdict.text}</p>
 </div>

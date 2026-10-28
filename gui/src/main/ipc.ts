@@ -13,6 +13,10 @@ import { detectEngine } from './engine'
 import { readArtifact, readArtifactAsync } from './artifact'
 import { consolidateChain } from './consolidate'
 import { readExamSession } from './session'
+import { ExamRecords, digest } from './exam-record'
+import { sendFinalReports } from './final-reports'
+import type { ExamRecord } from '../shared/exam-record'
+import { markOf, scaleOf } from '../renderer/src/lib/scale'
 import { listRuns, varDirOf } from './history'
 import { correctionStarting } from './activity'
 import { backupRuns, listBackups, restoreBackups, waitForBackups } from './backup'
@@ -83,14 +87,22 @@ async function chooseSourceCopy(source: string, kind: SourceKind): Promise<strin
  */
 let session: RunSession | null = null
 let shuttingDown = false
+let currentRecord: ExamRecord | null = null
+let finalizing: Promise<unknown> | null = null
+const finalDeliveries = new Set<string>()
+function records(): ExamRecords { return new ExamRecords(settingsDir(), readSettings(settingsDir()).enginePath) }
+function context(path: unknown, classId: unknown): asserts path is string {
+  if (typeof path !== 'string' || typeof classId !== 'string' || !path || !classId) throw new Error('Falta el examen o la clase de la sesión.')
+}
 
 /** Stop accepting rounds, finish the engine's artifact, then finish its copy. */
 export async function finishCorrections(): Promise<void> {
   shuttingDown = true
   endExamMode()
   const active = session
-  active?.cancel()
+  if (!finalizing) active?.cancel()
   await active?.closed
+  await finalizing
   await waitForBackups()
 }
 
@@ -181,7 +193,7 @@ function readRunRequest(value: unknown): RunRequest {
   if (retryFrom && sessionRounds.length > 0) {
     throw new Error('Una vuelta del examen y un reintento son dos cosas distintas y no se piden juntas.')
   }
-  return { examPath: raw.examPath, classId: raw.classId, secrets, retryFrom, sessionRounds }
+  return { examPath: raw.examPath, classId: raw.classId, passMark: markOf(raw.passMark ?? 70), secrets, retryFrom, sessionRounds }
 }
 
 /**
@@ -323,9 +335,13 @@ export function registerIpc(): void {
     const raw = (request ?? {}) as Partial<ExamModeRequest>
     if (typeof raw.active !== 'boolean') throw new Error('El modo examen no es válido.')
     if (raw.active && shuttingDown) throw new Error('La aplicación se está cerrando.')
+    if (raw.active && finalizing) throw new Error('El examen se está finalizando.')
     if (!raw.active) {
       endExamMode()
       return
+    }
+    if (typeof raw.examPath === 'string' && typeof raw.classId === 'string') {
+      currentRecord = records().prepare(raw.examPath, groupOf(raw.classId), false, markOf(raw.passMark ?? 70))
     }
     endExamMode()
     for (const [name, secret] of Object.entries(raw.secrets ?? {})) {
@@ -342,7 +358,8 @@ export function registerIpc(): void {
     // this one does not depend on the renderer being right.
     if (shuttingDown) throw new Error('La aplicación se está cerrando.')
     if (session) throw new Error('Ya hay una corrección en marcha.')
-    const { examPath, classId, secrets, retryFrom, sessionRounds } = readRunRequest(request)
+    if (finalizing) throw new Error('El examen se está finalizando.')
+    const { examPath, classId, secrets, retryFrom, passMark } = readRunRequest(request)
     // Passes after the first carry no credentials: the teacher typed them
     // once, when the exam started, and they have not left this process.
     if (examMode && Object.keys(secrets).length === 0) Object.assign(secrets, examSecrets)
@@ -352,14 +369,29 @@ export function registerIpc(): void {
     // first: nothing is written into a folder that is not a project.
     const dir = projectDirOf(examPath)
     const className = writeGeneratedAula(dir, groupOf(classId))
-    const target = { dir, className, retryFrom, sessionRounds }
+    const registry = records()
+    const record = registry.prepare(examPath, groupOf(classId), !!retryFrom, passMark)
+    registry.begin(record)
+    currentRecord = record
+    // Durable provenance, rather than renderer memory, owns the session.
+    // Reevaluate the whole roster even after a perfect round: current checks
+    // must remain observable while the durable session keeps the best grade.
+    const target = { dir, className, retryFrom }
     const sender = event.sender
 
     correctionStarting()
     session = new RunSession(engine, target, secrets, {
-      onEvent: (engineEvent) => send(sender, IPC.runEvent, engineEvent),
+      onEvent: (engineEvent) => {
+        if (engineEvent.event === 'run.end' && engineEvent.artifact) {
+          try { registry.append(record, engineEvent.artifact) }
+          catch (error) { endExamMode(); send(sender, IPC.backupWarning, `No se pudo registrar la sesión: ${String(error)}. No inicies otra vuelta hasta recuperar el registro.`) }
+        }
+        send(sender, IPC.runEvent, engineEvent)
+      },
       onClose: (exitCode, stderr) => {
         session = null
+        try { registry.recover(record) }
+        catch (error) { endExamMode(); stderr += `\nNo se pudo guardar la sesión: ${String(error)}` }
         // The grades leave the exam's folder the moment they exist. It never
         // throws and it never blocks: a copy that fails must not turn a
         // finished correction into an error (T113).
@@ -396,6 +428,71 @@ export function registerIpc(): void {
       : []
     if (rounds.length === 0) throw new Error('No hay ninguna vuelta que leer como sesión.')
     return readExamSession(readSettings(settingsDir()).enginePath, rounds)
+  })
+
+  ipcMain.handle(IPC.examRecords, (_e, path: unknown, classId: unknown) => {
+    context(path, classId)
+    return records().list(path, classId as string)
+  })
+
+  ipcMain.handle(IPC.savedExam, async (_e, path: unknown, classId: unknown, id?: string) => {
+    context(path, classId)
+    const registry = records()
+    let record = registry.get(path, classId as string, id)
+    if (!record) return null
+    if (!id && !session && record.state === 'ACTIVE') {
+      const group = groupOf(classId)
+      if (record.examHash !== digest(readFileSync(path, 'utf8')) || record.inventoryHash !== digest(aulaYaml(group))) record = registry.prepare(path, group, false, record.passMark)
+    }
+    if (!session && record.pending) registry.recover(record)
+    if (!session && record.state === 'FINALIZING') {
+      if (finalizing) {
+        await finalizing
+        const closed = registry.get(path, classId as string, id)
+        if (!closed) throw new Error('No se encuentra la sesión finalizada.')
+        return registry.view(closed)
+      }
+      return registry.finalize(record)
+    }
+    return registry.view(record)
+  })
+
+  ipcMain.handle(IPC.finishExam, (_e, path: unknown, classId: unknown, passMark?: number) => {
+    context(path, classId)
+    if (finalizing) return finalizing
+    const registry = records()
+    const record = session && currentRecord?.examPath === path && currentRecord.classId === classId ? currentRecord : registry.get(path, classId as string) ?? registry.prepare(path, groupOf(classId))
+    if (!record) throw new Error('No hay ninguna sesión que finalizar.')
+    if (record.state === 'FINALIZED') return registry.view(record)
+    record.state = 'FINALIZING'
+    registry.save(record)
+    endExamMode()
+    const active = session
+    finalizing = (async () => {
+      await active?.closed
+      const closed = await registry.finalize(record)
+      // If criteria changed after the last round, the current set has no
+      // evaluated rounds yet. Keep the old results and close an empty new set.
+      const group = groupOf(classId)
+      if (record.examHash !== digest(readFileSync(path, 'utf8')) || record.inventoryHash !== digest(aulaYaml(group)) || record.passMark !== markOf(passMark ?? record.passMark)) {
+        const current = registry.prepare(path, group, false, markOf(passMark ?? record.passMark))
+        return registry.finalize(current)
+      }
+      return closed
+    })().finally(() => { finalizing = null })
+    return finalizing
+  })
+
+  ipcMain.handle(IPC.sendFinalReports, async (_e, path: unknown, classId: unknown, id: unknown, rawScale: unknown) => {
+    context(path, classId)
+    if (typeof id !== 'string') throw new Error('Falta la sesión finalizada.')
+    const registry = records(), record = registry.get(path, classId as string, id)
+    if (!record || finalDeliveries.has(record.id)) throw new Error('Ya se están enviando los informes de esta sesión.')
+    const group = groupOf(classId)
+    const scale = rawScale as { id?: string; passMark?: number } | null
+    finalDeliveries.add(record.id)
+    try { return await sendFinalReports(registry, record, readSettings(settingsDir()).enginePath, group.password, scaleOf(scale?.id, scale?.passMark)) }
+    finally { finalDeliveries.delete(record.id) }
   })
 
   // Reading the history touches no machine and computes no grade: it only

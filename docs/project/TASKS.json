@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated": "2026-10-22",
+  "updated": "2026-10-28",
   "status_values": [
     "BLOCKED",
     "READY",
@@ -5035,6 +5035,52 @@
       ],
       "completed": "2026-10-27",
       "notes": "Interfaz T216/T217 instalada desde 1364223 conservando idéntico el motor RA1 v2 de T218. 620 pruebas GUI, tipos/build, 26 archivos de paquete, dependencias, AppRun y arranque con perfil temporal correctos. Copia anterior y huellas verificadas; instancia activa intacta. Commit e8fe97f subido y confirmado en origin/main. Evidencia: docs/reviews/evidence/T219/RESULTADOS.md. Sin etiquetas ni publicación."
+    },
+    {
+      "id": "T220",
+      "title": "Persistir mejores notas, finalizar sesiones y entregar informes finales",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T219"
+      ],
+      "goal": "Conservar automáticamente la mejor vuelta completa, cerrar el examen de forma durable y entregar un informe final privado por alumno con su propia evidencia.",
+      "scope": [
+        "Registro atómico de sesiones con referencias a artefactos, recuperación y separación de criterios.",
+        "Finalización coordinada con la corrección activa; notas principales y tabla Mejores notas en Resultados.",
+        "Exportación CSV/Moodle y envío confirmado mediante el sistema SSH existente con recibos persistentes e informes finales inmutables."
+      ],
+      "out_of_scope": [
+        "Publicar, instalar, corregir alumnado real o añadir acceso entrante al Desktop."
+      ],
+      "acceptance": [
+        "Un 10 completo persiste tras un 7 posterior y tras reiniciar; ninguna vuelta parcial inventa una nota.",
+        "Cambiar el PLAN inicia otro registro compatible conservando el histórico.",
+        "Finalizar bloquea nuevas vueltas inmediatamente, espera la activa y persiste FINALIZED con fecha, fuentes y referencias a mejores vueltas.",
+        "La matriz conserva comprobaciones de la última vuelta y muestra la mejor nota como principal; Mejores notas abre tabla con nota y vuelta.",
+        "Sesión finalizada recuperable; nuevas correcciones crean otra sesión. CSV/Moodle exportan notas finales.",
+        "Una sola confirmación de envío; cada informe usa su propia mejor vuelta, se identifica como final, no sobrescribe anteriores y es privado.",
+        "Recibos durables previenen duplicados y permiten reintentar pendientes/fallidos; ayuda para recuperar por SSH desde Desktop.",
+        "Pruebas de reinicio, cierre en curso, criterios, máximos y exportación/envío con mejor vuelta anterior; suites rápidas, tipos y build correctos."
+      ],
+      "tests": [
+        "make check",
+        "make gui-check gui-build",
+        "Pruebas de sesión persistente y cierre/envío; verificación visual aislada"
+      ],
+      "completed": "2026-10-28",
+      "notes": "634 pruebas GUI, tipos/build/preload, make check/docs-check/tools-check/build correctos. Motor nativo real verifica mejor vuelta, 10 tras 7, reinicio simulado y CSV/Moodle. Main/preload/renderer reales recuperan examen finalizado en perfil temporal. Capturas e interacciones a 1366/1024; tres hallazgos independientes corregidos y resueltos. Evidencia: docs/reviews/evidence/T220/RESULTADOS.md. Sin instalar, publicar ni enviar informes reales.",
+      "review": {
+        "base": "e8afe1fc3550ea9d0087001d6bca1de615887080",
+        "head": "e8afe1fc3550ea9d0087001d6bca1de615887080",
+        "includes_uncommitted": true,
+        "task_ids": [
+          "T220"
+        ],
+        "report": "docs/reviews/evidence/T220/RESULTADOS.md",
+        "status": "COMPLETE"
+      }
     }
   ]
 }

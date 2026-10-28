@@ -132,6 +132,7 @@ suite se ejecuta aparte.
 | Comprobar el examen RA1 | [perfil fijo](../internal/probe/probe.go), [programa remoto](../internal/probe/ra1.py), [examen](../exams/ra1-dhcp-kea/README.md) | [laboratorio y pruebas](../test/exams/ra1/README.md), ADR-0036; `make ra1-check` |
 | Copiar, retener, recuperar | [backup.ts](../gui/src/main/backup.ts), incluye `BackupChain` | [copias](../gui/tests/backups.test.ts), [recuperación](../gui/tests/backup-recovery.test.ts), ADR-0026 |
 | Reintentar y consolidar | [reintentos](../cmd/heimdall/retry.go), [consolidación](../cmd/heimdall/consolidate.go) | ADR-0018 y ADR-0019 |
+| Sesiones persistentes y cierre | [registro](../gui/src/main/exam-record.ts), [cierre](../gui/src/main/ipc.ts), [informes finales](../gui/src/main/final-reports.ts) | [persistencia](../gui/tests/exam-record.test.ts), [cierre activo](../gui/tests/exam-finalization.test.ts), [laboratorio sin SSH](../gui/scripts/exam-session-lab.ts), ADR-0039 |
 | Sesión de examen | [CLI](../cmd/heimdall/session.go), [GUI](../gui/src/main/session.ts) | ADR-0020; arnés `gui/scripts/examen-lab.ts` |
 | Credenciales del aula | [clases](../gui/src/shared/classes.ts), [secretos](../gui/src/main/secrets.ts) | ADR-0009 y ADR-0030; [auditoría](../gui/tests/secretos.test.ts) |
 | Actualizar y distribuir | [feed](../gui/src/main/updater.ts), [servicio](../gui/src/main/update-service.ts), [descarga](../gui/src/main/update-download.ts) | [verificación 0.9.1](releases/0.9.1/VERIFICACION.md); `make gui-dist` |

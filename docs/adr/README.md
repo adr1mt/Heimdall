@@ -47,3 +47,5 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 - [ADR-0037 · Informes individuales y acceso desde Ubuntu Desktop](0037-informes-individuales-y-acceso-desktop.md).
 
 - [ADR-0038 · Nombre fijo del último informe](0038-nombre-fijo-del-informe.md).
+
+- [ADR-0039 · Sesiones persistentes, cierre e informes definitivos](0039-sesiones-persistentes-y-cierre-definitivo.md).

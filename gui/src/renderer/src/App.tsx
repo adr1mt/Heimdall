@@ -25,12 +25,14 @@ import {
 import { NAV_FOOTER, NAV_MAIN, comingSoon, type NavEntry } from './lib/nav'
 import { useApp, noticeFrom, type View } from './stores/app'
 import { useRun } from './stores/run'
+import { useExamRecord } from './stores/exam-record'
 import { cn } from './lib/utils'
 import { shouldStartPass } from './lib/exam'
 import { startCorrection } from './lib/start-run'
 import { t } from './i18n/es'
 import logo from './assets/logo.png'
 import { ConfirmDialog } from '@/components/ui'
+import { FinalReports } from '@/components/ExamSession'
 
 const HomeView = lazy(() => import('./routes/Home'))
 const SettingsView = lazy(() => import('./routes/Settings'))
@@ -86,6 +88,36 @@ function AppBody() {
   // Without an exam open there is nothing to correct, no results and no
   // history: those sections are disabled, not hidden (lib/nav).
   const hasProject = useApp((s) => s.project !== null)
+  const examPath = useApp((s) => s.project?.examPath)
+  const classId = useApp((s) => s.classId)
+  useEffect(() => {
+    if (useApp.getState().project) return
+    const reopen = async () => {
+      const dir = localStorage.getItem('heimdall-last-project') || (await window.heimdall.recentProjects())[0]?.dir
+      if (!dir || useApp.getState().project) return
+      const project = await window.heimdall.openProject(dir)
+      if (!useApp.getState().project) useApp.getState().setProject(project)
+    }
+    void reopen().catch(error => setNotice(noticeFrom('No se pudo reabrir el último examen', error)))
+  }, [setNotice])
+  useEffect(() => {
+    useExamRecord.getState().reset()
+    if (!examPath || !classId) return
+    let current = true
+    void useExamRecord.getState().load(examPath, classId).then(async saved => {
+      if (!current || !saved) return
+      useApp.setState({ examRounds: saved.record.rounds.map(round => round.path) })
+      const last = saved.record.rounds.at(-1)
+      if (last) {
+        const artifact = await window.heimdall.readArtifact(last.path)
+        if (current) {
+          useRun.getState().setArtifact(artifact, last.path)
+          useApp.getState().setView('results')
+        }
+      }
+    }).catch(error => { if (current) setNotice(noticeFrom('No se pudo recuperar la sesión', error)) })
+    return () => { current = false }
+  }, [examPath, classId, setNotice])
   const projector = useApp((s) => s.projector)
   const update = useApp((s) => s.update)
  const draft=useApp((s)=>s.editorDraft)
@@ -153,6 +185,15 @@ function AppBody() {
       // The engine is gone: exam mode, if it is on, counts the interval from
       // here and never from the start of the pass.
       useApp.getState().examPassFinished()
+      const app = useApp.getState()
+      if (app.project && app.classId) {
+        void useExamRecord.getState().load(app.project.examPath, app.classId).then(saved => {
+          if (saved) useApp.setState({ examRounds: saved.record.rounds.map(round => round.path) })
+        }).catch(error => {
+          useApp.getState().stopExam()
+          useApp.getState().setNotice(noticeFrom('No se pudo actualizar la sesión', error))
+        })
+      }
     })
     return () => {
       offEvent()
@@ -310,6 +351,7 @@ function AppBody() {
             </button>
           </div>
         )}
+        <FinalReports />
         <div key={view} className="min-h-0 flex-1 animate-fade-in">
           <ViewErrorBoundary key={view}>
             <Suspense

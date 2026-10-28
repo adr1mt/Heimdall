@@ -15,6 +15,7 @@ import {
 import { canOpen, type View } from '@/lib/nav'
 import { useResultsView } from './results-view'
 import { useRun } from './run'
+import { useExamRecord } from './exam-record'
 
 export type { View }
 export type Theme = 'dark' | 'light'
@@ -259,9 +260,12 @@ export const useApp = create<AppState>((set, get) => ({
       useResultsView.getState().reset()
       useRun.getState().reset()
     }
+    if (project) localStorage.setItem('heimdall-last-project', project.dir)
+    else localStorage.removeItem('heimdall-last-project')
     set({
       editorDraft: null,
       project,
+      classId: project ? (localStorage.getItem(`heimdall-class-for:${project.dir}`) || get().classId) : get().classId,
       retry: null,
       examRounds: [],
       exam: EXAM_OFF,
@@ -275,7 +279,10 @@ export const useApp = create<AppState>((set, get) => ({
     }
     if (classId) localStorage.setItem('heimdall-class-id', classId)
     else localStorage.removeItem('heimdall-class-id')
-    set({ classId })
+    const dir = get().project?.dir
+    if (dir && classId) localStorage.setItem(`heimdall-class-for:${dir}`, classId)
+    else if (dir) localStorage.removeItem(`heimdall-class-for:${dir}`)
+    set({ classId, examRounds: [] })
   },
   setNotice: (notice, noticeKind = 'error') => {
     clearTimeout(noticeTimer)
@@ -348,5 +355,9 @@ export function noticeFrom(prefix: string, error: unknown): string {
 export function useScale(): Scale {
   const id = useApp((s) => s.scale)
   const mark = useApp((s) => s.passMark)
-  return useMemo(() => scaleOf(id, mark), [id, mark])
+  const saved = useExamRecord(s => s.saved)
+  const artifact = useRun(s => s.artifact)
+  const bound = saved && (saved.record.rounds.at(-1)?.runId === artifact?.run_id || (saved.record.rounds.length === 0 && saved.record.examPath === artifact?.exam.path))
+  const fixedMark = bound ? saved.record.passMark : mark
+  return useMemo(() => scaleOf(id, fixedMark), [id, fixedMark])
 }

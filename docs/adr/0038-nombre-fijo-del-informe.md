@@ -1,6 +1,7 @@
 # ADR-0038 · Nombre fijo del último informe
 
 - Estado: **aceptada** · 2026-10-27 · T215
+- Informes finales exceptuados por [ADR-0039](0039-sesiones-persistentes-y-cierre-definitivo.md); el informe normal conserva este nombre.
 - Sustituye la decisión de nombre por examen de ADR-0031; conserva ADR-0033 y ADR-0037.
 
 ## Decisión

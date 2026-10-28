@@ -3,6 +3,7 @@ import { Check, Send } from 'lucide-react'
 import { Button, ConfirmDialog, Spinner } from '@/components/ui'
 import { useApp, useScale, noticeFrom } from '@/stores/app'
 import { useRun } from '@/stores/run'
+import { useBoundExam } from '@/lib/use-session-grade'
 import { useReportDelivery } from '@/stores/report-delivery'
 import { examTitleOf, reportFileName, reportsSummary, studentReport, studentReports } from '@/lib/report'
 import { ReportAccessHelp } from './ReportAccessHelp'
@@ -19,6 +20,7 @@ interface Prepared {
 
 /** Single and bulk sends share confirmation, generation, receipts and the IPC. */
 export function ReportsButton({ artifactPath, studentId, compact = false }: { artifactPath: string | null; studentId?: string; compact?: boolean }) {
+  const saved = useBoundExam()
   const artifact = useRun((s) => s.artifact)
   const phase = useRun((s) => s.phase)
   const project = useApp((s) => s.project)
@@ -28,7 +30,7 @@ export function ReportsButton({ artifactPath, studentId, compact = false }: { ar
   const [preparing, setPreparing] = useState(false)
   const [delivery, setDelivery] = useState<(Delivery & { request: Prepared }) | null>(null)
   useEffect(() => { setPrepared(null); setDelivery(null) }, [artifact?.run_id])
-  if (!artifact || !artifactPath) return null
+  if (!artifact || !artifactPath || saved?.record.state === 'FINALIZED') return null
   const student = studentId ? artifact.students.find((s) => s.student_id === studentId) : null
   if (student?.status === 'EXCLUDED') return null
   const alreadySent = studentId ? receipts[artifact.run_id]?.includes(studentId) : false

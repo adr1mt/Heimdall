@@ -553,8 +553,8 @@ export const t = {
     // dentro, quién ha terminado y por dónde va la vuelta de ahora.
     roundLabel: 'Vuelta',
     nextLabel: 'Siguiente',
-    activeLabel: 'Activos',
-    finishedLabel: 'Finalizados',
+    activeLabel: 'Se reevalúan',
+    finishedLabel: 'Máxima conseguida',
     progressLabel: 'Progreso',
     nowCorrecting: 'ahora',
     ofMinutes: (minutes: number) => `cada ${minutes} min`,

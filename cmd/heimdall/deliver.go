@@ -78,6 +78,7 @@ func deliverCmd(args []string, stdout, stderr io.Writer) int {
 	fs.SetOutput(stderr)
 	secretsMode := fs.String("secrets", "env", "canal de los secretos: stdin o env")
 	artifactPath := fs.String("artifact", "", "resultado de la corrección cuyos informes se envían")
+	sourceDir := fs.String("source-dir", "", "definiciones conservadas de una sesión finalizada")
 	name := fs.String("file", "", "nombre del fichero en la carpeta personal: informe.html")
 	if err := fs.Parse(args); err != nil {
 		return exitInvalidConfig
@@ -94,11 +95,15 @@ func deliverCmd(args []string, stdout, stderr io.Writer) int {
 		return fail("%q no es un nombre de informe: se espera informe.html o informe-<letras, cifras y guiones>.html", *name)
 	}
 
+	if *sourceDir != "" && !strings.HasPrefix(*name, "informe-final-") {
+		return fail("las definiciones conservadas solo se usan para informes finales")
+	}
+
 	run, err := readArtifact(*artifactPath)
 	if err != nil {
 		return fail("%s", err)
 	}
-	p, err := planOf(run)
+	p, err := planOfSources(run, *sourceDir)
 	if err != nil {
 		return fail("%s", err)
 	}
@@ -139,9 +144,16 @@ func deliverCmd(args []string, stdout, stderr io.Writer) int {
 // and refuses it unless it is the PLAN that was corrected. A report must land
 // on the machine that was examined, not on the one the classroom says today.
 func planOf(run *model.RunResult) (*plan.Plan, error) {
+	return planOfSources(run, "")
+}
+
+func planOfSources(run *model.RunResult, sourceDir string) (*plan.Plan, error) {
 	dir := filepath.Dir(run.Exam.Path)
 	if filepath.Base(run.Exam.Path) != plan.ExamFile || filepath.Dir(run.Inventory.Path) != dir {
 		return nil, fmt.Errorf("el resultado no apunta a un examen y un aula de la misma carpeta")
+	}
+	if sourceDir != "" {
+		dir = sourceDir
 	}
 	p, err := plan.LoadNamed(dir, filepath.Base(run.Inventory.Path))
 	if err != nil {

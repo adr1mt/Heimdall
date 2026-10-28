@@ -52,7 +52,11 @@ import {
 } from '@/lib/results'
 import { MoodleExportButton } from '@/components/MoodleExport'
 import { ReportsButton } from '@/components/ReportsButton'
+import { ExamSessionActions } from '@/components/ExamSession'
+import { useBoundExam, useSessionGrade } from '@/lib/use-session-grade'
+import { sessionGrade } from '@/lib/session-grade'
 import {
+  savedExamCsv, savedExamCsvName, savedExamRows, sessionExportSummary,
   chainCsv,
   chainCsvName,
   chainExportSummary,
@@ -95,6 +99,8 @@ export default function ResultsView() {
   const problem = useRun((s) => s.artifactProblem)
   const scale = useScale()
   const passMark = scale.passMark
+  const savedExam = useBoundExam()
+  const gradeRun = useMemo(() => artifact && savedExam ? { ...artifact, students: artifact.students.map(student => sessionGrade(student, savedExam).student) } : artifact, [artifact, savedExam])
   const { filters, setFilters, studentFilter, setStudentFilter, order, setOrder,
     mode, setMode, hiddenIds, hideStudent, showStudent, showAll, clearFilters } = useResultsView()
   const [selected, setSelected] = useState<Selection | null>(null)
@@ -109,11 +115,11 @@ export default function ResultsView() {
   const causes = useMemo(() => (artifact ? causesIn(artifact) : []), [artifact])
   const names = useMemo(() => studentShortNames(artifact?.students ?? []), [artifact])
   const summary = useMemo(
-    () => (artifact ? classSummary(artifact, passMark) : null),
-    [artifact, passMark]
+    () => (gradeRun ? classSummary(gradeRun, passMark) : null),
+    [gradeRun, passMark]
   )
 
-  const average = useMemo(() => artifact ? displayedAverage(artifact, scale) : null, [artifact, scale])
+  const average = useMemo(() => gradeRun ? displayedAverage(gradeRun, scale) : null, [gradeRun, scale])
   const mostFailed = useMemo(() => {
     const checks = artifact ? failingChecks(artifact).filter((check) => check.failed > 0) : []
     return checks.filter((check) => check.failed === checks[0]?.failed)
@@ -121,14 +127,16 @@ export default function ResultsView() {
 
   // Both views share the same student ordering and check filters.
   const rows = useMemo(() => {
-    if (!artifact) return []
-    return exploreResults(filterRun(artifact, filters), studentFilter, order, passMark, hiddenIds)
-  }, [artifact, filters, studentFilter, order, passMark, hiddenIds])
+    if (!artifact || !gradeRun) return []
+    const latest = new Map(artifact.students.map(student => [student.student_id, student]))
+    return exploreResults(filterRun(gradeRun, filters), studentFilter, order, passMark, hiddenIds)
+      .map(row => ({ ...row, student: latest.get(row.student.student_id)! }))
+  }, [artifact, gradeRun, filters, studentFilter, order, passMark, hiddenIds])
 
   if (problem && !artifact) {
     return (
       <div className="flex h-full flex-col">
-        <ViewHeader title={t.results.title} />
+        <ViewHeader title={t.results.title} actions={<ExamSessionActions />} />
         <p
           role="alert"
           className="m-6 rounded-md bg-destructive/10 p-4 text-sm text-destructive-strong"
@@ -142,7 +150,7 @@ export default function ResultsView() {
   if (!artifact) {
     return (
       <div className="flex h-full flex-col">
-        <ViewHeader title={t.results.title} />
+        <ViewHeader title={t.results.title} actions={<ExamSessionActions />} />
         <p className="m-6 text-sm text-muted-foreground">{t.results.empty}</p>
       </div>
     )
@@ -288,6 +296,7 @@ export default function ResultsView() {
         }
         actions={
           <>
+            <ExamSessionActions />
             <Segmented>
               <SegmentedItem active={mode === 'list'} onClick={() => setMode('list')}>
                 <List className="h-3.5 w-3.5" />
@@ -320,6 +329,7 @@ export default function ResultsView() {
       />
 
       <CorrectionClock />
+      <SessionResultsHint />
       <ResultsCanvas projector={projector} overview={overview}>
       <div className="results-body space-y-3 p-3 sm:p-4">
         {rows.length === 0 ? (
@@ -531,18 +541,23 @@ function MatrixView({ rows, names, selected, onPick, onStudent, onHide }: {
 }
 
 function MatrixGrade({ student }: { student: StudentResult }) {
+  const best = useSessionGrade(student)
+  const latest = student
+  student = best.student
   const scale = useScale()
   const score = scoreView(student.score, scale)
   const appearance = gradeAppearance(student, scale.passMark)
   const label = score.kind === 'provisional' ? 'Provisional' : appearance.label
   return (
-    <div className="mt-1.5" role="group" title={`${label} · ${score.note}`}
+    <div className="mt-1.5" role="group" title={`${best.label || label} · ${best.origin || score.note}`}
       aria-label={`${student.name}: ${score.value === null ? 'sin nota' : `${score.text} sobre ${scale.max}`}, ${label}`}>
       <span className={cn('text-xl font-semibold leading-6 tabular-nums', appearance.color)}>
         {score.value === null ? '—' : score.text}
       </span>
       {score.value !== null && <span className="ml-0.5 text-xs font-normal text-muted-foreground">/{scale.max}</span>}
-      {appearance.tone !== 'pass' && appearance.tone !== 'fail' && (
+      {best.label && <span className="block text-micro font-normal text-muted-foreground">{best.label}{score.kind === 'final' ? ` · ${best.origin}` : ''}</span>}
+      {best.label && <span className="block text-micro font-normal text-muted-foreground">Última: {scoreView(latest.score, scale).text}</span>}
+      {!best.label && appearance.tone !== 'pass' && appearance.tone !== 'fail' && (
         <span className={`mt-0.5 block text-micro font-normal ${appearance.color}`}>{label}</span>
       )}
     </div>
@@ -563,6 +578,8 @@ function GradeBadge({
   onClick?: () => void
   large?: boolean
 }) {
+  const best = useSessionGrade(student)
+  student = best.student
   const scale = useScale()
   const score = scoreView(student.score, scale)
   const appearance = gradeAppearance(student, scale.passMark)
@@ -574,7 +591,8 @@ function GradeBadge({
       >
         {score.value === null ? '—' : score.text}
       </span>
-      {score.kind === 'provisional' && (
+      {best.label && <span className="mt-1 block text-micro font-normal">{best.label}</span>}
+      {!best.label && score.kind === 'provisional' && (
         <span className="mt-0.5 block text-micro font-medium leading-none">provisional</span>
       )}
     </>
@@ -584,7 +602,7 @@ function GradeBadge({
     large ? 'min-w-16' : 'min-w-14',
     appearance.fill
   )
-  const title = score.kind === 'final' ? `${label} · ${score.note}` : `${label}: ${score.note}`
+  const title = best.label ? `${best.label} · ${best.origin}` : score.kind === 'final' ? `${label} · ${score.note}` : `${label}: ${score.note}`
   if (!onClick)
     return (
       <span className={className} title={title}>
@@ -742,6 +760,7 @@ function useMask(artifact: RunResult | null): (text: string) => string {
  * without a final grade travels as «sin nota» with the reason.
  */
 function ExportButton() {
+  const saved = useBoundExam()
   const artifact = useRun((s) => s.artifact)
   const scale = useScale()
   const setNotice = useApp((s) => s.setNotice)
@@ -753,7 +772,7 @@ function ExportButton() {
     setConfirm(false)
     if (!artifact) return
     try {
-      const path = await window.heimdall.saveCsv(csvName(artifact), toCsv(artifact, scale))
+      const path = await window.heimdall.saveCsv(saved ? savedExamCsvName(saved) : csvName(artifact), saved ? savedExamCsv(saved, scale) : toCsv(artifact, scale))
       setNotice(path ? t.export.saved(path) : t.export.cancelled, path ? 'success' : 'info')
     } catch (error) {
       setNotice(noticeFrom(t.export.failed, error))
@@ -774,7 +793,7 @@ function ExportButton() {
         onCancel={() => setConfirm(false)}
       >
         <span className="space-y-2 block">
-          <span className="block">{exportSummary(artifact, scale)}</span>
+          <span className="block">{saved?.session ? sessionExportSummary(saved.session, scale) : saved ? `${saved.record.roster.length} alumnos sin nota final: ninguna vuelta evaluada de estos criterios.` : exportSummary(artifact, scale)}</span>
           <span className="block">{t.export.hint}</span>
           <span className="block text-xs text-muted-foreground">{t.export.scale(scale.label)}</span>
         </span>
@@ -790,10 +809,11 @@ function ExportButton() {
  */
 /** The same grades of this correction, in the file Moodle imports. */
 function RunMoodleButton() {
+  const saved = useBoundExam()
   const artifact = useRun((s) => s.artifact)
   const scale = useScale()
   if (!artifact) return null
-  return <MoodleExportButton rows={gradeRows(artifact, scale)} at={artifact.finished_at} />
+  return <MoodleExportButton rows={saved ? savedExamRows(saved, scale) : gradeRows(artifact, scale)} at={artifact.finished_at} />
 }
 
 /**
@@ -1190,10 +1210,11 @@ function HideStudentButton({ student, onHide }: { student: StudentResult; onHide
 function StudentRow({ student, name, onToggle, onHide }: {
   student: StudentResult; name: string; onToggle: () => void; onHide: () => void
 }) {
+  const best = useSessionGrade(student)
   const scale = useScale()
   const projector = useApp((s) => s.projector)
   const counts = tally(student.checks)
-  const appearance = gradeAppearance(student, scale.passMark)
+  const appearance = gradeAppearance(best.student, scale.passMark)
   const cause = student.checks.find((check) => check.cause !== 'NONE')?.cause
   return (
     <div className="student-row flex items-center gap-1 rounded-md border border-transparent hover:border-border">
@@ -1262,9 +1283,10 @@ function StudentDetailView({
   onBack: () => void
   onPick: (id: string | null) => void
 }) {
+  const best = useSessionGrade(student)
   const scale = useScale()
-  const score = scoreView(student.score, scale)
-  const appearance = gradeAppearance(student, scale.passMark)
+  const score = scoreView(best.student.score, scale)
+  const appearance = gradeAppearance(best.student, scale.passMark)
   const counts = tally(student.checks)
   const groups = [...new Set(student.checks.map((check) => check.group))]
   return (
@@ -1291,10 +1313,11 @@ function StudentDetailView({
               {score.value === null ? '—' : score.text}
             </strong>
             <span className="ml-2 text-sm">
-              {score.kind === 'provisional' ? 'Provisional' : appearance.label}
+              {best.label || (score.kind === 'provisional' ? 'Provisional' : appearance.label)}
             </span>
           </span>
         </div>
+        {best.label && <p className="text-sm text-muted-foreground">{best.origin} · Última vuelta: {scoreView(student.score, scale).text}. Las comprobaciones de abajo muestran la última vuelta.</p>}
         {score.kind !== 'final' && <p className="text-sm text-warning-strong">{score.note}</p>}
         {groups.map((group) => (
           <section key={group} className="space-y-2">
@@ -1497,4 +1520,12 @@ function StreamBlock({
       {cut && <p className="text-micro text-warning-strong">{cut}</p>}
     </Field>
   )
+}
+
+function SessionResultsHint() {
+  const saved = useBoundExam()
+  if (!saved) return null
+  return <p className="shrink-0 border-b border-border px-4 py-1 text-xs text-muted-foreground">
+    {saved.record.rounds.length === 0 ? 'Sin nota final: no hay vueltas evaluadas con los criterios actuales. Las comprobaciones visibles pertenecen a criterios anteriores.' : `${saved.record.state === 'FINALIZED' ? 'Nota final: mejor nota alcanzada.' : 'Nota principal: mejor nota completa alcanzada.'} Comprobaciones y resultados actuales: última vuelta.`}
+  </p>
 }

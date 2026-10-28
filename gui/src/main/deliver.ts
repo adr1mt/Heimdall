@@ -19,8 +19,8 @@ const OK = 0
 const PARTIAL = 3
 
 /** The argument vector: no password and no report in it, ever. */
-export function deliverArgs(artifactPath: string, file: string): string[] {
-  return ['deliver', '--secrets=stdin', `--artifact=${artifactPath}`, `--file=${file}`]
+export function deliverArgs(artifactPath: string, file: string, sourceDir?: string): string[] {
+  return ['deliver', '--secrets=stdin', `--artifact=${artifactPath}`, `--file=${file}`, ...(sourceDir ? [`--source-dir=${sourceDir}`] : [])]
 }
 
 /** What goes into the engine's stdin: the secrets line, then the reports. */
@@ -57,10 +57,11 @@ export function deliverReports(
   artifactPath: string,
   file: string,
   secrets: Record<string, string>,
-  reports: Record<string, string>
+  reports: Record<string, string>,
+  sourceDir?: string
 ): Promise<Delivery> {
   return new Promise((resolve, reject) => {
-    const child = spawn(enginePath, deliverArgs(artifactPath, file), { stdio: ['pipe', 'pipe', 'pipe'] })
+    const child = spawn(enginePath, deliverArgs(artifactPath, file, sourceDir), { stdio: ['pipe', 'pipe', 'pipe'] })
     let stdout = ''
     let stderr = ''
     const timer = setTimeout(() => child.kill('SIGKILL'), TIMEOUT_MS)

@@ -1,3 +1,4 @@
+import { useExamRecord } from '@/stores/exam-record'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { History, Save, ShieldCheck } from 'lucide-react'
 import { Button, Spinner, ViewHeader } from '@/components/ui'
@@ -49,6 +50,8 @@ export default function EditorView() {
       if (write && answer.ok) {
         await window.heimdall.writeExam(project.examPath, yaml)
         setDraft({ ...draft, savedText: yaml })
+        const classId = useApp.getState().classId
+        if (classId) await useExamRecord.getState().load(project.examPath, classId)
         setVerdict({ ok: true, message: `Examen guardado. ${t.editor.validationScope}` })
       }
     } catch (error) {

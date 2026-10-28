@@ -31,6 +31,8 @@ import { scoreView } from '@/lib/results'
 
 import { sessionCsv, sessionCsvName, sessionExportSummary, sessionGradeRows } from '@/lib/export'
 import { MoodleExportButton } from '@/components/MoodleExport'
+import { FinishExamButton } from '@/components/ExamSession'
+import { useExamRecord } from '@/stores/exam-record'
 import { startCorrection } from '@/lib/start-run'
 import type { Session } from '../../../shared/session'
 import type { Description } from '../../../shared/describe'
@@ -54,6 +56,7 @@ export default function CorrectView() {
   const retry = useApp((s) => s.retry)
   const setRetry = useApp((s) => s.setRetry)
   const exam = useApp((s) => s.exam)
+  const finishing = useExamRecord(s => s.finishing)
 
   const run = useRun()
   const busy = run.phase === 'starting' || run.phase === 'running'
@@ -149,7 +152,7 @@ export default function CorrectView() {
   async function startExamMode(minutes: number): Promise<void> {
     if (missing) return
     try {
-      await window.heimdall.setExamMode({ active: true, secrets: envelope() })
+      await window.heimdall.setExamMode({ active: true, secrets: envelope(), examPath: examPath!, classId: group!.id, passMark: useApp.getState().passMark })
     } catch (error) {
       setNotice(noticeFrom('No se pudo activar el modo examen', error))
       return
@@ -196,7 +199,7 @@ export default function CorrectView() {
               {run.cancelling ? t.run.cancelling : t.run.cancel}
             </Button>
           ) : (
-            <Button size="sm" disabled={!!missing || exam.active} onClick={() => void start()}>
+            <Button size="sm" disabled={!!missing || exam.active || finishing} onClick={() => void start()}>
               <Play className="h-4 w-4" />
               {retry ? t.run.retryStart : run.phase === 'finished' ? t.run.again : t.run.start}
             </Button>
@@ -237,7 +240,7 @@ export default function CorrectView() {
         {missing && !busy && <p className="text-sm text-muted-foreground">{missing}</p>}
         <ExamControl
           exam={exam}
-          disabled={busy || !!missing}
+          disabled={busy || !!missing || finishing}
           onStart={(minutes) => void startExamMode(minutes)}
           onStop={() => void stopExamMode()}
         />
@@ -422,6 +425,7 @@ function ExamControl({
           </Segmented>
         </div>
       )}
+      <FinishExamButton />
       <Button
         size="sm"
         variant={exam.active ? 'destructive' : 'outline'}
@@ -463,7 +467,7 @@ function ExamStrip({
   }, [exam])
 
   const tally = session ? sessionTally(session) : null
-  const active = tally ? tally.graded + tally.open - tally.finished : null
+  const active = session ? session.students.filter(student => student.status !== 'EXCLUDED').length : null
 
   return (
     <div className="exam-strip grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-5">

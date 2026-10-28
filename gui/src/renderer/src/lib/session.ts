@@ -55,7 +55,7 @@ export function fromRoundText(student: SessionStudent): string {
  */
 export function nextRoundText(student: SessionStudent): string | null {
   if (student.status === 'FINISHED') {
-    return `Terminado: en la vuelta ${student.from_round} ya tenía el examen entero bien, así que las vueltas siguientes no lo corrigen.`
+    return `Terminado: en la vuelta ${student.from_round} ya tenía el examen entero bien. Conserva esa nota; las vueltas siguientes muestran su situación actual.`
   }
   if (student.status === 'EXCLUDED') return 'El aula lo deja fuera del examen.'
   return null

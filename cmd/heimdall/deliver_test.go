@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -258,5 +259,34 @@ func TestDeliverOnlyRequestedStudent(t *testing.T) {
 	}
 	if len(home.dialed) != 1 || home.dialed[0].Port != 2202 || len(home.written) != 1 {
 		t.Fatalf("se contactó con otro alumno: %d conexiones, %d escrituras", len(home.dialed), len(home.written))
+	}
+}
+
+// Preserved definitions can deliver a prior best round without redirecting a
+// report to the changed classroom. Both snapshots must produce the same PLAN.
+func TestDeliverUsesVerifiedSessionDefinitions(t *testing.T) {
+	p, err := plan.Load(protoProject)
+	if err != nil {
+		t.Fatal(err)
+	}
+	run := &model.RunResult{PlanHash: p.Hash, Exam: model.SourceRef{Path: filepath.Join(protoProject, "examen.yaml")}, Inventory: model.SourceRef{Path: filepath.Join(protoProject, "aula.yaml")}}
+	snapshot := t.TempDir()
+	for _, name := range []string{"examen.yaml", "aula.yaml"} {
+		bytes, err := os.ReadFile(filepath.Join(protoProject, name))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(snapshot, name), bytes, 0600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, err := planOfSources(run, snapshot); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(snapshot, "examen.yaml"), []byte("examen: cambiado\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := planOfSources(run, snapshot); err == nil {
+		t.Fatal("accepted changed definitions")
 	}
 }

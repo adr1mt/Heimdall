@@ -339,3 +339,32 @@ máquina necesita credenciales propias. Una contraseña común de aula conocida
 por todos no protege frente al acceso a máquinas ajenas (ADR-0037).
 
 Documentación de referencia: [conectar con Archivos de Ubuntu](https://help.ubuntu.com/stable/ubuntu-help/nautilus-connect.html.en) y [opciones de SCP de OpenSSH](https://man.openbsd.org/scp).
+
+
+## Mejores notas y finalización del examen
+
+Cada corrección queda registrada automáticamente. Al volver al examen y su
+clase se recupera la sesión: el 10 conseguido se conserva aunque la última
+vuelta dé un 7. La nota principal es la mejor completa y las comprobaciones
+muestran la última vuelta. **Mejores notas**, en Resultados, abre la tabla de
+toda la clase con nota y vuelta; permite consultar sesiones anteriores y
+exportar CSV o Moodle. Cambiar los criterios abre otro registro sin mezclar
+notas; también lo hace cambiar el umbral de aprobado.
+
+**Finalizar examen** detiene la programación inmediatamente y espera a la
+corrección en curso. El cierre y los orígenes de las notas quedan guardados.
+Una nueva corrección abre otra sesión. Quien no completó ninguna vuelta figura
+como **Sin nota final**, con el motivo, y se exporta con la nota vacía.
+
+Después del cierre se pregunta una sola vez si quieres enviar los informes
+definitivos. **Ahora no** conserva las notas y deja disponible **Enviar informes
+finales**. Cada alumno recibe la evidencia de su propia mejor vuelta; los
+informes finales tienen nombre por sesión y no sustituyen informes anteriores.
+El resumen diferencia enviados, pendientes/fallidos y alumnos sin nota final;
+solo se reintentan entregas que no hayan tenido éxito. Los recibos sobreviven
+al cierre de la aplicación.
+
+Para abrir el HTML en Ubuntu Desktop, usa Archivos, pulsa Ctrl+L y abre
+`sftp://USUARIO@SERVIDOR:PUERTO` con tu cuenta SSH. Copia el archivo
+`informe-final-….html` de tu carpeta personal a Descargas y ábrelo con Firefox.
+No necesitas conexiones entrantes al Desktop ni enlaces públicos.

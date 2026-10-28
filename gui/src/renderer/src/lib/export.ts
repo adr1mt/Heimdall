@@ -2,6 +2,7 @@ import type { RunResult } from '../../../shared/artifact'
 import type { AcademicStatus, Score, StudentStatus } from '../../../shared/events'
 import type { Consolidation } from '../../../shared/consolidation'
 import type { Session } from '../../../shared/session'
+import type { SavedExam } from '../../../shared/exam-record'
 import { dateText } from './results'
 import { toScale, type Scale } from './scale'
 import { SESSION_STATUS_TEXT } from './session'
@@ -246,8 +247,12 @@ const SESSION_HEADER = [
  * own correction, where they can be read with their evidence.
  */
 export function sessionCsv(session: Session, scale: Scale): string {
+  return sessionRowsCsv(sessionGradeRows(session, scale), scale)
+}
+
+function sessionRowsCsv(rows: SessionGradeRow[], scale: Scale): string {
   const lines = [SESSION_HEADER.join(';')]
-  for (const row of sessionGradeRows(session, scale)) {
+  for (const row of rows) {
     lines.push(
       [
         row.name,
@@ -379,4 +384,22 @@ export function moodleSummary(source: MoodleSource[], scale: Scale): string {
 /** The Moodle file's name, said so it cannot be taken for the grade sheet. */
 export function moodleCsvName(iso: string): string {
   return `moodle-${stamp(iso)}.csv`
+}
+
+/** Empty criteria epochs export blank grades for the saved roster, never old grades. */
+export function savedExamRows(saved: SavedExam, scale: Scale): SessionGradeRow[] {
+  scale = { ...scale, passMark: saved.record.passMark }
+  const rows = saved.session ? sessionGradeRows(saved.session, scale) : saved.record.roster.map(student => ({
+    name: student.name, studentId: student.id, moodleId: student.moodleId, state: '', grade: '', round: '',
+    note: 'Sin nota final: ninguna vuelta con evaluación completa de estos criterios.'
+  }))
+  return saved.record.state === 'FINALIZED' ? rows.map(row => ({ ...row, state: 'Finalizado' })) : rows
+}
+
+export function savedExamCsv(saved: SavedExam, scale: Scale): string {
+  return sessionRowsCsv(savedExamRows(saved, scale), scale)
+}
+
+export function savedExamCsvName(saved: SavedExam): string {
+  return `notas-${saved.record.state === 'FINALIZED' ? 'finales' : 'sesion'}-${stamp(saved.record.closedAt || saved.record.createdAt)}.csv`
 }

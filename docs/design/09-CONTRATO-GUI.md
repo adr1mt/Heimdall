@@ -288,3 +288,18 @@ sigue siendo la de la vuelta en que la sacó.
 
 El esquema no se puede desincronizar de los tipos en silencio: los tests de
 `internal/report` lo recorren campo a campo contra el modelo.
+
+
+### Sesiones persistentes e informes finales (ADR-0039)
+
+La GUI persiste metadatos/referencias y reconstruye mejores notas mediante
+`session`; no añade campos al artefacto ni calcula otra regla de nota. Reevalúa
+toda la clase sin `--session` para distinguir la mejor nota del estado actual.
+La opción CLI `--session` conserva su comportamiento explícito.
+
+`deliver --file=informe-final-<id>.html --source-dir=<definiciones-conservadas>`
+rehace el PLAN con esas fuentes y exige el hash del artefacto de origen. La
+identidad SSH sigue siendo la anotada en esa corrección. La bandera de fuentes
+se rechaza para nombres que no sean finales. Los finales se crean sin
+sobrescribir; un archivo regular idéntico hace idempotente el reintento. No se
+alteran el formato de entrada, la respuesta de entrega ni `informe.html`.

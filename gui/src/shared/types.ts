@@ -6,6 +6,7 @@ import type { RunResult } from './artifact'
 import type { Description } from './describe'
 import type { Consolidation } from './consolidation'
 import type { Session } from './session'
+import type { ExamRecord, SavedExam } from './exam-record'
 import type { RunSummary } from './history'
 import type { BackupEntry, RestoreReport } from './backup'
 import type { ClassGroup } from './classes'
@@ -25,6 +26,7 @@ export interface EngineStatus {
 /** What the renderer asks for when the teacher presses «Corregir». */
 export interface RunRequest {
   examPath: string
+  passMark?: number
   /**
    * The class being corrected, by its identifier. The classroom the engine
    * reads is written from it before the run (ADR-0022): the interface never
@@ -50,6 +52,9 @@ export interface RunRequest {
 /** What the renderer asks for when exam mode is switched. */
 export interface ExamModeRequest {
   active: boolean
+  passMark?: number
+  examPath?: string
+  classId?: string
   /**
    * Credential name → value, sent once when the mode starts. It is never
    * written anywhere and it dies with the mode (ADR-0009).
@@ -145,6 +150,10 @@ export interface HeimdallApi {
    * is read-only and the grades in it are the engine's (ADR-0020).
    */
   session: (roundPaths: string[]) => Promise<Session>
+  savedExam: (examPath: string, classId: string, id?: string) => Promise<SavedExam | null>
+  examRecords: (examPath: string, classId: string) => Promise<ExamRecord[]>
+  finishExam: (examPath: string, classId: string, passMark?: number) => Promise<SavedExam>
+  sendFinalReports: (examPath: string, classId: string, id: string, scale: { id: 'ten' | 'hundred'; passMark: number }) => Promise<Delivery>
   /** The past runs of the project the exam belongs to, newest first. */
   listRuns: (examPath: string) => Promise<RunSummary[]>
   /**

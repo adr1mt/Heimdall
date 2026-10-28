@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/ssh"
@@ -19,6 +20,11 @@ import (
 // left half written. A symlink with that name is replaced, not followed; a
 // directory with that name is left alone.
 const writeHomeScript = `cd || exit 13; umask 077; [ ! -d "$1" ] || exit 10; t=$(mktemp ./.heimdall-XXXXXX) || exit 11; cat > "$t" && chmod 600 "$t" && mv -f "$t" "$1" && exit 0; rm -f "$t"; exit 12`
+
+// Final reports are immutable. Atomic link creation avoids clobbering a file
+// even after a crash between remote success and the local delivery receipt.
+// An identical existing regular file makes the retry idempotent.
+const writeFinalHomeScript = `cd || exit 13; umask 077; t=$(mktemp ./.heimdall-XXXXXX) || exit 11; trap 'rm -f "$t"' EXIT; cat > "$t" && chmod 600 "$t" || exit 12; ln -T "$t" "$1" 2>/dev/null && exit 0; [ ! -L "$1" ] && [ -f "$1" ] && cmp -s "$t" "$1" && exit 0; exit 14`
 
 // WriteHome leaves data in the home directory of the user this session logged
 // in as, under name, with permissions 0600. It returns one sentence when the
@@ -35,7 +41,11 @@ func (s *Session) WriteHome(ctx context.Context, name string, data []byte, timeo
 	}
 	defer sess.Close()
 	sess.Stdin = bytes.NewReader(data)
-	err = sess.Run(quote([]string{"sh", "-c", writeHomeScript, "heimdall-deliver", name}))
+	script := writeHomeScript
+	if strings.HasPrefix(name, "informe-final-") {
+		script = writeFinalHomeScript
+	}
+	err = sess.Run(quote([]string{"sh", "-c", script, "heimdall-deliver", name}))
 	if err == nil {
 		return nil
 	}
@@ -44,6 +54,8 @@ func (s *Session) WriteHome(ctx context.Context, name string, data []byte, timeo
 		switch ee.ExitStatus() {
 		case 10:
 			return fmt.Errorf("en su carpeta personal hay una carpeta llamada %s y no se ha tocado", name)
+		case 14:
+			return fmt.Errorf("ya existe un informe final diferente llamado %s; se conserva intacto", name)
 		case 13:
 			return fmt.Errorf("el usuario %s no tiene carpeta personal en la máquina", s.cfg.User)
 		default:

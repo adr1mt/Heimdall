@@ -8,6 +8,7 @@
 
 import { useApp, noticeFrom } from '@/stores/app'
 import { useRun } from '@/stores/run'
+import { useExamRecord } from '@/stores/exam-record'
 
 /** Whether an engine is already working for us. */
 export function busy(): boolean {
@@ -21,8 +22,8 @@ export function busy(): boolean {
  * as the mode lasts and never come back to the interface.
  */
 export async function startCorrection(secrets: Record<string, string>): Promise<boolean> {
-  const { project, classId, retry, exam, examRounds } = useApp.getState()
-  if (!project || !classId || busy()) return false
+  const { project, classId, retry, exam, examRounds, passMark } = useApp.getState()
+  if (!project || !classId || busy() || useExamRecord.getState().finishing) return false
 
   useRun.getState().begin()
   try {
@@ -35,10 +36,12 @@ export async function startCorrection(secrets: Record<string, string>): Promise<
     await window.heimdall.startRun({
       examPath: project.examPath,
       classId,
+      passMark,
       secrets,
       retryFrom: sessionRounds.length > 0 ? undefined : retry?.artifactPath,
       sessionRounds
     })
+    await useExamRecord.getState().load(project.examPath, classId)
     return true
   } catch (error) {
     useRun.getState().fail(noticeFrom('No se pudo empezar la corrección', error))

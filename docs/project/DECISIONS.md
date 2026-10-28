@@ -1069,3 +1069,21 @@ comprobados antes de sustituir. Copia anterior sincronizada y sustitución
 atómica con comprobación de concurrencia. No se reinicia la instancia activa,
 no se cambian perfiles, notas, clases o exámenes. Se autoriza push normal a main;
 no publicación, etiquetas ni cambio de versión nominal.
+
+## T220 · Sesiones persistentes y finalización · 2026-10-28
+
+ADR-0039 conserva la elección nativa de mejor vuelta completa y añade un
+manifiesto durable con fuentes y referencias, sin duplicar notas. La GUI
+reevalúa también a quienes alcanzaron máxima para mostrar su situación actual.
+El cierre espera la vuelta activa; guarda intención/estado final/orígenes y
+la recuperación completa un cierre interrumpido. Cambiar fuentes o umbral
+separa registros. Los finales por sesión usan la evidencia propia de cada
+alumno y el transporte existente, previa confirmación; escritura inmutable
+idempotente, permisos privados y recibos persistentes. Acceso desde Desktop
+por SFTP/SSH existente. Informes normales conservan `informe.html`.
+
+634 pruebas GUI, tipos/build/preload, make check/docs/tools/build correctos;
+laboratorio nativo, reapertura de main/preload/renderer e interfaz con datos
+ficticios verificados. Tres hallazgos de revisión visual corregidos y
+calificados resueltos. Sin instalación ni publicación. Evidencia en
+`docs/reviews/evidence/T220/RESULTADOS.md`.
