@@ -41,6 +41,7 @@ export async function startCorrection(secrets: Record<string, string>): Promise<
       retryFrom: sessionRounds.length > 0 ? undefined : retry?.artifactPath,
       sessionRounds
     })
+    useApp.setState({ preparingExam: false })
     await useExamRecord.getState().load(project.examPath, classId)
     return true
   } catch (error) {

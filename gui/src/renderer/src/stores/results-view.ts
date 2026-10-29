@@ -54,7 +54,8 @@ export const useResultsView = create<ResultsViewState>((set, get) => ({
   // A new run or a changed source hash must not bring absent students back.
   bindSources: (examPath, inventoryPath) => {
     const scope = JSON.stringify([examPath, inventoryPath])
-    if (get().scope !== scope) set({ ...defaults(), scope })
+    if (get().scope === null) set({ scope })
+    else if (get().scope !== scope) set({ ...defaults(), scope })
   },
   reset: () => set(defaults())
 }))

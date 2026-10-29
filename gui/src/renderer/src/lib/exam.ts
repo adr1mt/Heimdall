@@ -24,6 +24,8 @@ export interface ExamMode {
   nextAt: number | null
   /** Passes started since it was turned on, for the sentence on screen. */
   passes: number
+  /** Remaining wait retained during an in-memory pause. */
+  pausedRemaining?: number
 }
 
 /** What the teacher can pick, in minutes. */
@@ -37,8 +39,9 @@ export function examStarted(everyMinutes: number, now: number): ExamMode {
 }
 
 /** Turns it off. Nothing is pending after this. */
-export function examStopped(exam: ExamMode): ExamMode {
-  return { ...exam, active: false, nextAt: null }
+export function examStopped(exam: ExamMode, now = Date.now()): ExamMode {
+  return { ...exam, active: false, nextAt: null, pausedRemaining: exam.active && exam.nextAt !== null
+    ? Math.max(0, exam.nextAt - now) : exam.pausedRemaining }
 }
 
 /**
@@ -70,4 +73,11 @@ export function passFinished(exam: ExamMode, now: number): ExamMode {
 export function secondsLeft(exam: ExamMode, now: number): number | null {
   if (!exam.active || exam.nextAt === null) return null
   return Math.max(0, Math.ceil((exam.nextAt - now) / 1000))
+}
+
+/** A recovered pause waits an interval; resuming never launches a pass immediately. */
+export function examResumed(exam: ExamMode, everyMinutes: number, now: number): ExamMode {
+  const wait = exam.everyMinutes === everyMinutes ? exam.pausedRemaining : undefined
+  return { active: true, everyMinutes, passes: exam.passes,
+    nextAt: now + Math.max(1000, wait ?? everyMinutes * 60_000) }
 }

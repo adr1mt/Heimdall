@@ -16,7 +16,6 @@ import {
   Play,
   PanelLeftClose,
   PanelLeftOpen,
-  SlidersHorizontal,
   Settings as SettingsIcon,
   Sun,
   Users,
@@ -102,7 +101,7 @@ function AppBody() {
   }, [setNotice])
   useEffect(() => {
     useExamRecord.getState().reset()
-    if (!examPath || !classId) return
+    if (!examPath || !classId || useApp.getState().preparingExam) return
     let current = true
     void useExamRecord.getState().load(examPath, classId).then(async saved => {
       if (!current || !saved) return
@@ -297,7 +296,6 @@ function AppBody() {
             ))}
           </div>
           <EngineBadge />
-          <TeacherDisplay />
           <ProjectorToggle />
           <button
             onClick={toggleTheme}
@@ -448,40 +446,7 @@ function ProjectorToggle() {
     </button>
   )
 }
-
-function TeacherDisplay() {
-  const { uiZoom, setUiZoom, sidebar, setSidebar } = useApp()
-  return (
-    <details className="teacher-display relative">
-      <summary aria-label="Vista del profesor" title="Vista del profesor"
-        className="flex cursor-pointer list-none items-center gap-2 rounded-md px-3 py-2 text-xs hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-primary">
-        <SlidersHorizontal className="h-4 w-4 shrink-0" />
-        <span className="sidebar-label">Vista profesor · {uiZoom} %</span>
-      </summary>
-      <div className="absolute bottom-full left-0 z-50 mb-2 w-60 space-y-3 rounded-md border border-border bg-popover p-3 text-sm text-popover-foreground">
-        <label className="flex items-center justify-between gap-2">Escala de interfaz
-          <select aria-label="Escala de interfaz" value={uiZoom} onChange={(e) => setUiZoom(Number(e.target.value))}
-            className="h-8 rounded border border-input bg-background px-2 focus-visible:ring-2 focus-visible:ring-ring">
-            {[80, 90, 100, 110, 120].map((value) => <option key={value} value={value}>{value} %</option>)}
-          </select>
-        </label>
-        <button className="rounded px-2 py-1 text-xs hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setUiZoom(100)}>Restablecer al 100 %</button>
-        <label className="flex items-center justify-between gap-2">Menú lateral
-          <select aria-label="Menú lateral" value={sidebar} onChange={(e) => setSidebar(e.target.value as typeof sidebar)}
-            className="h-8 rounded border border-input bg-background px-2 focus-visible:ring-2 focus-visible:ring-ring">
-            <option value="auto">Automático</option><option value="expanded">Expandido</option><option value="collapsed">Iconos</option>
-          </select>
-        </label>
-        <p className="text-xs text-muted-foreground">El proyector tiene sus propios controles de zoom.</p>
-      </div>
-    </details>
-  )
-}
-
-/**
- * The way out of the projector when the sidebar is gone. Small and in the
- * corner: it is for the teacher, and the wall is for the class.
- */
+/** The exit stays reachable when projection hides the sidebar. */
 function ProjectorExit() {
   const toggleProjector = useApp((s) => s.toggleProjector)
   return (

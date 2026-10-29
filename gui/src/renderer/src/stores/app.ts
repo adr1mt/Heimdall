@@ -6,6 +6,7 @@ import { DEFAULT_PASS_MARK } from '@/lib/summary'
 import {
   EXAM_OFF,
   examStarted,
+  examResumed,
   examStopped,
   passFinished,
   passStarted,
@@ -29,6 +30,7 @@ export interface EditorDraft {
 type Navigation = { view: View } | { project: OpenProject | null }
 
 interface AppState {
+  preparingExam: boolean
   uiZoom: number
   sidebar: 'auto' | 'expanded' | 'collapsed'
   setUiZoom: (percent: number) => void
@@ -108,7 +110,7 @@ interface AppState {
   setPassMark: (mark: number) => void
   setRetry: (retry: RetryRequest | null) => void
   toggleProjector: () => void
-  startExam: (everyMinutes: number) => void
+  startExam: (everyMinutes: number, resuming?: boolean) => void
   stopExam: () => void
   /** A pass has just been launched; the next one is due when it ends. */
   examPassStarted: () => void
@@ -195,6 +197,7 @@ applyProjector(savedProjector)
 let noticeTimer: ReturnType<typeof setTimeout> | undefined
 
 export const useApp = create<AppState>((set, get) => ({
+  preparingExam: false,
   uiZoom: savedUiZoom,
   sidebar: savedSidebar === 'expanded' || savedSidebar === 'collapsed' ? savedSidebar : 'auto',
   setUiZoom: (percent) => {
@@ -264,6 +267,7 @@ export const useApp = create<AppState>((set, get) => ({
     else localStorage.removeItem('heimdall-last-project')
     set({
       editorDraft: null,
+      preparingExam: false,
       project,
       classId: project ? (localStorage.getItem(`heimdall-class-for:${project.dir}`) || get().classId) : get().classId,
       retry: null,
@@ -314,7 +318,8 @@ export const useApp = create<AppState>((set, get) => ({
   },
 
   // The durable record chooses compatible rounds; resuming never clears them.
-  startExam: (everyMinutes) => set({ exam: examStarted(everyMinutes, Date.now()) }),
+  startExam: (everyMinutes, resuming = false) => set({ exam: resuming
+    ? examResumed(get().exam, everyMinutes, Date.now()) : examStarted(everyMinutes, Date.now()) }),
   stopExam: () => set({ exam: examStopped(get().exam) }),
   examPassStarted: () => set({ exam: passStarted(get().exam) }),
   examPassFinished: () => set({ exam: passFinished(get().exam, Date.now()) }),

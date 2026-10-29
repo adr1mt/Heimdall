@@ -171,3 +171,12 @@ describe('matrix column width', () => {
     expect(useResultsView.getState().checkWidth).toBeNull()
   })
 })
+
+it('keeps the roster hidden before the first correction when its sources become known', () => {
+  useResultsView.getState().hideStudent('absent')
+  const run = validRun()
+  useRun.getState().setArtifact(run, '/tmp/first-roster.json')
+  expect(useResultsView.getState().hiddenIds).toEqual(['absent'])
+  useRun.getState().setArtifact({ ...run, inventory: { ...run.inventory, path: '/different/class.yaml' } }, '/tmp/other-class.json')
+  expect(useResultsView.getState().hiddenIds).toEqual([])
+})

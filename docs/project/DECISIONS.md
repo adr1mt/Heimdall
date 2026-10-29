@@ -1179,3 +1179,13 @@ Los datos previos se respaldan y la clase anterior conserva exactamente su
 contenido; escala y umbral no cambian. La aplicación instalada corrige 15
 alumnos y 75 comprobaciones y queda abierta desde el menú de Zorin.
 Evidencia: `docs/reviews/evidence/T226/RESULTADOS.md`. Sin push ni publicación.
+
+
+## T227 · Ajustes de aula pedidos por Adrià (2026-10-29)
+
+Escala en Resultados y eliminación de Vista profesor y leyenda de matriz.
+Ocultar es presentación compartida entre Corregir, lista y matriz: no excluye
+alumnos de la evaluación. Reanudar conserva la espera en memoria; al recuperar
+una pausa de disco espera el intervalo completo. Preparar otro examen tras
+finalizar limpia solo el contexto visible y la selección de clase, sin borrar
+registros. No cambia ADR-0040 ni el manifiesto de sesión.

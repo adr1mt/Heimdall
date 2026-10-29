@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Download, FileText, GraduationCap, Layers, Play, Radio, Square } from 'lucide-react'
+import { Download, EyeOff, FileText, GraduationCap, Layers, Play, Radio, Square } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -15,6 +15,7 @@ import { useApp, useScale, messageOf, noticeFrom } from '@/stores/app'
 import { useClasses, groupById } from '@/stores/classes'
 import type { ClassGroup } from '../../../shared/classes'
 import { useRun } from '@/stores/run'
+import { useResultsView } from '@/stores/results-view'
 import { runPercent, type StudentProgress } from '@/lib/run-state'
 import { EXAM_INTERVALS, type ExamMode } from '@/lib/exam'
 import {
@@ -228,11 +229,13 @@ export default function CorrectView() {
           onStart={(minutes) => void startExamMode(minutes)}
           onStop={() => void pauseExam()}
         />
-        {group && !exam.active && run.phase === 'idle' && <PendingStudents group={group} />}
+        {group && <details open={run.phase === 'idle'} className="rounded-md border border-border p-3">
+          <summary className="cursor-pointer text-sm font-medium">Alumnos de la clase · mostrar u ocultar</summary>
+          <PendingStudents group={group} />
+        </details>}
 
         {run.phase !== 'idle' && <RunPanel percent={percent} />}
 
-        {exam.active && !examSession.session && run.students.length === 0 && group && <PendingStudents group={group} />}
         {recordState !== 'FINALIZED' && examSession.problem && <p role="alert" className="text-sm text-destructive-strong">{examSession.problem}</p>}
         {recordState !== 'FINALIZED' && examSession.rounds.length > 0 && <details className="session-details">
           <summary className="cursor-pointer py-2 text-sm text-muted-foreground">Detalle de la sesión</summary>
@@ -302,25 +305,23 @@ function ExamControl({
 
 /** The roster is visible before the first correction, just as in Teuton GUI. */
 function PendingStudents({ group }: { group: ClassGroup }) {
-  return (
-    <section className="space-y-2">
-      <SectionTitle>
-        Alumnos a evaluar{' '}
-        <span className="ml-3 font-normal text-muted-foreground">Toda la clase · {group.students.length}</span>
-      </SectionTitle>
-      <div className="pending-students grid gap-1.5">
-        {group.students.map((student, index) => (
-          <div
-            key={student.id}
-            className="pending-student flex items-center gap-3 rounded-md border border-border px-3 py-2 text-sm"
-          >
-            <span className="text-xs text-muted-foreground">{index + 1}</span>
-            {student.name}
-          </div>
-        ))}
-      </div>
-    </section>
-  )
+  const { hiddenIds, hideStudent, showStudent, showAll } = useResultsView()
+  const visible = group.students.filter(student => !hiddenIds.includes(student.id)).length
+  return <section className="mt-3 space-y-2">
+    <div className="flex items-center gap-2 text-sm">
+      <span>{visible} de {group.students.length} visibles</span>
+      {visible < group.students.length && <Button variant="ghost" size="sm" onClick={showAll}>Mostrar todos</Button>}
+    </div>
+    <p className="text-xs text-muted-foreground">Los alumnos ocultos tampoco aparecen en la lista ni en la matriz. Se siguen evaluando y sus notas se conservan.</p>
+    <div className="pending-students grid gap-1.5">
+      {group.students.map(student => <label key={student.id}
+        className="pending-student flex cursor-pointer items-center gap-3 rounded-md border border-border px-3 py-2 text-sm">
+        <input type="checkbox" aria-label={`Mostrar a ${student.name}`} checked={!hiddenIds.includes(student.id)}
+          onChange={event => event.target.checked ? showStudent(student.id) : hideStudent(student.id)} />
+        <span>{student.name}</span>
+      </label>)}
+    </div>
+  </section>
 }
 
 /**
@@ -537,6 +538,7 @@ function SessionExportButton({ session }: { session: Session }) {
 /** What is happening, and what happened. The grades are in Resultados. */
 function RunPanel({ percent }: { percent: number | null }) {
   const run = useRun()
+  const { hiddenIds, hideStudent } = useResultsView()
   const expected = run.start?.expected_checks ?? 0
 
   return (
@@ -566,12 +568,11 @@ function RunPanel({ percent }: { percent: number | null }) {
         <div className="space-y-2">
           <SectionTitle>{t.run.classTitle}</SectionTitle>
           <div className="running-students grid gap-2 md:grid-cols-3">
-            {run.students.map((student) => (
-              <StudentRow
-                key={student.studentId}
-                student={student}
-                checks={run.start?.plan.check_count ?? 0}
-              />
+            {run.students.filter(student => !hiddenIds.includes(student.studentId)).map((student) => (
+              <div key={student.studentId} className="flex items-center gap-1">
+                <StudentRow student={student} checks={run.start?.plan.check_count ?? 0} />
+              <Button variant="ghost" size="sm" aria-label={`Ocultar a ${student.name}`} onClick={() => hideStudent(student.studentId)}><EyeOff className="h-4 w-4" /></Button>
+              </div>
             ))}
           </div>
         </div>

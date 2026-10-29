@@ -303,6 +303,7 @@ export default function ResultsView() {
                 {exploring || hiddenStudents.length > 0 ? <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-label="Opciones activas" /> : null}
               </summary>
               <div className="results-options-panel space-y-3">
+                <ResultsScale />
                 {overview}
                 <div className="flex flex-wrap gap-2 border-t border-border pt-3">
                   <ExamSessionActions />
@@ -374,7 +375,7 @@ export default function ResultsView() {
 }
 
 function ResultsCanvas({ projector, children }: { projector: boolean; children: ReactNode }) {
-  return projector ? <ProjectorCanvas toolbar={<Legend />}>{children}</ProjectorCanvas>
+  return projector ? <ProjectorCanvas>{children}</ProjectorCanvas>
     : <div className="results-scroll min-h-0 flex-1 overflow-auto">{children}</div>
 }
 
@@ -411,7 +412,6 @@ function MatrixView({ rows, names, selected, onPick, onStudent }: {
   onPick: (selection: Selection) => void
   onStudent: (id: string) => void
 }) {
-  const projector = useApp(s => s.projector)
   const matrix = useMemo(() => buildMatrix(rows), [rows])
   const checkWidth = useResultsView(s => s.checkWidth)
   const setCheckWidth = useResultsView(s => s.setCheckWidth)
@@ -428,7 +428,6 @@ function MatrixView({ rows, names, selected, onPick, onStudent }: {
   const [column, setColumn] = useState<string | null>(null)
   return (
     <div className="space-y-2">
-      {!projector && <Legend />}
       <div className="matrix-viewport max-h-[65vh] overflow-auto rounded-md border border-border focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
         role="region" aria-label="Matriz de resultados, desplazamiento horizontal y vertical" tabIndex={0}>
         <table className="results-matrix min-w-full table-fixed border-separate border-spacing-0 text-left"
@@ -655,31 +654,6 @@ function MatrixRowView({
 function matrixCellTone(status: AcademicStatus): string {
   return status === 'PASS' ? 'bg-success text-success-foreground' : status === 'FAIL'
     ? 'bg-destructive text-destructive-foreground' : 'bg-warning/15 text-warning-strong'
-}
-
-/** The three academic states, spelled out once above the grid. */
-function Legend() {
-  return (
-    <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-      {(['PASS', 'FAIL', 'UNEVALUATED'] as const).map((status) => (
-        <span key={status} className="flex items-center gap-1.5">
-          <span
-            className={cn(
-              'inline-flex h-5 w-6 items-center justify-center rounded text-xs font-semibold',
-              matrixCellTone(status)
-            )}
-          >
-            {GLYPH[status]}
-          </span>
-          {status === 'PASS'
-            ? t.results.legendPass
-            : status === 'FAIL'
-              ? t.results.legendFail
-              : t.results.legendUnevaluated}
-        </span>
-      ))}
-    </div>
-  )
 }
 
 const GLYPH: Record<AcademicStatus, string> = {
@@ -1224,7 +1198,6 @@ function StudentRow({ student, name, onToggle, onHide }: {
           <GradeBadge student={student} large />
         </span>
       </button>
-      {!projector && <ReportsButton artifactPath={useRun.getState().artifactPath} studentId={student.student_id} compact />}
       {!projector && <HideStudentButton student={student} onHide={onHide} />}
     </div>
   )
@@ -1486,4 +1459,15 @@ function SessionResultsHint() {
   return <p role="status" className="shrink-0 border-b border-border px-4 py-2 text-xs text-warning-strong">
     Los resultados visibles pertenecen a criterios anteriores. Corrige para obtener notas con los criterios actuales.
   </p>
+}
+
+function ResultsScale() {
+  const { uiZoom, setUiZoom } = useApp()
+  return <label className="flex items-center justify-between gap-3 text-sm">
+    Escala de interfaz
+    <select aria-label="Escala de interfaz" value={uiZoom} onChange={event => setUiZoom(Number(event.target.value))}
+      className="h-8 rounded border border-input bg-background px-2">
+      {[80, 90, 100, 110, 120].map(value => <option key={value} value={value}>{value} %</option>)}
+    </select>
+  </label>
 }

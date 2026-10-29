@@ -189,7 +189,9 @@ export default function HelpView() {
             <p>
               La lista muestra cada alumno con su nota. La matriz cruza alumnos y comprobaciones.
               Pulsa un alumno o una celda para ver el detalle; abre una comprobación para consultar
-              qué se esperaba y qué devolvió la máquina. Los filtros están en «Filtros y estados».
+              qué se esperaba y qué devolvió la máquina. Los filtros y la escala de interfaz están en «Más opciones».
+              Puedes ocultar alumnos desde Corregir o Resultados; se ocultan tanto en lista como en matriz
+              y sus notas se conservan.
             </p>
             <p>
               Si una máquina no responde, se indica la causa y no se inventa un cero. Los reintentos

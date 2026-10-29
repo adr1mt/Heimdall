@@ -4,7 +4,7 @@ import { useApp, useScale, noticeFrom } from '@/stores/app'
 import { useExamRecord } from '@/stores/exam-record'
 import { useRun } from '@/stores/run'
 import { scoreView } from '@/lib/results'
-import { pauseExam, resumeExam } from '@/lib/exam-actions'
+import { pauseExam, resumeExam, prepareAnotherExam } from '@/lib/exam-actions'
 import { savedExamCsv, savedExamCsvName, savedExamRows } from '@/lib/export'
 import { MoodleExportButton } from './MoodleExport'
 import { ReportAccessHelp } from './ReportAccessHelp'
@@ -60,12 +60,14 @@ export function FinalGrades({ saved }: { saved: SavedExam }) {
   const scale = useScale()
   return <div className="flex h-full flex-col" data-testid="final-grades">
     <ViewHeader title="Notas finales" actions={<>
+      <Button size="sm" variant="outline" onClick={prepareAnotherExam}>Preparar otro examen</Button>
       <FinalReports />
       <Button size="sm" variant="outline" onClick={() => setExporting(true)}>Exportar notas</Button>
     </>} />
     <div className="min-h-0 flex-1 overflow-auto px-6 py-4">
       <div className="mx-auto max-w-4xl space-y-4">
         <p className="text-sm text-muted-foreground">{saved.record.title} · {saved.record.className} · Examen finalizado</p>
+        <p className="text-sm text-muted-foreground">Las notas quedan guardadas en el histórico. Para cambiar de clase o empezar de nuevo, pulsa «Preparar otro examen».</p>
         <GradesTable saved={saved} />
       </div>
     </div>

@@ -5290,6 +5290,37 @@
       ],
       "notes": "T225 instalado por usuario y abierto desde el menú de Zorin; icono, desktop válido y SHA-256 verificados. Ajustes antiguos apuntaban al motor y demo en una carpeta inexistente: reparados mediante motor embebido y nueva demo seleccionada. Respaldo privado de ajustes/clases/proyectos/Local Storage; clase anterior conservada exactamente. Nueva clase ficticia de 15 personas y cuestionario valor/hosts[] de cinco preguntas: corrección desde la app instalada con 75 resultados PASS/FAIL y notas esperadas, sin SSH ni incidencias técnicas. Fuente testdata/demo-local-15; evidencia docs/reviews/evidence/T226/RESULTADOS.md. App abierta, sin sudo ni publicación ni push.",
       "completed": "2026-10-29"
+    },
+    {
+      "id": "T227",
+      "title": "Simplificar los controles de aula y preparar otro examen conservando el histórico",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T226"
+      ],
+      "goal": "Aplicar los ajustes pedidos durante la prueba de aula sin alterar notas ni registros guardados.",
+      "scope": [
+        "Controles de presentación en Resultados, ocultación compartida y preparación tras finalizar.",
+        "Reanudación del temporizador sin corrección inmediata."
+      ],
+      "acceptance": [
+        "Desaparece Vista profesor del lateral; escala disponible en opciones de Resultados y proyector conservado.",
+        "Matriz sin leyenda redundante; lista de corrección sin envío individual y notas finales mantienen informes.",
+        "Corregir permite ocultar y recuperar alumnos; lista y matriz respetan la selección incluso en la primera corrección.",
+        "Pausar y reanudar conserva espera pendiente y vueltas; una sesión recuperada espera el intervalo antes de corregir.",
+        "Preparar otro examen tras finalizar limpia la vista, permite elegir clase y conserva el anterior en histórico.",
+        "Suite rápida, tipos y build GUI correctos, con pruebas de reanudación y preparación."
+      ],
+      "tests": [
+        "make check gui-check gui-build docs-check tools-check"
+      ],
+      "out_of_scope": [
+        "Publicación, instalación habitual y cambios en notas o persistencia canónica."
+      ],
+      "completed": "2026-10-29",
+      "notes": "648 pruebas GUI correctas, make check/gui-build/docs-check/tools-check y arnés Electron con alumnado ficticio. Vista profesor eliminada, escala en Resultados, matriz sin leyenda, lista sin informes individuales y ocultación compartida desde Corregir. Reanudar mantiene espera; Preparar otro examen tras cierre limpia presentación y permite elegir la misma clase sin recuperar las notas antiguas. Evidencia docs/reviews/evidence/T227/RESULTADOS.md. Sin instalación habitual ni publicación."
     }
   ]
 }

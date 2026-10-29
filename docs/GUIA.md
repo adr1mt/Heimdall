@@ -312,13 +312,17 @@ corrige o se pausa, muestra ese estado. Si falla el arranque o la lectura, o se
 cancela, las notas anteriores siguen visibles y se muestra el aviso. Cambiar
 de examen o de clase limpia esos resultados para no confundir contextos.
 
-Cada fila del modo lista tiene **Enviar informe**. Antes de enviar se
-confirman nombre e identificador; el destinatario recibe solo su informe.
-**Enviado** identifica la entrega de esa corrección, también cuando vino del
-envío masivo. El registro se conserva en este equipo para las últimas 100
-correcciones. Una corrección nueva permite otro envío. El envío general sigue
-disponible y avisa si va a reenviar informes ya entregados. Reintentar un
-envío parcial solo vuelve a intentarlo con los que faltan.
+La lista de corrección permite **Ocultar** a un alumno. También puedes hacerlo
+antes de empezar desde **Corregir → Alumnos de la clase**, o recuperar alumnos
+en **Resultados → Más opciones → Alumnos**. La selección se comparte entre
+lista y matriz: solo cambia la presentación, se sigue evaluando a toda la
+clase y las notas e informes conservan todos los alumnos. Cambiar de clase o
+preparar otro examen restablece la selección.
+
+La **Escala de interfaz** está en **Resultados → Más opciones**. El modo
+proyector conserva sus propios controles de tamaño. El envío general de
+informes está en Más opciones; al finalizar, **Enviar informes a todos**
+entrega las mejores notas de la sesión tras confirmarlo.
 
 Para abrir el HTML en el equipo con escritorio:
 
@@ -362,7 +366,10 @@ La corrección activa puede terminar; para interrumpirla ordenadamente usa
 Puedes editar el examen y cerrar Heimdall: al volver, la sesión está pausada.
 
 **Reanudar** continúa la misma sesión y conserva sus notas y correcciones
-compatibles, sin confirmaciones. Si cambias los criterios, la clase o el
+compatibles, sin confirmaciones. Conserva la espera que quedaba al pausar;
+no lanza una corrección inmediata. Si has cerrado y reabierto la aplicación,
+espera un intervalo completo. Cambiar el intervalo también inicia una espera
+completa del nuevo intervalo. Si cambias los criterios, la clase o el
 umbral de aprobado, la siguiente corrección abre un registro separado sin
 mezclar notas ni borrar el anterior. No hace falta crear otro examen.
 
@@ -373,6 +380,11 @@ de procedencia. Quien no completó ninguna corrección figura como **Sin nota
 final**, nunca con un cero inventado. Si editaste el examen pero todavía no
 has vuelto a corregir, se cierran las notas válidas de la sesión seleccionada;
 el cambio del editor no las borra.
+
+Tras finalizar, **Preparar otro examen** limpia la vista y vuelve a Corregir
+sin clase seleccionada. Elige la clase y empieza cuando estés listo, también
+si quieres repetir con la misma clase. El examen anterior permanece en el
+Histórico; no se borran sus notas ni sus informes.
 
 **Enviar informes a todos** pide confirmación antes de entregar. Cada informe
 usa la corrección que produjo la mejor nota del alumno, aunque después apagara
