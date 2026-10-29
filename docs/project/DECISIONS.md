@@ -1087,3 +1087,22 @@ laboratorio nativo, reapertura de main/preload/renderer e interfaz con datos
 ficticios verificados. Tres hallazgos de revisión visual corregidos y
 calificados resueltos. Sin instalación ni publicación. Evidencia en
 `docs/reviews/evidence/T220/RESULTADOS.md`.
+
+## T221 · Pausa explícita y lista final · 2026-10-29
+
+ADR-0040 distingue ACTIVE/PAUSED de FINALIZING/FINALIZED. Pausar conserva la
+vuelta activa, limpia secretos en memoria y no cierra ni envía; reiniciar
+recupera como pausada una sesión abierta. Reanudar mantiene identidad y vueltas
+compatibles, también al seleccionar una pausa histórica. La separación
+conservadora de criterios de T220 sigue vigente. Leer no crea nuevos registros.
+Finalizar una sesión seleccionada conserva sus notas válidas aunque el editor
+haya cambiado sin una corrección nueva; sustituye el registro vacío al cierre.
+
+La lista final automática muestra alumno/mejor nota y acciones de entrega y
+exportación. Procedencia y vueltas permanecen internas; el Histórico ofrece
+sesiones y consulta secundaria de correcciones. Envíos y reintentos requieren
+confirmación explícita. Estado por destinatario; un fallo SSH no cambia la nota.
+642 pruebas GUI, tipos/build/preload, motor y herramientas correctos. Electron
+real verifica recuperación de pausa y lista final; laboratorio nativo conserva
+el 10 tras fallo SSH. Datos ficticios, sin instalación ni publicación.
+Evidencia: `docs/reviews/evidence/T221/RESULTADOS.md`.

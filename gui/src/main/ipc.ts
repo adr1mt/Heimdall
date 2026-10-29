@@ -13,7 +13,7 @@ import { detectEngine } from './engine'
 import { readArtifact, readArtifactAsync } from './artifact'
 import { consolidateChain } from './consolidate'
 import { readExamSession } from './session'
-import { ExamRecords, digest } from './exam-record'
+import { ExamRecords } from './exam-record'
 import { sendFinalReports } from './final-reports'
 import type { ExamRecord } from '../shared/exam-record'
 import { markOf, scaleOf } from '../renderer/src/lib/scale'
@@ -173,6 +173,7 @@ export function endExamMode(): void {
   examSecrets = {}
   examMode = false
   setKeepAwake(false)
+  if (currentRecord?.state === 'ACTIVE') records().pause(currentRecord)
 }
 
 function readRunRequest(value: unknown): RunRequest {
@@ -340,10 +341,11 @@ export function registerIpc(): void {
       endExamMode()
       return
     }
-    if (typeof raw.examPath === 'string' && typeof raw.classId === 'string') {
-      currentRecord = records().prepare(raw.examPath, groupOf(raw.classId), false, markOf(raw.passMark ?? 70))
-    }
+    if (session) throw new Error('Espera a que termine la corrección antes de reanudar.')
     endExamMode()
+    if (typeof raw.examPath === 'string' && typeof raw.classId === 'string') {
+      currentRecord = records().prepare(raw.examPath, groupOf(raw.classId), false, markOf(raw.passMark ?? 70), raw.recordId)
+    }
     for (const [name, secret] of Object.entries(raw.secrets ?? {})) {
       if (typeof secret === 'string') examSecrets[name] = secret
     }
@@ -370,7 +372,7 @@ export function registerIpc(): void {
     const dir = projectDirOf(examPath)
     const className = writeGeneratedAula(dir, groupOf(classId))
     const registry = records()
-    const record = registry.prepare(examPath, groupOf(classId), !!retryFrom, passMark)
+    const record = registry.prepare(examPath, groupOf(classId), !!retryFrom, passMark, examMode && currentRecord?.examPath === examPath && currentRecord.classId === classId ? currentRecord.id : undefined)
     registry.begin(record)
     currentRecord = record
     // Durable provenance, rather than renderer memory, owns the session.
@@ -390,8 +392,13 @@ export function registerIpc(): void {
       },
       onClose: (exitCode, stderr) => {
         session = null
-        try { registry.recover(record) }
-        catch (error) { endExamMode(); stderr += `\nNo se pudo guardar la sesión: ${String(error)}` }
+        try {
+          registry.recover(record)
+          if (!examMode) registry.pause(record)
+        } catch (error) {
+          endExamMode()
+          stderr += `\nNo se pudo guardar la sesión: ${String(error)}`
+        }
         // The grades leave the exam's folder the moment they exist. It never
         // throws and it never blocks: a copy that fails must not turn a
         // finished correction into an error (T113).
@@ -432,18 +439,22 @@ export function registerIpc(): void {
 
   ipcMain.handle(IPC.examRecords, (_e, path: unknown, classId: unknown) => {
     context(path, classId)
-    return records().list(path, classId as string)
+    const registry = records()
+    return registry.list(path, classId as string).map(record => {
+      if (record.id !== currentRecord?.id || (!session && !examMode)) registry.pause(record)
+      return record
+    })
   })
 
   ipcMain.handle(IPC.savedExam, async (_e, path: unknown, classId: unknown, id?: string) => {
     context(path, classId)
     const registry = records()
-    let record = registry.get(path, classId as string, id)
+    const selected = !id && currentRecord?.examPath === path && currentRecord.classId === classId ? currentRecord.id : id
+    const record = registry.get(path, classId as string, selected)
     if (!record) return null
-    if (!id && !session && record.state === 'ACTIVE') {
-      const group = groupOf(classId)
-      if (record.examHash !== digest(readFileSync(path, 'utf8')) || record.inventoryHash !== digest(aulaYaml(group))) record = registry.prepare(path, group, false, record.passMark)
-    }
+    // Reading history never changes criteria or opens a new session. An open
+    // session recovered without its scheduler is paused until an explicit resume.
+    if (!session && !examMode) registry.pause(record)
     if (!session && record.pending) registry.recover(record)
     if (!session && record.state === 'FINALIZING') {
       if (finalizing) {
@@ -457,13 +468,15 @@ export function registerIpc(): void {
     return registry.view(record)
   })
 
-  ipcMain.handle(IPC.finishExam, (_e, path: unknown, classId: unknown, passMark?: number) => {
+  ipcMain.handle(IPC.finishExam, (_e, path: unknown, classId: unknown, _passMark?: number, id?: string) => {
     context(path, classId)
     if (finalizing) return finalizing
     const registry = records()
-    const record = session && currentRecord?.examPath === path && currentRecord.classId === classId ? currentRecord : registry.get(path, classId as string) ?? registry.prepare(path, groupOf(classId))
+    if (session && (currentRecord?.examPath !== path || currentRecord.classId !== classId || (id && currentRecord.id !== id))) throw new Error('Espera a que termine la corrección de la otra sesión.')
+    const record = session && currentRecord ? currentRecord : registry.get(path, classId as string, id) ?? registry.prepare(path, groupOf(classId))
     if (!record) throw new Error('No hay ninguna sesión que finalizar.')
     if (record.state === 'FINALIZED') return registry.view(record)
+    currentRecord = record
     record.state = 'FINALIZING'
     registry.save(record)
     endExamMode()
@@ -471,13 +484,8 @@ export function registerIpc(): void {
     finalizing = (async () => {
       await active?.closed
       const closed = await registry.finalize(record)
-      // If criteria changed after the last round, the current set has no
-      // evaluated rounds yet. Keep the old results and close an empty new set.
-      const group = groupOf(classId)
-      if (record.examHash !== digest(readFileSync(path, 'utf8')) || record.inventoryHash !== digest(aulaYaml(group)) || record.passMark !== markOf(passMark ?? record.passMark)) {
-        const current = registry.prepare(path, group, false, markOf(passMark ?? record.passMark))
-        return registry.finalize(current)
-      }
+      // Finalize the selected evidence. Edits affect only a later resumed
+      // correction; they must never replace completed grades with an empty set.
       return closed
     })().finally(() => { finalizing = null })
     return finalizing

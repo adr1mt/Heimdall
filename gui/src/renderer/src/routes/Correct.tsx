@@ -33,6 +33,7 @@ import { sessionCsv, sessionCsvName, sessionExportSummary, sessionGradeRows } fr
 import { MoodleExportButton } from '@/components/MoodleExport'
 import { FinishExamButton } from '@/components/ExamSession'
 import { useExamRecord } from '@/stores/exam-record'
+import { pauseExam, resumeExam } from '@/lib/exam-actions'
 import { startCorrection } from '@/lib/start-run'
 import type { Session } from '../../../shared/session'
 import type { Description } from '../../../shared/describe'
@@ -57,6 +58,7 @@ export default function CorrectView() {
   const setRetry = useApp((s) => s.setRetry)
   const exam = useApp((s) => s.exam)
   const finishing = useExamRecord(s => s.finishing)
+  const recordState = useExamRecord(s => s.saved?.record.state)
 
   const run = useRun()
   const busy = run.phase === 'starting' || run.phase === 'running'
@@ -150,24 +152,7 @@ export default function CorrectView() {
    * it already refuses to.
    */
   async function startExamMode(minutes: number): Promise<void> {
-    if (missing) return
-    try {
-      await window.heimdall.setExamMode({ active: true, secrets: envelope(), examPath: examPath!, classId: group!.id, passMark: useApp.getState().passMark })
-    } catch (error) {
-      setNotice(noticeFrom('No se pudo activar el modo examen', error))
-      return
-    }
-    setRetry(null)
-    useApp.getState().startExam(minutes)
-  }
-
-  async function stopExamMode(): Promise<void> {
-    useApp.getState().stopExam()
-    try {
-      await window.heimdall.setExamMode({ active: false })
-    } catch (error) {
-      setNotice(noticeFrom('No se pudo desactivar el modo examen', error))
-    }
+    if (!missing) await resumeExam(minutes)
   }
 
   async function stop(): Promise<void> {
@@ -242,7 +227,7 @@ export default function CorrectView() {
           exam={exam}
           disabled={busy || !!missing || finishing}
           onStart={(minutes) => void startExamMode(minutes)}
-          onStop={() => void stopExamMode()}
+          onStop={() => void pauseExam()}
         />
         {group && !exam.active && run.phase === 'idle' && <PendingStudents group={group} />}
 
@@ -255,7 +240,7 @@ export default function CorrectView() {
         {run.phase !== 'idle' && <RunPanel percent={percent} />}
 
         {exam.active && !examSession.session && run.students.length === 0 && group && <PendingStudents group={group} />}
-        <SessionPanel {...examSession} />
+        {recordState !== 'FINALIZED' && <SessionPanel {...examSession} />}
       </div>
 
       <ConfirmDialog
@@ -395,6 +380,8 @@ function ExamControl({
   onStop: () => void
 }) {
   const [minutes, setMinutes] = useState<number>(exam.everyMinutes)
+  const paused = useExamRecord(s => s.saved?.record.state === 'PAUSED')
+  const changing = useExamRecord(s => s.changing)
 
   return (
     <section
@@ -428,12 +415,12 @@ function ExamControl({
       <FinishExamButton />
       <Button
         size="sm"
-        variant={exam.active ? 'destructive' : 'outline'}
-        disabled={!exam.active && disabled}
+        variant="outline"
+        disabled={changing || (!exam.active && disabled)}
         onClick={() => (exam.active ? onStop() : onStart(minutes))}
       >
         <Timer className="h-4 w-4" />
-        {exam.active ? 'Detener modo examen' : 'Iniciar modo examen'}
+        {exam.active ? 'Pausar' : paused ? 'Reanudar' : 'Iniciar modo examen'}
       </Button>
     </section>
   )

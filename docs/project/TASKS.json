@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated": "2026-10-28",
+  "updated": "2026-10-29",
   "status_values": [
     "BLOCKED",
     "READY",
@@ -5079,6 +5079,51 @@
           "T220"
         ],
         "report": "docs/reviews/evidence/T220/RESULTADOS.md",
+        "status": "COMPLETE"
+      }
+    },
+    {
+      "id": "T221",
+      "title": "Diferenciar pausa y finalización con lista final e histórico por sesiones",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T220"
+      ],
+      "goal": "Pausar y reanudar la misma sesión compatible, reservar el cierre para Finalizar examen y mostrar solo notas y entrega al finalizar.",
+      "scope": [
+        "Estado PAUSED durable, recuperación tras reinicio y reanudación conservando vueltas compatibles; separación automática de criterios.",
+        "Lista final automática sin contadores ni procedencia visible; entrega confirmada, estado por alumno y reintentos; CSV/Moodle.",
+        "Histórico por sesiones con estado y consulta secundaria de sus correcciones."
+      ],
+      "out_of_scope": [
+        "Rediseño completo del proyector adjunto a un encargo anterior, motor Go, instalación, publicación y alumnado real."
+      ],
+      "acceptance": [
+        "Pausar impide nuevas vueltas, conserva la activa y permite detenerla ordenadamente sin cerrar ni enviar; se puede editar y reanudar sin confirmaciones.",
+        "Reiniciar recupera como pausada una sesión abierta; reanudar conserva identidad, mejores notas y vueltas compatibles.",
+        "Criterios incompatibles se separan automáticamente conservando registros y artefactos anteriores.",
+        "Finalizar espera la vuelta activa, bloquea nuevas vueltas, fija mejores notas válidas y muestra automáticamente alumno y mejor nota sin vueltas ni resúmenes.",
+        "Histórico presenta sesiones pausadas y finalizadas; abrir una finalizada muestra su lista y permite consultar correcciones de forma secundaria.",
+        "Enviar informes a todos requiere confirmación, usa cada mejor vuelta, conserva éxitos y permite reintentar no entregados sin afectar notas; exporta CSV/Moodle.",
+        "Pruebas de pausa, reinicio, criterios, alumno desconectado, cierre activo y UI a 1080p/768p; suites, tipos y build correctos."
+      ],
+      "tests": [
+        "make check",
+        "make gui-check gui-build",
+        "Laboratorios sintéticos de sesión y UI Electron"
+      ],
+      "completed": "2026-10-29",
+      "notes": "642 pruebas GUI (47 archivos), tipos/build/preload, motor y docs/herramientas correctos. Electron a 1920×1080/1366×768, pausa/reanudación sin confirmaciones, cierre a lista, envío/reintento confirmado, nota conservada en fallo y consulta histórica comprobados. Laboratorio nativo conserva 10 tras SSH fallido; main/preload/renderer reales recuperan ACTIVE como PAUSED y FINALIZED como lista. Evidencia: docs/reviews/evidence/T221/RESULTADOS.md. Pendiente de instalar; sin push, publicación ni alumnado real.",
+      "review": {
+        "base": "2633a8306f9efb29f7e8334193721208eac11072",
+        "head": "2633a8306f9efb29f7e8334193721208eac11072",
+        "includes_uncommitted": true,
+        "task_ids": [
+          "T221"
+        ],
+        "report": "docs/reviews/evidence/T221/RESULTADOS.md",
         "status": "COMPLETE"
       }
     }

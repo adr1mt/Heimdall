@@ -52,7 +52,8 @@ import {
 } from '@/lib/results'
 import { MoodleExportButton } from '@/components/MoodleExport'
 import { ReportsButton } from '@/components/ReportsButton'
-import { ExamSessionActions } from '@/components/ExamSession'
+import { useExamRecord } from '@/stores/exam-record'
+import { FinalGrades, ExamSessionActions } from '@/components/ExamSession'
 import { useBoundExam, useSessionGrade } from '@/lib/use-session-grade'
 import { sessionGrade } from '@/lib/session-grade'
 import {
@@ -100,6 +101,8 @@ export default function ResultsView() {
   const scale = useScale()
   const passMark = scale.passMark
   const savedExam = useBoundExam()
+  const saved = useExamRecord(s => s.saved)
+  const showFinals = useExamRecord(s => s.showFinals)
   const gradeRun = useMemo(() => artifact && savedExam ? { ...artifact, students: artifact.students.map(student => sessionGrade(student, savedExam).student) } : artifact, [artifact, savedExam])
   const { filters, setFilters, studentFilter, setStudentFilter, order, setOrder,
     mode, setMode, hiddenIds, hideStudent, showStudent, showAll, clearFilters } = useResultsView()
@@ -132,6 +135,8 @@ export default function ResultsView() {
     return exploreResults(filterRun(gradeRun, filters), studentFilter, order, passMark, hiddenIds)
       .map(row => ({ ...row, student: latest.get(row.student.student_id)! }))
   }, [artifact, gradeRun, filters, studentFilter, order, passMark, hiddenIds])
+
+  if (saved?.record.state === 'FINALIZED' && showFinals) return <FinalGrades saved={saved} />
 
   if (problem && !artifact) {
     return (

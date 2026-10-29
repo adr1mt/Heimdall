@@ -33,7 +33,7 @@ function round(number: number, points: number[]) {
       score: { obtained: missing ? 0 : obtained, evaluable: missing ? 0 : 50, total: 50, unevaluated: missing ? 50 : 0,
         status: missing ? 'NOT_EVALUATED' : 'COMPLETE', final_score: missing ? null : obtained * 2, provisional_score: missing ? null : obtained * 2 },
       checks: run.plan.check_ids.map((id, i) => ({ ...base.checks[0], check_id: id,
-        status: missing ? 'UNEVALUATED' : i < obtained ? 'PASS' : 'FAIL', cause: missing ? 'NOT_RUN' : 'NONE',
+        status: missing ? 'UNEVALUATED' : i < obtained ? 'PASS' : 'FAIL', cause: missing ? 'CONNECT_FAILED' : 'NONE',
         execution: missing ? null : { ...base.checks[0].execution!, started_at: at },
         assertion: missing ? null : { ...base.checks[0].assertion!, matched: i < obtained, found: i < obtained ? 'yes' : 'no' } })) }
   })
@@ -48,7 +48,18 @@ const last = round(2, [41, 45, -1])
 // Simulate a hard process death after the canonical file was committed.
 const reopened = new ExamRecords(data, engine), restored = reopened.get(exam, group.id)!
 reopened.recover(restored)
-const final = await reopened.finalize(restored)
+reopened.pause(restored)
+const pausedAfterRestart = new ExamRecords(data, engine).get(exam, group.id)!
+assert.equal(pausedAfterRestart.state, 'PAUSED')
+assert.equal(pausedAfterRestart.closedAt, undefined)
+const resumed = reopened.prepare(exam, group)
+assert.equal(resumed.id, record.id)
+assert.equal(resumed.rounds.length, 2)
+reopened.begin(resumed)
+const offline = round(3, [-1, 40, -1])
+reopened.append(resumed, offline.path); reopened.recover(resumed)
+assert.equal(offline.run.students[0].score.final_score, null)
+const final = await reopened.finalize(resumed)
 assert.equal(final.record.state, 'FINALIZED')
 assert.deepEqual(final.session!.students.map(student => [student.student_id, student.score.final_score, student.from_round]), [['first',100,1],['second',90,2],['missing',null,0]])
 assert.equal(sessionGrade(last.run.students[0], final).student.score.final_score, 100)
@@ -69,6 +80,6 @@ const next = reopened.prepare(exam, group)
 assert.notEqual(next.id, record.id); assert.equal(next.rounds.length, 0)
 assert.equal(reopened.list(exam, group.id).length, 2)
 assert.equal(readFileSync(first.path, 'utf8'), JSON.stringify(first.run))
-console.log(JSON.stringify({ root, finalGrades: afterRestart.session!.students.map(s => ({ student: s.student_id, score: s.score.final_score, round: s.from_round })), closedAt: final.record.closedAt, nativeEngine: engine, csv: 'verified', moodle: 'verified', recovery: 'verified', preservedTenAfterSeven: true, historicalBytes: 'unchanged' }, null, 2))
+console.log(JSON.stringify({ root, finalGrades: afterRestart.session!.students.map(s => ({ student: s.student_id, score: s.score.final_score, round: s.from_round })), closedAt: final.record.closedAt, nativeEngine: engine, csv: 'verified', moodle: 'verified', recovery: 'verified', preservedTenAfterSeven: true, preservedBestAfterSshFailure: true, pausedRestartAndResume: true, historicalBytes: 'unchanged' }, null, 2))
 
 export { root, engine, group, final }

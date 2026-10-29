@@ -341,28 +341,43 @@ por todos no protege frente al acceso a máquinas ajenas (ADR-0037).
 Documentación de referencia: [conectar con Archivos de Ubuntu](https://help.ubuntu.com/stable/ubuntu-help/nautilus-connect.html.en) y [opciones de SCP de OpenSSH](https://man.openbsd.org/scp).
 
 
-## Mejores notas y finalización del examen
+## Pausar, reanudar y finalizar el examen
 
-Cada corrección queda registrada automáticamente. Al volver al examen y su
-clase se recupera la sesión: el 10 conseguido se conserva aunque la última
-vuelta dé un 7. La nota principal es la mejor completa y las comprobaciones
-muestran la última vuelta. **Mejores notas**, en Resultados, abre la tabla de
-toda la clase con nota y vuelta; permite consultar sesiones anteriores y
-exportar CSV o Moodle. Cambiar los criterios abre otro registro sin mezclar
-notas; también lo hace cambiar el umbral de aprobado.
+Mientras corriges, la matriz muestra las comprobaciones actuales y conserva
+la mejor nota completa de cada alumno. Una máquina apagada o un error de SSH
+no convierten esa nota en cero.
 
-**Finalizar examen** detiene la programación inmediatamente y espera a la
-corrección en curso. El cierre y los orígenes de las notas quedan guardados.
-Una nueva corrección abre otra sesión. Quien no completó ninguna vuelta figura
-como **Sin nota final**, con el motivo, y se exporta con la nota vacía.
+**Pausar** detiene las siguientes correcciones y mantiene la sesión abierta.
+La corrección activa puede terminar; para interrumpirla ordenadamente usa
+**Detener** en Corregir. No se fijan notas definitivas ni se envían informes.
+Puedes editar el examen y cerrar Heimdall: al volver, la sesión está pausada.
 
-Después del cierre se pregunta una sola vez si quieres enviar los informes
-definitivos. **Ahora no** conserva las notas y deja disponible **Enviar informes
-finales**. Cada alumno recibe la evidencia de su propia mejor vuelta; los
-informes finales tienen nombre por sesión y no sustituyen informes anteriores.
-El resumen diferencia enviados, pendientes/fallidos y alumnos sin nota final;
-solo se reintentan entregas que no hayan tenido éxito. Los recibos sobreviven
-al cierre de la aplicación.
+**Reanudar** continúa la misma sesión y conserva sus notas y correcciones
+compatibles, sin confirmaciones. Si cambias los criterios, la clase o el
+umbral de aprobado, la siguiente corrección abre un registro separado sin
+mezclar notas ni borrar el anterior. No hace falta crear otro examen.
+
+**Finalizar examen** detiene la programación, espera la corrección activa y
+cierra la sesión con la mejor nota válida de cada alumno. Abre automáticamente
+la lista de **Notas finales**: alumno y mejor nota, sin contadores ni vuelta
+de procedencia. Quien no completó ninguna corrección figura como **Sin nota
+final**, nunca con un cero inventado. Si editaste el examen pero todavía no
+has vuelto a corregir, se cierran las notas válidas de la sesión seleccionada;
+el cambio del editor no las borra.
+
+**Enviar informes a todos** pide confirmación antes de entregar. Cada informe
+usa la corrección que produjo la mejor nota del alumno, aunque después apagara
+su máquina. La lista muestra **Entregado** o **No entregado**; los fallos de
+entrega no alteran la nota. **Reintentar no entregados** vuelve a pedir
+confirmación y conserva los éxitos, también después de reiniciar Heimdall.
+Los informes tienen nombre por sesión y no sustituyen los anteriores.
+**Exportar notas** ofrece CSV y Moodle con las notas definitivas.
+
+El **Histórico** muestra las sesiones del examen y la clase seleccionados,
+diferenciando **Pausado** y **Finalizado**. Al abrir una finalizada se muestra
+directamente su lista de notas. **Consultar correcciones** permite abrir sus
+resultados anteriores; la procedencia se conserva para calcular las notas y
+generar los informes. Los originales históricos permanecen intactos.
 
 Para abrir el HTML en Ubuntu Desktop, usa Archivos, pulsa Ctrl+L y abre
 `sftp://USUARIO@SERVIDOR:PUERTO` con tu cuenta SSH. Copia el archivo

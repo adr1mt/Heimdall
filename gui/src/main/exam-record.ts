@@ -48,7 +48,7 @@ export class ExamRecords {
     if (!existsSync(root)) return []
     return readdirSync(root).filter(id => /^[a-f0-9-]{36}$/.test(id)).map(id => {
       const raw = JSON.parse(readFileSync(join(root, id, 'session.json'), 'utf8')) as ExamRecord
-      if (raw.version !== 1 || raw.id !== id || raw.examPath !== resolve(examPath) || raw.classId !== classId || !Array.isArray(raw.rounds) || !raw.delivery || !['ACTIVE', 'FINALIZING', 'FINALIZED'].includes(raw.state)) {
+      if (raw.version !== 1 || raw.id !== id || raw.examPath !== resolve(examPath) || raw.classId !== classId || !Array.isArray(raw.rounds) || !raw.delivery || !['ACTIVE', 'PAUSED', 'FINALIZING', 'FINALIZED'].includes(raw.state)) {
         throw new Error('El registro de la sesión está dañado. No se han sustituido sus notas.')
       }
       return raw
@@ -62,13 +62,18 @@ export class ExamRecords {
     return record ?? null
   }
 
-  prepare(examPath: string, group: ClassGroup, fresh = false, passMark = 70): ExamRecord {
+  prepare(examPath: string, group: ClassGroup, fresh = false, passMark = 70, id?: string): ExamRecord {
     if (basename(aulaFileName(group)) !== aulaFileName(group)) throw new Error('Identificador de clase inválido.')
     const exam = readFileSync(examPath, 'utf8'), inventory = aulaYaml(group)
-    const previous = this.get(examPath, group.id)
+    const previous = this.get(examPath, group.id, id)
     if (previous?.pending) this.recover(previous)
     if (previous?.state === 'FINALIZING') throw new Error('La sesión se está finalizando. No se pueden iniciar más vueltas.')
-    if (!fresh && previous?.state === 'ACTIVE' && previous.examHash === digest(exam) && previous.inventoryHash === digest(inventory) && previous.passMark === passMark) return previous
+    if (!fresh && previous && ['ACTIVE', 'PAUSED'].includes(previous.state) && previous.examHash === digest(exam) && previous.inventoryHash === digest(inventory) && previous.passMark === passMark) {
+      previous.state = 'ACTIVE'
+      this.save(previous)
+      return previous
+    }
+    if (previous?.state === 'ACTIVE') this.pause(previous)
     const parsed = load(exam) as { examen?: string } | null
     const record: ExamRecord = {
       version: 1, id: randomUUID(), examPath: resolve(examPath), classId: group.id, className: group.name,
@@ -93,6 +98,12 @@ export class ExamRecords {
   begin(record: ExamRecord): void {
     if (record.state !== 'ACTIVE' || record.pending) throw new Error('La sesión no acepta otra vuelta.')
     record.pending = { before: this.artifacts(record) }
+    this.save(record)
+  }
+
+  pause(record: ExamRecord): void {
+    if (record.state !== 'ACTIVE') return
+    record.state = 'PAUSED'
     this.save(record)
   }
 

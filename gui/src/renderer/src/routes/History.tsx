@@ -2,14 +2,14 @@ import { useCallback, useEffect, useState } from 'react'
 import { AlertTriangle, FolderOpen, RefreshCw, RotateCcw, ShieldCheck } from 'lucide-react'
 import { Badge, Button, Spinner, ViewHeader } from '@/components/ui'
 import { useApp, noticeFrom } from '@/stores/app'
+import { useResultsView } from '@/stores/results-view'
+import { useExamRecord } from '@/stores/exam-record'
+import type { ExamRecord } from '../../../shared/exam-record'
 import { useRun } from '@/stores/run'
 import { dateText } from '@/lib/results'
 import { t } from '@/i18n/es'
 import type { RunSummary } from '../../../shared/history'
 import type { BackupEntry } from '../../../shared/backup'
-
-/** As many rows as the main process is willing to summarise (history.ts). */
-const MAX_RUNS = 50
 
 /** As many copies as the main process keeps of one exam (backup.ts). */
 const MAX_BACKUPS = 50
@@ -21,10 +21,15 @@ const MAX_BACKUPS = 50
  */
 export default function HistoryView() {
   const examPath = useApp((s) => s.project?.examPath ?? null)
+  const classId = useApp(s => s.classId)
+  const active = useApp(s => s.exam.active)
+  const finishing = useExamRecord(s => s.finishing)
+  const [sessions, setSessions] = useState<ExamRecord[] | null>(null)
+  const [sessionError, setSessionError] = useState<string | null>(null)
   const setView = useApp((s) => s.setView)
   const setNotice = useApp((s) => s.setNotice)
   const phase = useRun((s) => s.phase)
-  const busy = phase === 'starting' || phase === 'running'
+  const busy = active || finishing || phase === 'starting' || phase === 'running'
 
   const [runs, setRuns] = useState<RunSummary[] | null>(null)
   const [runError, setRunError] = useState<string | null>(null)
@@ -41,6 +46,11 @@ export default function HistoryView() {
       setBackupError(null)
       return
     }
+    setSessions(null)
+    setSessionError(null)
+    if (classId) void window.heimdall.examRecords(examPath, classId).then(setSessions)
+      .catch(error => setSessionError(noticeFrom('No se pudieron leer las sesiones', error)))
+    else setSessions([])
     setRuns(null)
     setRunError(null)
     window.heimdall
@@ -57,7 +67,7 @@ export default function HistoryView() {
       .catch((error) => {
         setBackupError(noticeFrom('No se pudieron leer las copias de seguridad', error))
       })
-  }, [examPath])
+  }, [examPath, classId])
 
   useEffect(load, [load])
 
@@ -66,12 +76,30 @@ export default function HistoryView() {
     try {
       const artifact = await window.heimdall.readArtifact(path)
       useRun.getState().setArtifact(artifact, path)
+      useExamRecord.setState({ showFinals: false })
       setView('results')
     } catch (error) {
       setNotice(noticeFrom('No se pudo abrir el resultado', error))
     } finally {
       setOpening(null)
     }
+  }
+
+  async function openSession(record: ExamRecord): Promise<void> {
+    if (!examPath || !classId) return
+    setOpening(record.id)
+    try {
+      const saved = await useExamRecord.getState().load(examPath, classId, record.id)
+      if (!saved) return
+      const last = saved.record.rounds.at(-1)
+      if (last) useRun.getState().setArtifact(await window.heimdall.readArtifact(last.path), last.path)
+      else useRun.getState().reset()
+      useApp.setState({ examRounds: saved.record.rounds.map(round => round.path) })
+      useExamRecord.setState({ showFinals: true })
+      if (saved.record.state !== 'FINALIZED') useResultsView.getState().setMode('matrix')
+      setView('results')
+    } catch (error) { setNotice(noticeFrom('No se pudo abrir la sesión', error)) }
+    finally { setOpening(null) }
   }
 
   /**
@@ -109,14 +137,12 @@ export default function HistoryView() {
     <div className="flex h-full flex-col">
       <ViewHeader title={t.history.title} />
       <div className="min-h-0 flex-1 space-y-4 overflow-auto p-6">
-        <p className="max-w-3xl text-xs text-muted-foreground">{t.history.hint}</p>
-
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" disabled={!examPath} onClick={load}>
             <RefreshCw className="h-4 w-4" />
             {t.history.refresh}
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => void openOther()}>
+          <Button variant="ghost" size="sm" disabled={busy || opening !== null} onClick={() => void openOther()}>
             <FolderOpen className="h-4 w-4" />
             {t.history.openOther}
           </Button>
@@ -126,43 +152,50 @@ export default function HistoryView() {
             that would be the correction in flight. It waits. */}
         {busy && <p className="text-xs text-warning-strong">{t.history.busy}</p>}
 
-        {!examPath ? (
-          <p className="text-sm text-muted-foreground">{t.history.needExam}</p>
-        ) : runError ? (
-          <p className="flex items-start gap-1.5 break-all text-sm text-destructive-strong">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> {runError}
-          </p>
-        ) : runs === null ? (
-          <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Spinner /> {t.history.loading}
-          </p>
-        ) : runs.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{t.history.empty}</p>
-        ) : (
-          <div className="space-y-2">
-            {runs.map((run) => (
-              <RunRow
-                key={run.path}
-                run={run}
-                disabled={busy || opening !== null}
-                opening={opening === run.path}
-                onOpen={() => void open(run.path)}
-              />
-            ))}
-            {runs.length >= MAX_RUNS && (
-              <p className="text-micro text-muted-foreground">{t.history.capped(MAX_RUNS)}</p>
-            )}
-          </div>
-        )}
+        {sessionError && <p role="alert" className="text-sm text-destructive-strong">{sessionError}</p>}
+        {sessions === null && examPath && classId && !sessionError && <div role="status" className="flex items-center gap-2 text-sm"><Spinner /> Cargando sesiones…</div>}
+        {sessions && sessions.length > 0 && <section aria-label="Sesiones de examen" className="space-y-3">
+          {sessions.map(record => <article key={record.id} className="rounded-md border border-border p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="min-w-0 space-y-1">
+                <p className="text-base font-medium">{record.title} · {record.className}</p>
+                <p className="text-sm text-muted-foreground">{dateText(record.createdAt)}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Badge variant={record.state === 'FINALIZED' ? 'success' : 'outline'}>{record.state === 'FINALIZED' ? 'Finalizado' : record.state === 'FINALIZING' ? 'Finalizando' : record.state === 'PAUSED' ? 'Pausado' : 'En curso'}</Badge>
+                <Button size="sm" variant="outline" disabled={busy || opening !== null} onClick={() => void openSession(record)}>{opening === record.id && <Spinner />}Abrir sesión</Button>
+              </div>
+            </div>
+            {record.rounds.length > 0 && <details className="mt-3 text-sm">
+              <summary className="cursor-pointer text-muted-foreground">Consultar correcciones</summary>
+              <div className="mt-2 space-y-2">{record.rounds.map(round => <Button key={round.runId} size="sm" variant="ghost" className="mr-2" disabled={busy || opening !== null} onClick={() => {
+                setOpening(round.path)
+                void useExamRecord.getState().load(record.examPath, record.classId, record.id).then(() => open(round.path))
+                  .catch(error => setNotice(noticeFrom('No se pudo abrir la corrección', error)))
+                  .finally(() => setOpening(null))
+              }}>{dateText(runs?.find(run => run.path === round.path)?.at ?? '') || 'Abrir corrección'}</Button>)}</div>
+            </details>}
+          </article>)}
+        </section>}
+        {!examPath && <p className="text-sm text-muted-foreground">{t.history.needExam}</p>}
+        {runs && sessions && (() => {
+          const known = new Set(sessions.flatMap(record => record.rounds.map(round => round.path)))
+          const other = runs.filter(run => !known.has(run.path))
+          return other.length ? <details open={!sessions.length}>
+            <summary className="cursor-pointer text-sm text-muted-foreground">Otras correcciones</summary>
+            <div className="mt-3 space-y-2">{other.map(run => <RunRow key={run.path} run={run} disabled={busy || opening !== null} opening={opening === run.path} onOpen={() => void open(run.path)} />)}</div>
+          </details> : !sessions.length ? <p className="text-sm text-muted-foreground">{t.history.empty}</p> : null
+        })()}
+        {runError && <p role="alert" className="text-sm text-destructive-strong">{runError}</p>}
 
         {examPath && (
-          <Backups
+          <details><summary className="cursor-pointer text-sm text-muted-foreground">Copias de seguridad</summary><div className="mt-3"><Backups
             backups={backups}
             error={backupError}
             restoring={restoring}
             disabled={busy}
             onRestore={() => void restore()}
-          />
+          /></div></details>
         )}
       </div>
     </div>
@@ -201,9 +234,9 @@ function Backups({
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> {error}
         </p>
       ) : backups === null ? (
-        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div role="status" className="flex items-center gap-2 text-sm text-muted-foreground">
           <Spinner /> {t.backups.loading}
-        </p>
+        </div>
       ) : backups.length === 0 ? (
         <p className="text-sm text-muted-foreground">{t.backups.empty}</p>
       ) : (

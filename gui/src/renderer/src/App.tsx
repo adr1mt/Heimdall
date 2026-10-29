@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import { NAV_FOOTER, NAV_MAIN, comingSoon, type NavEntry } from './lib/nav'
 import { useApp, noticeFrom, type View } from './stores/app'
+import { useResultsView } from './stores/results-view'
 import { useRun } from './stores/run'
 import { useExamRecord } from './stores/exam-record'
 import { cn } from './lib/utils'
@@ -32,7 +33,6 @@ import { startCorrection } from './lib/start-run'
 import { t } from './i18n/es'
 import logo from './assets/logo.png'
 import { ConfirmDialog } from '@/components/ui'
-import { FinalReports } from '@/components/ExamSession'
 
 const HomeView = lazy(() => import('./routes/Home'))
 const SettingsView = lazy(() => import('./routes/Settings'))
@@ -107,11 +107,14 @@ function AppBody() {
     void useExamRecord.getState().load(examPath, classId).then(async saved => {
       if (!current || !saved) return
       useApp.setState({ examRounds: saved.record.rounds.map(round => round.path) })
+      if (saved.record.state !== 'FINALIZED') useResultsView.getState().setMode('matrix')
       const last = saved.record.rounds.at(-1)
+      useApp.getState().setView(saved.record.state === 'FINALIZED' || saved.record.rounds.length ? 'results' : 'correct')
       if (last) {
         const artifact = await window.heimdall.readArtifact(last.path)
         if (current) {
           useRun.getState().setArtifact(artifact, last.path)
+          if (saved.record.state !== 'FINALIZED') useResultsView.getState().setMode('matrix')
           useApp.getState().setView('results')
         }
       }
@@ -166,6 +169,7 @@ function AppBody() {
             return
           }
           useRun.getState().setArtifact(artifact, event.artifact)
+          if (useApp.getState().exam.active) useResultsView.getState().setMode('matrix')
           useApp.getState().setView('results')
         })
         .catch((error) => {
@@ -188,7 +192,10 @@ function AppBody() {
       const app = useApp.getState()
       if (app.project && app.classId) {
         void useExamRecord.getState().load(app.project.examPath, app.classId).then(saved => {
-          if (saved) useApp.setState({ examRounds: saved.record.rounds.map(round => round.path) })
+          if (saved) {
+            useApp.setState({ examRounds: saved.record.rounds.map(round => round.path) })
+            if (saved.record.state !== 'ACTIVE') useApp.getState().stopExam()
+          }
         }).catch(error => {
           useApp.getState().stopExam()
           useApp.getState().setNotice(noticeFrom('No se pudo actualizar la sesión', error))
@@ -351,7 +358,6 @@ function AppBody() {
             </button>
           </div>
         )}
-        <FinalReports />
         <div key={view} className="min-h-0 flex-1 animate-fade-in">
           <ViewErrorBoundary key={view}>
             <Suspense

@@ -1,5 +1,6 @@
 # ADR-0039 · Sesiones persistentes, cierre e informes definitivos
 
+- Parcialmente sustituida por [ADR-0040](0040-pausa-explicita-y-lista-final.md).
 - Estado: **aceptada** · 2026-10-28 · T220, petición expresa del profesor.
 - Amplía ADR-0020/0025; sustituye su exclusión automática de alumnos con máxima
   en la GUI. Amplía ADR-0031/0037 y exceptúa los informes finales del nombre

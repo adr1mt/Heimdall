@@ -15,7 +15,7 @@ vi.mock('../src/main/session', () => ({ readExamSession: state.session }))
 let root = ''
 afterEach(() => { if (root) rmSync(root, { recursive: true, force: true }) })
 
-it.each([false, true])('finalization stops starts immediately and waits for the active artifact (changed criteria=%s)', async changed => {
+it.each([{ changed: false, pause: false }, { changed: true, pause: false }, { changed: false, pause: true }])('finalization waits for the active artifact (changed=$changed, paused=$pause)', async ({ changed, pause }) => {
   vi.resetModules()
   root = mkdtempSync(join(tmpdir(), 'heimdall-finalize-'))
   state.data = join(root, 'profile'); mkdirSync(state.data); mkdirSync(join(root, 'var'))
@@ -38,6 +38,16 @@ it.each([false, true])('finalization stops starts immediately and waits for the 
   await new Promise<void>(resolve => {
     state.handlers.get(IPC.startRun)!({ sender: { isDestroyed: () => false, send: (channel: string) => { if (channel === IPC.runEvent) resolve() } } }, { examPath: exam, classId: group.id, secrets: {} })
   })
+  if (pause) {
+    await state.handlers.get(IPC.setExamMode)!(null, { active: false })
+    expect(ipc.isExamModeActive()).toBe(false)
+    expect(ipc.isRunActive()).toBe(true)
+    const paused = await state.handlers.get(IPC.savedExam)!(null, exam, group.id)
+    expect(paused.record.state).toBe('PAUSED')
+    expect(paused.record.closedAt).toBeUndefined()
+    expect(paused.record.finalOrigins).toBeUndefined()
+    expect(paused.record.delivery).toEqual({})
+  }
   if (changed) writeFileSync(exam, 'examen: Criterios nuevos\n')
   let ended = false
   const first = state.handlers.get(IPC.finishExam)!(null, exam, group.id) as Promise<any>
@@ -56,12 +66,9 @@ it.each([false, true])('finalization stops starts immediately and waits for the 
   expect(saved.record.closedAt).toBeTruthy()
   expect(JSON.parse(readFileSync(path, 'utf8')).status).toBe('COMPLETE')
   expect(JSON.parse(readFileSync(path, 'utf8')).students[0].score.final_score).toBe(100)
-  if (changed) {
-    expect(saved.session).toBeNull()
-    expect(new ExamRecords(state.data, engine).list(exam, group.id)).toHaveLength(2)
-  } else {
-    expect(saved.session.students[0].score.final_score).toBe(100)
-  }
+  // Edits on disk cannot erase the valid grades of the selected session.
+  expect(saved.session.students[0].score.final_score).toBe(100)
+  expect(new ExamRecords(state.data, engine).list(exam, group.id)).toHaveLength(1)
   // This query simulates a fresh renderer, reading the durable finalized state.
   const reopened = await state.handlers.get(IPC.savedExam)!(null, exam, group.id)
   expect(reopened.record.closedAt).toBe(saved.record.closedAt)

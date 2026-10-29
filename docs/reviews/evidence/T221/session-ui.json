@@ -1,0 +1,18 @@
+{
+  "viewports": [
+    [
+      1920,
+      1080
+    ],
+    [
+      1366,
+      768
+    ]
+  ],
+  "maximumAndLatest": "verified",
+  "noGradeReason": "verified",
+  "doubleClick": "one finalization",
+  "sendConfirmation": "before every send/retry",
+  "finalizedCountdown": "absent",
+  "errors": []
+}

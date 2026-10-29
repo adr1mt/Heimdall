@@ -6,6 +6,8 @@ interface State {
   problem: string | null
   loading: boolean
   finishing: boolean
+  changing: boolean
+  showFinals: boolean
   prompt: boolean
   key: string
   load: (path: string, classId: string, id?: string) => Promise<SavedExam | null>
@@ -15,7 +17,7 @@ interface State {
 
 let revision = 0
 export const useExamRecord = create<State>((set) => ({
-  saved: null, problem: null, loading: false, finishing: false, prompt: false, key: '',
+  saved: null, problem: null, loading: false, finishing: false, changing: false, showFinals: true, prompt: false, key: '',
   load: async (path, classId, id) => {
     const token = ++revision
     const key = `${path}\n${classId}`
@@ -23,13 +25,13 @@ export const useExamRecord = create<State>((set) => ({
     try {
       const saved = await window.heimdall.savedExam(path, classId, id)
       if (token !== revision) return null
-      set({ saved, problem: null, loading: false })
+      set(state => ({ saved, problem: null, loading: false, showFinals: state.saved?.record.id !== saved?.record.id || state.saved?.record.state !== saved?.record.state ? true : state.showFinals }))
       return saved
     } catch (error) {
       if (token === revision) set({ saved: null, problem: error instanceof Error ? error.message : String(error), loading: false })
       throw error
     }
   },
-  accept: saved => { revision++; set({ saved, problem: null, loading: false }) },
-  reset: () => { revision++; set({ saved: null, problem: null, loading: false, finishing: false, prompt: false, key: '' }) }
+  accept: saved => { revision++; set(state => ({ saved, problem: null, loading: false, showFinals: state.saved?.record.id !== saved?.record.id || state.saved?.record.state !== saved?.record.state ? true : state.showFinals })) },
+  reset: () => { revision++; set({ saved: null, problem: null, loading: false, finishing: false, changing: false, showFinals: true, prompt: false, key: '' }) }
 }))

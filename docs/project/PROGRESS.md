@@ -1,40 +1,42 @@
 # Estado del proyecto
 
 Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
-**Actualizado**: 2026-10-28 · **Fase**: 9 — Endurecimiento y publicación
+**Actualizado**: 2026-10-29 · **Fase**: 9 — Endurecimiento y publicación
 
 ## Última sesión
 
-**T220 preparado, pendiente de instalar:** mejores notas persistentes,
-recuperación automática, cierre definitivo y tabla «Mejores notas» en Resultados.
-La nota principal conserva la mejor vuelta; las comprobaciones muestran la
-última. Cierre espera la activa, persiste estado y orígenes; otro criterio o
-corrección tras finalizar abre otro registro. CSV/Moodle finales, informe de
-la vuelta ganadora por alumno y envío confirmado con recibos/reintentos.
-634 pruebas GUI, tipos/build/preload, motor, docs/herramientas y laboratorios
-con datos ficticios correctos. [Evidencia](../reviews/evidence/T220/RESULTADOS.md).
-[Decisión](../adr/0039-sesiones-persistentes-y-cierre-definitivo.md).
+**T221 preparado, pendiente de instalar:** Pausar conserva una sesión abierta
+recuperable; Reanudar mantiene su identidad, vueltas y mejores notas compatibles.
+Cambiar criterios separa registros automáticamente. Finalizar espera la activa,
+fija las notas válidas y abre una lista limpia de alumno/mejor nota, también
+al reabrir. Histórico por sesiones; informes confirmados y reintentos con estado
+por alumno, sin afectar notas por SSH. Exportación CSV/Moodle conservada.
+642 pruebas GUI, tipos/build/preload, motor, docs/herramientas correctos;
+Electron a 1080p/768p, laboratorio nativo y reapertura real con perfil ficticio.
+[Evidencia](../reviews/evidence/T221/RESULTADOS.md).
+[Decisión](../adr/0040-pausa-explicita-y-lista-final.md).
 
+**T220 pendiente de instalar**, incluido en T221: mejores notas persistentes,
+fuentes conservadas, cierre definitivo y recibos/reintentos privados.
+[Evidencia](../reviews/evidence/T220/RESULTADOS.md).
 **Instalación actual: T219**, interfaz compacta, nombres y escala persistente.
-Motor RA1 v2 T218 idéntico; copia anterior verificada y push confirmado.
-[Instalación](../reviews/evidence/T219/RESULTADOS.md). Cerrar/abrir para cargarla.
+Motor RA1 v2 T218 idéntico; copia anterior y push verificados.
+[Instalación](../reviews/evidence/T219/RESULTADOS.md).
 T218: RA1 v2 separado, 12 criterios/peso 19, siete Kea de peso 2,
 DNS DHCP 8.8.8.8 y forwarding guardado; [evidencia](../reviews/evidence/T218/RESULTADOS.md).
-T215 instalado: informe normal `informe.html`, reemplazable.
-T197/T202: pública 1.0.1 (`a5ccaf9`), [publicación](../releases/1.0.1/PUBLICACION.md).
-Las compilaciones posteriores conservan ese número nominal; no son otra publicación.
+T197/T202: pública 1.0.1, [publicación](../releases/1.0.1/PUBLICACION.md).
+Las compilaciones posteriores conservan el número nominal; no son publicación.
 
 ## Problemas conocidos y límites
 
-- T220 no infiere sesiones anteriores sin manifiesto. Fuentes completas del
-  PLAN: un cambio textual también puede separar registros. Artefactos originales
+- No se infieren sesiones anteriores sin manifiesto. Compatibilidad conservadora:
+  un cambio textual también puede separar registros. Artefactos originales
   necesarios para reconstruir; no protege frente a pérdida del disco.
 - Informes finales privados por sesión; Desktop los recupera por SFTP/SSH.
   La privacidad entre alumnos exige credenciales propias; contraseña común no aísla.
 - RA1 no evalúa el cliente ni su registro. Kea valida archivo guardado;
   gateway/DNS son opciones declaradas, no configuración efectiva del cliente.
-- Si el consumidor no lee, puede faltar progreso y `run.end`; el resultado
-  guardado conserva la nota. T220 recupera el artefacto mediante la intención guardada.
+- Si faltan eventos, el resultado se recupera mediante la intención guardada.
 - Copias de notas: 128 MB es heap V8 probado, no RSS ni cualquier examen.
 - Fuentes: 50 versiones/origen, 4 MiB, privadas. Clases guardan contraseña.
 - Laboratorio en 127.1.2.3; arneses SSH/secretos secuenciales. Sin sudo: 2298.
@@ -45,10 +47,11 @@ Las compilaciones posteriores conservan ese número nominal; no son otra publica
 - Informe normal exige fuentes vigentes; final usa fuentes conservadas verificadas.
 - Un informe con la contraseña de la clase no se envía.
 - Electron 43.8.3 incorpora Node 24.22.0; actualizador mitigado, runtime pendiente.
-  npm: 8 moderados de build con excepción específica.
+- npm: 8 moderados de build con excepción específica.
 
 ## Siguiente trabajo
 
-Instalar T220 cuando se solicite. T070 READY: T204 reparó solo RA1. T084 espera
-prueba de aula de Adrià. T023 y T186 siguen READY. Sin publicación autorizada
-para los cambios nuevos.
+Instalar T220/T221 cuando se solicite. T070 READY: T204 reparó solo RA1.
+T084 espera prueba de aula de Adrià. T023 y T186 siguen READY.
+El rediseño completo del proyector del adjunto anterior no forma parte de T221.
+Sin publicación autorizada para los cambios nuevos.

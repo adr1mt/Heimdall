@@ -9,7 +9,7 @@ export interface ExamRecord {
   roster: { id: string; name: string; moodleId: string }[]
   title: string
   createdAt: string
-  state: 'ACTIVE' | 'FINALIZING' | 'FINALIZED'
+  state: 'ACTIVE' | 'PAUSED' | 'FINALIZING' | 'FINALIZED'
   closedAt?: string
   passMark: number
   examHash: string

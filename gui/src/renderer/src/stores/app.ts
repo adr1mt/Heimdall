@@ -313,9 +313,8 @@ export const useApp = create<AppState>((set, get) => ({
     set({ projector })
   },
 
-  // A new exam is a new session: the rounds of the previous one are not
-  // part of it and reading them together would grade the wrong exam.
-  startExam: (everyMinutes) => set({ exam: examStarted(everyMinutes, Date.now()), examRounds: [] }),
+  // The durable record chooses compatible rounds; resuming never clears them.
+  startExam: (everyMinutes) => set({ exam: examStarted(everyMinutes, Date.now()) }),
   stopExam: () => set({ exam: examStopped(get().exam) }),
   examPassStarted: () => set({ exam: passStarted(get().exam) }),
   examPassFinished: () => set({ exam: passFinished(get().exam, Date.now()) }),

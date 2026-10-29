@@ -170,8 +170,11 @@ export default function HelpView() {
             <p>
               La sesión conserva la mejor nota completa de cada alumno. Una ronda incompleta
               posterior no convierte esa nota en cero. Si no existe ninguna ronda completa, la nota
-              sigue siendo provisional. «Detener modo examen» detiene las siguientes rondas; para
-              detener una corrección en curso usa también Detener.
+              sigue siendo provisional. «Pausar» detiene la programación y mantiene la sesión abierta,
+              también tras reiniciar. «Reanudar» conserva las notas compatibles. Para detener
+              la corrección activa usa Detener. «Finalizar examen» espera la activa, fija las
+              mejores notas y abre su lista. Desde allí puedes exportar las notas o enviar los
+              informes con confirmación; una entrega fallida no cambia la nota.
             </p>
           </Block>
           <Block id="resultados" title="Resultados">

@@ -52,6 +52,7 @@ export interface RunRequest {
 /** What the renderer asks for when exam mode is switched. */
 export interface ExamModeRequest {
   active: boolean
+  recordId?: string
   passMark?: number
   examPath?: string
   classId?: string
@@ -152,7 +153,7 @@ export interface HeimdallApi {
   session: (roundPaths: string[]) => Promise<Session>
   savedExam: (examPath: string, classId: string, id?: string) => Promise<SavedExam | null>
   examRecords: (examPath: string, classId: string) => Promise<ExamRecord[]>
-  finishExam: (examPath: string, classId: string, passMark?: number) => Promise<SavedExam>
+  finishExam: (examPath: string, classId: string, passMark?: number, id?: string) => Promise<SavedExam>
   sendFinalReports: (examPath: string, classId: string, id: string, scale: { id: 'ten' | 'hundred'; passMark: number }) => Promise<Delivery>
   /** The past runs of the project the exam belongs to, newest first. */
   listRuns: (examPath: string) => Promise<RunSummary[]>
