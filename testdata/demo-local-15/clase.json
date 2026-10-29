@@ -1,0 +1,239 @@
+{
+  "id": "demo-local-15",
+  "name": "Prueba local · 15 alumnos ficticios",
+  "columns": [
+    "p1",
+    "p2",
+    "p3",
+    "p4",
+    "p5"
+  ],
+  "password": "DEMO_LOCAL_SIN_CONEXION",
+  "students": [
+    {
+      "id": "demo01",
+      "name": "Ana Demo",
+      "contact": "demo01@example.invalid",
+      "host": "127.1.2.3",
+      "port": "22",
+      "user": "demo",
+      "fields": {
+        "p1": "443",
+        "p2": "22",
+        "p3": "53",
+        "p4": "DHCP",
+        "p5": "127.0.0.1"
+      }
+    },
+    {
+      "id": "demo02",
+      "name": "Bruno Demo",
+      "contact": "demo02@example.invalid",
+      "host": "127.1.2.3",
+      "port": "22",
+      "user": "demo",
+      "fields": {
+        "p1": "443",
+        "p2": "22",
+        "p3": "53",
+        "p4": "incorrecto",
+        "p5": "127.0.0.1"
+      }
+    },
+    {
+      "id": "demo03",
+      "name": "Carla Demo",
+      "contact": "demo03@example.invalid",
+      "host": "127.1.2.3",
+      "port": "22",
+      "user": "demo",
+      "fields": {
+        "p1": "443",
+        "p2": "incorrecto",
+        "p3": "incorrecto",
+        "p4": "DHCP",
+        "p5": "127.0.0.1"
+      }
+    },
+    {
+      "id": "demo04",
+      "name": "Diego Demo",
+      "contact": "demo04@example.invalid",
+      "host": "127.1.2.3",
+      "port": "22",
+      "user": "demo",
+      "fields": {
+        "p1": "incorrecto",
+        "p2": "incorrecto",
+        "p3": "53",
+        "p4": "DHCP",
+        "p5": "incorrecto"
+      }
+    },
+    {
+      "id": "demo05",
+      "name": "Elena Demo",
+      "contact": "demo05@example.invalid",
+      "host": "127.1.2.3",
+      "port": "22",
+      "user": "demo",
+      "fields": {
+        "p1": "incorrecto",
+        "p2": "22",
+        "p3": "incorrecto",
+        "p4": "incorrecto",
+        "p5": "incorrecto"
+      }
+    },
+    {
+      "id": "demo06",
+      "name": "Fabio Demo",
+      "contact": "demo06@example.invalid",
+      "host": "127.1.2.3",
+      "port": "22",
+      "user": "demo",
+      "fields": {
+        "p1": "incorrecto",
+        "p2": "incorrecto",
+        "p3": "incorrecto",
+        "p4": "incorrecto",
+        "p5": "incorrecto"
+      }
+    },
+    {
+      "id": "demo07",
+      "name": "Gala Demo",
+      "contact": "demo07@example.invalid",
+      "host": "127.1.2.3",
+      "port": "22",
+      "user": "demo",
+      "fields": {
+        "p1": "443",
+        "p2": "22",
+        "p3": "53",
+        "p4": "DHCP",
+        "p5": "127.0.0.1"
+      }
+    },
+    {
+      "id": "demo08",
+      "name": "Hugo Demo",
+      "contact": "demo08@example.invalid",
+      "host": "127.1.2.3",
+      "port": "22",
+      "user": "demo",
+      "fields": {
+        "p1": "443",
+        "p2": "22",
+        "p3": "incorrecto",
+        "p4": "DHCP",
+        "p5": "127.0.0.1"
+      }
+    },
+    {
+      "id": "demo09",
+      "name": "Inés Demo",
+      "contact": "demo09@example.invalid",
+      "host": "127.1.2.3",
+      "port": "22",
+      "user": "demo",
+      "fields": {
+        "p1": "incorrecto",
+        "p2": "incorrecto",
+        "p3": "53",
+        "p4": "DHCP",
+        "p5": "127.0.0.1"
+      }
+    },
+    {
+      "id": "demo10",
+      "name": "Joel Demo",
+      "contact": "demo10@example.invalid",
+      "host": "127.1.2.3",
+      "port": "22",
+      "user": "demo",
+      "fields": {
+        "p1": "incorrecto",
+        "p2": "22",
+        "p3": "53",
+        "p4": "incorrecto",
+        "p5": "incorrecto"
+      }
+    },
+    {
+      "id": "demo11",
+      "name": "Lara Demo",
+      "contact": "demo11@example.invalid",
+      "host": "127.1.2.3",
+      "port": "22",
+      "user": "demo",
+      "fields": {
+        "p1": "443",
+        "p2": "incorrecto",
+        "p3": "incorrecto",
+        "p4": "incorrecto",
+        "p5": "incorrecto"
+      }
+    },
+    {
+      "id": "demo12",
+      "name": "Marcos Demo",
+      "contact": "demo12@example.invalid",
+      "host": "127.1.2.3",
+      "port": "22",
+      "user": "demo",
+      "fields": {
+        "p1": "incorrecto",
+        "p2": "incorrecto",
+        "p3": "incorrecto",
+        "p4": "incorrecto",
+        "p5": "incorrecto"
+      }
+    },
+    {
+      "id": "demo13",
+      "name": "Nora Demo",
+      "contact": "demo13@example.invalid",
+      "host": "127.1.2.3",
+      "port": "22",
+      "user": "demo",
+      "fields": {
+        "p1": "443",
+        "p2": "22",
+        "p3": "53",
+        "p4": "DHCP",
+        "p5": "127.0.0.1"
+      }
+    },
+    {
+      "id": "demo14",
+      "name": "Óscar Demo",
+      "contact": "demo14@example.invalid",
+      "host": "127.1.2.3",
+      "port": "22",
+      "user": "demo",
+      "fields": {
+        "p1": "443",
+        "p2": "incorrecto",
+        "p3": "53",
+        "p4": "DHCP",
+        "p5": "127.0.0.1"
+      }
+    },
+    {
+      "id": "demo15",
+      "name": "Paula Demo",
+      "contact": "demo15@example.invalid",
+      "host": "127.1.2.3",
+      "port": "22",
+      "user": "demo",
+      "fields": {
+        "p1": "incorrecto",
+        "p2": "22",
+        "p3": "53",
+        "p4": "DHCP",
+        "p5": "incorrecto"
+      }
+    }
+  ]
+}

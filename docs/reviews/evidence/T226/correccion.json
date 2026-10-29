@@ -1,0 +1,32 @@
+{
+  "engine": {
+    "found": true,
+    "path": "/tmp/.mount_HeimdaLLDPJf/resources/heimdall",
+    "version": "1.0.1",
+    "problem": null
+  },
+  "students": 15,
+  "checks": 75,
+  "grades": [
+    100,
+    80,
+    60,
+    40,
+    20,
+    0,
+    100,
+    80,
+    60,
+    40,
+    20,
+    0,
+    100,
+    80,
+    60
+  ],
+  "allAcademic": true,
+  "realDataPreserved": true,
+  "project": "/home/adr1/Documentos/Heimdall/Prueba-local-15",
+  "artifact": "/home/adr1/Documentos/Heimdall/Prueba-local-15/var/run-01M63SDKF4C05JFWQ15GXHEAWH.json",
+  "installedClasses": 2
+}

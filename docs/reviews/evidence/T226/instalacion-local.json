@@ -1,0 +1,13 @@
+{
+  "installed": "/home/adr1/.local/share/heimdall/Heimdall.AppImage",
+  "sha256": "01f251fd080595b1d6715076e5fde49eed4c45e43684869bb7494f660666e63f",
+  "desktop": "/home/adr1/.local/share/applications/heimdall-gui.desktop",
+  "backup": "/home/adr1/.config/heimdall-gui/respaldo-instalacion-20261029-131459",
+  "demo": "/home/adr1/Documentos/Heimdall/Prueba-local-15",
+  "date": "2026-10-29",
+  "sourceCommit": "4fb7faa",
+  "menuLaunchVerified": true,
+  "existingClassesPreservedExactly": true,
+  "demoStudents": 15,
+  "checks": 75
+}

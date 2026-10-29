@@ -1165,3 +1165,17 @@ anterior ni se desactiva la auditoría. Se retira la excepción npm de build.
 Ver ADR-0041 y `docs/reviews/evidence/T225/RESULTADOS.md` para versiones,
 comprobaciones y el aviso OpenPGP no importado del módulo SSH oficial.
 Sin publicar, push ni sustituir la aplicación habitual o datos del usuario.
+
+## T226 · Instalación por usuario y demo local · 2026-10-29
+
+Adrià autoriza instalar en Zorin y preparar una clase de 15 personas para probar.
+Se instala el AppImage validado de T225 por usuario, con acceso e icono en el
+menú. Se reparan los ajustes que apuntaban a un motor y una demo de una carpeta
+antigua; el motor se resuelve desde el paquete en cada arranque.
+Se añade un cuestionario `valor:` y `hosts: []` de cinco preguntas con alumnado
+ficticio: no depende de SSH ni servicios que puedan estar apagados. La ficha
+de clase y las respuestas se conservan en el perfil, junto a las anteriores.
+Los datos previos se respaldan y la clase anterior conserva exactamente su
+contenido; escala y umbral no cambian. La aplicación instalada corrige 15
+alumnos y 75 comprobaciones y queda abierta desde el menú de Zorin.
+Evidencia: `docs/reviews/evidence/T226/RESULTADOS.md`. Sin push ni publicación.

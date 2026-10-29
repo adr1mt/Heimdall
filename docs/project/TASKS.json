@@ -5258,6 +5258,38 @@
       ],
       "notes": "Dependencias directas en @latest, npm outdated vacío; 0 vulnerabilidades npm (completo/producción), 0 deprecated y scripts revisados. Go 1.27.3, YAML mantenido, React 19, TS 7, Vite 8, Vitest 5, Zustand 5 y Electron 45; empaquetado sustituido por packager oficial y herramientas Linux. 643 pruebas GUI, tipos/build/preload, make check/test/race, editor real, UI 1024/1366/1920, AppImage sandbox/fallback/auto, deb extraído y deb instalado/desinstalado en Ubuntu 24.04/26.04 correctos. Govulncheck sin funciones/paquetes importados vulnerables; aviso OpenPGP no importado del módulo SSH documentado. Dependencias internas respetan rangos upstream; sin overrides de mayores incompatibles. Evidencia docs/reviews/evidence/T225/RESULTADOS.md; ADR-0041. Sin push, publicación ni instalación habitual.",
       "completed": "2026-10-29"
+    },
+    {
+      "id": "T226",
+      "title": "Instalar Heimdall en Zorin y preparar una demo local de 15 alumnos",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T225"
+      ],
+      "goal": "Dejar la aplicación accesible en el menú de Zorin, resolver las rutas antiguas de motor/demo y disponer de una corrección local sencilla lista para el usuario.",
+      "scope": [
+        "Instalación por usuario con acceso de aplicaciones e icono, copia de los ajustes anteriores y verificación de huellas.",
+        "Clase ficticia de 15 alumnos y cuestionario local de cinco preguntas, sin conexiones externas.",
+        "Comprobar en la app instalada el motor y una corrección completa; dejar la demo seleccionada."
+      ],
+      "out_of_scope": [
+        "Datos académicos reales, reemplazar clases existentes, publicación, push y cambios en reglas de evaluación."
+      ],
+      "acceptance": [
+        "El menú de aplicaciones de Zorin contiene Heimdall y abre el paquete actualizado con su motor reconocido.",
+        "Los ajustes anteriores quedan respaldados y las clases existentes se conservan.",
+        "La clase nueva contiene 15 alumnos ficticios, con respuestas variadas y cinco comprobaciones simples; se corrige sin SSH ni pedir credenciales.",
+        "Una corrección real desde la interfaz instalada termina con 15 alumnos y 75 comprobaciones; se registra evidencia y queda el examen preparado."
+      ],
+      "tests": [
+        "desktop-file-validate y SHA-256 del paquete instalado",
+        "Arranque real, detectEngine y corrección desde la interfaz instalada",
+        "make check docs-check tools-check"
+      ],
+      "notes": "T225 instalado por usuario y abierto desde el menú de Zorin; icono, desktop válido y SHA-256 verificados. Ajustes antiguos apuntaban al motor y demo en una carpeta inexistente: reparados mediante motor embebido y nueva demo seleccionada. Respaldo privado de ajustes/clases/proyectos/Local Storage; clase anterior conservada exactamente. Nueva clase ficticia de 15 personas y cuestionario valor/hosts[] de cinco preguntas: corrección desde la app instalada con 75 resultados PASS/FAIL y notas esperadas, sin SSH ni incidencias técnicas. Fuente testdata/demo-local-15; evidencia docs/reviews/evidence/T226/RESULTADOS.md. App abierta, sin sudo ni publicación ni push.",
+      "completed": "2026-10-29"
     }
   ]
 }

@@ -4,20 +4,16 @@
 
 ## Última sesión
 
+**T226 instalado y abierto desde el menú de Zorin:** T225 con motor embebido.
+Rutas antiguas reparadas; respaldo privado y clase anterior conservada.
+Demo local de 15 alumnos ficticios, cinco preguntas, 75 comprobaciones correctas.
+Examen/clase seleccionados, sin SSH. [Evidencia](../reviews/evidence/T226/RESULTADOS.md).
+
 **T225 terminado:** dependencias directas en sus últimas versiones
 estables; React 19, TypeScript 7, Vite 8, Vitest 5, Zustand 5, Electron 45
 y Go 1.27.3. npm sin vulnerabilidades/deprecated ni scripts pendientes.
 Nuevo empaquetado Linux; 643 pruebas GUI, motor/SSH y editor real correctos.
 [Evidencia](../reviews/evidence/T225/RESULTADOS.md).
-
-**T224 listo, pendiente de instalar junto a T223:** Corregir y Resultados
-siguen las capturas de Adrià: tarjeta azul de examen, alumnos compactos,
-matriz con colores sólidos y notas al pie; búsqueda y opciones agrupadas.
-Franja con reloj, proyector ajustable y leyenda legible. 643 pruebas GUI,
-tipos/build/preload, motor y herramientas correctos; Electron a
-1024/1366/1920 con datos ficticios. [Evidencia](../reviews/evidence/T224/RESULTADOS.md).
-**Instalación vigente T222: T220/T221**, paquete y arranque verificados;
-copia anterior recuperable. [Instalación](../reviews/evidence/T222/RESULTADOS.md).
 
 **T221 instalado:** Pausar conserva una sesión abierta
 recuperable; Reanudar mantiene su identidad, vueltas y mejores notas compatibles.
@@ -57,4 +53,4 @@ T197/T202: pública 1.0.1; los builds posteriores no son publicación.
 
 T070 READY: T204 reparó solo RA1.
 T084 espera prueba de aula de Adrià. T023 y T186 siguen READY.
-T223/T224 pendientes de instalar; sin publicación autorizada para los cambios nuevos.
+T223/T224/T225 instalados (T226); sin publicación nueva autorizada.
