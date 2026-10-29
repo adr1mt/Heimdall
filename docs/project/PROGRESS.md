@@ -1,11 +1,14 @@
 # Estado del proyecto
 
-Memoria entre sesiones. Máximo ~60 líneas. No copia `TASKS.json`.
 **Actualizado**: 2026-10-29 · **Fase**: 9 — Endurecimiento y publicación
 
 ## Última sesión
 
-**T221 preparado, pendiente de instalar:** Pausar conserva una sesión abierta
+**T222 instalado: T220/T221**, con commit y push autorizados.
+Paquete y arranque real verificados; copia anterior recuperable.
+[Instalación](../reviews/evidence/T222/RESULTADOS.md).
+
+**T221 instalado:** Pausar conserva una sesión abierta
 recuperable; Reanudar mantiene su identidad, vueltas y mejores notas compatibles.
 Cambiar criterios separa registros automáticamente. Finalizar espera la activa,
 fija las notas válidas y abre una lista limpia de alumno/mejor nota, también
@@ -16,10 +19,10 @@ Electron a 1080p/768p, laboratorio nativo y reapertura real con perfil ficticio.
 [Evidencia](../reviews/evidence/T221/RESULTADOS.md).
 [Decisión](../adr/0040-pausa-explicita-y-lista-final.md).
 
-**T220 pendiente de instalar**, incluido en T221: mejores notas persistentes,
+**T220 instalado**, incluido en T221: mejores notas persistentes,
 fuentes conservadas, cierre definitivo y recibos/reintentos privados.
 [Evidencia](../reviews/evidence/T220/RESULTADOS.md).
-**Instalación actual: T219**, interfaz compacta, nombres y escala persistente.
+**Instalación anterior T219:** interfaz compacta, nombres y escala persistente.
 Motor RA1 v2 T218 idéntico; copia anterior y push verificados.
 [Instalación](../reviews/evidence/T219/RESULTADOS.md).
 T218: RA1 v2 separado, 12 criterios/peso 19, siete Kea de peso 2,
@@ -51,7 +54,7 @@ Las compilaciones posteriores conservan el número nominal; no son publicación.
 
 ## Siguiente trabajo
 
-Instalar T220/T221 cuando se solicite. T070 READY: T204 reparó solo RA1.
+T070 READY: T204 reparó solo RA1.
 T084 espera prueba de aula de Adrià. T023 y T186 siguen READY.
 El rediseño completo del proyector del adjunto anterior no forma parte de T221.
 Sin publicación autorizada para los cambios nuevos.

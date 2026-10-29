@@ -1106,3 +1106,15 @@ confirmación explícita. Estado por destinatario; un fallo SSH no cambia la not
 real verifica recuperación de pausa y lista final; laboratorio nativo conserva
 el 10 tras fallo SSH. Datos ficticios, sin instalación ni publicación.
 Evidencia: `docs/reviews/evidence/T221/RESULTADOS.md`.
+
+## T222 · Reinstalación y push de T220/T221 · 2026-10-29
+
+Autorización expresa de commit, push y reinstalación. AppImage construido desde
+el producto confirmado a843b53 y motor de la misma fuente: conserva RA1 v2 y
+actualiza la entrega final de T220. Contenido GUI, dependencias, motor, AppRun
+y arranque real extraído/instalado comprobados con perfiles temporales.
+Copia anterior recuperable y sustitución atómica con huellas comprobadas.
+Sin modificar datos ni reiniciar instancias habituales; instalación lista
+para abrir. Push normal del producto confirmado en origin/main y registro de
+instalación separado. No implica publicación ni nueva versión nominal.
+Evidencia: `docs/reviews/evidence/T222/RESULTADOS.md`.

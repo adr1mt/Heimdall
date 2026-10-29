@@ -1,0 +1,30 @@
+{
+  "task": "T222",
+  "sourceCommit": "a843b538005754f792e926bff8b7d7d287536f3d",
+  "stage": "/tmp/heimdall-t222-j_5a4cvf",
+  "package": "/home/adr1/apps/heimdall/gui/dist/Heimdall-1.0.1.AppImage",
+  "app": "/home/adr1/Aplicaciones/Heimdall/Heimdall.AppImage",
+  "beforeAppSHA256": "1c9be66319b05a4487ebc03f2d928c2d49f3fea0c78974e2b9179788d6dd4375",
+  "packageSHA256": "8d182a30f479441f47e96f5a8a568cb6f1b1396622d807dd3602010321533821",
+  "verifiedFiles": 26,
+  "guiAsarSHA256": "c3653d106410a9e601705a2868bd342292d6c0296d6a677ad961450b66066488",
+  "engineSHA256": "08771d2ab813cae78358979b2123211f7d52fecacaa9a802dd78ecda72a81cc9",
+  "dependenciesVerified": [
+    "js-yaml",
+    "argparse",
+    "@monaco-editor/react",
+    "@monaco-editor/loader"
+  ],
+  "engineVersion": "heimdall 1.0.1",
+  "smoke": "Package auto: renderer and preload OK (Heimdall)",
+  "apprun": "4 variants verified",
+  "backupApp": "/home/adr1/Aplicaciones/Heimdall/Heimdall.AppImage.antes-sesiones-pausa-2026-10-29.bak",
+  "installedAppSHA256": "8d182a30f479441f47e96f5a8a568cb6f1b1396622d807dd3602010321533821",
+  "installedAt": "2026-10-29T07:16:40.645650+00:00",
+  "runningInstanceRestarted": false,
+  "status": "INSTALLED_VERIFIED",
+  "activeInstancesPreserved": [],
+  "installedSmoke": "Package auto: renderer and preload OK (Heimdall)",
+  "productPushCommit": "a843b538005754f792e926bff8b7d7d287536f3d",
+  "remoteRef": "origin/main"
+}

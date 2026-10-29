@@ -5126,6 +5126,37 @@
         "report": "docs/reviews/evidence/T221/RESULTADOS.md",
         "status": "COMPLETE"
       }
+    },
+    {
+      "id": "T222",
+      "title": "Reinstalar T220/T221 y confirmar el push autorizado",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T221"
+      ],
+      "goal": "Instalar la versión validada con pausa, sesiones persistentes y lista final, dejando copia recuperable y el remoto actualizado.",
+      "scope": [
+        "Empaquetado AppImage del código confirmado y del motor correspondiente.",
+        "Validación del contenido y arranque aislado; sustitución local con copia y huellas.",
+        "Commit de instalación y push normal confirmado en origin/main."
+      ],
+      "out_of_scope": [
+        "Cambios de producto, publicación o etiquetas, pruebas con alumnado real y modificación de sus datos."
+      ],
+      "acceptance": [
+        "El paquete incorpora T220/T221 y su motor; contenido y preload/renderer verificados en un perfil temporal.",
+        "Copia anterior recuperable, cambio atómico y huellas verificadas; ninguna instancia activa interrumpida.",
+        "Estado y evidencia de instalación guardados en un commit; push normal a origin/main confirmado."
+      ],
+      "tests": [
+        "make check",
+        "Contenido del paquete, check_apprun.py y smoke-package.mjs",
+        "SHA-256 antes/copia/paquete/instalación y comprobación de origin/main"
+      ],
+      "completed": "2026-10-29",
+      "notes": "AppImage de a843b53 con motor correspondiente construido y validado: 26 archivos GUI idénticos, cuatro dependencias, motor y AppRun correctos; renderer/preload arrancan desde extracción y ruta instalada con perfil temporal. Copia anterior, sustitución atómica y huellas verificadas. Commit de producto a843b53 subido y confirmado; registro de instalación en commit separado. Evidencia: docs/reviews/evidence/T222/RESULTADOS.md. Sin tocar datos, reiniciar instancias, publicar ni etiquetar."
     }
   ]
 }
