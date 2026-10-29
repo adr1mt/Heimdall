@@ -1134,3 +1134,16 @@ no cambia notas, artefactos, criterios, exportaciones ni persistencia de sesione
 Encajar mide mínimos de columna y ocupa el ancho disponible sin realimentar la
 escala; el tamaño de texto no depende de unidades de contenedor en celdas de tabla.
 Evidencia: `docs/reviews/evidence/T223/RESULTADOS.md`. Sin instalación ni push.
+
+## T224 · Referencias visuales de aula · 2026-10-29
+
+Las dos capturas aportadas por Adrià fijan la dirección de Corregir y Resultados:
+una tarjeta azul de modo examen, alumnos compactos, búsqueda y acciones juntas,
+estados sólidos y nombres en cabecera con notas al pie. Se conserva la retirada
+de estadísticas de T223; filtros y visibilidad quedan en Más opciones.
+No se copian funciones hipotéticas de las capturas: no hay selección parcial ni
+intervalos nuevos. Pausa, cierre y mejores notas conservan su comportamiento;
+las opciones de sesión siguen disponibles también en el menú secundario.
+El detalle de sesión se pliega, pero sus errores se anuncian fuera. La leyenda
+del proyector permanece fuera de la escala para conservar su legibilidad.
+Evidencia: `docs/reviews/evidence/T224/RESULTADOS.md`. Sin instalación ni push.

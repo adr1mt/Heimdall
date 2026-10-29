@@ -6,8 +6,9 @@ import {
   Check,
   AlertTriangle,
   Download,
-  SlidersHorizontal,
-  Users,
+  GraduationCap,
+  MoreVertical,
+  Search,
   EyeOff,
   Grid3x3,
   Layers,
@@ -192,15 +193,9 @@ export default function ResultsView() {
     )
 
   const overview = <div className="results-overview flex min-w-0 flex-wrap items-center gap-2">
-    <Input className="h-8 w-48 sm:w-56" aria-label={t.results.filterText}
-      placeholder="Buscar…" value={filters.text}
-      onChange={(e) => setFilters({ ...filters, text: e.target.value })} />
-    <details className="results-options" name="results-options">
-      <summary className="results-option-trigger">
-        <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
-        Filtros{exploring ? ' · activos' : ''}
-      </summary>
-      <div className="results-options-panel space-y-3">
+    <section className="w-full space-y-3" aria-label="Filtros de resultados">
+      <h2 className="text-sm font-semibold">Filtros{exploring ? ' · activos' : ''}</h2>
+      <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
             <Segmented aria-label="Filtrar alumnos" className="max-w-full flex-wrap">
               {([
@@ -260,13 +255,12 @@ export default function ResultsView() {
             <p className="text-xs text-muted-foreground">Se pudo conectar con su máquina; puede haber comprobaciones pendientes.</p>
           )}
       </div>
-    </details>
-    <details className="results-options" name="results-options">
-      <summary className="results-option-trigger">
-        <Users className="h-4 w-4" aria-hidden="true" />
+    </section>
+    <details className="w-full border-t border-border pt-2">
+      <summary className="cursor-pointer py-1 text-sm font-medium">
         Alumnos{hiddenStudents.length > 0 ? ` · ${hiddenStudents.length} ocultos` : ''}
       </summary>
-      <div className="results-options-panel max-h-72 space-y-1 overflow-auto">
+      <div className="max-h-60 space-y-1 overflow-auto">
         {hiddenStudents.length > 0 && <Button variant="ghost" size="sm" onClick={showAll}>Mostrar todos</Button>}
         {artifact.students.map(student => <label key={student.student_id} className="flex cursor-pointer items-center gap-3 rounded px-2 py-1.5 text-sm hover:bg-accent">
           <input type="checkbox" checked={!hiddenIds.includes(student.student_id)}
@@ -279,18 +273,19 @@ export default function ResultsView() {
   </div>
 
   return (
-    <div className={cn('flex h-full flex-col', !projector && 'teacher-results')}>
+    <div className={cn('results-view flex h-full flex-col', !projector && 'teacher-results')}>
       <ViewHeader
         title={t.results.title}
-        meta={
-          <MetaChip>
-            {artifact.students.length} alumnos · {artifact.plan.check_count} comprobaciones
-          </MetaChip>
-        }
+        meta={saved?.record.className ? <MetaChip><GraduationCap className="h-4 w-4" />{saved.record.className}</MetaChip>
+          : <span className="text-xs text-muted-foreground">{artifact.students.length} alumnos</span>}
         actions={
           <>
-            <ExamSessionActions />
-            <CorrectionClock />
+            <label className="results-search relative block">
+              <Search className="pointer-events-none absolute left-2.5 top-2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+              <Input className="h-8 w-44 pl-8 sm:w-52" aria-label={t.results.filterText}
+                placeholder="Buscar alumno…" value={filters.text}
+                onChange={event => setFilters({ ...filters, text: event.target.value })} />
+            </label>
             <Segmented>
               <SegmentedItem active={mode === 'list'} onClick={() => setMode('list')}>
                 <List className="h-3.5 w-3.5" />
@@ -301,34 +296,32 @@ export default function ResultsView() {
                 {t.results.modeMatrix}
               </SegmentedItem>
             </Segmented>
-            {!projector && (
-              <>
-                <ReportsButton artifactPath={artifactPath} />
-                <details className="relative">
-                  <summary
-                    className="list-none cursor-pointer rounded px-2 py-1 text-sm"
-                    aria-label="Más opciones"
-                  >
-                    •••
-                  </summary>
-                  <div className="absolute right-0 z-30 w-max space-y-2 rounded-md border border-border bg-popover p-2">
-                    <RunMoodleButton />
-                    <ExportButton />
-                  </div>
-                </details>
-              </>
-            )}
+            {!projector && <ExportButton />}
+            <details className="results-options" name="results-options">
+              <summary className="results-option-trigger" aria-label="Más opciones de resultados" title="Más opciones">
+                <MoreVertical className="h-5 w-5" aria-hidden="true" />
+                {exploring || hiddenStudents.length > 0 ? <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-label="Opciones activas" /> : null}
+              </summary>
+              <div className="results-options-panel space-y-3">
+                {overview}
+                <div className="flex flex-wrap gap-2 border-t border-border pt-3">
+                  <ExamSessionActions />
+                  {!projector && <><ReportsButton artifactPath={artifactPath} /><RunMoodleButton /></>}
+                </div>
+              </div>
+            </details>
           </>
         }
       />
 
+      <CorrectionClock banner actions={<ExamSessionActions placement="session" />} />
       <CorrectionProblem />
       <SessionResultsHint />
-      <ResultsCanvas projector={projector} overview={overview}>
+      <ResultsCanvas projector={projector}>
       <div className="results-body space-y-3 p-3 sm:p-4">
         {rows.length === 0 ? (
           <p className="text-sm text-muted-foreground">{hiddenStudents.length === artifact.students.length
-            ? 'Todos los alumnos están ocultos. Puedes recuperarlos desde Ocultos.' : t.results.noMatches}</p>
+            ? 'Todos los alumnos están ocultos. Puedes recuperarlos desde Más opciones → Alumnos.' : t.results.noMatches}</p>
         ) : mode === 'list' ? (
           <div className="student-list grid gap-x-4 gap-y-1 xl:grid-cols-2">
             {rows.map(({ student }) => (
@@ -380,9 +373,9 @@ export default function ResultsView() {
   )
 }
 
-function ResultsCanvas({ projector, overview, children }: { projector: boolean; overview: ReactNode; children: ReactNode }) {
-  return projector ? <ProjectorCanvas toolbar={overview}>{children}</ProjectorCanvas>
-    : <div className="results-scroll min-h-0 flex-1 overflow-auto"><div className="px-3 pt-3 sm:px-4">{overview}</div>{children}</div>
+function ResultsCanvas({ projector, children }: { projector: boolean; children: ReactNode }) {
+  return projector ? <ProjectorCanvas toolbar={<Legend />}>{children}</ProjectorCanvas>
+    : <div className="results-scroll min-h-0 flex-1 overflow-auto">{children}</div>
 }
 
 /**
@@ -418,6 +411,7 @@ function MatrixView({ rows, names, selected, onPick, onStudent }: {
   onPick: (selection: Selection) => void
   onStudent: (id: string) => void
 }) {
+  const projector = useApp(s => s.projector)
   const matrix = useMemo(() => buildMatrix(rows), [rows])
   const checkWidth = useResultsView(s => s.checkWidth)
   const setCheckWidth = useResultsView(s => s.setCheckWidth)
@@ -434,13 +428,11 @@ function MatrixView({ rows, names, selected, onPick, onStudent }: {
   const [column, setColumn] = useState<string | null>(null)
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <Legend />
-      </div>
+      {!projector && <Legend />}
       <div className="matrix-viewport max-h-[65vh] overflow-auto rounded-md border border-border focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
         role="region" aria-label="Matriz de resultados, desplazamiento horizontal y vertical" tabIndex={0}>
         <table className="results-matrix min-w-full table-fixed border-separate border-spacing-0 text-left"
-          style={{ '--matrix-check-width': checkWidth === null ? undefined : `${checkWidth}px`, width: '100%', minWidth: `calc(var(--matrix-check-width, clamp(15rem, 28vw, 24rem)) + ${matrix.students.length} * var(--matrix-student-width, 6.5rem))` } as CSSProperties}
+          style={{ '--matrix-check-width': checkWidth === null ? undefined : `${checkWidth}px`, width: '100%', minWidth: `calc(var(--matrix-check-width, clamp(15rem, 28vw, 24rem)) + ${matrix.students.length} * var(--matrix-student-width, 4.25rem))` } as CSSProperties}
           onPointerOver={(event) => setColumn((event.target as HTMLElement).closest<HTMLElement>('[data-column]')?.dataset.column ?? null)}
           onPointerLeave={() => setColumn(null)}
           onFocusCapture={(event) => setColumn(event.target.closest<HTMLElement>('[data-column]')?.dataset.column ?? null)}
@@ -496,9 +488,6 @@ function MatrixView({ rows, names, selected, onPick, onStudent }: {
                     title={student.name} aria-label={`Ver detalle de ${student.name}`} onClick={() => onStudent(student.student_id)}>
                     <span className="matrix-student-name line-clamp-2 wrap-break-word">{names.get(student.student_id)}</span>
                   </button>
-                  <div className="matrix-student-summary">
-                    <MatrixGrade student={student} />
-                  </div>
                 </th>
               ))}
             </tr>
@@ -507,6 +496,13 @@ function MatrixView({ rows, names, selected, onPick, onStudent }: {
             {matrix.rows.map((row) => <MatrixRowView key={row.checkId} row={row} students={matrix.students}
               selected={selected} onPick={onPick} column={column} />)}
           </tbody>
+          <tfoot className="sticky bottom-0 z-20">
+            <tr>
+              <th scope="row" className="sticky left-0 z-30 border-r border-t border-border bg-secondary px-3 py-2 text-sm font-semibold">Nota</th>
+              {matrix.students.map(student => <td key={student.student_id} data-column={student.student_id}
+                className="border-t border-border bg-secondary px-2 py-2 text-center"><MatrixGrade student={student} /></td>)}
+            </tr>
+          </tfoot>
         </table>
       </div>
     </div>
@@ -521,12 +517,11 @@ function MatrixGrade({ student }: { student: StudentResult }) {
   const appearance = gradeAppearance(student, scale.passMark)
   const label = score.kind === 'provisional' ? 'Provisional' : appearance.label
   return (
-    <div className="mt-1.5" role="group" title={`${best.label || label} · ${best.origin || score.note}`}
+    <div className="matrix-grade" role="group" title={`${best.label || label} · ${best.origin || score.note}`}
       aria-label={`${student.name}: ${score.value === null ? 'sin nota' : `${score.text} sobre ${scale.max}`}, ${label}`}>
-      <span className={cn('text-xl font-semibold leading-6 tabular-nums', appearance.color)}>
+      <span className={cn('text-base font-semibold leading-6 tabular-nums', appearance.color)}>
         {score.value === null ? '—' : score.text}
       </span>
-      {score.value !== null && <span className="ml-0.5 text-xs font-normal text-muted-foreground">/{scale.max}</span>}
       {score.kind === 'provisional' && <span className="block text-micro font-normal text-warning-strong">Provisional</span>}
     </div>
   )
@@ -643,7 +638,7 @@ function MatrixRowView({
               title={`${student.name} · ${row.description} · ${STATUS_TEXT[check.status]}${check.cause !== 'NONE' ? ` · ${CAUSE_TEXT[check.cause]}` : ''}`}
               aria-label={`${student.name}, ${row.description}: ${STATUS_TEXT[check.status]}`}
               className={cn(
-                'inline-flex h-6 w-7 items-center justify-center rounded text-xs font-semibold transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+                'matrix-state inline-flex h-7 w-8 items-center justify-center rounded text-xs font-semibold transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                 matrixCellTone(check.status),
                 active && 'ring-2 ring-ring'
               )}
@@ -658,8 +653,8 @@ function MatrixRowView({
 }
 
 function matrixCellTone(status: AcademicStatus): string {
-  return status === 'PASS' ? 'bg-success/10 text-success-strong' : status === 'FAIL'
-    ? 'bg-destructive/10 text-destructive-strong' : 'bg-warning/15 text-warning-strong'
+  return status === 'PASS' ? 'bg-success text-success-foreground' : status === 'FAIL'
+    ? 'bg-destructive text-destructive-foreground' : 'bg-warning/15 text-warning-strong'
 }
 
 /** The three academic states, spelled out once above the grid. */
@@ -744,7 +739,7 @@ function ExportButton() {
 
   return (
     <div>
-      <Button variant="outline" size="sm" onClick={() => setConfirm(true)}>
+      <Button size="sm" onClick={() => setConfirm(true)}>
         <Download className="h-4 w-4" />
         {t.export.button}
       </Button>

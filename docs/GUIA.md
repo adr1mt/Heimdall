@@ -117,13 +117,13 @@ siempre se puede enseñar; una avería también.
 La lista y la matriz muestran aprobados en verde, suspensos en rojo y
 comprobaciones pendientes en ámbar. Pulsa el nombre de un alumno para ver
 sus comprobaciones agrupadas, y cada comprobación para abrir su evidencia.
-La búsqueda y los menús **Filtros** y **Alumnos** están disponibles también
-en el modo proyector. **Filtros** reúne los estados y el orden de alumnos. **Evaluados** muestra a quienes tienen evidencia de
+La búsqueda está en la cabecera. **Más opciones** (⋮) reúne filtros, orden,
+visibilidad de alumnos y acciones secundarias, también en el proyector. **Evaluados** muestra a quienes tienen evidencia de
 conexión con su máquina en la corrección abierta, incluidos los que quedaron
 incompletos. No equivale a tener nota final; una corrección que solo lee el
 inventario no demuestra conexión.
 
-Abre **Alumnos** y desmarca a quien quieras apartar de la lista y de la matriz,
+Abre **Más opciones → Alumnos** y desmarca a quien quieras apartar de la lista y de la matriz,
 por ejemplo si hoy no ha venido. Vuelve a marcarlo para recuperarlo o pulsa
 **Mostrar todos**. En la lista del profesor también tienes el ojo tachado.
 La selección se conserva al cambiar de vista, entrar o salir del proyector
@@ -283,9 +283,15 @@ completo. Los informes y exportaciones mantienen los nombres completos.
 La lista usa iconos para **Enviar informe** y **Ocultar**. La matriz conserva
 la columna de comprobaciones y las cabeceras
 al desplazarse dentro de ella; también puedes enfocarla con Tab y desplazarte
-con las flechas. Las cabeceras muestran nombre y nota; un guion indica que no
-hay nota, y una nota incompleta conserva la etiqueta **Provisional**. En Corregir, el contexto y el
+con las flechas. La cabecera de la matriz muestra los nombres y la fila **Nota**, al pie,
+muestra la nota principal. Un guion indica que no hay nota; la incompleta
+conserva la etiqueta **Provisional**. En Corregir, el contexto y el
 modo examen ocupan menos espacio y el progreso aparece antes del listado.
+
+En **Corregir**, la clase se elige junto al título. La tarjeta azul de modo
+examen ofrece el intervalo y la acción de inicio; debajo aparece toda la clase
+en filas compactas. Los detalles de la sesión están plegados. Cualquier error
+al recuperar la sesión se muestra también fuera del desplegable.
 
 ## Proyectar resultados y consultar informes desde Ubuntu Desktop
 
@@ -299,8 +305,9 @@ el ancho automático. El ajuste se conserva al cambiar de vista y corregir
 la misma clase. Las descripciones admiten dos líneas y su texto completo
 sigue en la ayuda y en el detalle.
 
-Mientras se corrige, se mantienen las últimas notas validadas. El reloj de
-la cabecera muestra solo el tiempo hasta la próxima corrección; mientras se
+Mientras se corrige, se mantienen las últimas notas validadas. La franja azul
+de modo examen reúne el reloj, Pausar/Reanudar y Finalizar examen. El reloj
+muestra solo el tiempo hasta la próxima corrección; mientras se
 corrige o se pausa, muestra ese estado. Si falla el arranque o la lectura, o se
 cancela, las notas anteriores siguen visibles y se muestra el aviso. Cambiar
 de examen o de clase limpia esos resultados para no confundir contextos.

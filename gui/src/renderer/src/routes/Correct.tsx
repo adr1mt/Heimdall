@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Download, FileText, Layers, Play, Square, Timer, Users } from 'lucide-react'
+import { Download, FileText, GraduationCap, Layers, Play, Radio, Square } from 'lucide-react'
 import {
   Badge,
   Button,
-  Card,
-  CardContent,
   ConfirmDialog,
   Meter,
   ProgressBar,
@@ -15,10 +13,10 @@ import {
 } from '@/components/ui'
 import { useApp, useScale, messageOf, noticeFrom } from '@/stores/app'
 import { useClasses, groupById } from '@/stores/classes'
-import { groupLine, type ClassGroup } from '../../../shared/classes'
+import type { ClassGroup } from '../../../shared/classes'
 import { useRun } from '@/stores/run'
 import { runPercent, type StudentProgress } from '@/lib/run-state'
-import { EXAM_INTERVALS, secondsLeft, type ExamMode } from '@/lib/exam'
+import { EXAM_INTERVALS, type ExamMode } from '@/lib/exam'
 import {
   SESSION_STATUS_TEXT,
   fromRoundText,
@@ -31,6 +29,7 @@ import { scoreView } from '@/lib/results'
 
 import { sessionCsv, sessionCsvName, sessionExportSummary, sessionGradeRows } from '@/lib/export'
 import { MoodleExportButton } from '@/components/MoodleExport'
+import { CorrectionClock } from '@/components/CorrectionClock'
 import { FinishExamButton } from '@/components/ExamSession'
 import { useExamRecord } from '@/stores/exam-record'
 import { pauseExam, resumeExam } from '@/lib/exam-actions'
@@ -172,6 +171,14 @@ export default function CorrectView() {
     <div className="correct-view flex h-full flex-col">
       <ViewHeader
         title={t.correct.title}
+        meta={groups.length > 0 ? <label className="class-selector">
+          <GraduationCap className="h-4 w-4" aria-hidden="true" />
+          <select aria-label={t.correct.classPick} disabled={busy || exam.active}
+            value={group?.id ?? ''} onChange={event => setClassId(event.target.value || null)}>
+            <option value="">{classId && !group ? t.correct.classGone : t.correct.classNone}</option>
+            {groups.map(other => <option key={other.id} value={other.id}>{other.name}</option>)}
+          </select>
+        </label> : <Button size="sm" variant="outline" onClick={() => setView('classes')}>{t.correct.goToClasses}</Button>}
         actions={
           busy ? (
             <Button
@@ -192,20 +199,12 @@ export default function CorrectView() {
         }
       />
       <div className="correct-content min-h-0 flex-1 space-y-3 overflow-auto p-4">
-        <div className="correct-context grid gap-3 md:grid-cols-2">
-          <ExamCard
-            name={examPath ? (described.exam?.name ?? t.home.unnamed) : null}
-            meta={described.exam?.checks == null ? null : t.home.examMeta(described.exam.checks)}
-            onOpen={() => setView('home')}
-          />
-          <ClassCard
-            group={group}
-            groups={groups}
-            missingClass={classId !== null && group === null}
-            disabled={busy || exam.active}
-            onChoose={setClassId}
-            onGoToClasses={() => setView('classes')}
-          />
+        <div className="correct-context flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
+          <FileText className="h-4 w-4 shrink-0" aria-hidden="true" />
+          {examPath ? <span className="truncate" title={described.exam?.name ?? examPath}>
+            {described.exam?.name ?? t.home.unnamed}
+            {described.exam?.checks != null && ` · ${t.home.examMeta(described.exam.checks)}`}
+          </span> : <Button variant="outline" size="sm" onClick={() => setView('home')}>{t.correct.goHome}</Button>}
         </div>
 
         {/* A retry is never silent: it says what it will repeat and it can be
@@ -231,16 +230,14 @@ export default function CorrectView() {
         />
         {group && !exam.active && run.phase === 'idle' && <PendingStudents group={group} />}
 
-        {exam.active && (
-          <>
-            <ExamStrip exam={exam} percent={percent} session={examSession.session} />
-          </>
-        )}
-
         {run.phase !== 'idle' && <RunPanel percent={percent} />}
 
         {exam.active && !examSession.session && run.students.length === 0 && group && <PendingStudents group={group} />}
-        {recordState !== 'FINALIZED' && <SessionPanel {...examSession} />}
+        {recordState !== 'FINALIZED' && examSession.problem && <p role="alert" className="text-sm text-destructive-strong">{examSession.problem}</p>}
+        {recordState !== 'FINALIZED' && examSession.rounds.length > 0 && <details className="session-details">
+          <summary className="cursor-pointer py-2 text-sm text-muted-foreground">Detalle de la sesión</summary>
+          <SessionPanel {...examSession} />
+        </details>}
       </div>
 
       <ConfirmDialog
@@ -254,112 +251,6 @@ export default function CorrectView() {
         {t.run.confirmBody}
       </ConfirmDialog>
     </div>
-  )
-}
-
-/** The exam being corrected, by its name. It is opened in Inicio. */
-function ExamCard({
-  name,
-  meta,
-  onOpen
-}: {
-  name: string | null
-  meta: string | null
-  onOpen: () => void
-}) {
-  return (
-    <Card>
-      <CardContent className="space-y-1 p-3">
-        <div className="flex items-center gap-2 text-micro uppercase tracking-[0.09em] text-muted-foreground">
-          <FileText className="h-4 w-4" />
-          {t.correct.exam}
-        </div>
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <div className="min-w-0">
-            <p className="wrap-break-word text-sm font-semibold">
-              {name ?? <span className="text-muted-foreground">{t.correct.examNone}</span>}
-            </p>
-            {name && meta && <p className="text-xs text-muted-foreground">{meta}</p>}
-          </div>
-          {!name && (
-            <Button variant="outline" size="sm" onClick={onOpen}>
-              {t.correct.goHome}
-            </Button>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-/**
- * The class being corrected, by its name.
- *
- * What the teacher recognises is «2SMX A · 15 alumnos», and that is all there
- * is to choose: the classroom the engine reads is written from this class
- * before every correction and never appears on screen (ADR-0022).
- */
-function ClassCard({
-  group,
-  groups,
-  missingClass,
-  disabled,
-  onChoose,
-  onGoToClasses
-}: {
-  group: ClassGroup | null
-  groups: ClassGroup[]
-  /** A class was chosen and is no longer there. */
-  missingClass: boolean
-  disabled: boolean
-  onChoose: (id: string | null) => void
-  onGoToClasses: () => void
-}) {
-  return (
-    <Card>
-      <CardContent className="space-y-1 p-3">
-        <div className="flex items-center gap-2 text-micro uppercase tracking-[0.09em] text-muted-foreground">
-          <Users className="h-4 w-4" />
-          {t.correct.classroom}
-        </div>
-
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <p className="min-w-0 wrap-break-word text-sm font-semibold">
-            {group ? (
-              groupLine(group)
-            ) : (
-              <span className="text-muted-foreground">
-                {missingClass ? t.correct.classGone : t.correct.classNone}
-              </span>
-            )}
-          </p>
-          {groups.length === 0 ? (
-            <Button variant="outline" size="sm" onClick={onGoToClasses}>
-              {t.correct.goToClasses}
-            </Button>
-          ) : (
-            <select
-              aria-label={t.correct.classPick}
-              disabled={disabled}
-              value={group?.id ?? ''}
-              onChange={(e) => onChoose(e.target.value || null)}
-              className="h-9 rounded-md border border-input bg-background px-2 text-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
-            >
-              <option value="">{t.correct.classNone}</option>
-              {groups.map((other) => (
-                <option key={other.id} value={other.id}>
-                  {other.name}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-
-        {groups.length === 0 && (
-          <p className="text-xs text-muted-foreground">{t.correct.classEmpty}</p>
-        )}
-      </CardContent>
-    </Card>
   )
 }
 
@@ -383,104 +274,30 @@ function ExamControl({
   const paused = useExamRecord(s => s.saved?.record.state === 'PAUSED')
   const changing = useExamRecord(s => s.changing)
 
-  return (
-    <section
-      className="exam-control flex flex-wrap items-center gap-x-4 gap-y-2 rounded-md border border-border bg-card p-3"
-      aria-label="Modo examen"
-    >
-      <h2 className="flex shrink-0 items-center gap-2 text-sm font-semibold">
-        <Timer className="h-4 w-4 text-primary" />
-        Modo examen
-      </h2>
-      <p className="exam-control-description min-w-0 flex-1 text-xs text-muted-foreground">
-        Reevalúa la clase automáticamente. Se conserva la mejor nota completa de cada alumno.
-      </p>
-      {!exam.active && (
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs">Intervalo:</span>
-          <Segmented>
-            {EXAM_INTERVALS.map((value) => (
-              <SegmentedItem
-                key={value}
-                active={value === minutes}
-                disabled={disabled}
-                onClick={() => setMinutes(value)}
-              >
-                {value} min
-              </SegmentedItem>
-            ))}
-          </Segmented>
-        </div>
-      )}
-      <FinishExamButton />
-      <Button
-        size="sm"
-        variant="outline"
-        disabled={changing || (!exam.active && disabled)}
-        onClick={() => (exam.active ? onStop() : onStart(minutes))}
-      >
-        <Timer className="h-4 w-4" />
-        {exam.active ? 'Pausar' : paused ? 'Reanudar' : 'Iniciar modo examen'}
-      </Button>
-    </section>
-  )
-}
-
-/**
- * What is going on while the exam lasts, in the five readings that answer it
- * without opening anything: which round this is, how long until the next one,
- * how many students are still being corrected, how many have finished and how
- * far the round in flight has got.
- *
- * The countdown is what says the mode is still on between two rounds; the
- * finished ones are the engine's word (ADR-0020), never counted here.
- */
-function ExamStrip({
-  exam,
-  percent,
-  session
-}: {
-  exam: ExamMode
-  percent: number | null
-  session: Session | null
-}) {
-  const [left, setLeft] = useState<number | null>(null)
-
-  useEffect(() => {
-    const tick = (): void => setLeft(secondsLeft(exam, Date.now()))
-    tick()
-    const timer = setInterval(tick, 1000)
-    return () => clearInterval(timer)
-  }, [exam])
-
-  const tally = session ? sessionTally(session) : null
-  const active = session ? session.students.filter(student => student.status !== 'EXCLUDED').length : null
-
-  return (
-    <div className="exam-strip grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-5">
-      <Reading
-        value={String(exam.passes)}
-        label={t.exam.roundLabel}
-        hint={t.exam.ofMinutes(exam.everyMinutes)}
-      />
-      <Reading
-        value={
-          left === null
-            ? t.exam.nowCorrecting
-            : left >= 60
-              ? `${Math.ceil(left / 60)} min`
-              : `${left} s`
-        }
-        label={t.exam.nextLabel}
-      />
-      <Reading
-        value={active === null ? '—' : String(Math.max(active, 0))}
-        label={t.exam.activeLabel}
-      />
-      <Reading value={tally === null ? '—' : String(tally.finished)} label={t.exam.finishedLabel} />
-      <Reading value={percent === null ? '—' : `${percent}%`} label={t.exam.progressLabel} />
+  return <section className={`exam-control ${exam.active ? 'exam-control-active' : ''}`} aria-label="Modo examen">
+    <div className="flex flex-wrap items-center gap-3">
+      <h2 className="flex items-center gap-2 text-lg font-semibold"><Radio className="h-5 w-5 text-primary" />Modo examen</h2>
+      {(exam.active || paused) && <div className="ml-auto"><CorrectionClock /></div>}
     </div>
-  )
+    {!exam.active && <>
+      <p className="mt-1 text-sm text-muted-foreground">Corrige automáticamente y conserva la mejor nota completa de cada alumno.</p>
+      <div className="exam-interval my-4 flex flex-wrap items-center gap-3">
+        <span className="text-sm text-muted-foreground">Intervalo</span>
+        <Segmented aria-label="Intervalo entre correcciones">
+          {EXAM_INTERVALS.map(value => <SegmentedItem key={value} active={value === minutes}
+            disabled={disabled} onClick={() => setMinutes(value)}>{value} min</SegmentedItem>)}
+        </Segmented>
+      </div>
+    </>}
+    <div className="exam-control-actions mt-3 flex flex-wrap gap-2">
+      <Button size="sm" variant="outline" className={!exam.active ? 'exam-start w-full' : undefined}
+        disabled={changing || (!exam.active && disabled)}
+        onClick={() => exam.active ? onStop() : onStart(minutes)}>
+        <Radio className="h-4 w-4" />{exam.active ? 'Pausar' : paused ? 'Reanudar' : 'Iniciar modo examen'}
+      </Button>
+      <FinishExamButton />
+    </div>
+  </section>
 }
 
 /** The roster is visible before the first correction, just as in Teuton GUI. */
@@ -489,14 +306,13 @@ function PendingStudents({ group }: { group: ClassGroup }) {
     <section className="space-y-2">
       <SectionTitle>
         Alumnos a evaluar{' '}
-        <span className="ml-2 text-muted-foreground">{group.students.length}</span>
+        <span className="ml-3 font-normal text-muted-foreground">Toda la clase · {group.students.length}</span>
       </SectionTitle>
-      <p className="text-xs text-muted-foreground">Se evaluará toda la clase.</p>
       <div className="pending-students grid gap-1.5">
         {group.students.map((student, index) => (
           <div
             key={student.id}
-            className="flex items-center gap-3 rounded border border-border px-3 py-2 text-sm"
+            className="pending-student flex items-center gap-3 rounded-md border border-border px-3 py-2 text-sm"
           >
             <span className="text-xs text-muted-foreground">{index + 1}</span>
             {student.name}
@@ -504,16 +320,6 @@ function PendingStudents({ group }: { group: ClassGroup }) {
         ))}
       </div>
     </section>
-  )
-}
-
-function Reading({ value, label, hint }: { value: string; label: string; hint?: string }) {
-  return (
-    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 bg-background px-3 py-2">
-      <div className="text-xl font-semibold tabular-nums">{value}</div>
-      <div className="text-micro uppercase tracking-[0.09em] text-muted-foreground">{label}</div>
-      {hint && <div className="text-xs text-muted-foreground">{hint}</div>}
-    </div>
   )
 }
 
@@ -563,8 +369,8 @@ function useExamSession(): {
 }
 
 /**
- * The exam as a whole, student by student. It is read once, by the view, and
- * shown in two places: the strip up top and this panel.
+ * Optional session evidence, folded while the teacher operates the correction.
+ * Loading errors are also surfaced outside this panel by the parent.
  */
 function SessionPanel({
   rounds,
@@ -759,7 +565,7 @@ function RunPanel({ percent }: { percent: number | null }) {
       {run.students.length > 0 && (
         <div className="space-y-2">
           <SectionTitle>{t.run.classTitle}</SectionTitle>
-          <div className="grid gap-2 md:grid-cols-2">
+          <div className="running-students grid gap-2 md:grid-cols-3">
             {run.students.map((student) => (
               <StudentRow
                 key={student.studentId}
@@ -797,7 +603,7 @@ function StudentRow({ student, checks }: { student: StudentProgress; checks: num
           : undefined
 
   return (
-    <div className="space-y-1.5 rounded-md border border-border p-3">
+    <div className="space-y-1 rounded-md border border-border px-3 py-2">
       <div className="flex items-center justify-between gap-2">
         <span className="min-w-0 wrap-break-word text-sm font-medium">{student.name}</span>
         <Badge variant={badge}>{label}</Badge>
@@ -805,9 +611,6 @@ function StudentRow({ student, checks }: { student: StudentProgress; checks: num
       {!student.excluded && (
         <>
           <Meter value={student.done} total={checks} tone={tone} />
-          <p className="text-micro text-muted-foreground">
-            {t.run.counts(student.pass, student.fail, student.unevaluated)}
-          </p>
         </>
       )}
     </div>

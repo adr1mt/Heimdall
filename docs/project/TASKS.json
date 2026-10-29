@@ -5191,6 +5191,40 @@
       ],
       "completed": "2026-10-29",
       "notes": "Resultados sin resúmenes ni franjas de explicación; reloj compacto, filtros/visibilidad plegados, matriz con nombre/nota y separador arrastrable/accesible. Proyector sin porcentajes y Encajar usa el ancho disponible sin realimentación de escala. 643 pruebas GUI, tipos/build/preload, make check/docs-check/tools-check correctos. Electron con datos ficticios verifica arrastre real, teclado, mejor nota, pausa/cierre, filtros, fallos y ajuste a 1024/1366/1920. Evidencia: docs/reviews/evidence/T223/RESULTADOS.md. Sin instalación, push ni publicación."
+    },
+    {
+      "id": "T224",
+      "title": "Acercar Corregir y Resultados a las referencias visuales de aula",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T223"
+      ],
+      "goal": "Aplicar las capturas facilitadas por Adrià: modo examen reconocible, alumnado compacto y matriz clara con notas al pie, reduciendo controles visibles.",
+      "scope": [
+        "Corregir: contexto compacto, tarjeta azul de modo examen y listado de alumnos en tres columnas sin resúmenes repetidos.",
+        "Resultados: búsqueda y acciones principales en cabecera, controles secundarios agrupados, franja azul de examen y matriz con estados sólidos y nota al pie.",
+        "Conservar pausa/finalización, notas, avisos, detalle, visibilidad, filtros secundarios, arrastre y ajuste a pantalla."
+      ],
+      "out_of_scope": [
+        "Motor, reglas de evaluación, selección parcial de alumnos, intervalos nuevos, instalación, push y publicación."
+      ],
+      "acceptance": [
+        "Corregir muestra clase/contexto sin dos tarjetas redundantes; tarjeta de examen reconocible con intervalos existentes y acción clara; alumnos compactos y detalles de sesión plegados con errores visibles.",
+        "Resultados presenta búsqueda y acciones principales en una cabecera; filtros, visibilidad e informes quedan accesibles en opciones secundarias. No reaparecen estadísticas ni explicaciones retiradas en T223.",
+        "Franja azul de examen con reloj y acciones de pausa/finalización, conservando los estados en curso/pausa y avisos de error.",
+        "Matriz con nombres en cabecera, estados de alto contraste y nota principal en fila inferior; provisional y sin nota distinguibles, detalle y separador ajustable conservados.",
+        "Ajuste a pantalla sin porcentajes sigue cubriendo alumnos y comprobaciones, incluida la fila de notas, y aprovecha el ancho.",
+        "Interacciones y capturas a 1366×768/1920×1080 y proyector 1024×768; pruebas GUI, tipos/build, motor y documentación correctos."
+      ],
+      "tests": [
+        "make check",
+        "make gui-check gui-build",
+        "Arnés Electron con datos ficticios de Corregir y Resultados"
+      ],
+      "completed": "2026-10-29",
+      "notes": "Referencias visuales de Adrià aplicadas a ambas pantallas: tarjeta azul, contexto y alumnos compactos; matriz sólida con nombres arriba y notas al pie. Opciones secundarias agrupadas; franja de examen y leyenda del proyector legible. 643 pruebas GUI en serie, tipos/build/preload, make check/docs-check/tools-check correctos. Electron verifica interacciones, arrastre, pausa/cierre y ajuste a 1024/1366/1920 con datos ficticios. Evidencia: docs/reviews/evidence/T224/RESULTADOS.md. Sin instalar, push ni publicación."
     }
   ]
 }

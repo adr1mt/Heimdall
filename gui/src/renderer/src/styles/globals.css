@@ -296,14 +296,14 @@
 .teacher-display[open] > div { position: fixed; left: 0.75rem; bottom: 7rem; }
 .teacher-results {
   --matrix-check-width: clamp(15rem, 24vw, 22rem);
-  --matrix-student-width: 6.5rem;
+  --matrix-student-width: 4.25rem;
 }
 .teacher-results .student-list { grid-template-columns: repeat(auto-fit, minmax(min(100%, 32rem), 1fr)); }
 .teacher-results .student-row { border-bottom-color: hsl(var(--border)); border-radius: 0; }
 .teacher-results .student-row-main { min-height: 3.25rem; }
 .teacher-results .student-grade { align-items: center; gap: 0.5rem; }
 .teacher-results .student-grade > span:first-child { font-size: 0.6875rem; }
-.teacher-results .matrix-viewport { max-height: max(12rem, calc(100dvh - 13rem)); scrollbar-gutter: stable; }
+.teacher-results .matrix-viewport { max-height: max(12rem, calc(100dvh - 14rem)); scrollbar-gutter: stable; }
 .teacher-results .results-matrix thead th { padding-block: 0.375rem; }
 .teacher-results .results-matrix thead button { height: auto; min-height: 2rem; }
 .teacher-results .matrix-student-name { display: block; -webkit-line-clamp: unset; }
@@ -327,13 +327,12 @@
 .results-option-trigger:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }
 /* Fixed placement escapes both scrolling results and the scaled projector. */
 .results-options-panel { position: fixed; left: max(1rem, calc((100vw - 48rem) / 2)); right: 1rem; top: 9rem; z-index: 50; max-width: 46rem; max-height: calc(100dvh - 10rem); overflow: auto; border: 1px solid hsl(var(--border)); border-radius: 0.5rem; padding: 0.75rem; background: hsl(var(--popover)); color: hsl(var(--popover-foreground)); box-shadow: 0 8px 24px hsl(var(--foreground) / 0.12); }
-.results-matrix tbody th { container-type: inline-size; }
-.case-name { font-size: clamp(1rem, 4.5cqi, 1.5rem); font-weight: 500; line-height: 1.25; }
+.case-name { font-size: 1rem; font-weight: 500; line-height: 1.25; }
 .matrix-resizer { position: absolute; right: -5px; top: 0; bottom: 0; z-index: 40; width: 10px; cursor: col-resize; touch-action: none; }
 .matrix-resizer::after { content: ''; position: absolute; top: 0; bottom: 0; left: 4px; width: 2px; background: hsl(var(--border)); }
 .matrix-resizer:hover::after, .matrix-resizer:focus-visible::after, .matrix-resizer[data-dragging]::after { background: hsl(var(--primary)); }
 .matrix-resizer:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }
-.projector-content { --matrix-student-width: 6rem; }
+.projector-content { --matrix-student-width: 4.5rem; }
 .projector-content .case-name { font-size: 1rem; line-height: 1.25; }
 .projector-content .results-matrix thead button { height: auto; min-height: 2rem; }
 .projector-content .matrix-student-summary > div { margin-top: 0; }
@@ -342,3 +341,40 @@
 .projector-fit .results-matrix th { position: relative; }
 .projector-fit .results-matrix tbody th { padding-block: 1px; }
 .projector-fit .results-matrix tbody td { padding-block: 1px; }
+
+/* Classroom references: one clear exam block and a compact, legible roster. */
+.class-selector { display: inline-flex; align-items: center; gap: 0.375rem; max-width: 15rem; padding: 0.25rem 0.5rem; border-radius: 0.5rem; color: hsl(var(--primary)); background: hsl(var(--primary) / 0.08); }
+.class-selector select { min-width: 0; max-width: 12rem; background: transparent; color: inherit; font-size: 0.875rem; font-weight: 600; }
+.class-selector select:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }
+.class-selector option { color: hsl(var(--foreground)); background: hsl(var(--background)); }
+.correct-view .view-header h1, .results-view .view-header h1 { font-size: 1.0625rem; }
+.correct-view .exam-control { width: 100%; max-width: 50rem; padding: 1rem 1.25rem; border: 1px solid hsl(var(--primary) / 0.3); border-radius: 0.75rem; background: hsl(var(--primary) / 0.045); }
+.correct-view .exam-start { min-height: 2.5rem; border-color: hsl(var(--primary) / 0.5); background: transparent; }
+.correct-view .exam-start:hover { background: hsl(var(--primary) / 0.08); }
+.correct-view .pending-students { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+.correct-view .pending-student { min-height: 2.5rem; }
+.correct-view .pending-student > span { min-width: 1.5rem; }
+.correct-view .correct-context { padding-block: 0.25rem; }
+.exam-banner { display: flex; flex-wrap: wrap; flex-shrink: 0; align-items: center; gap: 0.5rem 0.75rem; padding: 0.5rem 1rem; border-bottom: 1px solid hsl(var(--primary) / 0.2); background: hsl(var(--primary) / 0.08); font-size: 0.875rem; }
+.exam-banner .correction-timer { padding: 0 0.5rem; min-height: 2rem; background: transparent; font-size: 1.75rem; }
+.exam-banner .correction-timer svg { width: 1.125rem; height: 1.125rem; }
+.exam-banner button { background: hsl(var(--background)); }
+.exam-banner button:last-of-type { color: hsl(var(--primary-foreground)); background: hsl(var(--primary)); }
+.results-view .results-options-panel { top: 4rem; max-height: calc(100dvh - 5rem); }
+.results-view .results-matrix thead th { padding-block: 0.5rem; }
+.results-view .results-matrix thead button { min-height: 1.5rem; height: auto; font-size: 0.875rem; font-weight: 600; }
+.results-view .results-matrix tfoot th, .results-view .results-matrix tfoot td { padding-block: 0.5rem; }
+.results-view .results-matrix tbody th { padding-block: 0.25rem; }
+.results-view .results-matrix tbody td { padding-block: 0.125rem; }
+.results-view .results-matrix { background: hsl(var(--card)); }
+.results-view .results-matrix tbody th, .results-view .results-matrix thead th { background: hsl(var(--card)); }
+.results-view .results-matrix tbody tr:hover th { background: hsl(var(--secondary)); }
+.projector-fit .results-matrix tfoot { position: relative; }
+@media (max-width: 850px) {
+  .correct-view .pending-students { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .correct-view .pending-students { grid-template-columns: minmax(0, 1fr); }
+}
+
+.projector-content .results-body { padding: 0.5rem 0.75rem; }

@@ -35,7 +35,7 @@ export function FinishExamButton() {
   </Button>
 }
 
-export function ExamSessionActions() {
+export function ExamSessionActions({ placement = 'all' }: { placement?: 'all' | 'session' }) {
   const { saved, problem, finishing, changing } = useExamRecord()
   const active = useApp(s => s.exam.active)
   const busy = useRun(s => s.phase === 'running' || s.phase === 'starting')
@@ -44,9 +44,9 @@ export function ExamSessionActions() {
     {active && <Button size="sm" variant="outline" disabled={finishing} onClick={() => void pauseExam()}>Pausar</Button>}
     {!active && saved?.record.state === 'PAUSED' && <Button size="sm" variant="outline" disabled={busy || finishing || changing} onClick={() => void resumeExam(useApp.getState().exam.everyMinutes)}>Reanudar</Button>}
     <FinishExamButton />
-    {saved?.record.state === 'FINALIZED'
+    {placement !== 'session' && (saved?.record.state === 'FINALIZED'
       ? <Button size="sm" variant="outline" onClick={() => useExamRecord.setState({ showFinals: true })}>Notas finales</Button>
-      : (saved || problem) && <Button size="sm" variant="outline" onClick={() => setOpen(true)}>Mejores notas</Button>}
+      : (saved || problem) && <Button size="sm" variant="outline" onClick={() => setOpen(true)}>Mejores notas</Button>)}
     <ConfirmDialog open={open} title="Mejores notas" cancelLabel="Cerrar" onCancel={() => setOpen(false)}>
       {problem && <p role="alert">{problem}</p>}
       {saved && <GradesTable saved={saved} />}

@@ -4,12 +4,12 @@
 
 ## Última sesión
 
-**T223 listo, pendiente de instalar:** Resultados centrados en la tabla,
-sin estadísticas ni explicaciones permanentes. Reloj con cuenta atrás,
-filtros/visibilidad plegados, cabeceras compactas y ancho arrastrable.
-Proyector sin porcentajes; Encajar aprovecha el ancho disponible.
-643 pruebas GUI, tipos/build/preload, motor y herramientas correctos;
-Electron a 1024/1366/1920 con datos ficticios. [Evidencia](../reviews/evidence/T223/RESULTADOS.md).
+**T224 listo, pendiente de instalar junto a T223:** Corregir y Resultados
+siguen las capturas de Adrià: tarjeta azul de examen, alumnos compactos,
+matriz con colores sólidos y notas al pie; búsqueda y opciones agrupadas.
+Franja con reloj, proyector ajustable y leyenda legible. 643 pruebas GUI,
+tipos/build/preload, motor y herramientas correctos; Electron a
+1024/1366/1920 con datos ficticios. [Evidencia](../reviews/evidence/T224/RESULTADOS.md).
 **Instalación vigente T222: T220/T221**, paquete y arranque verificados;
 copia anterior recuperable. [Instalación](../reviews/evidence/T222/RESULTADOS.md).
 
@@ -57,4 +57,4 @@ Las compilaciones posteriores conservan el número nominal; no son publicación.
 
 T070 READY: T204 reparó solo RA1.
 T084 espera prueba de aula de Adrià. T023 y T186 siguen READY.
-T223 pendiente de instalar; sin publicación autorizada para los cambios nuevos.
+T223/T224 pendientes de instalar; sin publicación autorizada para los cambios nuevos.
