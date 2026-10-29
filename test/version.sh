@@ -3,7 +3,7 @@
 #
 # The number lives in VERSION at the root. The engine is stamped with it by
 # `make build`; the application carries it in its package.json, because that is
-# what electron-builder names the package with. Two places, one number: this
+# what the Linux packager names the artifacts with. Two places, one number: this
 # checks they have not drifted apart, and that the binary in bin/ is a stamped
 # build and not a stray `go build`.
 set -uo pipefail

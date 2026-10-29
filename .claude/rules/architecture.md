@@ -42,7 +42,7 @@ que describe el sistema; esto describe **qué no se puede hacer**.
 ## Dependencias
 
 Permitidas en el módulo Go: `golang.org/x/crypto/ssh`, un parser YAML
-(`gopkg.in/yaml.v3`), un generador de ULID. **Cualquier otra requiere un ADR.**
+(`go.yaml.in/yaml/v3`, sucesor mantenido de `gopkg.in/yaml.v3`; ADR-0041), un generador de ULID. **Cualquier otra requiere un ADR.**
 
 ## Estructura del módulo
 

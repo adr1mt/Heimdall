@@ -1,0 +1,24 @@
+cd gui && HEIMDALL_ENGINE=/mnt/datos/Applications/heimdall/bin/heimdall LAB_SECRET=HEIMDALL_SECRET_TEST_12345 npm run --silent editor-lab
+
+  ../../../../../tmp/heimdall-editor-lab.mjs  211.4kb
+
+⚡ Done in 14ms
+Screenshot: 02-corregir
+Screenshot: 01-editor-yaml
+[255960:1029/125933.982275:ERROR:ui/gfx/x/atom_cache.cc:236] Add application/vnd.portal.filetransfer to kAtomsToCache
+[255960:1029/125933.982421:ERROR:ui/gfx/x/atom_cache.cc:236] Add application/vnd.portal.files to kAtomsToCache
+Screenshot: 01b-validacion
+Screenshot: 03-resultados-lista
+Screenshot: 04-resultados-matriz
+Screenshot: 05-detalle-alumno
+Screenshot: 06-analiticas
+Screenshot: 07-ajustes
+Screenshot: 08-ayuda
+Screenshot: 09-clase
+Screenshot: 10-proyector
+Screenshot: 11-matriz-clara
+Screenshot: 12-editor-claro
+Screenshot: 13-incidencia-tecnica
+Screenshot: 13b-analiticas-incidencia
+Screenshot: 14-modo-examen
+{"grades":[100,80,60,40,20],"offlineGrade":null,"ok":true,"base":"/tmp/heimdall-ui-Decpl0","checks":["YAML editor offline and syntax colours","paste, Ctrl+S and byte preservation","unsaved guard","invalid draft does not overwrite","malformed source reopens for repair","real SSH correction, five students","list, matrix and student detail","analytics, help, grading preview","default port hidden; custom port and shared user survive save and reopen","light and dark themes","projector","offline student","automatic exam resumption and pause"],"consoleErrors":[]}

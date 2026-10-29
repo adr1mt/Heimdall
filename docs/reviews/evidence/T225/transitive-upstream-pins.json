@@ -1,0 +1,610 @@
+[
+  {
+    "package": "@babel/code-frame",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.6",
+    "dependent": "@babel/core",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/code-frame"
+  },
+  {
+    "package": "@babel/code-frame",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.6",
+    "dependent": "@babel/template",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/code-frame"
+  },
+  {
+    "package": "@babel/code-frame",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.6",
+    "dependent": "@babel/traverse",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/code-frame"
+  },
+  {
+    "package": "@babel/compat-data",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.5",
+    "dependent": "@babel/helper-compilation-targets",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/compat-data"
+  },
+  {
+    "package": "@babel/core",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.9",
+    "dependent": "@babel/helper-module-transforms",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/core"
+  },
+  {
+    "package": "@babel/core",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.9",
+    "dependent": "@babel/plugin-transform-arrow-functions",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/core"
+  },
+  {
+    "package": "@babel/core",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.9",
+    "dependent": "electron-vite",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/core"
+  },
+  {
+    "package": "@babel/generator",
+    "current": "7.29.8",
+    "wanted": "7.29.8",
+    "latest": "8.0.6",
+    "dependent": "@babel/core",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/generator"
+  },
+  {
+    "package": "@babel/generator",
+    "current": "7.29.8",
+    "wanted": "7.29.8",
+    "latest": "8.0.6",
+    "dependent": "@babel/traverse",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/generator"
+  },
+  {
+    "package": "@babel/helper-compilation-targets",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.7",
+    "dependent": "@babel/core",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/helper-compilation-targets"
+  },
+  {
+    "package": "@babel/helper-globals",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.6",
+    "dependent": "@babel/traverse",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/helper-globals"
+  },
+  {
+    "package": "@babel/helper-module-imports",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.0",
+    "dependent": "@babel/helper-module-transforms",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/helper-module-imports"
+  },
+  {
+    "package": "@babel/helper-module-transforms",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.6",
+    "dependent": "@babel/core",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/helper-module-transforms"
+  },
+  {
+    "package": "@babel/helper-plugin-utils",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.1",
+    "dependent": "@babel/plugin-transform-arrow-functions",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/helper-plugin-utils"
+  },
+  {
+    "package": "@babel/helper-string-parser",
+    "current": "7.29.11",
+    "wanted": "7.29.11",
+    "latest": "8.0.8",
+    "dependent": "@babel/types",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/helper-string-parser"
+  },
+  {
+    "package": "@babel/helper-validator-identifier",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.6",
+    "dependent": "@babel/code-frame",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/helper-validator-identifier"
+  },
+  {
+    "package": "@babel/helper-validator-identifier",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.6",
+    "dependent": "@babel/helper-module-transforms",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/helper-validator-identifier"
+  },
+  {
+    "package": "@babel/helper-validator-identifier",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.6",
+    "dependent": "@babel/types",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/helper-validator-identifier"
+  },
+  {
+    "package": "@babel/helper-validator-option",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.0",
+    "dependent": "@babel/helper-compilation-targets",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/helper-validator-option"
+  },
+  {
+    "package": "@babel/helpers",
+    "current": "7.29.10",
+    "wanted": "7.29.10",
+    "latest": "8.0.8",
+    "dependent": "@babel/core",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/helpers"
+  },
+  {
+    "package": "@babel/parser",
+    "current": "7.29.11",
+    "wanted": "7.29.11",
+    "latest": "8.0.8",
+    "dependent": "@babel/core",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/parser"
+  },
+  {
+    "package": "@babel/parser",
+    "current": "7.29.11",
+    "wanted": "7.29.11",
+    "latest": "8.0.8",
+    "dependent": "@babel/generator",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/parser"
+  },
+  {
+    "package": "@babel/parser",
+    "current": "7.29.11",
+    "wanted": "7.29.11",
+    "latest": "8.0.8",
+    "dependent": "@babel/template",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/parser"
+  },
+  {
+    "package": "@babel/parser",
+    "current": "7.29.11",
+    "wanted": "7.29.11",
+    "latest": "8.0.8",
+    "dependent": "@babel/traverse",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/parser"
+  },
+  {
+    "package": "@babel/plugin-transform-arrow-functions",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.1",
+    "dependent": "electron-vite",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/plugin-transform-arrow-functions"
+  },
+  {
+    "package": "@babel/template",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.0",
+    "dependent": "@babel/core",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/template"
+  },
+  {
+    "package": "@babel/template",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.0",
+    "dependent": "@babel/helpers",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/template"
+  },
+  {
+    "package": "@babel/template",
+    "current": "7.29.7",
+    "wanted": "7.29.7",
+    "latest": "8.0.0",
+    "dependent": "@babel/traverse",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/template"
+  },
+  {
+    "package": "@babel/traverse",
+    "current": "7.29.10",
+    "wanted": "7.29.10",
+    "latest": "8.0.7",
+    "dependent": "@babel/core",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/traverse"
+  },
+  {
+    "package": "@babel/traverse",
+    "current": "7.29.10",
+    "wanted": "7.29.10",
+    "latest": "8.0.7",
+    "dependent": "@babel/helper-module-imports",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/traverse"
+  },
+  {
+    "package": "@babel/traverse",
+    "current": "7.29.10",
+    "wanted": "7.29.10",
+    "latest": "8.0.7",
+    "dependent": "@babel/helper-module-transforms",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/traverse"
+  },
+  {
+    "package": "@babel/types",
+    "current": "7.29.11",
+    "wanted": "7.29.11",
+    "latest": "8.0.8",
+    "dependent": "@babel/core",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/types"
+  },
+  {
+    "package": "@babel/types",
+    "current": "7.29.11",
+    "wanted": "7.29.11",
+    "latest": "8.0.8",
+    "dependent": "@babel/generator",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/types"
+  },
+  {
+    "package": "@babel/types",
+    "current": "7.29.11",
+    "wanted": "7.29.11",
+    "latest": "8.0.8",
+    "dependent": "@babel/helper-module-imports",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/types"
+  },
+  {
+    "package": "@babel/types",
+    "current": "7.29.11",
+    "wanted": "7.29.11",
+    "latest": "8.0.8",
+    "dependent": "@babel/helpers",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/types"
+  },
+  {
+    "package": "@babel/types",
+    "current": "7.29.11",
+    "wanted": "7.29.11",
+    "latest": "8.0.8",
+    "dependent": "@babel/parser",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/types"
+  },
+  {
+    "package": "@babel/types",
+    "current": "7.29.11",
+    "wanted": "7.29.11",
+    "latest": "8.0.8",
+    "dependent": "@babel/template",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/types"
+  },
+  {
+    "package": "@babel/types",
+    "current": "7.29.11",
+    "wanted": "7.29.11",
+    "latest": "8.0.8",
+    "dependent": "@babel/traverse",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/types"
+  },
+  {
+    "package": "@oxc-project/types",
+    "current": "0.155.0",
+    "wanted": "0.155.0",
+    "latest": "0.156.0",
+    "dependent": "rolldown",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@oxc-project/types"
+  },
+  {
+    "package": "@types/node",
+    "current": "24.19.2",
+    "wanted": "24.19.2",
+    "latest": "26.6.6",
+    "dependent": "electron",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/electron/node_modules/@types/node"
+  },
+  {
+    "package": "balanced-match",
+    "current": "4.0.4",
+    "wanted": "4.0.4",
+    "latest": "5.0.0",
+    "dependent": "brace-expansion",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/balanced-match"
+  },
+  {
+    "package": "commander",
+    "current": "9.5.0",
+    "wanted": "9.5.0",
+    "latest": "15.0.0",
+    "dependent": "postject",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/commander"
+  },
+  {
+    "package": "env-paths",
+    "current": "3.0.0",
+    "wanted": "3.0.0",
+    "latest": "4.0.0",
+    "dependent": "@electron/get",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/env-paths"
+  },
+  {
+    "package": "err-code",
+    "current": "2.0.3",
+    "wanted": "2.0.3",
+    "latest": "3.0.1",
+    "dependent": "promise-retry",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/err-code"
+  },
+  {
+    "package": "es-module-lexer",
+    "current": "2.3.2",
+    "wanted": "2.3.2",
+    "latest": "3.0.4",
+    "dependent": "vitest",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/es-module-lexer"
+  },
+  {
+    "package": "filename-reserved-regex",
+    "current": "3.0.0",
+    "wanted": "3.0.0",
+    "latest": "4.1.0",
+    "dependent": "filenamify",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/filename-reserved-regex"
+  },
+  {
+    "package": "filenamify",
+    "current": "6.0.0",
+    "wanted": "6.0.0",
+    "latest": "7.0.3",
+    "dependent": "@electron/packager",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/filenamify"
+  },
+  {
+    "package": "glob",
+    "current": "13.0.6",
+    "wanted": "13.0.6",
+    "latest": "14.0.3",
+    "dependent": "@electron/asar",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/glob"
+  },
+  {
+    "package": "isbinaryfile",
+    "current": "4.0.10",
+    "wanted": "4.0.10",
+    "latest": "6.0.0",
+    "dependent": "@electron/osx-sign",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/isbinaryfile"
+  },
+  {
+    "package": "isexe",
+    "current": "2.0.0",
+    "wanted": "2.0.0",
+    "latest": "4.0.0",
+    "dependent": "which",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/isexe"
+  },
+  {
+    "package": "js-tokens",
+    "current": "4.0.0",
+    "wanted": "4.0.0",
+    "latest": "10.0.0",
+    "dependent": "@babel/code-frame",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/js-tokens"
+  },
+  {
+    "package": "lightningcss",
+    "current": "1.32.0",
+    "wanted": "1.32.0",
+    "latest": "1.33.0",
+    "dependent": "@tailwindcss/node",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/lightningcss"
+  },
+  {
+    "package": "lightningcss-linux-x64-gnu",
+    "current": "1.32.0",
+    "wanted": "1.32.0",
+    "latest": "1.33.0",
+    "dependent": "lightningcss",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/lightningcss-linux-x64-gnu"
+  },
+  {
+    "package": "lru-cache",
+    "current": "5.1.1",
+    "wanted": "5.1.1",
+    "latest": "11.5.3",
+    "dependent": "@babel/helper-compilation-targets",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/lru-cache"
+  },
+  {
+    "package": "magic-string",
+    "current": "0.30.21",
+    "wanted": "0.30.21",
+    "latest": "1.4.5",
+    "dependent": "@tailwindcss/node",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/magic-string"
+  },
+  {
+    "package": "marked",
+    "current": "14.0.0",
+    "wanted": "14.0.0",
+    "latest": "18.1.2",
+    "dependent": "monaco-editor",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/marked"
+  },
+  {
+    "package": "minimatch",
+    "current": "10.2.6",
+    "wanted": "10.2.6",
+    "latest": "11.0.3",
+    "dependent": "@electron/asar",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/minimatch"
+  },
+  {
+    "package": "minimatch",
+    "current": "10.2.6",
+    "wanted": "10.2.6",
+    "latest": "11.0.3",
+    "dependent": "glob",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/minimatch"
+  },
+  {
+    "package": "nanoid",
+    "current": "3.3.20",
+    "wanted": "3.3.20",
+    "latest": "6.0.2",
+    "dependent": "postcss",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/nanoid"
+  },
+  {
+    "package": "path-key",
+    "current": "3.1.1",
+    "wanted": "3.1.1",
+    "latest": "4.0.0",
+    "dependent": "cross-spawn",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/path-key"
+  },
+  {
+    "package": "path-scurry",
+    "current": "2.0.2",
+    "wanted": "2.0.2",
+    "latest": "3.0.0",
+    "dependent": "glob",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/path-scurry"
+  },
+  {
+    "package": "pe-library",
+    "current": "1.0.1",
+    "wanted": "1.0.1",
+    "latest": "2.0.1",
+    "dependent": "resedit",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/pe-library"
+  },
+  {
+    "package": "plist",
+    "current": "3.1.1",
+    "wanted": "3.1.1",
+    "latest": "5.0.0",
+    "dependent": "@electron/osx-sign",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/plist"
+  },
+  {
+    "package": "plist",
+    "current": "3.1.1",
+    "wanted": "3.1.1",
+    "latest": "5.0.0",
+    "dependent": "@electron/packager",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/plist"
+  },
+  {
+    "package": "plist",
+    "current": "3.1.1",
+    "wanted": "3.1.1",
+    "latest": "5.0.0",
+    "dependent": "@electron/universal",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/plist"
+  },
+  {
+    "package": "resedit",
+    "current": "2.0.3",
+    "wanted": "2.0.3",
+    "latest": "3.1.0",
+    "dependent": "@electron/packager",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/resedit"
+  },
+  {
+    "package": "retry",
+    "current": "0.12.0",
+    "wanted": "0.12.0",
+    "latest": "0.13.1",
+    "dependent": "promise-retry",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/retry"
+  },
+  {
+    "package": "semver",
+    "current": "6.3.1",
+    "wanted": "6.3.1",
+    "latest": "7.8.5",
+    "dependent": "@babel/core",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/core/node_modules/semver"
+  },
+  {
+    "package": "semver",
+    "current": "6.3.1",
+    "wanted": "6.3.1",
+    "latest": "7.8.5",
+    "dependent": "@babel/helper-compilation-targets",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/@babel/helper-compilation-targets/node_modules/semver"
+  },
+  {
+    "package": "shebang-regex",
+    "current": "3.0.0",
+    "wanted": "3.0.0",
+    "latest": "4.0.0",
+    "dependent": "shebang-command",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/shebang-regex"
+  },
+  {
+    "package": "undici",
+    "current": "7.30.1",
+    "wanted": "7.30.1",
+    "latest": "8.12.3",
+    "dependent": "@electron/get",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/undici"
+  },
+  {
+    "package": "undici-types",
+    "current": "8.9.0",
+    "wanted": "8.9.0",
+    "latest": "8.12.3",
+    "dependent": "@types/node",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/undici-types"
+  },
+  {
+    "package": "undici-types",
+    "current": "7.24.6",
+    "wanted": "7.24.6",
+    "latest": "8.12.3",
+    "dependent": "@types/node",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/electron/node_modules/undici-types"
+  },
+  {
+    "package": "which",
+    "current": "2.0.2",
+    "wanted": "2.0.2",
+    "latest": "7.0.0",
+    "dependent": "cross-spawn",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/which"
+  },
+  {
+    "package": "why-is-node-running",
+    "current": "3.2.1",
+    "wanted": "3.2.1",
+    "latest": "3.2.3",
+    "dependent": "vitest",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/why-is-node-running"
+  },
+  {
+    "package": "yallist",
+    "current": "3.1.1",
+    "wanted": "3.1.1",
+    "latest": "5.0.0",
+    "dependent": "lru-cache",
+    "location": "/mnt/datos/Applications/heimdall/gui/node_modules/yallist"
+  }
+]

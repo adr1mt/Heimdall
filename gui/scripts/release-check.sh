@@ -19,4 +19,9 @@ if unshare -Ur true 2>/dev/null; then
 else
   echo 'Sandbox real: entorno sin user namespaces; pendiente de comprobar en otro equipo.'
 fi
+dpkg-deb --extract "$DEB" "$WORK/deb"
+for file in resources/app.asar resources/heimdall AppRun; do
+  cmp "$WORK/squashfs-root/$file" "$WORK/deb/opt/Heimdall/$file"
+done
+node "$ROOT/gui/scripts/smoke-package.mjs" "$WORK/deb/opt/Heimdall/AppRun" auto
 (cd "$ROOT/gui/dist" && sha256sum "Heimdall-$VERSION.AppImage" "Heimdall-$VERSION.deb" > SHA256SUMS && sha256sum -c SHA256SUMS)

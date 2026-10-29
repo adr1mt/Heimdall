@@ -49,15 +49,15 @@ function inlineCsp(): Plugin {
 export default defineConfig({
   main: {
     build: {
-      rollupOptions: {
-        input: { index: resolve(__dirname, 'src/main/index.ts') }
+      rolldownOptions: {
+        input: { index: resolve(import.meta.dirname, 'src/main/index.ts') }
       }
     }
   },
   preload: {
     build: {
-      rollupOptions: {
-        input: { index: resolve(__dirname, 'src/preload/index.ts') },
+      rolldownOptions: {
+        input: { index: resolve(import.meta.dirname, 'src/preload/index.ts') },
         // Los preload ESM solo funcionan sin sandbox. Mantenemos el renderer
         // aislado y emitimos un único CommonJS explícito para Electron.
         output: { format: 'cjs', entryFileNames: '[name].cjs' }
@@ -68,13 +68,13 @@ export default defineConfig({
     root: 'src/renderer',
     resolve: {
       alias: {
-        '@': resolve(__dirname, 'src/renderer/src'),
-        '@shared': resolve(__dirname, 'src/shared')
+        '@': resolve(import.meta.dirname, 'src/renderer/src'),
+        '@shared': resolve(import.meta.dirname, 'src/shared')
       }
     },
     build: {
-      rollupOptions: {
-        input: { index: resolve(__dirname, 'src/renderer/index.html') }
+      rolldownOptions: {
+        input: { index: resolve(import.meta.dirname, 'src/renderer/index.html') }
       }
     },
     plugins: [react(), tailwindcss(), inlineCsp()]

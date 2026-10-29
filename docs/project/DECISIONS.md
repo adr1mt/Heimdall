@@ -1147,3 +1147,21 @@ las opciones de sesión siguen disponibles también en el menú secundario.
 El detalle de sesión se pliega, pero sus errores se anuncian fuera. La leyenda
 del proyector permanece fuera de la escala para conservar su legibilidad.
 Evidencia: `docs/reviews/evidence/T224/RESULTADOS.md`. Sin instalación ni push.
+
+## T225 · Dependencias actuales y empaquetado mantenido · 2026-10-29
+
+Petición expresa de Adrià: migrar todas las dependencias a las últimas versiones
+estables y eliminar paquetes deprecated y vulnerabilidades conocidas. Se migra
+a React 19, TypeScript 7, Vite 8, Vitest 5, Zustand 5, Electron 45 y Go 1.27.3;
+Node 26.13.0 y npm 12.2.1 fijados para desarrollar y CI. Los cambios de API de
+Monaco, js-yaml, TypeScript y Vite se aplican sin cambiar el contrato ni las notas.
+El parser YAML Go usa el sucesor mantenido en lugar del repositorio archivado.
+Se sustituye electron-builder: su última versión sigue arrastrando bibliotecas
+obsoletas de otras plataformas. `@electron/packager` más herramientas Linux
+conservan AppImage/deb, nombre, perfil y motor, con verificación del contenido.
+El runtime oficial AppImage queda fijado por asset y SHA-256. Monaco necesita
+DOMPurify 3.4.17 mediante override específico; no se baja el editor a una versión
+anterior ni se desactiva la auditoría. Se retira la excepción npm de build.
+Ver ADR-0041 y `docs/reviews/evidence/T225/RESULTADOS.md` para versiones,
+comprobaciones y el aviso OpenPGP no importado del módulo SSH oficial.
+Sin publicar, push ni sustituir la aplicación habitual o datos del usuario.

@@ -46,7 +46,7 @@ function registerCsp(): void {
   })
 }
 
-/** Window icon. When packaged, electron-builder leaves it in `resources/`. */
+/** Window icon. When packaged, the packager leaves it in `resources/`. */
 function iconPath(): string {
   return app.isPackaged
     ? join(process.resourcesPath, 'icon.png')

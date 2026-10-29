@@ -4,7 +4,7 @@
 Reads `src/renderer/src/assets/logo.png` (the character shown inside the
 application) and writes `build/icon.png` (512x512, the one the Electron window
 and taskbar use) and `build/icons/<n>x<n>.png` in the sizes the .deb package
-and the AppImage install -- electron-builder reads the size off the file name,
+and the AppImage install -- the Linux packager reads the size off the file name,
 so the folder has to name them exactly like that.
 
 The logo is not square: it is trimmed to its visible pixels and centred on a

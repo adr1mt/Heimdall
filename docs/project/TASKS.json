@@ -5225,6 +5225,39 @@
       ],
       "completed": "2026-10-29",
       "notes": "Referencias visuales de Adrià aplicadas a ambas pantallas: tarjeta azul, contexto y alumnos compactos; matriz sólida con nombres arriba y notas al pie. Opciones secundarias agrupadas; franja de examen y leyenda del proyector legible. 643 pruebas GUI en serie, tipos/build/preload, make check/docs-check/tools-check correctos. Electron verifica interacciones, arrastre, pausa/cierre y ajuste a 1024/1366/1920 con datos ficticios. Evidencia: docs/reviews/evidence/T224/RESULTADOS.md. Sin instalar, push ni publicación."
+    },
+    {
+      "id": "T225",
+      "title": "Migrar dependencias y herramientas a las últimas versiones estables sin avisos de seguridad ni obsolescencia",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T224"
+      ],
+      "goal": "Actualizar íntegramente el árbol de dependencias, compiladores y automatización de Heimdall; eliminar dependencias obsoletas y vulnerabilidades conocidas sin alterar la evaluación ni las sesiones.",
+      "scope": [
+        "Inventario de versiones estables actuales, migraciones de GUI, motor y empaquetado.",
+        "Instalación reproducible de Electron y scripts necesarios; auditoría estricta sin excepciones.",
+        "Validación de tipos, suites, compilación, interfaz real y paquetes Linux con datos ficticios."
+      ],
+      "out_of_scope": [
+        "Actualizar aplicaciones o paquetes globales del sistema, modificar datos reales, publicar, push o reinstalar la aplicación habitual."
+      ],
+      "acceptance": [
+        "Dependencias directas y herramientas mantenidas apuntan a las últimas versiones estables consultadas, con evidencia de fecha y versiones.",
+        "Instalación limpia reproducible sin dependencias marcadas deprecated; npm audit completo y de producción con cero vulnerabilidades.",
+        "Go y dependencias actualizados; govulncheck sin vulnerabilidades alcanzables.",
+        "Migraciones verificadas con make check, gui-check, gui-build, docs-check, tools-check y arnés Electron; AppImage y deb compilados y arranque aislado verificado.",
+        "CI rechaza cualquier aviso de vulnerabilidad o paquete deprecated, sin la antigua excepción de build; documentación y criterios de arranque actualizados."
+      ],
+      "tests": [
+        "make check gui-check gui-build docs-check tools-check",
+        "npm ci; npm outdated; npm audit; govulncheck",
+        "Empaquetado Linux y arnés Electron aislado"
+      ],
+      "notes": "Dependencias directas en @latest, npm outdated vacío; 0 vulnerabilidades npm (completo/producción), 0 deprecated y scripts revisados. Go 1.27.3, YAML mantenido, React 19, TS 7, Vite 8, Vitest 5, Zustand 5 y Electron 45; empaquetado sustituido por packager oficial y herramientas Linux. 643 pruebas GUI, tipos/build/preload, make check/test/race, editor real, UI 1024/1366/1920, AppImage sandbox/fallback/auto, deb extraído y deb instalado/desinstalado en Ubuntu 24.04/26.04 correctos. Govulncheck sin funciones/paquetes importados vulnerables; aviso OpenPGP no importado del módulo SSH documentado. Dependencias internas respetan rangos upstream; sin overrides de mayores incompatibles. Evidencia docs/reviews/evidence/T225/RESULTADOS.md; ADR-0041. Sin push, publicación ni instalación habitual.",
+      "completed": "2026-10-29"
     }
   ]
 }

@@ -12,24 +12,22 @@ concurrency:
 
 jobs:
   packages:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-go@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-go@v7.0.0
         with:
           go-version-file: go.mod
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.1.0
         with:
-          node-version: '24'
+          node-version: '26.13.0'
           cache: npm
           cache-dependency-path: gui/package-lock.json
       - name: Install lab and package prerequisites
-        run: sudo apt-get update && sudo apt-get install -y podman jq xvfb libgtk-3-0t64 libnss3 libasound2t64
+        run: sudo apt-get update && sudo apt-get install -y podman jq xvfb squashfs-tools libgtk-3-0t64 libnss3 libasound2t64
+      - run: npm install --global npm@12.2.1
       - run: npm ci
-        working-directory: gui
-      - name: Install Electron runtime for UI harnesses
-        run: node node_modules/electron/install.js
         working-directory: gui
       - run: make gui-check gui-build docs-check tools-check
       - run: go test -race ./...

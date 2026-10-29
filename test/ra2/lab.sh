@@ -16,10 +16,13 @@ die() { echo "ra2/lab: $*" >&2; exit 1; }
 
 up() {
   command -v podman >/dev/null || die "podman not found"
+  local want have
+  want=$(sha256sum "$HERE/Containerfile" | cut -c1-16)
   for m in "${MACHINES[@]}"; do
     IFS=: read -r name variant port <<<"$m"
-    podman image exists "$IMAGE_PREFIX-$variant" || \
-      podman build -t "$IMAGE_PREFIX-$variant" --build-arg "VARIANT=$variant" -f "$HERE/Containerfile" "$HERE"
+    have=$(podman image inspect -f '{{index .Labels "heimdall.containerfile"}}' "$IMAGE_PREFIX-$variant" 2>/dev/null || true)
+    [ "$want" = "$have" ] || \
+      podman build --label "heimdall.containerfile=$want" -t "$IMAGE_PREFIX-$variant" --build-arg "VARIANT=$variant" -f "$HERE/Containerfile" "$HERE"
     # NET_ADMIN: the lab creates the dummy enp2s0 the exam reads.
     # --systemd=always: the exam asks systemctl whether named is running.
     podman run -d --replace --name "$name" --hostname "$name" \

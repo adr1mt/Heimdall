@@ -1,0 +1,8 @@
+python3 -B -m unittest discover -s test/tools -p 'test_*.py'
+...........
+----------------------------------------------------------------------
+Ran 11 tests in 0.130s
+
+OK
+python3 scripts/check_doc_links.py
+Enlaces locales correctos en 117 documentos mantenidos (sin comprobar anclas).

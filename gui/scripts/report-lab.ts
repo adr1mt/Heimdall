@@ -135,15 +135,15 @@ app
       webPreferences: { preload: resolve('out/preload/index.cjs'), sandbox: true, contextIsolation: true, nodeIntegration: false }
     })
     const consoleErrors: string[] = []
-    win.webContents.on('console-message', (_e, level, message) => {
-      if (level >= 2) consoleErrors.push(message)
+    win.webContents.on('console-message', (event) => {
+      if (event.level === 'error' || event.level === 'warning') consoleErrors.push(event.message)
     })
     await win.loadFile(resolve('out/renderer/index.html'))
     await until("!![...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Abrir…')", 'home')
     await click('Abrir…')
-    await until("!!document.querySelector('select')", 'class chooser')
+    await until("!!document.querySelector('.class-selector select')", 'class chooser')
     await js(
-      `(()=>{const e=document.querySelector('select[aria-label]');Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,'value').set.call(e,'demo');e.dispatchEvent(new Event('change',{bubbles:true}));})()`
+      `(()=>{const e=document.querySelector('.class-selector select');Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,'value').set.call(e,'demo');e.dispatchEvent(new Event('change',{bubbles:true}));})()`
     )
     await delay(400)
     await click('Corregir', 'header button')

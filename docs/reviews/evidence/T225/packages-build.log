@@ -1,0 +1,106 @@
+go build -ldflags "-X main.version=1.0.1" -o bin/heimdall ./cmd/heimdall
+cd gui && npm run dist
+npm notice run heimdall-gui@1.0.1 dist
+npm notice run npm run build && node scripts/package-linux.mjs && node scripts/verify-package.mjs
+npm notice run heimdall-gui@1.0.1 build
+npm notice run electron-vite build && npm run verify:preload
+vite v8.3.5 building ssr environment for production...
+transforming...
+✓ 39 modules transformed.
+rendering chunks...
+out/main/index.js  137.43 kB
+
+✓ built in 49ms
+vite v8.3.5 building ssr environment for production...
+transforming...
+✓ 3 modules transformed.
+rendering chunks...
+out/preload/index.cjs  4.92 kB
+
+✓ built in 5ms
+vite v8.3.5 building client environment for production...
+transforming...
+✓ 2805 modules transformed.
+rendering chunks...
+out/renderer/index.html                               1.36 kB
+out/renderer/assets/logo-BBd1nwCm.png               271.22 kB
+out/renderer/assets/editor.worker-BWgavr07.js       597.84 kB
+out/renderer/assets/index-WcoS5EyD.css               65.70 kB
+out/renderer/assets/YamlEditor-CXfYqUZ6.css         132.60 kB
+out/renderer/assets/plus-DST51YF6.js                  0.51 kB
+out/renderer/assets/rotate-ccw-Bxaj6ulh.js            0.57 kB
+out/renderer/assets/shield-check-DUeGW9H6.js          0.70 kB
+out/renderer/assets/classes-DlRlrI_c.js               0.80 kB
+out/renderer/assets/ReportAccessHelp-0CjMp9fE.js      2.12 kB
+out/renderer/assets/summary-XWcXzey3.js               3.56 kB
+out/renderer/assets/yaml-CguZPduS.js                  4.62 kB
+out/renderer/assets/Editor-BLKD4Zmc.js                7.83 kB
+out/renderer/assets/Settings-pxSJ25dy.js              7.91 kB
+out/renderer/assets/Home-BRiLBgsc.js                 10.02 kB
+out/renderer/assets/Analytics-DG-UMemh.js            14.89 kB
+out/renderer/assets/Help-_dheGFCA.js                 17.73 kB
+out/renderer/assets/History-BZ4BQUYa.js              18.13 kB
+out/renderer/assets/jsx-runtime-Dq8_Q5KF.js          19.11 kB
+out/renderer/assets/Correct-BAQMVFYv.js              26.72 kB
+out/renderer/assets/ExamSession-DbuId919.js          33.85 kB
+out/renderer/assets/Classes-CQke4BhI.js              45.10 kB
+out/renderer/assets/exam-0rKWDmCK.js                102.49 kB
+out/renderer/assets/Results-D-SW_yOm.js             108.50 kB
+out/renderer/assets/ui-iXj4NO1F.js                  114.72 kB
+out/renderer/assets/index-CcyFrw06.js               648.02 kB
+out/renderer/assets/YamlEditor-G09kxut2.js        4,993.00 kB
+
+✓ built in 524ms
+npm notice run heimdall-gui@1.0.1 verify:preload
+npm notice run node scripts/verify-preload.mjs
+Preload sandboxed verificado: CommonJS único y ruta correcta.
+mksquashfs version 4.6.1 (2023/03/25)
+copyright (C) 2023 Phillip Lougher <phillip@squashfs.org.uk>
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2,
+or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+Debian 'dpkg-deb' package archive backend version 1.22.6 (amd64).
+This is free software; see the GNU General Public License version 2 or
+later for copying conditions. There is NO warranty.
+Packaging app for platform linux x64 using electron v45.1.0
+Parallel mksquashfs: Using 2 processors
+Creating 4.0 filesystem on /tmp/heimdall-package-dGPEiv/payload.squashfs, block size 131072.
+[====================|                                         ]  800/2379  33%[==============================================\               ] 1800/2379  75%[=============================================================\] 2379/2379 100%
+
+Exportable Squashfs 4.0 filesystem, zstd compressed, data block size 131072
+	compressed data, compressed metadata, compressed fragments,
+	no xattrs, compressed ids
+	duplicates are removed
+Filesystem size 119977.13 Kbytes (117.17 Mbytes)
+	39.91% of uncompressed filesystem size (300638.25 Kbytes)
+Inode table size 6681 bytes (6.52 Kbytes)
+	55.90% of uncompressed inode table size (11952 bytes)
+Directory table size 751 bytes (0.73 Kbytes)
+	53.87% of uncompressed directory table size (1394 bytes)
+Number of duplicate files found 2
+Number of inodes 81
+Number of files 78
+Number of fragments 34
+Number of symbolic links 0
+Number of device nodes 0
+Number of fifo nodes 0
+Number of socket nodes 0
+Number of directories 3
+Number of hard-links 0
+Number of ids (unique uids + gids) 1
+Number of uids 1
+	root (0)
+Number of gids 1
+	root (0)
+AppImage runtime version: https://github.com/AppImage/type2-runtime/commit/fedfad5
+dpkg-deb: building package 'heimdall-gui' in '/mnt/datos/Applications/heimdall/gui/dist/Heimdall-1.0.1.deb.pending'.
+Created /mnt/datos/Applications/heimdall/gui/dist/Heimdall-1.0.1.AppImage
+Created /mnt/datos/Applications/heimdall/gui/dist/Heimdall-1.0.1.deb
+Package content: 29 compiled files, engine, icon, profile identity, CSP and two production dependencies verified

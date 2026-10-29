@@ -63,7 +63,7 @@ inválida · `3` ejecución parcial · `4` cancelado.
 
 ## Herramientas
 
-La versión mínima de Go está en `go.mod`; Node 24 y Python 3 completan el
+La versión mínima de Go está en `go.mod`; Node 26.13.0, npm 12.2.1 y Python 3 completan el
 entorno de desarrollo. Desde `gui/`, `npm ci` instala las dependencias fijadas
 por `package-lock.json`. Si Go está instalado fuera del PATH, se puede indicar
 su ejecutable con `make GO=/ruta/a/go check`.
@@ -99,7 +99,7 @@ heimdall check ./examen-ra2                      # valida sin tocar ninguna máq
 heimdall run --secrets=stdin ./examen-ra2        # corrige
 ```
 
-Dependencias del módulo: `x/crypto/ssh` y `yaml.v3`. Ninguna más —los
+Dependencias del módulo: `x/crypto/ssh` y `go.yaml.in/yaml/v3`. Ninguna más —los
 identificadores de ejecución los genera el propio motor—, y cualquier añadido
 necesita un [ADR](adr/).
 
@@ -201,12 +201,27 @@ versiones ni etiquetas publicadas. Para la reparación 1.0.1, Adrià autoriza
 expresamente publicar con T084 pendiente y realizar él después la prueba de
 aula (T202, 2026-10-22). Esta excepción no equivale a una validación de aula.
 
-La política npm de `scripts/check_npm_audit.py` solo admite el aviso moderado
-GHSA-hp3w-g68c-fv3c de sprintf-js y su cadena conocida de construcción, siempre
-que todos sus nodos sean dependencias dev. Cualquier aviso nuevo, más grave,
-fuera de esa cadena, presente en producción o una consulta incompleta bloquea
-la comprobación. La excepción se revisa en cada publicación y se retira cuando
-el empaquetador tenga una corrección compatible; no se ejecuta audit fix --force.
+La política npm de `scripts/check_npm_audit.py` rechaza cualquier vulnerabilidad
+conocida, también de desarrollo, cualquier dependencia `deprecated` en el lock y
+las consultas incompletas. No hay excepciones ni `audit fix --force`.
+El empaquetado usa `@electron/packager`, `mksquashfs` y `dpkg-deb`; el runtime
+AppImage oficial se fija por ID de asset y SHA-256. La verificación del paquete
+compara todos los archivos compilados y el motor, comprueba CSP/preload y limita
+las bibliotecas de ejecución a `js-yaml` y `argparse` (ADR-0041).
 Govulncheck bloquea vulnerabilidades alcanzables, y deja visibles las de módulos
 o paquetes no usados. No examina el Node incorporado en Electron: T201 conserva
-esa evaluación separada.
+esa evaluación separada. T225 actualiza a Electron 45.1.0 (Node 24.22.1,
+Chromium 156.0.8078.49). El aviso GO-2026-5932 es de `x/crypto/openpgp`, un
+paquete que no se importa ni se incluye en el binario; no tiene parche upstream.
+
+### Dependencias y arranque actualizados (T225)
+
+La versión de Node está en `.nvmrc`. Con un gestor compatible, usa
+`nvm install` y `nvm use` desde la raíz; instala npm 12.2.1 en ese entorno.
+Desde `gui/`, `npm ci` instala automáticamente Electron y `npm run dev` abre
+la aplicación. `npm outdated` no debe mostrar dependencias directas atrasadas.
+La política `allowScripts` solo aprueba el instalador de esbuild revisado;
+Electron se instala explícitamente desde el postinstall del proyecto.
+Para empaquetar en Linux x64 se requieren `squashfs-tools` y `dpkg` además
+de Go, Node y npm. `make gui-dist` crea y verifica AppImage y `.deb`, sin
+instalarlos ni publicarlos. Véase [ADR-0041](adr/0041-dependencias-y-empaquetado-mantenidos.md).

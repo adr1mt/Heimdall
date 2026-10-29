@@ -12,6 +12,12 @@ for release in 24.04 26.04; do
       DEBIAN_FRONTEND=noninteractive apt-get install -y /tmp/heimdall.deb > /tmp/install.log 2>&1 || { cat /tmp/install.log; exit 1; }
       test "$(dpkg-query -W -f="\${Version}" heimdall-gui)" = "$EXPECTED_VERSION"
       engine=$(dpkg -L heimdall-gui | sed -n "/\/resources\/heimdall$/p")
+      command -v xdg-open
+      if ldd /opt/Heimdall/heimdall-gui | grep -q "not found"; then
+        echo "Electron has missing shared libraries" >&2; exit 1
+      fi
+      test -x /usr/bin/heimdall-gui
+      test "$(readlink -f /usr/bin/heimdall-gui)" = /opt/Heimdall/AppRun
       test -x "$engine"
       test "$("$engine" version)" = "heimdall $EXPECTED_VERSION"
       dpkg --remove heimdall-gui

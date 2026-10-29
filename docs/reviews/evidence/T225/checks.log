@@ -1,0 +1,106 @@
+cd gui && npm run typecheck && npm test
+npm notice run heimdall-gui@1.0.1 typecheck
+npm notice run npm run typecheck:node && npm run typecheck:web && npm run typecheck:test
+npm notice run heimdall-gui@1.0.1 typecheck:node
+npm notice run tsc --noEmit -p tsconfig.node.json --composite false
+npm notice run heimdall-gui@1.0.1 typecheck:web
+npm notice run tsc --noEmit -p tsconfig.web.json --composite false
+npm notice run heimdall-gui@1.0.1 typecheck:test
+npm notice run tsc --noEmit -p tsconfig.test.json
+npm notice run heimdall-gui@1.0.1 test
+npm notice run vitest run
+
+ RUN  v5.0.5 /mnt/datos/Applications/heimdall/gui
+
+
+ Test Files  47 passed (47)
+      Tests  643 passed (643)
+   Start at  12:11:50
+   Duration  2.71s (tests 56%, transform 33%, import 9%, worker 2%)
+
+python3 scripts/check_doc_links.py
+Enlaces locales correctos en 116 documentos mantenidos (sin comprobar anclas).
+python3 -B -m unittest discover -s test/tools -p 'test_*.py'
+..........
+----------------------------------------------------------------------
+Ran 10 tests in 0.161s
+
+OK
+python3 -B -m unittest discover -s test/exams/ra1 -p 'test_*.py'
+.....No se pudo comprobar: PermissionError: fixture access denied
+.......No se pudo comprobar: PermissionError: denied
+.Kea rechaza su configuración: kend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+INFO backend registered
+
+Error encountered: subnet configuration failed: pool outside subnet
+No se pudo comprobar: Unavailable: Kea no puede abrir su configuración; revisa permisos/AppArmor: 
+Syntax check failed with: Unable to open file /etc/kea/kea-dhcp4.conf
+No se pudo comprobar: Unavailable: Kea no puede abrir su configuración; revisa permisos/AppArmor: Syntax check failed with: Unable to open file /etc/kea/include.conf
+
+..No se pudo comprobar: PermissionError: denied
+No se pudo comprobar: Unavailable: unsupported
+bad config
+...............
+----------------------------------------------------------------------
+Ran 30 tests in 0.045s
+
+OK
+FAIL

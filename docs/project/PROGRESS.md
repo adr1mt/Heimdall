@@ -4,6 +4,12 @@
 
 ## Última sesión
 
+**T225 terminado:** dependencias directas en sus últimas versiones
+estables; React 19, TypeScript 7, Vite 8, Vitest 5, Zustand 5, Electron 45
+y Go 1.27.3. npm sin vulnerabilidades/deprecated ni scripts pendientes.
+Nuevo empaquetado Linux; 643 pruebas GUI, motor/SSH y editor real correctos.
+[Evidencia](../reviews/evidence/T225/RESULTADOS.md).
+
 **T224 listo, pendiente de instalar junto a T223:** Corregir y Resultados
 siguen las capturas de Adrià: tarjeta azul de examen, alumnos compactos,
 matriz con colores sólidos y notas al pie; búsqueda y opciones agrupadas.
@@ -19,17 +25,10 @@ Cambiar criterios separa registros automáticamente. Finalizar espera la activa,
 fija las notas válidas y abre una lista limpia de alumno/mejor nota, también
 al reabrir. Histórico por sesiones; informes confirmados y reintentos con estado
 por alumno, sin afectar notas por SSH. Exportación CSV/Moodle conservada.
-642 pruebas GUI, tipos/build/preload, motor, docs/herramientas correctos;
-Electron a 1080p/768p, laboratorio nativo y reapertura real con perfil ficticio.
 [Evidencia](../reviews/evidence/T221/RESULTADOS.md).
 [Decisión](../adr/0040-pausa-explicita-y-lista-final.md).
 
-T220 incluido en T221: [mejores notas e informes](../reviews/evidence/T220/RESULTADOS.md).
-**Instalación anterior T219:** interfaz compacta, nombres y escala persistente.
-Motor RA1 v2 T218 idéntico; copia anterior y push verificados.
-[Instalación](../reviews/evidence/T219/RESULTADOS.md).
-T197/T202: pública 1.0.1, [publicación](../releases/1.0.1/PUBLICACION.md).
-Las compilaciones posteriores conservan el número nominal; no son publicación.
+T197/T202: pública 1.0.1; los builds posteriores no son publicación.
 
 ## Problemas conocidos y límites
 
@@ -50,8 +49,9 @@ Las compilaciones posteriores conservan el número nominal; no son publicación.
 - Linux x64. AppImage/.deb. Editor conserva texto; Monaco diferido local.
 - Informe normal exige fuentes vigentes; final usa fuentes conservadas verificadas.
 - Un informe con la contraseña de la clase no se envía.
-- Electron 43.8.3 incorpora Node 24.22.0; actualizador mitigado, runtime pendiente.
-- npm: 8 moderados de build con excepción específica.
+- Electron 45.1.0 incorpora Node 24.22.1; herramientas Node 26.13.0/npm 12.2.1.
+- Go: aviso OpenPGP del módulo SSH, sin importar ni incluir ese paquete.
+- Dependencias internas respetan las versiones compatibles fijadas upstream.
 
 ## Siguiente trabajo
 

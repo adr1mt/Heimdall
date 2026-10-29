@@ -10,7 +10,7 @@ import { registerIpc } from '../src/main/ipc'
 const base = mkdtempSync(join(tmpdir(), 'heimdall-ui-'))
 const project = join(base, 'redes-demo')
 const profile = join(base, 'profile')
-const out = resolve('../docs/reviews/evidence/T178-T183')
+const out = resolve(process.env.HEIMDALL_UI_EVIDENCE || '../docs/reviews/evidence/T178-T183')
 mkdirSync(project)
 mkdirSync(profile)
 mkdirSync(out, { recursive: true })
@@ -108,8 +108,9 @@ async function shot(name: string) {
   writeFileSync(join(out, `${name}.txt`), await text())
 }
 async function choose(id: string) {
+  await until("!!document.querySelector('.class-selector select')", 'class selector ready')
   await js(
-    `(()=>{const e=document.querySelector('select[aria-label]');Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,'value').set.call(e,${JSON.stringify(id)});e.dispatchEvent(new Event('change',{bubbles:true}));})()`
+    `(()=>{const e=document.querySelector('.class-selector select');Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,'value').set.call(e,${JSON.stringify(id)});e.dispatchEvent(new Event('change',{bubbles:true}));})()`
   )
   await delay(400)
 }
@@ -126,7 +127,7 @@ async function typeYaml(value: string) {
   win.webContents.sendInputEvent({ type: 'keyUp', keyCode: 'a', modifiers: ['control'] })
   // Exercise Monaco's paste handler without reading or changing the desktop clipboard.
   await js(
-    `(()=>{const data=new DataTransfer();data.setData('text/plain',${JSON.stringify(value)});document.querySelector('.monaco-editor textarea').dispatchEvent(new ClipboardEvent('paste',{clipboardData:data,bubbles:true,cancelable:true}));})()`
+    `(()=>{const data=new DataTransfer();data.setData('text/plain',${JSON.stringify(value)});document.activeElement.dispatchEvent(new ClipboardEvent('paste',{clipboardData:data,bubbles:true,cancelable:true}));})()`
   )
   await delay(400)
 }
@@ -160,8 +161,8 @@ app
       }
     })
     const consoleErrors: string[] = []
-    win.webContents.on('console-message', (_event, level, message) => {
-      if (level >= 2) consoleErrors.push(message)
+    win.webContents.on('console-message', (event) => {
+      if (event.level === 'error' || event.level === 'warning') consoleErrors.push(event.message)
     })
     await win.loadFile(resolve('out/renderer/index.html'))
     await until(
@@ -169,10 +170,10 @@ app
       'home'
     )
     await click('Abrir…')
-    await until("!!document.querySelector('select')", 'class chooser')
+    await until("!!document.querySelector('.class-selector select')", 'class chooser')
     await choose('demo')
     await shot('02-corregir')
-    assert.match(await text(), /Alumnos a evaluar/)
+    assert.equal(await js("document.querySelectorAll('.pending-student').length"), 5)
     assert.match(await text(), /Iniciar modo examen/)
     await click('El examen', 'aside button')
     await until("!!document.querySelector('.monaco-editor textarea')", 'offline YAML editor')
@@ -185,7 +186,7 @@ app
     assert.match(await text(), /Hay cambios sin guardar/)
     // Cancel preserves the draft.
     await click('Cancelar')
-    await js("document.querySelector('.monaco-editor textarea').focus()")
+    await js("(document.querySelector('.monaco-editor .native-edit-context') ?? document.querySelector('.monaco-editor textarea')).focus()")
     await saveKey()
     assert.equal(readFileSync(join(project, 'examen.yaml'), 'utf8'), changed)
     await typeYaml(changed + '\nfoo: [\n')
@@ -227,9 +228,10 @@ app
     await shot('08-ayuda')
     assert.equal(
       await js('document.querySelectorAll(\'nav[aria-label="Índice de ayuda"] a\').length'),
-      13
+      14
     )
     await click('Clases', 'aside button')
+    await until("[...document.querySelectorAll('main button')].some(b=>b.textContent.includes('Clase habitual'))", 'class list loaded')
     await js(
       "[...document.querySelectorAll('main button')].find(b=>b.textContent.includes('Clase habitual')).click()"
     )
@@ -277,7 +279,7 @@ app
     await click('Tema oscuro', 'aside button')
     await click('Corregir', 'aside button')
     await choose('offline')
-    await correct('Corregir otra vez')
+    await correct()
     await shot('13-incidencia-tecnica')
     assert.match(await text(), /Sin evaluar/)
     const partial = latestResult()
@@ -297,7 +299,7 @@ app
     await click('Salir del proyector')
     await click('Corregir', 'aside button')
     await choose('demo')
-    await click('Iniciar modo examen')
+    await click('Reanudar')
     await until(
       "document.querySelector('header h1')?.textContent === 'Resultados'",
       'first automatic round',
@@ -305,11 +307,11 @@ app
     )
     await click('Corregir', 'aside button')
     await until(
-      "!![...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Detener modo examen')",
+      "!![...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Pausar')",
       'active exam'
     )
     await shot('14-modo-examen')
-    await click('Detener modo examen')
+    await click('Pausar')
     // Reopen a malformed source: it must remain editable, never be replaced by a template.
     await click('Inicio', 'aside button')
     const broken = changed + '\nfoo: [\n'
@@ -340,7 +342,7 @@ app
         'light and dark themes',
         'projector',
         'offline student',
-        'first automatic exam round and stop'
+        'automatic exam resumption and pause'
       ],
       consoleErrors
     }

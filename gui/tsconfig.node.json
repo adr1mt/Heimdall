@@ -10,10 +10,13 @@
     "noUnusedParameters": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "types": ["node"],
-    "baseUrl": ".",
+    "types": [
+      "node"
+    ],
     "paths": {
-      "@shared/*": ["src/shared/*"]
+      "@shared/*": [
+        "./src/shared/*"
+      ]
     }
   },
   "include": [

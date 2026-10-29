@@ -28,7 +28,8 @@ los resultados quedan en `var/` junto al examen.
 ## Comandos
 
 ```bash
-npm ci
+# Node 26.13.0 y npm 12.2.1 (Node fijado en ../.nvmrc)
+npm ci               # instala también el ejecutable de Electron
 npm run dev          # aplicación en desarrollo
 npm test             # suite rápida (vitest)
 npm run typecheck    # main, renderer y tests
@@ -71,6 +72,9 @@ Desde la raíz del repositorio: `make gui-check` (typecheck + tests) y
 
 ## Empaquetado
 
+El empaquetado usa `@electron/packager` y requiere `squashfs-tools` y `dpkg`
+en Linux x64. El runtime AppImage oficial se descarga con ID y SHA-256 fijados.
+
 `make gui-dist` compila el motor y deja en `gui/dist` un AppImage y un `.deb`
 con el binario dentro, en `resources/heimdall`. Sin nada guardado en ajustes,
 la aplicación usa ese motor: quien instala el paquete no instala nada más. Una
@@ -80,3 +84,7 @@ ruta elegida a mano en Ajustes manda siempre sobre el motor embebido.
 ese motor corrige igual que el compilado del repositorio con el entorno vacío
 y que la aplicación arranca sin ningún `heimdall` en el `PATH`. Necesita
 `make gui-dist` y `make lab`.
+
+La auditoría npm completa y la comprobación del lock deben terminar sin
+vulnerabilidades ni paquetes `deprecated`. No hay excepciones de build.
+Las versiones mayores se migran y prueban; no se usa `audit fix --force`.

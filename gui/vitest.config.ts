@@ -11,12 +11,14 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src/renderer/src'),
-      '@shared': resolve(__dirname, 'src/shared')
+      '@': resolve(import.meta.dirname, 'src/renderer/src'),
+      '@shared': resolve(import.meta.dirname, 'src/shared')
     }
   },
   test: {
     environment: 'node',
+    // Renderer storage is mocked by the tests; do not enable Node's experimental disk store.
+    execArgv: ['--no-experimental-webstorage'],
     include: ['tests/**/*.test.ts']
   }
 })

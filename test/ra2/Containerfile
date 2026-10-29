@@ -6,7 +6,7 @@
 #
 # Test credentials are fictitious and public on purpose. The classroom uses
 # usuario/usuario; the password here is not a real one (see .claude/rules).
-FROM docker.io/library/debian:12-slim
+FROM docker.io/library/debian:13-slim
 
 ARG VARIANT=bien
 

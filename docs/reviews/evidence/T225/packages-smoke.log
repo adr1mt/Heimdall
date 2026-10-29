@@ -1,0 +1,7 @@
+AppRun: user namespaces available/unavailable and explicit fallback verified.
+Package auto: renderer and preload OK (Heimdall)
+Package fallback: renderer and preload OK (Heimdall)
+Package sandbox: renderer and preload OK (Heimdall)
+Package auto: renderer and preload OK (Heimdall)
+Heimdall-1.0.1.AppImage: OK
+Heimdall-1.0.1.deb: OK

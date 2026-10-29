@@ -1,0 +1,63 @@
+test/ra2/lab.sh up
+STEP 1/10: FROM docker.io/library/debian:13-slim
+STEP 2/10: ARG VARIANT=bien
+--> Using cache 8fe3363b85f0953ec9e27d6ac725e5c71fd9a697062d715b300f5e296e1c4d1c
+--> 8fe3363b85f0
+STEP 3/10: ENV DEBIAN_FRONTEND=noninteractive
+--> Using cache c65a60932af8161350768de3bccaa182a16d7413c1eefa6779eb8277e06cd49b
+--> c65a60932af8
+STEP 4/10: RUN apt-get update && apt-get install -y --no-install-recommends       systemd systemd-sysv dbus openssh-server bind9 bind9-utils iproute2 procps &&     rm -rf /var/lib/apt/lists/* &&     mkdir -p /run/sshd /etc/kea &&     useradd -m -s /bin/bash usuario &&     echo 'usuario:HEIMDALL_SECRET_RA2_TEST' | chpasswd &&     sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config &&     sed -i 's/^#*PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config &&     ssh-keygen -A &&     systemctl enable ssh
+--> Using cache 616a0f82383de434c631b0f8e6a0218922ef5e8af8641d35c31543f191fa7fcb
+--> 616a0f82383d
+STEP 5/10: COPY enp2s0.service /etc/systemd/system/enp2s0.service
+--> Using cache 12bc64cb04b94f78aff8c6c16e4d96d13dc66713b76a68daaff46e6b1c7c2756
+--> 12bc64cb04b9
+STEP 6/10: RUN systemctl enable enp2s0.service
+--> Using cache 72ff846212d96f1f9e53d3babe25b1d8d942215673bf9ddb219c73185b5d406e
+--> 72ff846212d9
+STEP 7/10: COPY configs/${VARIANT}/etc/ /etc/
+--> Using cache 1b9b0000c56328cce7fb794832317e38d64f3bf2f6f1e6af29e7da58cd6d96e6
+--> 1b9b0000c563
+STEP 8/10: RUN if [ "$VARIANT" = "parcial" ]; then systemctl disable named; else systemctl enable named; fi
+--> Using cache 3d8530163bd60792175de1c7433584d107420afdd3fa07581953a132a0c64f56
+--> 3d8530163bd6
+STEP 9/10: CMD ["/sbin/init"]
+--> Using cache 96cd7518ac07e1569660cd573eff132e57cdcf73a678ec4421a8ac77dce39518
+--> 96cd7518ac07
+STEP 10/10: LABEL "heimdall.containerfile"="13623d1a59e6726e"
+COMMIT heimdalllab-ra2-bien
+--> c794a701af52
+Successfully tagged localhost/heimdalllab-ra2-bien:latest
+c794a701af52f3350905ee59107662104c6971ec0a1fad2fc221683d4e09b7ec
+STEP 1/10: FROM docker.io/library/debian:13-slim
+STEP 2/10: ARG VARIANT=bien
+--> Using cache 8fe3363b85f0953ec9e27d6ac725e5c71fd9a697062d715b300f5e296e1c4d1c
+--> 8fe3363b85f0
+STEP 3/10: ENV DEBIAN_FRONTEND=noninteractive
+--> Using cache c65a60932af8161350768de3bccaa182a16d7413c1eefa6779eb8277e06cd49b
+--> c65a60932af8
+STEP 4/10: RUN apt-get update && apt-get install -y --no-install-recommends       systemd systemd-sysv dbus openssh-server bind9 bind9-utils iproute2 procps &&     rm -rf /var/lib/apt/lists/* &&     mkdir -p /run/sshd /etc/kea &&     useradd -m -s /bin/bash usuario &&     echo 'usuario:HEIMDALL_SECRET_RA2_TEST' | chpasswd &&     sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config &&     sed -i 's/^#*PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config &&     ssh-keygen -A &&     systemctl enable ssh
+--> Using cache 04731ddd18c9931b048ba4047d7dc35266702785da7a2f66695fddba8fe1397a
+--> 04731ddd18c9
+STEP 5/10: COPY enp2s0.service /etc/systemd/system/enp2s0.service
+--> Using cache a97694a9fc7e2d6493d1191e59846e00e22fbeee5ea4dead75d4734a680541fa
+--> a97694a9fc7e
+STEP 6/10: RUN systemctl enable enp2s0.service
+--> Using cache b62944ffa94ecce64a6cbccf9b13690f7a2db6863f8f120e48f21ea192aadafc
+--> b62944ffa94e
+STEP 7/10: COPY configs/${VARIANT}/etc/ /etc/
+--> Using cache 8f212d9fd73d61e97cb362fad918c3be5b217de43595119155231caf5a92553d
+--> 8f212d9fd73d
+STEP 8/10: RUN if [ "$VARIANT" = "parcial" ]; then systemctl disable named; else systemctl enable named; fi
+--> Using cache 5734652e3777541d7b80038013a24c62f1bfc916800f4f75d1328bbaf4e2347f
+--> 5734652e3777
+STEP 9/10: CMD ["/sbin/init"]
+--> Using cache 1b289e9c160c38cd75abf0e03ebbdd831492dd152d18daf04389dd5c7b0b9b9b
+--> 1b289e9c160c
+STEP 10/10: LABEL "heimdall.containerfile"="13623d1a59e6726e"
+COMMIT heimdalllab-ra2-parcial
+--> 0042a179629a
+Successfully tagged localhost/heimdalllab-ra2-parcial:latest
+0042a179629aa3fb688d00cce3e4e890e2a400f40807b05209b3627659c5bba9
+ra2/lab: ra2-bien listening on 127.1.2.3:2211
+ra2/lab: ra2-parcial listening on 127.1.2.3:2212

@@ -1,0 +1,126 @@
+{
+  "version": "1.0.1",
+  "name": "heimdall-gui",
+  "dependencies": {
+    "@electron/asar": {
+      "version": "4.3.1",
+      "resolved": "https://registry.npmjs.org/@electron/asar/-/asar-4.3.1.tgz",
+      "overridden": false
+    },
+    "@electron/packager": {
+      "version": "20.3.0",
+      "resolved": "https://registry.npmjs.org/@electron/packager/-/packager-20.3.0.tgz",
+      "overridden": false
+    },
+    "@monaco-editor/react": {
+      "version": "4.7.0",
+      "resolved": "https://registry.npmjs.org/@monaco-editor/react/-/react-4.7.0.tgz",
+      "overridden": false
+    },
+    "@tailwindcss/vite": {
+      "version": "4.3.3",
+      "resolved": "https://registry.npmjs.org/@tailwindcss/vite/-/vite-4.3.3.tgz",
+      "overridden": false
+    },
+    "@types/node": {
+      "version": "26.6.6",
+      "resolved": "https://registry.npmjs.org/@types/node/-/node-26.6.6.tgz",
+      "overridden": false
+    },
+    "@types/react-dom": {
+      "version": "19.3.0",
+      "resolved": "https://registry.npmjs.org/@types/react-dom/-/react-dom-19.3.0.tgz",
+      "overridden": false
+    },
+    "@types/react": {
+      "version": "19.3.0",
+      "resolved": "https://registry.npmjs.org/@types/react/-/react-19.3.0.tgz",
+      "overridden": false
+    },
+    "@vitejs/plugin-react": {
+      "version": "6.1.2",
+      "resolved": "https://registry.npmjs.org/@vitejs/plugin-react/-/plugin-react-6.1.2.tgz",
+      "overridden": false
+    },
+    "class-variance-authority": {
+      "version": "0.7.1",
+      "resolved": "https://registry.npmjs.org/class-variance-authority/-/class-variance-authority-0.7.1.tgz",
+      "overridden": false
+    },
+    "clsx": {
+      "version": "2.1.1",
+      "resolved": "https://registry.npmjs.org/clsx/-/clsx-2.1.1.tgz",
+      "overridden": false
+    },
+    "electron-vite": {
+      "version": "6.0.0",
+      "resolved": "https://registry.npmjs.org/electron-vite/-/electron-vite-6.0.0.tgz",
+      "overridden": false
+    },
+    "electron": {
+      "version": "45.1.0",
+      "resolved": "https://registry.npmjs.org/electron/-/electron-45.1.0.tgz",
+      "overridden": false
+    },
+    "esbuild": {
+      "version": "0.28.2",
+      "resolved": "https://registry.npmjs.org/esbuild/-/esbuild-0.28.2.tgz",
+      "overridden": false
+    },
+    "js-yaml": {
+      "version": "5.5.0",
+      "resolved": "https://registry.npmjs.org/js-yaml/-/js-yaml-5.5.0.tgz",
+      "overridden": false
+    },
+    "lucide-react": {
+      "version": "1.64.0",
+      "resolved": "https://registry.npmjs.org/lucide-react/-/lucide-react-1.64.0.tgz",
+      "overridden": false
+    },
+    "monaco-editor": {
+      "version": "0.57.0",
+      "resolved": "https://registry.npmjs.org/monaco-editor/-/monaco-editor-0.57.0.tgz",
+      "overridden": false
+    },
+    "react-dom": {
+      "version": "19.3.1",
+      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-19.3.1.tgz",
+      "overridden": false
+    },
+    "react": {
+      "version": "19.3.1",
+      "resolved": "https://registry.npmjs.org/react/-/react-19.3.1.tgz",
+      "overridden": false
+    },
+    "tailwind-merge": {
+      "version": "3.7.0",
+      "resolved": "https://registry.npmjs.org/tailwind-merge/-/tailwind-merge-3.7.0.tgz",
+      "overridden": false
+    },
+    "tailwindcss": {
+      "version": "4.3.3",
+      "resolved": "https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.3.3.tgz",
+      "overridden": false
+    },
+    "typescript": {
+      "version": "7.0.2",
+      "resolved": "https://registry.npmjs.org/typescript/-/typescript-7.0.2.tgz",
+      "overridden": false
+    },
+    "vite": {
+      "version": "8.3.5",
+      "resolved": "https://registry.npmjs.org/vite/-/vite-8.3.5.tgz",
+      "overridden": false
+    },
+    "vitest": {
+      "version": "5.0.5",
+      "resolved": "https://registry.npmjs.org/vitest/-/vitest-5.0.5.tgz",
+      "overridden": false
+    },
+    "zustand": {
+      "version": "5.0.16",
+      "resolved": "https://registry.npmjs.org/zustand/-/zustand-5.0.16.tgz",
+      "overridden": false
+    }
+  }
+}

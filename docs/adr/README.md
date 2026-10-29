@@ -49,3 +49,7 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 - [ADR-0038 · Nombre fijo del último informe](0038-nombre-fijo-del-informe.md).
 
 - [ADR-0039 · Sesiones persistentes, cierre e informes definitivos](0039-sesiones-persistentes-y-cierre-definitivo.md).
+
+- [ADR-0040 · Pausa explícita y lista final de notas](0040-pausa-explicita-y-lista-final.md).
+
+- [ADR-0041 · Dependencias mantenidas y empaquetado Linux verificable](0041-dependencias-y-empaquetado-mantenidos.md).

@@ -3,7 +3,11 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
@@ -12,13 +16,23 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "jsx": "react-jsx",
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "noEmit": true,
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/renderer/src/*"],
-      "@shared/*": ["src/shared/*"]
+      "@/*": [
+        "./src/renderer/src/*"
+      ],
+      "@shared/*": [
+        "./src/shared/*"
+      ]
     }
   },
-  "include": ["tests/**/*", "vitest.config.ts", "src/renderer/src/vite-env.d.ts", "src/preload/index.d.ts"]
+  "include": [
+    "tests/**/*",
+    "vitest.config.ts",
+    "src/renderer/src/vite-env.d.ts",
+    "src/preload/index.d.ts"
+  ]
 }

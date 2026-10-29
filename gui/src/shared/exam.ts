@@ -282,7 +282,7 @@ export function examYaml(exam: Exam): string {
   // Every string is quoted on purpose. An expected value of `yes`, `on` or
   // `no` written bare is a boolean in YAML, and the check would compare the
   // student's output against `true`.
-  return dump(doc, { lineWidth: 100, noRefs: true, quotingType: '"', forceQuotes: true })
+  return dump(doc, { lineWidth: 100, noRefs: true, quoteStyle: 'double', forceQuotes: true })
 }
 
 /** The total weight of the exam, the denominator every student shares. */
