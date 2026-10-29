@@ -155,3 +155,19 @@ describe('session presentation state', () => {
     vi.unstubAllGlobals()
   })
 })
+
+// Column sizing must survive the same classroom refreshes as other view choices.
+describe('matrix column width', () => {
+  it('preserves the dragged width over refresh, projector and list navigation', () => {
+    const run = validRun()
+    useRun.getState().setArtifact(run, '/tmp/width-1.json')
+    useResultsView.getState().setCheckWidth(420)
+    useResultsView.getState().setMode('list')
+    useResultsView.getState().setProjectorScale(0.8, true)
+    useRun.getState().setArtifact({ ...run, run_id: 'new-width-run' }, '/tmp/width-2.json')
+    useResultsView.getState().setMode('matrix')
+    expect(useResultsView.getState().checkWidth).toBe(420)
+    useRun.getState().setArtifact({ ...run, exam: { ...run.exam, path: '/another/exam.yaml' } }, '/tmp/width-3.json')
+    expect(useResultsView.getState().checkWidth).toBeNull()
+  })
+})

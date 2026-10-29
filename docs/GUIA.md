@@ -117,24 +117,23 @@ siempre se puede enseñar; una avería también.
 La lista y la matriz muestran aprobados en verde, suspensos en rojo y
 comprobaciones pendientes en ámbar. Pulsa el nombre de un alumno para ver
 sus comprobaciones agrupadas, y cada comprobación para abrir su evidencia.
-La búsqueda, los filtros de alumnos y **Ordenar** están disponibles también
-en el modo proyector. **Evaluados** muestra a quienes tienen evidencia de
+La búsqueda y los menús **Filtros** y **Alumnos** están disponibles también
+en el modo proyector. **Filtros** reúne los estados y el orden de alumnos. **Evaluados** muestra a quienes tienen evidencia de
 conexión con su máquina en la corrección abierta, incluidos los que quedaron
 incompletos. No equivale a tener nota final; una corrección que solo lee el
 inventario no demuestra conexión.
 
-Pulsa el icono del ojo tachado (**Ocultar**) junto a un alumno para apartarlo de la lista y de la matriz,
-por ejemplo si hoy no ha venido. **Ocultos (N)** permite mostrarlo de nuevo,
-uno a uno o con **Mostrar todos**. La selección se conserva al cambiar de
-vista, entrar o salir del proyector y volver a corregir. Se reinicia al
-cambiar de clase o examen, o cerrar la aplicación. **Restablecer** limpia
-filtros y orden, pero conserva los ocultos.
+Abre **Alumnos** y desmarca a quien quieras apartar de la lista y de la matriz,
+por ejemplo si hoy no ha venido. Vuelve a marcarlo para recuperarlo o pulsa
+**Mostrar todos**. En la lista del profesor también tienes el ojo tachado.
+La selección se conserva al cambiar de vista, entrar o salir del proyector
+y volver a corregir. Se reinicia al cambiar de clase o examen, o cerrar la
+aplicación. **Restablecer** limpia filtros y orden, pero conserva los ocultos.
 
 Ocultar solo cambia estas vistas: no modifica la clase, las notas, a quién
-se corrige ni las exportaciones o informes. El resumen general sigue
-incluyendo toda la corrección; los recuentos de la matriz se refieren a los
-alumnos visibles. Los filtros de comprobaciones y la explicación de los
-estados están plegados.
+se corrige ni las exportaciones o informes. Los resúmenes, la media y las
+comprobaciones con más fallos se consultan en **Analíticas**. Resultados
+muestra la tabla sin esos resúmenes ni recuentos por comprobación.
 
 Desde ahí se exportan:
 
@@ -284,22 +283,25 @@ completo. Los informes y exportaciones mantienen los nombres completos.
 La lista usa iconos para **Enviar informe** y **Ocultar**. La matriz conserva
 la columna de comprobaciones y las cabeceras
 al desplazarse dentro de ella; también puedes enfocarla con Tab y desplazarte
-con las flechas. El resumen distingue **aprobados**, **suspensos** y **sin evaluar**
-sin contar una incidencia técnica como suspenso. En Corregir, el contexto y el
+con las flechas. Las cabeceras muestran nombre y nota; un guion indica que no
+hay nota, y una nota incompleta conserva la etiqueta **Provisional**. En Corregir, el contexto y el
 modo examen ocupan menos espacio y el progreso aparece antes del listado.
 
 ## Proyectar resultados y consultar informes desde Ubuntu Desktop
 
-En el proyector, **+ / −** ajustan el tamaño y **Ajustar a pantalla** muestra
+En el proyector, **+ / −** ajustan el tamaño y **Encajar** muestra
 el contenido completo, incluidos todos los casos y alumnos visibles. Se
 recalcula al cambiar el tamaño de ventana o filtrar. Si el grupo o el examen
 son muy grandes, ajustar todo exige reducir el tamaño: usa + o los filtros
-para leer una parte desde lejos. Los nombres de casos aprovechan una columna
-más ancha y admiten dos líneas; el nombre completo sigue en su ayuda.
+para leer una parte desde lejos. Arrastra la separación de la cabecera **Comprobación** para ajustar su ancho.
+También puedes enfocarla con Tab y usar ← / →; Inicio o doble clic recuperan
+el ancho automático. El ajuste se conserva al cambiar de vista y corregir
+la misma clase. Las descripciones admiten dos líneas y su texto completo
+sigue en la ayuda y en el detalle.
 
-Mientras se corrige, se mantienen las últimas notas validadas. La franja de
-tiempos muestra la hora actual, el estado, la cuenta atrás del modo examen y
-la última corrección completada. Si falla el arranque o la lectura, o se
+Mientras se corrige, se mantienen las últimas notas validadas. El reloj de
+la cabecera muestra solo el tiempo hasta la próxima corrección; mientras se
+corrige o se pausa, muestra ese estado. Si falla el arranque o la lectura, o se
 cancela, las notas anteriores siguen visibles y se muestra el aviso. Cambiar
 de examen o de clase limpia esos resultados para no confundir contextos.
 

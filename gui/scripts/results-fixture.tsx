@@ -5,6 +5,7 @@ import { flushSync } from 'react-dom'
 import ResultsView from '../src/renderer/src/routes/Results'
 import { useRun } from '../src/renderer/src/stores/run'
 import { useReportDelivery } from '../src/renderer/src/stores/report-delivery'
+import { useResultsView } from '../src/renderer/src/stores/results-view'
 import { useApp } from '../src/renderer/src/stores/app'
 import { validRun } from '../tests/fixtures/valid-run'
 
@@ -101,3 +102,5 @@ window.resultsConnections = () => {
 window.resultsFixture(5)
 export const root = createRoot(document.getElementById('root')!)
 root.render(<ResultsView />)
+
+Object.assign(window, { resultsTest: { view: useResultsView, app: useApp, run: useRun } })

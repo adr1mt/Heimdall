@@ -1118,3 +1118,19 @@ Sin modificar datos ni reiniciar instancias habituales; instalación lista
 para abrir. Push normal del producto confirmado en origin/main y registro de
 instalación separado. No implica publicación ni nueva versión nominal.
 Evidencia: `docs/reviews/evidence/T222/RESULTADOS.md`.
+
+## T223 · Resultados centrados en la tabla · 2026-10-29
+
+Petición de Adrià: retirar estadísticas y explicaciones permanentes de
+Resultados, compactar el proyector y ajustar el ancho de las comprobaciones.
+La media, los recuentos académicos y los fallos frecuentes siguen en Analíticas.
+La cabecera usa un reloj con cuenta atrás; pausa/corrección y errores continúan
+visibles. Se conserva el aviso excepcional de criterios anteriores.
+Nombre y nota principal en la matriz; procedencia en ayuda, evidencia en el
+detalle. El guion de ausencia de nota y la etiqueta provisional evitan convertir
+una incidencia técnica en un cero. Visibilidad y filtros se agrupan en menús.
+El separador ajusta solo presentación, con ratón/teclado y reinicio automático;
+no cambia notas, artefactos, criterios, exportaciones ni persistencia de sesiones.
+Encajar mide mínimos de columna y ocupa el ancho disponible sin realimentar la
+escala; el tamaño de texto no depende de unidades de contenedor en celdas de tabla.
+Evidencia: `docs/reviews/evidence/T223/RESULTADOS.md`. Sin instalación ni push.

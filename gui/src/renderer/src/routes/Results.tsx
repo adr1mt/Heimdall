@@ -1,11 +1,13 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type CSSProperties } from 'react'
 import { ProjectorCanvas } from '@/components/ProjectorCanvas'
-import { CorrectionClock } from '@/components/CorrectionClock'
+import { CorrectionClock, CorrectionProblem } from '@/components/CorrectionClock'
 import {
   ArrowLeft,
   Check,
   AlertTriangle,
   Download,
+  SlidersHorizontal,
+  Users,
   EyeOff,
   Grid3x3,
   Layers,
@@ -68,8 +70,7 @@ import {
   toCsv
 } from '@/lib/export'
 
-import { averageText, classSummary, displayedAverage, studentShortNames, type ClassSummary } from '@/lib/summary'
-import { failingChecks, type FailingCheck } from '@/lib/analytics'
+import { studentShortNames } from '@/lib/summary'
 import { buildMatrix, type MatrixRow } from '@/lib/matrix'
 import { attemptsText, chainTally, chainText, fromRunText } from '@/lib/chain'
 import { machineLiterals, maskerFor } from '@/lib/projector'
@@ -114,20 +115,26 @@ export default function ResultsView() {
     setSelected(null)
   }, [artifact?.run_id])
 
+  useEffect(() => {
+    const dismiss = (event: PointerEvent | KeyboardEvent) => {
+      if (event instanceof KeyboardEvent && event.key !== 'Escape') return
+      document.querySelectorAll<HTMLDetailsElement>('.results-options[open]').forEach(menu => {
+        if (event instanceof PointerEvent && menu.contains(event.target as Node)) return
+        menu.open = false
+        if (event instanceof KeyboardEvent) menu.querySelector('summary')?.focus()
+      })
+    }
+    document.addEventListener('pointerdown', dismiss)
+    document.addEventListener('keydown', dismiss)
+    return () => {
+      document.removeEventListener('pointerdown', dismiss)
+      document.removeEventListener('keydown', dismiss)
+    }
+  }, [])
+
   const mask = useMask(artifact)
   const causes = useMemo(() => (artifact ? causesIn(artifact) : []), [artifact])
   const names = useMemo(() => studentShortNames(artifact?.students ?? []), [artifact])
-  const summary = useMemo(
-    () => (gradeRun ? classSummary(gradeRun, passMark) : null),
-    [gradeRun, passMark]
-  )
-
-  const average = useMemo(() => gradeRun ? displayedAverage(gradeRun, scale) : null, [gradeRun, scale])
-  const mostFailed = useMemo(() => {
-    const checks = artifact ? failingChecks(artifact).filter((check) => check.failed > 0) : []
-    return checks.filter((check) => check.failed === checks[0]?.failed)
-  }, [artifact])
-
   // Both views share the same student ordering and check filters.
   const rows = useMemo(() => {
     if (!artifact || !gradeRun) return []
@@ -184,26 +191,17 @@ export default function ResultsView() {
       />
     )
 
-  const overview = <div className="results-overview space-y-2">
-        {summary && projector && <details className="text-xs">
-          <summary className="cursor-pointer py-1 text-muted-foreground">Resumen de toda la corrección · {summary.passed} aprobados</summary>
-          <KpiStrip summary={summary} average={average} mostFailed={mostFailed} />
-        </details>}
-        {summary && !projector && (
-          <section aria-label="Resumen de toda la corrección">
-            <KpiStrip summary={summary} average={average} mostFailed={mostFailed} />
-          </section>
-        )}
-
-        <div className="space-y-1">
-          <div className="results-filters flex flex-wrap items-center gap-2">
-            <Input
-              className="h-8 w-full sm:w-56"
-              aria-label={t.results.filterText}
-              placeholder={t.results.filterText}
-              value={filters.text}
-              onChange={(e) => setFilters({ ...filters, text: e.target.value })}
-            />
+  const overview = <div className="results-overview flex min-w-0 flex-wrap items-center gap-2">
+    <Input className="h-8 w-48 sm:w-56" aria-label={t.results.filterText}
+      placeholder="Buscar…" value={filters.text}
+      onChange={(e) => setFilters({ ...filters, text: e.target.value })} />
+    <details className="results-options" name="results-options">
+      <summary className="results-option-trigger">
+        <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+        Filtros{exploring ? ' · activos' : ''}
+      </summary>
+      <div className="results-options-panel space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
             <Segmented aria-label="Filtrar alumnos" className="max-w-full flex-wrap">
               {([
                 ['all', 'Todos'], ['evaluated', 'Evaluados'], ['pass', 'Aprobados'], ['fail', 'Suspensos'], ['ungraded', 'Sin evaluar']
@@ -232,30 +230,6 @@ export default function ResultsView() {
             </label>
             {exploring && <Button variant="ghost" size="sm" onClick={clearFilters}>Restablecer</Button>}
           </div>
-          <div className="flex flex-wrap items-start gap-x-4 gap-y-1">
-            <p role="status" className="py-1 text-xs text-muted-foreground">
-              {rows.length} de {artifact.students.length} alumnos · {hiddenStudents.length} ocultos
-              {filtering && ' · Filtros activos'}
-              {order !== 'name' && ' · Orden personalizado'}
-            </p>
-            {hiddenStudents.length > 0 && (
-              <details className="w-full text-xs sm:w-auto">
-                <summary className="w-fit cursor-pointer rounded px-2 py-1 text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring">
-                  Ocultos ({hiddenStudents.length})
-                </summary>
-                <div className="mt-2 max-h-64 space-y-1 overflow-auto rounded-md border border-border p-2">
-                  <p className="px-2 py-1 text-muted-foreground">Solo se ocultan en estas vistas durante la sesión.</p>
-                  <Button variant="ghost" size="sm" onClick={showAll}>Mostrar todos</Button>
-                  {hiddenStudents.map((student) => (
-                    <div key={student.student_id} className="flex items-center gap-3 px-2 py-1">
-                      <span className="min-w-0 flex-1 wrap-break-word">{student.name}</span>
-                      <Button variant="ghost" size="sm" aria-label={`Mostrar a ${student.name}`}
-                        onClick={() => showStudent(student.student_id)}>Mostrar</Button>
-                    </div>
-                  ))}
-                </div>
-              </details>
-            )}
           <details className="min-w-0 py-1 text-xs">
             <summary className="cursor-pointer text-muted-foreground">
               Filtrar comprobaciones y ver estados{hasFilters(filters) ? ' · filtros activos' : ''}
@@ -282,12 +256,26 @@ export default function ResultsView() {
             </div>
             <States />
           </details>
-          </div>
           {studentFilter === 'evaluated' && (
             <p className="text-xs text-muted-foreground">Se pudo conectar con su máquina; puede haber comprobaciones pendientes.</p>
           )}
-        </div>
-
+      </div>
+    </details>
+    <details className="results-options" name="results-options">
+      <summary className="results-option-trigger">
+        <Users className="h-4 w-4" aria-hidden="true" />
+        Alumnos{hiddenStudents.length > 0 ? ` · ${hiddenStudents.length} ocultos` : ''}
+      </summary>
+      <div className="results-options-panel max-h-72 space-y-1 overflow-auto">
+        {hiddenStudents.length > 0 && <Button variant="ghost" size="sm" onClick={showAll}>Mostrar todos</Button>}
+        {artifact.students.map(student => <label key={student.student_id} className="flex cursor-pointer items-center gap-3 rounded px-2 py-1.5 text-sm hover:bg-accent">
+          <input type="checkbox" checked={!hiddenIds.includes(student.student_id)}
+            onChange={e => e.target.checked ? showStudent(student.student_id) : hideStudent(student.student_id)} />
+          <span className="min-w-0 wrap-break-word">{student.name}</span>
+        </label>)}
+      </div>
+    </details>
+    {filtering && <span role="status" className="text-xs text-muted-foreground">{rows.length} de {artifact.students.length}</span>}
   </div>
 
   return (
@@ -302,6 +290,7 @@ export default function ResultsView() {
         actions={
           <>
             <ExamSessionActions />
+            <CorrectionClock />
             <Segmented>
               <SegmentedItem active={mode === 'list'} onClick={() => setMode('list')}>
                 <List className="h-3.5 w-3.5" />
@@ -317,7 +306,7 @@ export default function ResultsView() {
                 <ReportsButton artifactPath={artifactPath} />
                 <details className="relative">
                   <summary
-                    className="cursor-pointer rounded px-2 py-1 text-sm"
+                    className="list-none cursor-pointer rounded px-2 py-1 text-sm"
                     aria-label="Más opciones"
                   >
                     •••
@@ -333,7 +322,7 @@ export default function ResultsView() {
         }
       />
 
-      <CorrectionClock />
+      <CorrectionProblem />
       <SessionResultsHint />
       <ResultsCanvas projector={projector} overview={overview}>
       <div className="results-body space-y-3 p-3 sm:p-4">
@@ -365,7 +354,6 @@ export default function ResultsView() {
               setOpenStudent(selection.studentId)
             }}
             onStudent={setOpenStudent}
-            onHide={hideStudent}
           />
         )}
 
@@ -393,46 +381,8 @@ export default function ResultsView() {
 }
 
 function ResultsCanvas({ projector, overview, children }: { projector: boolean; overview: ReactNode; children: ReactNode }) {
-  return projector ? <>
-    <div className="max-h-[40%] shrink-0 overflow-auto px-3 pt-2">{overview}</div>
-    <ProjectorCanvas>{children}</ProjectorCanvas>
-  </> : <div className="results-scroll min-h-0 flex-1 overflow-auto"><div className="px-3 pt-3 sm:px-4">{overview}</div>{children}</div>
-}
-
-/** Class-wide summary, independent of the current exploration filters. */
-function KpiStrip({ summary, average, mostFailed }: {
-  summary: ClassSummary
-  average: number | null
-  mostFailed: FailingCheck[]
-}) {
-  const scale = useScale()
-  const hardest = mostFailed[0]
-  return (
-    <div className="results-summary grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3">
-      <div className="summary-counts flex flex-wrap content-center items-center gap-x-2 gap-y-1 bg-background px-3 py-2 text-sm">
-        <span><strong className="tnum">{summary.passed}</strong> aprobados</span>
-        <span aria-hidden="true">·</span>
-        <span><strong className="tnum">{summary.graded - summary.passed}</strong> suspensos</span>
-        <span aria-hidden="true">·</span>
-        <span><strong className="tnum">{summary.students - summary.graded}</strong> sin evaluar</span>
-      </div>
-      <Reading
-        value={averageText(average)}
-        label={t.results.kpiAverage}
-        color={average === null ? 'text-muted-foreground' : 'text-foreground'}
-        hint={average === null ? t.results.kpiNoGrades : `Media de ${summary.graded} notas finales · sobre ${scale.max}`}
-      />
-      <div className="summary-hardest min-w-0 bg-background px-3 py-2">
-        <p className="text-micro uppercase tracking-[0.09em] text-muted-foreground">Comprobación con más fallos</p>
-        <p className="mt-1 truncate text-sm font-semibold" title={mostFailed.map((check) => `${check.description} (${check.checkId})`).join(' · ')}>
-          {hardest ? hardest.description : 'Ninguna comprobación fallada'}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          {hardest ? `${hardest.failed} ${hardest.failed === 1 ? 'fallo' : 'fallos'} de ${hardest.evaluated} evaluados${mostFailed.length > 1 ? ` · ${mostFailed.length} empatadas` : ''}` : 'Las incidencias técnicas no cuentan como fallos'}
-        </p>
-      </div>
-    </div>
-  )
+  return projector ? <ProjectorCanvas toolbar={overview}>{children}</ProjectorCanvas>
+    : <div className="results-scroll min-h-0 flex-1 overflow-auto"><div className="px-3 pt-3 sm:px-4">{overview}</div>{children}</div>
 }
 
 /**
@@ -460,65 +410,84 @@ const STATE_TEXT: Record<AcademicStatus, string> = {
   UNEVALUATED: t.results.stateUnevaluated
 }
 
-function Reading({
-  value,
-  label,
-  hint,
-  color
-}: {
-  value: string
-  label: string
-  hint: string
-  color?: string
-}) {
-  return (
-    <div className="summary-reading flex items-baseline gap-2 bg-background px-3 py-2">
-      <span className={cn('text-lg font-semibold tabular-nums', color)}>{value}</span>
-      <span className="min-w-0">
-        <span className="block text-micro uppercase tracking-[0.09em] text-muted-foreground">
-          {label}
-        </span>
-        <span className="block text-xs text-muted-foreground">{hint}</span>
-      </span>
-    </div>
-  )
-}
-
 /** Compact comparison table; the scroll container owns both sticky axes. */
-function MatrixView({ rows, names, selected, onPick, onStudent, onHide }: {
+function MatrixView({ rows, names, selected, onPick, onStudent }: {
   rows: { student: StudentResult; checks: CheckResult[] }[]
   names: Map<string, string>
   selected: Selection | null
   onPick: (selection: Selection) => void
   onStudent: (id: string) => void
-  onHide: (id: string) => void
 }) {
   const matrix = useMemo(() => buildMatrix(rows), [rows])
+  const checkWidth = useResultsView(s => s.checkWidth)
+  const setCheckWidth = useResultsView(s => s.setCheckWidth)
+  const separator = useRef<HTMLDivElement>(null)
+  const [actualWidth, setActualWidth] = useState(320)
+  useLayoutEffect(() => {
+    const cell = separator.current!.parentElement!
+    const measure = () => setActualWidth(cell.offsetWidth)
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(cell)
+    return () => observer.disconnect()
+  }, [])
   const [column, setColumn] = useState<string | null>(null)
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <Legend />
-        <span className="text-xs text-muted-foreground">Pulsa un nombre para ver su detalle</span>
       </div>
       <div className="matrix-viewport max-h-[65vh] overflow-auto rounded-md border border-border focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
         role="region" aria-label="Matriz de resultados, desplazamiento horizontal y vertical" tabIndex={0}>
         <table className="results-matrix min-w-full table-fixed border-separate border-spacing-0 text-left"
-          style={{ width: `calc(var(--matrix-check-width, clamp(10rem, 38vw, 40rem)) + ${matrix.students.length} * var(--matrix-student-width, 9rem))` }}
+          style={{ '--matrix-check-width': checkWidth === null ? undefined : `${checkWidth}px`, width: '100%', minWidth: `calc(var(--matrix-check-width, clamp(15rem, 28vw, 24rem)) + ${matrix.students.length} * var(--matrix-student-width, 6.5rem))` } as CSSProperties}
           onPointerOver={(event) => setColumn((event.target as HTMLElement).closest<HTMLElement>('[data-column]')?.dataset.column ?? null)}
           onPointerLeave={() => setColumn(null)}
           onFocusCapture={(event) => setColumn(event.target.closest<HTMLElement>('[data-column]')?.dataset.column ?? null)}
           onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setColumn(null) }}>
           <caption className="sr-only">Notas por alumno y comprobaciones superadas por los alumnos visibles</caption>
           <colgroup>
-            <col style={{ width: 'var(--matrix-check-width, clamp(10rem, 38vw, 40rem))' }} />
-            {matrix.students.map((student) => <col key={student.student_id} style={{ width: 'var(--matrix-student-width, 9rem)' }} />)}
+            <col style={{ width: 'var(--matrix-check-width, clamp(15rem, 28vw, 24rem))' }} />
+            {matrix.students.map((student) => <col key={student.student_id} />)}
           </colgroup>
           <thead className="sticky top-0 z-20">
             <tr>
               <th scope="col" className="sticky left-0 z-30 border-b border-r border-border bg-background px-3 py-3 align-bottom text-xs font-medium text-muted-foreground">
                 {t.results.matrixCheck}
-                <span className="mt-1 block text-micro font-normal">Superados / alumnos visibles</span>
+                <div ref={separator} role="separator" tabIndex={0} aria-label="Ancho de comprobaciones" aria-orientation="vertical"
+                  aria-valuemin={160} aria-valuemax={800} aria-valuenow={actualWidth}
+                  title="Arrastra para ajustar el ancho · flechas para ajustar con teclado"
+                  className="matrix-resizer"
+                  onPointerDown={event => {
+                    if (event.button !== 0) return
+                    event.preventDefault()
+                    const handle = event.currentTarget
+                    const cell = handle.parentElement!
+                    const startX = event.clientX
+                    const startWidth = cell.offsetWidth
+                    const scale = cell.getBoundingClientRect().width / startWidth
+                    handle.setPointerCapture(event.pointerId)
+                    handle.dataset.startX = String(startX)
+                    handle.dataset.startWidth = String(startWidth)
+                    handle.dataset.scale = String(scale)
+                    handle.dataset.dragging = 'true'
+                  }}
+                  onPointerMove={event => {
+                    const handle = event.currentTarget
+                    if (!handle.hasPointerCapture(event.pointerId)) return
+                    setCheckWidth(Number(handle.dataset.startWidth) + (event.clientX - Number(handle.dataset.startX)) / Number(handle.dataset.scale))
+                  }}
+                  onPointerUp={event => {
+                    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
+                  }}
+                  onLostPointerCapture={event => { delete event.currentTarget.dataset.dragging }}
+                  onDoubleClick={() => setCheckWidth(null)}
+                  onKeyDown={event => {
+                    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+                      event.preventDefault()
+                      setCheckWidth((checkWidth ?? event.currentTarget.parentElement!.offsetWidth) + (event.key === 'ArrowRight' ? 20 : -20))
+                    } else if (event.key === 'Home') { event.preventDefault(); setCheckWidth(null) }
+                  }} />
               </th>
               {matrix.students.map((student) => (
                 <th scope="col" key={student.student_id} data-column={student.student_id}
@@ -529,7 +498,6 @@ function MatrixView({ rows, names, selected, onPick, onStudent, onHide }: {
                   </button>
                   <div className="matrix-student-summary">
                     <MatrixGrade student={student} />
-                    <HideStudentButton student={student} onHide={() => onHide(student.student_id)} />
                   </div>
                 </th>
               ))}
@@ -547,7 +515,6 @@ function MatrixView({ rows, names, selected, onPick, onStudent, onHide }: {
 
 function MatrixGrade({ student }: { student: StudentResult }) {
   const best = useSessionGrade(student)
-  const latest = student
   student = best.student
   const scale = useScale()
   const score = scoreView(student.score, scale)
@@ -560,11 +527,7 @@ function MatrixGrade({ student }: { student: StudentResult }) {
         {score.value === null ? '—' : score.text}
       </span>
       {score.value !== null && <span className="ml-0.5 text-xs font-normal text-muted-foreground">/{scale.max}</span>}
-      {best.label && <span className="block text-micro font-normal text-muted-foreground">{best.label}{score.kind === 'final' ? ` · ${best.origin}` : ''}</span>}
-      {best.label && <span className="block text-micro font-normal text-muted-foreground">Última: {scoreView(latest.score, scale).text}</span>}
-      {!best.label && appearance.tone !== 'pass' && appearance.tone !== 'fail' && (
-        <span className={`mt-0.5 block text-micro font-normal ${appearance.color}`}>{label}</span>
-      )}
+      {score.kind === 'provisional' && <span className="block text-micro font-normal text-warning-strong">Provisional</span>}
     </div>
   )
 }
@@ -596,8 +559,7 @@ function GradeBadge({
       >
         {score.value === null ? '—' : score.text}
       </span>
-      {best.label && <span className="mt-1 block text-micro font-normal">{best.label}</span>}
-      {!best.label && score.kind === 'provisional' && (
+      {score.kind === 'provisional' && (
         <span className="mt-0.5 block text-micro font-medium leading-none">provisional</span>
       )}
     </>
@@ -653,10 +615,6 @@ function MatrixRowView({
         <span className="flex items-center gap-2">
           <span className="case-name min-w-0 flex-1 line-clamp-2 wrap-break-word">{row.description}</span>
           {row.weight !== 1 && <span className="shrink-0 text-muted-foreground">{t.results.matrixWeight(row.weight)}</span>}
-          <span className="shrink-0 tabular-nums text-muted-foreground"
-            aria-label={`${row.cells.filter((check) => check?.status === 'PASS').length} de ${students.length} alumnos visibles han superado esta comprobación`}>
-            {row.cells.filter((check) => check?.status === 'PASS').length}/{students.length}
-          </span>
         </span>
       </th>
       {row.cells.map((check, index) => {
@@ -1263,16 +1221,16 @@ function StudentRow({ student, name, onToggle, onHide }: {
           />
           {cause && <span className="block text-micro text-warning-strong">{CAUSE_TEXT[cause]}</span>}
         </span>
-        <span className="text-micro text-muted-foreground">
+        {!projector && <span className="text-micro text-muted-foreground">
           {counts.pass}/{student.checks.length}
-        </span>
+        </span>}
         <span className="student-grade flex shrink-0 items-center gap-2">
-          <span className={cn('text-xs font-medium', appearance.color)}>{appearance.label}</span>
+          {!projector && <span className={cn('text-xs font-medium', appearance.color)}>{appearance.label}</span>}
           <GradeBadge student={student} large />
         </span>
       </button>
       {!projector && <ReportsButton artifactPath={useRun.getState().artifactPath} studentId={student.student_id} compact />}
-      <HideStudentButton student={student} onHide={onHide} />
+      {!projector && <HideStudentButton student={student} onHide={onHide} />}
     </div>
   )
 }
@@ -1529,8 +1487,8 @@ function StreamBlock({
 
 function SessionResultsHint() {
   const saved = useBoundExam()
-  if (!saved) return null
-  return <p className="shrink-0 border-b border-border px-4 py-1 text-xs text-muted-foreground">
-    {saved.record.rounds.length === 0 ? 'Sin nota final: no hay vueltas evaluadas con los criterios actuales. Las comprobaciones visibles pertenecen a criterios anteriores.' : `${saved.record.state === 'FINALIZED' ? 'Nota final: mejor nota alcanzada.' : 'Nota principal: mejor nota completa alcanzada.'} Comprobaciones y resultados actuales: última vuelta.`}
+  if (!saved || saved.record.rounds.length > 0) return null
+  return <p role="status" className="shrink-0 border-b border-border px-4 py-2 text-xs text-warning-strong">
+    Los resultados visibles pertenecen a criterios anteriores. Corrige para obtener notas con los criterios actuales.
   </p>
 }

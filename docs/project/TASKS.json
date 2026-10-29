@@ -5157,6 +5157,40 @@
       ],
       "completed": "2026-10-29",
       "notes": "AppImage de a843b53 con motor correspondiente construido y validado: 26 archivos GUI idénticos, cuatro dependencias, motor y AppRun correctos; renderer/preload arrancan desde extracción y ruta instalada con perfil temporal. Copia anterior, sustitución atómica y huellas verificadas. Commit de producto a843b53 subido y confirmado; registro de instalación en commit separado. Evidencia: docs/reviews/evidence/T222/RESULTADOS.md. Sin tocar datos, reiniciar instancias, publicar ni etiquetar."
+    },
+    {
+      "id": "T223",
+      "title": "Simplificar Resultados y proyector con reloj y matriz ajustable",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T222"
+      ],
+      "goal": "Concentrar la corrección en alumnos, comprobaciones y tiempo restante, con estadísticas disponibles en Analíticas.",
+      "scope": [
+        "Eliminar resúmenes y explicaciones persistentes de Resultados; condensar controles y reloj.",
+        "Simplificar cabeceras de alumnos y filas de comprobaciones; mover visibilidad a un menú.",
+        "Permitir ajustar por arrastre y teclado el ancho de las comprobaciones en ambas vistas."
+      ],
+      "out_of_scope": [
+        "Motor, cálculo de notas, contrato, instalación, publicación y alumnado real."
+      ],
+      "acceptance": [
+        "Resultados no muestra media, comprobación con más fallos, recuentos de aprobados/suspensos/sin evaluar, hora actual ni última completada; Analíticas conserva sus resúmenes.",
+        "Reloj con icono y cuenta atrás accesible; estados de corrección, pausa y errores siguen identificables sin franjas de explicación permanente.",
+        "Proyector dedica el espacio a la tabla; ajuste a pantalla compacto sin porcentajes ni ayuda persistente; filtros y visibilidad siguen accesibles.",
+        "Cabeceras de matriz muestran nombre y nota compacta sin última/mejor/procedencia/ojo; notas provisionales e incidencias siguen diferenciadas y detalle accesible.",
+        "Comprobaciones sin contador de alumnos que las superan; separador visible al pasar el ratón y ajustable con puntero y teclado, conservado al cambiar modo.",
+        "Pruebas de interacción, ajuste automático y pantallas 1920×1080/1366×768/1024×768; suite GUI, tipos/build y comprobaciones rápidas correctas."
+      ],
+      "tests": [
+        "make check",
+        "make gui-check gui-build",
+        "Arnés Electron aislado con datos ficticios"
+      ],
+      "completed": "2026-10-29",
+      "notes": "Resultados sin resúmenes ni franjas de explicación; reloj compacto, filtros/visibilidad plegados, matriz con nombre/nota y separador arrastrable/accesible. Proyector sin porcentajes y Encajar usa el ancho disponible sin realimentación de escala. 643 pruebas GUI, tipos/build/preload, make check/docs-check/tools-check correctos. Electron con datos ficticios verifica arrastre real, teclado, mejor nota, pausa/cierre, filtros, fallos y ajuste a 1024/1366/1920. Evidencia: docs/reviews/evidence/T223/RESULTADOS.md. Sin instalación, push ni publicación."
     }
   ]
 }

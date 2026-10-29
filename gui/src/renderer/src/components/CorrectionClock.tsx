@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Clock3, LoaderCircle, Pause } from 'lucide-react'
 import { useRun } from '@/stores/run'
 import { useApp } from '@/stores/app'
 import { useExamRecord } from '@/stores/exam-record'
@@ -7,25 +8,36 @@ import { secondsLeft } from '@/lib/exam'
 /** One small ticker: refreshing the clock never rerenders the results table. */
 export function CorrectionClock() {
   const [now, setNow] = useState(Date.now)
-  const exam = useApp((s) => s.exam)
-  const phase = useRun((s) => s.phase)
-  const last = useRun((s) => s.artifact?.finished_at)
-  const problem = useRun((s) => s.artifactProblem || s.problem)
+  const exam = useApp(s => s.exam)
+  const phase = useRun(s => s.phase)
+  const record = useExamRecord(s => s.saved?.record)
+  const finishing = useExamRecord(s => s.finishing)
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(timer)
   }, [])
-  const record = useExamRecord(s => s.saved?.record)
-  const finishing = useExamRecord(s => s.finishing)
   const remaining = secondsLeft(exam, now)
   const working = phase === 'starting' || phase === 'running'
-  return (
-    <div className="flex shrink-0 flex-wrap items-center gap-x-5 gap-y-1 border-b border-border px-4 py-1 text-xs text-muted-foreground tnum" aria-label="Tiempos de corrección">
-      <time aria-label="Hora actual">{new Date(now).toLocaleTimeString('es-ES')}</time>
-      <span role="status">{finishing ? 'Finalizando: espera a que termine la corrección en curso' : record?.state === 'FINALIZED' ? 'Examen finalizado' : record?.state === 'PAUSED' && !working ? 'Pausado' : working ? 'Corrigiendo… · resultados anteriores visibles, pendientes de actualizar' : 'En espera'}</span>
-      {remaining !== null && !working && !finishing && record?.state !== 'FINALIZED' && <span>Próxima corrección en {Math.floor(remaining / 60)}:{String(remaining % 60).padStart(2, '0')}</span>}
-      {last && <span>Última completada: <time dateTime={last}>{new Date(last).toLocaleTimeString('es-ES')}</time></span>}
-      {problem && <span role="status" className="text-warning-strong">No se actualizó la corrección. Se conservan los resultados anteriores. {useApp.getState().projector ? 'Revisa Corregir al salir del proyector.' : problem}</span>}
-    </div>
-  )
+  if (record?.state === 'FINALIZED' && !finishing) return null
+  const paused = record?.state === 'PAUSED' && !working
+  if (!finishing && !working && !paused && remaining === null) return null
+  const text = finishing ? 'Finalizando…' : working ? 'Corrigiendo…' : paused ? 'Pausado'
+    : `${Math.floor(remaining! / 60)}:${String(remaining! % 60).padStart(2, '0')}`
+  const label = finishing ? 'Finalizando examen' : working ? 'Corrección en curso' : paused ? 'Examen pausado'
+    : `Próxima corrección en ${text}`
+  const Icon = finishing || working ? LoaderCircle : paused ? Pause : Clock3
+  return <div className="correction-timer" role="timer" aria-label={label} title={label}>
+    <Icon className="h-4 w-4" aria-hidden="true" />
+    <span className="tabular-nums">{text}</span>
+  </div>
+}
+
+/** Exceptional failures stay visible; routine timing needs only the clock. */
+export function CorrectionProblem() {
+  const problem = useRun(s => s.artifactProblem || s.problem)
+  const projector = useApp(s => s.projector)
+  if (!problem) return null
+  return <p role="status" className="shrink-0 border-b border-border px-4 py-2 text-xs text-warning-strong">
+    No se actualizó la corrección. Se conservan los resultados anteriores. {projector ? 'Revisa Corregir al salir del proyector.' : problem}
+  </p>
 }

@@ -298,16 +298,12 @@
   --matrix-check-width: clamp(15rem, 24vw, 22rem);
   --matrix-student-width: 6.5rem;
 }
-.teacher-results .results-summary { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr) minmax(0, 1fr); }
-.teacher-results .summary-reading { align-items: center; }
-.teacher-results .summary-hardest > p:first-child { font-size: 0.6875rem; letter-spacing: normal; text-transform: none; }
-.teacher-results .summary-hardest > p:nth-child(2) { margin-top: 0; }
 .teacher-results .student-list { grid-template-columns: repeat(auto-fit, minmax(min(100%, 32rem), 1fr)); }
 .teacher-results .student-row { border-bottom-color: hsl(var(--border)); border-radius: 0; }
 .teacher-results .student-row-main { min-height: 3.25rem; }
 .teacher-results .student-grade { align-items: center; gap: 0.5rem; }
 .teacher-results .student-grade > span:first-child { font-size: 0.6875rem; }
-.teacher-results .matrix-viewport { max-height: max(12rem, calc(100dvh - 19rem)); scrollbar-gutter: stable; }
+.teacher-results .matrix-viewport { max-height: max(12rem, calc(100dvh - 13rem)); scrollbar-gutter: stable; }
 .teacher-results .results-matrix thead th { padding-block: 0.375rem; }
 .teacher-results .results-matrix thead button { height: auto; min-height: 2rem; }
 .teacher-results .matrix-student-name { display: block; -webkit-line-clamp: unset; }
@@ -318,29 +314,31 @@
 .correct-view .pending-students { grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); }
 .correct-view .correct-context { align-items: stretch; }
 .correct-view .exam-strip > div { min-width: 0; }
-@media (max-width: 1100px) {
-  .teacher-results .results-summary { grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr); }
-  .teacher-results .summary-hardest { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.5rem; }
-  .teacher-results .summary-hardest > p:nth-child(2) { min-width: 0; }
-}
 @media (max-width: 700px) {
-  .teacher-results .results-summary { grid-template-columns: minmax(0, 1fr); }
-  .teacher-results .summary-hardest { display: block; }
   .teacher-results .student-row-main { flex-wrap: wrap; }
   .teacher-results .student-row-main > span:nth-child(2) { flex-basis: 60%; }
 }
 
-/* Case descriptions expand only for classroom distance. */
+/* Result controls stay secondary to names, grades and checks. */
+.correction-timer { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.25rem; padding: 0.375rem 0.75rem; border-radius: 0.5rem; background: hsl(var(--secondary)); font-size: 1.125rem; font-weight: 600; white-space: nowrap; }
+.results-options > summary { list-style: none; }
+.results-option-trigger { display: flex; align-items: center; gap: 0.375rem; min-height: 2rem; padding: 0.25rem 0.5rem; border-radius: 0.375rem; cursor: pointer; font-size: 0.75rem; color: hsl(var(--muted-foreground)); }
+.results-option-trigger:hover, .results-options[open] > summary { background: hsl(var(--secondary)); color: hsl(var(--foreground)); }
+.results-option-trigger:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }
+/* Fixed placement escapes both scrolling results and the scaled projector. */
+.results-options-panel { position: fixed; left: max(1rem, calc((100vw - 48rem) / 2)); right: 1rem; top: 9rem; z-index: 50; max-width: 46rem; max-height: calc(100dvh - 10rem); overflow: auto; border: 1px solid hsl(var(--border)); border-radius: 0.5rem; padding: 0.75rem; background: hsl(var(--popover)); color: hsl(var(--popover-foreground)); box-shadow: 0 8px 24px hsl(var(--foreground) / 0.12); }
 .results-matrix tbody th { container-type: inline-size; }
 .case-name { font-size: clamp(1rem, 4.5cqi, 1.5rem); font-weight: 500; line-height: 1.25; }
-.projector-content .results-matrix { width: auto !important; }
-.projector-content .results-matrix col:first-child { width: clamp(24rem, 40vw, 40rem) !important; }
-.projector-content .results-matrix col:not(:first-child) { width: 6rem !important; }
+.matrix-resizer { position: absolute; right: -5px; top: 0; bottom: 0; z-index: 40; width: 10px; cursor: col-resize; touch-action: none; }
+.matrix-resizer::after { content: ''; position: absolute; top: 0; bottom: 0; left: 4px; width: 2px; background: hsl(var(--border)); }
+.matrix-resizer:hover::after, .matrix-resizer:focus-visible::after, .matrix-resizer[data-dragging]::after { background: hsl(var(--primary)); }
+.matrix-resizer:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }
+.projector-content { --matrix-student-width: 6rem; }
+.projector-content .case-name { font-size: 1rem; line-height: 1.25; }
 .projector-content .results-matrix thead button { height: auto; min-height: 2rem; }
+.projector-content .matrix-student-summary > div { margin-top: 0; }
 .projector-fit .matrix-viewport { max-height: none; overflow: visible; }
-.projector-fit .results-matrix { min-width: max(100%, 36rem); }
 .projector-fit .results-matrix thead { position: static; }
-.projector-fit .results-matrix th { position: static; }
-.projector-fit .results-matrix { width: 100% !important; }
+.projector-fit .results-matrix th { position: relative; }
 .projector-fit .results-matrix tbody th { padding-block: 1px; }
 .projector-fit .results-matrix tbody td { padding-block: 1px; }
