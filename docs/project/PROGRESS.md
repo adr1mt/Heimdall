@@ -6,7 +6,7 @@
 
 **T228 terminado:** Ajustes muestra la versión y permite buscar actualizaciones.
 El AppImage reintenta al terminar la actividad que aplazó la búsqueda.
-654 pruebas GUI correctas. Versión 1.0.2 preparada para validación remota.
+654 pruebas GUI correctas. [Versión 1.0.2 publicada](https://github.com/adr1mt/Heimdall/releases/tag/v1.0.2).
 [Evidencia](../reviews/evidence/T228/RESULTADOS.md).
 
 **T227 terminado, compilado sin reinstalar la app abierta:** controles de aula
@@ -15,11 +15,6 @@ Ocultación compartida desde Corregir/lista/matriz; lista sin envío individual.
 Reanudar mantiene la espera. Preparar otro examen conserva el histórico y
 permite elegir clase de nuevo. 648 pruebas GUI y arnés Electron correctos.
 [Evidencia](../reviews/evidence/T227/RESULTADOS.md).
-
-**T226 instalado y abierto desde el menú de Zorin:** T225 con motor embebido.
-Rutas antiguas reparadas; respaldo privado y clase anterior conservada.
-Demo local de 15 alumnos ficticios, cinco preguntas, 75 comprobaciones correctas.
-Examen/clase seleccionados, sin SSH. [Evidencia](../reviews/evidence/T226/RESULTADOS.md).
 
 **T225 terminado:** dependencias y empaquetado Linux actualizados, sin avisos
 npm; 643 pruebas GUI, motor/SSH y editor real correctos. [Evidencia](../reviews/evidence/T225/RESULTADOS.md).
@@ -33,7 +28,7 @@ por alumno, sin afectar notas por SSH. Exportación CSV/Moodle conservada.
 [Evidencia](../reviews/evidence/T221/RESULTADOS.md).
 [Decisión](../adr/0040-pausa-explicita-y-lista-final.md).
 
-T197/T202: pública 1.0.1; los builds posteriores no son publicación.
+T197/T202: [publicación anterior 1.0.1](https://github.com/adr1mt/Heimdall/releases/tag/v1.0.1).
 
 ## Problemas conocidos y límites
 
@@ -61,5 +56,3 @@ T197/T202: pública 1.0.1; los builds posteriores no son publicación.
 ## Siguiente trabajo
 
 T070 READY: T204 reparó solo RA1. T084 espera aula; T023 y T186 READY.
-T223/T224/T225 instalados (T226); T227 compilado, pendiente de instalación.
-Sin publicación nueva autorizada.
