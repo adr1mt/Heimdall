@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated": "2026-10-29",
+  "updated": "2026-11-03",
   "status_values": [
     "BLOCKED",
     "READY",
@@ -5321,6 +5321,33 @@
       ],
       "completed": "2026-10-29",
       "notes": "648 pruebas GUI correctas, make check/gui-build/docs-check/tools-check y arnés Electron con alumnado ficticio. Vista profesor eliminada, escala en Resultados, matriz sin leyenda, lista sin informes individuales y ocultación compartida desde Corregir. Reanudar mantiene espera; Preparar otro examen tras cierre limpia presentación y permite elegir la misma clase sin recuperar las notas antiguas. Evidencia docs/reviews/evidence/T227/RESULTADOS.md. Sin instalación habitual ni publicación."
+    },
+    {
+      "id": "T228",
+      "title": "Buscar actualizaciones y reintentar al terminar la actividad de aula",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T227"
+      ],
+      "goal": "Hacer visible el estado de las actualizaciones y retomar las búsquedas aplazadas.",
+      "scope": [
+        "Ajustes, actualizador AppImage y publicación 1.0.2."
+      ],
+      "acceptance": [
+        "Ajustes muestra la versión instalada, la última publicada consultada y el resultado de la búsqueda manual.",
+        "Una corrección o el modo examen interrumpen la búsqueda y la descarga. Se reintenta una vez al quedar libre, incluso si la actividad termina antes de resolverse la cancelación.",
+        "La descarga verificada se instala al cerrar. La versión declarada en el motor, la GUI y el lock es 1.0.2."
+      ],
+      "tests": [
+        "Pruebas del servicio y actualizador, make check gui-check gui-build docs-check tools-check y Release validation."
+      ],
+      "completed": "2026-11-03",
+      "notes": "654 pruebas GUI y validación local de versiones, herramientas, Go y documentación. Evidencia en docs/reviews/evidence/T228/RESULTADOS.md. Validación remota antes de publicar.",
+      "out_of_scope": [
+        "Recuperación de la AppImage anterior y cambios en la corrección."
+      ]
     }
   ]
 }

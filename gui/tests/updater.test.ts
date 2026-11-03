@@ -140,6 +140,7 @@ describe('la versión nueva', () => {
     expect(await h.updater.check()).toBe('ready')
     expect(h.announced).toEqual(['0.2.0'])
     expect(h.updater.pendingVersion()).toBe('0.2.0')
+    expect(h.updater.latestVersion).toBe('0.2.0')
     // Nada ha tocado todavía la aplicación que se está usando.
     expect(readFileSync(h.appImage, 'utf-8')).toBe('la versión que hay instalada')
 
@@ -165,6 +166,12 @@ describe('la versión nueva', () => {
 })
 
 describe('cuando algo falla', () => {
+  it('reports an invalid release feed as failed', async () => {
+    const h = harness({}, '<html>error</html>')
+    expect(await h.updater.check()).toBe('failed')
+    expect(h.updater.latestVersion).toBeNull()
+  })
+
   it('sin red arranca igual, se registra y no se avisa a nadie', async () => {
     const h = harness({
       fetchText: async () => {

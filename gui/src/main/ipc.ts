@@ -18,7 +18,7 @@ import { sendFinalReports } from './final-reports'
 import type { ExamRecord } from '../shared/exam-record'
 import { markOf, scaleOf } from '../renderer/src/lib/scale'
 import { listRuns, varDirOf } from './history'
-import { correctionStarting } from './activity'
+import { correctionSettled, correctionStarting } from './activity'
 import { backupRuns, listBackups, restoreBackups, waitForBackups } from './backup'
 import { RunSession, projectDirOf } from './run'
 import { describeExam } from './describe'
@@ -147,6 +147,10 @@ export function isExamModeActive(): boolean {
   return examMode
 }
 
+export function isUpdateBlocked(): boolean {
+  return shuttingDown || examMode || session !== null || finalizing !== null
+}
+
 /**
  * Keeps the computer awake while the exam lasts. The teacher does not touch
  * the keyboard —the application corrects on its own and the panel is
@@ -173,6 +177,7 @@ export function endExamMode(): void {
   examSecrets = {}
   examMode = false
   setKeepAwake(false)
+  correctionSettled()
   if (currentRecord?.state === 'ACTIVE') records().pause(currentRecord)
 }
 
@@ -392,6 +397,7 @@ export function registerIpc(): void {
       },
       onClose: (exitCode, stderr) => {
         session = null
+        correctionSettled()
         try {
           registry.recover(record)
           if (!examMode) registry.pause(record)
@@ -487,7 +493,10 @@ export function registerIpc(): void {
       // Finalize the selected evidence. Edits affect only a later resumed
       // correction; they must never replace completed grades with an empty set.
       return closed
-    })().finally(() => { finalizing = null })
+    })().finally(() => {
+      finalizing = null
+      correctionSettled()
+    })
     return finalizing
   })
 

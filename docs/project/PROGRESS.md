@@ -1,8 +1,13 @@
 # Estado del proyecto
 
-**Actualizado**: 2026-10-29 · **Fase**: 9 — Endurecimiento y publicación
+**Actualizado**: 2026-11-03 · **Fase**: 9 — Endurecimiento y publicación
 
 ## Última sesión
+
+**T228 terminado:** Ajustes muestra la versión y permite buscar actualizaciones.
+El AppImage reintenta al terminar la actividad que aplazó la búsqueda.
+654 pruebas GUI correctas. Versión 1.0.2 preparada para validación remota.
+[Evidencia](../reviews/evidence/T228/RESULTADOS.md).
 
 **T227 terminado, compilado sin reinstalar la app abierta:** controles de aula
 simplificados; escala en Resultados, sin Vista profesor ni leyenda en matriz.

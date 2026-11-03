@@ -130,6 +130,7 @@ export type CheckOutcome =
   | 'failed'
 
 export class Updater {
+  latestVersion: string | null = null
   private pending: { release: Release; file: string } | null = null
 
   constructor(private readonly deps: UpdaterDeps) { }
@@ -162,10 +163,8 @@ export class Updater {
       const release = parseRelease(await this.deps.fetchText(RELEASE_FEED, signal))
       if (busy() || controller.signal.aborted) return 'busy'
       signal.throwIfAborted()
-      if (!release) {
-        log('no hay ninguna versión publicada que se pueda instalar')
-        return 'current'
-      }
+      if (!release) throw new Error('GitHub no ofrece una AppImage con datos de verificación válidos')
+      this.latestVersion = release.version
       if (!isNewer(release.version, this.deps.currentVersion)) {
         log(`al día: la última publicada es la ${release.version}`)
         return 'current'

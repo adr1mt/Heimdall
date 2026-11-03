@@ -213,10 +213,11 @@ copia aunque la corrección permanezca guardada en su carpeta.
 
 La aplicación mira si hay una versión nueva publicada y, si la hay, la deja
 descargada y avisa sin interrumpir. Se instala al cerrar el programa. Solo
-funciona con el AppImage; el `.deb` se actualiza con `apt`. Si empieza una
-corrección o el modo examen, aplaza la actualización y cancela la descarga en
-curso. Las descargas tienen un límite de tiempo y tamaño y se comprueba que
-su tamaño y huella coinciden con los publicados antes de instalarlas.
+funciona con el AppImage. En **Ajustes → Actualizaciones** puedes buscar
+manualmente y consultar la versión instalada, la última versión encontrada y el
+resultado de la búsqueda. Si empieza una corrección o el modo examen, Heimdall
+cancela la búsqueda o descarga en curso y vuelve a intentarlo cuando queda
+libre. Antes de instalar verifica el tamaño y la huella de la descarga.
 Lo que hace el actualizador queda anotado en
 `~/.config/heimdall-gui/logs/actualizacion.log`.
 

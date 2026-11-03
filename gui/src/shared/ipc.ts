@@ -40,5 +40,8 @@ export const IPC = {
   runClosed: 'run:closed',
   backupWarning: 'backups:warning',
   // A new version is downloaded and waiting for the application to close.
-  updateReady: 'update:ready'
+  updateReady: 'update:ready',
+  getUpdateStatus: 'update:getStatus',
+  checkForUpdates: 'update:check',
+  updateStatus: 'update:status'
 } as const

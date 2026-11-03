@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 import { IPC } from '../shared/ipc'
 import type { EngineEvent } from '../shared/events'
-import type { HeimdallApi, RunClosed, RunRequest } from '../shared/types'
+import type { HeimdallApi, RunClosed, RunRequest, UpdateStatus } from '../shared/types'
 
 /**
  * Subscribes to a channel the main process pushes on. Only the payload
@@ -55,6 +55,9 @@ const api: HeimdallApi = {
   onBackupWarning: (listener) => subscribe<string>(IPC.backupWarning, listener),
   onRunEvent: (listener) => subscribe<EngineEvent>(IPC.runEvent, listener),
   onRunClosed: (listener) => subscribe<RunClosed>(IPC.runClosed, listener),
+  getUpdateStatus: () => ipcRenderer.invoke(IPC.getUpdateStatus),
+  checkForUpdates: () => ipcRenderer.invoke(IPC.checkForUpdates),
+  onUpdateStatus: (listener) => subscribe<UpdateStatus>(IPC.updateStatus, listener),
   onUpdateReady: (listener) => subscribe<string>(IPC.updateReady, listener)
 }
 

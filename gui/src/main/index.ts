@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { allowQuit, guardClose } from './close-guard'
 import { registerIpc, isRunActive, finishCorrections } from './ipc'
 import { hasPendingBackups } from './backup'
-import { applyPendingUpdate, startUpdates } from './update-service'
+import { applyPendingUpdate, registerUpdateIpc, startUpdates } from './update-service'
 
 // Avoids the compositor/GPU hangs that are common on Linux (the usual cause
 // of "the window is not responding"). The app is light and needs no HW
@@ -138,6 +138,7 @@ app.whenReady().then(() => {
   if (!primaryInstance) return
   registerCsp()
   registerIpc()
+  registerUpdateIpc()
   createWindow()
 
   app.on('activate', () => {
