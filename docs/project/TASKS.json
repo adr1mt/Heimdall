@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated": "2026-10-29",
+  "updated": "2026-11-05",
   "status_values": [
     "BLOCKED",
     "READY",
@@ -5321,6 +5321,186 @@
       ],
       "completed": "2026-10-29",
       "notes": "648 pruebas GUI correctas, make check/gui-build/docs-check/tools-check y arnés Electron con alumnado ficticio. Vista profesor eliminada, escala en Resultados, matriz sin leyenda, lista sin informes individuales y ocultación compartida desde Corregir. Reanudar mantiene espera; Preparar otro examen tras cierre limpia presentación y permite elegir la misma clase sin recuperar las notas antiguas. Evidencia docs/reviews/evidence/T227/RESULTADOS.md. Sin instalación habitual ni publicación."
+    },
+    {
+      "id": "T228",
+      "title": "Zoom por teclado y ayuda de comprobaciones en el editor",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [],
+      "goal": "Zoom por teclado y ayuda de comprobaciones en el editor",
+      "scope": [
+        "Atajos de escala persistida de toda la interfaz y Monaco; coordinación con menú nativo.",
+        "Panel de aserciones en editor y manual, conservando borradores.",
+        "Auditoría AutoCheck conservada y fases autorizadas registradas como T229–T234."
+      ],
+      "acceptance": [
+        "Ctrl + más/igual, menos y cero cambian/restablecen una única escala persistida, también con Monaco enfocado; límites 80–120 %.",
+        "El selector de Resultados refleja los atajos; la escala incluye texto del editor y no se duplica con el zoom nativo.",
+        "Ayuda accesible desde el editor sin perder borrador explica las cinco aserciones actuales, ejemplos y restricciones.",
+        "Suite rápida, tipos, build y comprobación Electron aislada correctos."
+      ],
+      "out_of_scope": [
+        "Publicación y push."
+      ],
+      "tests": [
+        "GOCACHE=/tmp/heimdall-go-cache make check",
+        "make gui-check gui-build docs-check tools-check",
+        "Arnés Electron scripts/zoom-help-lab.ts con perfil temporal"
+      ],
+      "completed": "2026-11-05",
+      "notes": "648 pruebas GUI, tipos, build/preload y motor correctos. Pruebas de procesos hijos requieren ejecución fuera del sandbox de Codex. Arnés real con zoom 80–120 %, Ctrl + más/igual/menos/cero, Monaco enfocado, persistencia al recargar, ayuda y borrador conservado; capturas 1024/1280 a 120 %. Evidencia docs/reviews/evidence/T228/RESULTADOS.md. Sin instalación habitual ni publicación. Node disponible 24.22.1; no se ha validado toolchain Node 26 en esta sesión."
+    },
+    {
+      "id": "T229",
+      "title": "Formato YAML inglés versionado y conversión de exámenes",
+      "phase": 9,
+      "status": "READY",
+      "priority": "P1",
+      "depends_on": [
+        "T228"
+      ],
+      "goal": "Formato YAML inglés versionado y conversión de exámenes",
+      "scope": [
+        "Propuesta autorizada por el usuario el 2026-11-05; detallar la fase antes de implementarla."
+      ],
+      "acceptance": [
+        "Definir ADR y formato inglés coherente, manteniendo lectura explícita del formato español.",
+        "Conversión validada conserva significado y fuentes antiguas; no reescribe sesiones activas ni notas previas.",
+        "Editor, ayuda, ejemplos y pruebas de motor/GUI usan el formato versionado."
+      ],
+      "out_of_scope": [
+        "Publicación y push."
+      ],
+      "tests": [
+        "Pruebas específicas de los criterios y suites de las áreas afectadas."
+      ]
+    },
+    {
+      "id": "T230",
+      "title": "Exportar informes individuales para Moodle",
+      "phase": 9,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T229"
+      ],
+      "goal": "Exportar informes individuales para Moodle",
+      "scope": [
+        "Propuesta autorizada por el usuario el 2026-11-05; detallar la fase antes de implementarla."
+      ],
+      "acceptance": [
+        "Producir paquete de feedback y mapeo de participantes verificable para una tarea Moodle.",
+        "Conservar CSV existente y comprobar importación en entorno de prueba sin datos reales.",
+        "Documentar requisitos y limitaciones de tareas sin entregas de archivos."
+      ],
+      "out_of_scope": [
+        "Publicación y push."
+      ],
+      "tests": [
+        "Pruebas específicas de los criterios y suites de las áreas afectadas."
+      ]
+    },
+    {
+      "id": "T231",
+      "title": "Enviar informes individuales por correo",
+      "phase": 9,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T230"
+      ],
+      "goal": "Enviar informes individuales por correo",
+      "scope": [
+        "Propuesta autorizada por el usuario el 2026-11-05; detallar la fase antes de implementarla."
+      ],
+      "acceptance": [
+        "Definir proveedor/autenticación del centro antes de implementar el envío.",
+        "Vista previa por destinatario, confirmación de lote y estado de envío separado de las notas.",
+        "Proteger credenciales y probar reintentos y resultados inciertos sin duplicación silenciosa."
+      ],
+      "out_of_scope": [
+        "Publicación y push."
+      ],
+      "tests": [
+        "Pruebas específicas de los criterios y suites de las áreas afectadas."
+      ]
+    },
+    {
+      "id": "T232",
+      "title": "Validar un corrector especializado aislado",
+      "phase": 9,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T229"
+      ],
+      "goal": "Validar un corrector especializado aislado",
+      "scope": [
+        "Propuesta autorizada por el usuario el 2026-11-05; detallar la fase antes de implementarla."
+      ],
+      "acceptance": [
+        "Elegir una práctica real y un lenguaje o formato antes de ampliar el motor.",
+        "ADR y prototipo con criterios fijos, versión identificable, evidencia y errores técnicos separados.",
+        "Probar aislamiento, límites, entrega correcta/incorrecta y fallos sin afectar otros alumnos."
+      ],
+      "out_of_scope": [
+        "Publicación y push."
+      ],
+      "tests": [
+        "Pruebas específicas de los criterios y suites de las áreas afectadas."
+      ]
+    },
+    {
+      "id": "T233",
+      "title": "Paquetes instalables de correctores para profesores",
+      "phase": 9,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T232"
+      ],
+      "goal": "Paquetes instalables de correctores para profesores",
+      "scope": [
+        "Propuesta autorizada por el usuario el 2026-11-05; detallar la fase antes de implementarla."
+      ],
+      "acceptance": [
+        "Extraer un contrato versionado del corrector validado y documentar autoría de paquetes.",
+        "Instalar y seleccionar paquetes con compatibilidad, permisos y versiones visibles.",
+        "Conservar versiones por sesión y rechazar paquetes incompatibles antes de evaluar."
+      ],
+      "out_of_scope": [
+        "Publicación y push."
+      ],
+      "tests": [
+        "Pruebas específicas de los criterios y suites de las áreas afectadas."
+      ]
+    },
+    {
+      "id": "T234",
+      "title": "Publicar notas e informes directamente en Moodle",
+      "phase": 9,
+      "status": "BLOCKED",
+      "priority": "P1",
+      "depends_on": [
+        "T230"
+      ],
+      "goal": "Publicar notas e informes directamente en Moodle",
+      "scope": [
+        "Propuesta autorizada por el usuario el 2026-11-05; detallar la fase antes de implementarla."
+      ],
+      "acceptance": [
+        "Comprobar API, permisos y configuración de una instancia Moodle de prueba.",
+        "Resolver curso/tarea/participante y publicar feedback y nota con confirmación.",
+        "Verificar reintentos y conflictos sin alterar notas locales ni sobrescribir cambios remotos inadvertidamente."
+      ],
+      "out_of_scope": [
+        "Publicación y push."
+      ],
+      "tests": [
+        "Pruebas específicas de los criterios y suites de las áreas afectadas."
+      ]
     }
   ]
 }

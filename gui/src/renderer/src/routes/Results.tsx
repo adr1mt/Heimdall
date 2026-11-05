@@ -1465,7 +1465,7 @@ function ResultsScale() {
   const { uiZoom, setUiZoom } = useApp()
   return <label className="flex items-center justify-between gap-3 text-sm">
     Escala de interfaz
-    <select aria-label="Escala de interfaz" value={uiZoom} onChange={event => setUiZoom(Number(event.target.value))}
+    <select aria-label="Escala de interfaz" title="Ctrl + + / − para cambiar; Ctrl + 0 para restablecer" value={uiZoom} onChange={event => setUiZoom(Number(event.target.value))}
       className="h-8 rounded border border-input bg-background px-2">
       {[80, 90, 100, 110, 120].map(value => <option key={value} value={value}>{value} %</option>)}
     </select>

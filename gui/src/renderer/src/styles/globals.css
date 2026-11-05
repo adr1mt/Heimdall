@@ -134,7 +134,8 @@
 
 @layer base {
   :root {
-    font-size: calc(16px * var(--ui-scale, 1));
+    font-size: 16px;
+    zoom: var(--ui-scale, 1);
     --background: 220 27% 98%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;

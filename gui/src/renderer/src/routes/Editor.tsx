@@ -5,6 +5,7 @@ import { Button, Spinner, ViewHeader } from '@/components/ui'
 import { useApp, noticeFrom } from '@/stores/app'
 import { readExam } from '../../../shared/exam'
 import { t } from '@/i18n/es'
+import { AssertionHelp } from '@/components/AssertionHelp'
 
 const YamlEditor = lazy(() => import('@/components/YamlEditor'))
 
@@ -15,6 +16,7 @@ export default function EditorView() {
   const setDraft = useApp((s) => s.setEditorDraft)
   const setNotice = useApp((s) => s.setNotice)
   const [checking, setChecking] = useState(false)
+  const [showAssertions, setShowAssertions] = useState(false)
   const [verdict, setVerdict] = useState<{ ok: boolean; message: string } | null>(null)
   useEffect(() => {
     if (!project || useApp.getState().editorDraft?.path === project.examPath) return
@@ -119,6 +121,14 @@ export default function EditorView() {
           </>
         }
       />
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-4 py-2 text-xs">
+        <span className="text-muted-foreground">Ctrl + + / −: zoom · Ctrl + 0: restablecer</span>
+        <Button size="sm" variant="outline" aria-expanded={showAssertions} aria-controls="assertion-help"
+          onClick={() => setShowAssertions(!showAssertions)}>Comprobaciones disponibles</Button>
+      </div>
+      {showAssertions && <aside id="assertion-help" aria-label="Ayuda de comprobaciones" className="max-h-[40vh] shrink-0 overflow-auto border-b border-border p-4">
+        <AssertionHelp />
+      </aside>}
       <div className="min-h-0 flex-1">
         <Suspense
           fallback={

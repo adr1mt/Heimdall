@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react'
 import { ReportAccessHelp } from '@/components/ReportAccessHelp'
 import { ViewHeader } from '@/components/ui'
+import { AssertionHelp } from '@/components/AssertionHelp'
 
 const sections = [
   ['inicio', 'Flujo rápido'],
   ['proyectos', 'Proyectos'],
   ['yaml', 'Editor YAML'],
+  ['aserciones', 'Comprobaciones YAML'],
   ['clases', 'Clases y alumnos'],
   ['conexion', 'Usuario y contraseña'],
   ['corregir', 'Corregir'],
@@ -128,6 +130,9 @@ export default function HelpView() {
               motivo y se conserva el fichero anterior. Los comentarios y el texto se guardan tal
               como los escribes. Al salir con cambios sin guardar, la aplicación te avisa.
             </p>
+          </Block>
+          <Block id="aserciones" title="Comprobaciones del examen YAML">
+            <AssertionHelp />
           </Block>
           <Block id="clases" title="Clases y alumnos">
             <p>

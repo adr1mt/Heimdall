@@ -32,6 +32,7 @@ import { startCorrection } from './lib/start-run'
 import { t } from './i18n/es'
 import logo from './assets/logo.png'
 import { ConfirmDialog } from '@/components/ui'
+import { zoomAction } from '../../shared/ui-zoom'
 
 const HomeView = lazy(() => import('./routes/Home'))
 const SettingsView = lazy(() => import('./routes/Settings'))
@@ -80,6 +81,19 @@ function AppBody() {
     return () => query.removeEventListener('change', update)
   }, [])
   const collapsed = sidebar === 'collapsed' || (sidebar === 'auto' && narrow)
+  useEffect(() => {
+    function onZoom(event: KeyboardEvent): void {
+      const action = zoomAction(event.key, event.ctrlKey, event.metaKey, event.altKey)
+      if (!action || event.isComposing) return
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      const state = useApp.getState()
+      state.setUiZoom(action === 'reset' ? 100 : state.uiZoom + (action === 'in' ? 10 : -10))
+    }
+    // Capture before Monaco handles the keystroke, including while editing.
+    window.addEventListener('keydown', onZoom, true)
+    return () => window.removeEventListener('keydown', onZoom, true)
+  }, [])
   const notice = useApp((s) => s.notice)
   const noticeKind = useApp((s) => s.noticeKind)
   const setNotice = useApp((s) => s.setNotice)

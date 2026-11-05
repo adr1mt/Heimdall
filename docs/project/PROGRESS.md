@@ -1,15 +1,17 @@
 # Estado del proyecto
 
-**Actualizado**: 2026-10-29 · **Fase**: 9 — Endurecimiento y publicación
+**Actualizado**: 2026-11-05 · **Fase**: 9 — Endurecimiento y publicación
 
 ## Última sesión
+**T228 terminado:** zoom Ctrl + más/menos/cero, escala única persistida que
+incluye Monaco; ayuda de las cinco aserciones desde editor y manual, sin perder
+borradores. 648 pruebas GUI y arnés Electron real correctos.
+[Evidencia](../reviews/evidence/T228/RESULTADOS.md). Compilado, sin instalar.
+Propuesta AutoCheck autorizada, fases T229–T234; siguiente: YAML inglés T229.
+[Auditoría](../research/AUTOCHECK-2026-11-05.md).
 
-**T227 terminado, compilado sin reinstalar la app abierta:** controles de aula
-simplificados; escala en Resultados, sin Vista profesor ni leyenda en matriz.
-Ocultación compartida desde Corregir/lista/matriz; lista sin envío individual.
-Reanudar mantiene la espera. Preparar otro examen conserva el histórico y
-permite elegir clase de nuevo. 648 pruebas GUI y arnés Electron correctos.
-[Evidencia](../reviews/evidence/T227/RESULTADOS.md).
+**T227 terminado:** controles de aula simplificados, ocultación compartida y
+preparación de otro examen con histórico conservado; pendiente de instalación.
 
 **T226 instalado y abierto desde el menú de Zorin:** T225 con motor embebido.
 Rutas antiguas reparadas; respaldo privado y clase anterior conservada.
@@ -27,8 +29,6 @@ al reabrir. Histórico por sesiones; informes confirmados y reintentos con estad
 por alumno, sin afectar notas por SSH. Exportación CSV/Moodle conservada.
 [Evidencia](../reviews/evidence/T221/RESULTADOS.md).
 [Decisión](../adr/0040-pausa-explicita-y-lista-final.md).
-
-T197/T202: pública 1.0.1; los builds posteriores no son publicación.
 
 ## Problemas conocidos y límites
 
@@ -55,6 +55,6 @@ T197/T202: pública 1.0.1; los builds posteriores no son publicación.
 
 ## Siguiente trabajo
 
-T070 READY: T204 reparó solo RA1. T084 espera aula; T023 y T186 READY.
-T223/T224/T225 instalados (T226); T227 compilado, pendiente de instalación.
+T229 READY priorizado por el usuario; T070, T023 y T186 siguen READY. T084 espera aula.
+T223/T224/T225 instalados (T226); T227/T228 compilados, pendientes de instalación.
 Sin publicación nueva autorizada.

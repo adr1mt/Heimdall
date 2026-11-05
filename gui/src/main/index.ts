@@ -1,4 +1,5 @@
 import { app, BrowserWindow, dialog, session, shell } from 'electron'
+import { zoomAction } from '../shared/ui-zoom'
 import { join } from 'node:path'
 import { allowQuit, guardClose } from './close-guard'
 import { registerIpc, isRunActive, finishCorrections } from './ipc'
@@ -73,6 +74,11 @@ function createWindow(): void {
   })
 
   win.on('ready-to-show', () => win.show())
+  // Let the renderer own the persisted scale, without Electron's menu applying
+  // a second browser zoom. Other menu accelerators keep their normal behavior.
+  win.webContents.on('before-input-event', (_event, input) => {
+    win.webContents.setIgnoreMenuShortcuts(zoomAction(input.key, input.control, input.meta, input.alt) !== null)
+  })
   win.webContents.on('will-prevent-unload', (event) => {
     const choice=dialog.showMessageBoxSync(win,{type:'question',buttons:['Volver al editor','Descartar y cerrar'],defaultId:0,cancelId:0,title:'Cambios sin guardar',message:'El borrador del examen no se ha guardado.'})
     if(choice===1) event.preventDefault()

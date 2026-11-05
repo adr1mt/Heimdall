@@ -1189,3 +1189,13 @@ alumnos de la evaluación. Reanudar conserva la espera en memoria; al recuperar
 una pausa de disco espera el intervalo completo. Preparar otro examen tras
 finalizar limpia solo el contexto visible y la selección de clase, sin borrar
 registros. No cambia ADR-0040 ni el manifiesto de sesión.
+
+## T228 · Zoom y propuesta AutoCheck (2026-11-05)
+
+El usuario autoriza la propuesta de ampliación: primero zoom y ayuda de
+aserciones, después YAML inglés versionado, entrega de informes y correctores
+especializados. T228 implementa solo el primer bloque. T229–T234 conservan
+el resto con criterios y dependencias. La auditoría está en
+`docs/research/AUTOCHECK-2026-11-05.md`. No se sustituye ningún ADR del motor:
+las fases de formato, correo y plugins requieren su decisión específica antes
+de implementarse. Escala UI única persistida 80–120 %, ahora incluyendo Monaco.
