@@ -126,7 +126,7 @@ export const t = {
       'El comando y sus argumentos, separados por espacios. No hay intérprete: un ; o un | son un argumento más. Entre comillas lo que lleve espacios.',
     commandPlaceholder: 'systemctl is-active kea-dhcp4-server',
     value: 'Dato del alumno',
-    valueHint: 'De la clase, por ejemplo ${alumno.p1}.',
+    valueHint: 'De la clase, por ejemplo ${student.p1}.',
     assertion: 'Qué se espera',
     expected: 'Valor esperado',
     anchor: 'Línea de anclaje',
@@ -149,11 +149,11 @@ export const t = {
     readFailed: 'No se pudo leer el examen',
     saveFailed: 'No se pudo guardar el examen',
     assertionName: {
-      contiene: 'La salida contiene',
-      igual_a: 'La salida es exactamente',
-      no_contiene: 'La salida NO contiene',
+      contains: 'La salida contiene',
+      equals: 'La salida es exactamente',
+      not_contains: 'La salida NO contiene',
       exit_code: 'El comando termina con el código',
-      cerca_de: 'Cerca de una línea, aparece'
+      near: 'Cerca de una línea, aparece'
     }
   },
   // Analíticas: a quién atender primero y qué está fallando al grupo entero.
@@ -231,7 +231,7 @@ export const t = {
     columnName: 'Nombre de la columna',
     columnPlaceholder: 'subdominio',
     columnHint:
-      'Para lo que el examen pida de cada alumno y no sea su máquina: un subdominio, un puerto asignado. En el examen se escribe ${alumno.NOMBRE}.',
+      'Para lo que el examen pida de cada alumno y no sea su máquina: un subdominio, un puerto asignado. En el examen se escribe ${student.NOMBRE}.',
     removeColumn: (name: string) => `Quitar la columna «${name}»`,
     removeColumnTitle: (name: string) => `¿Quitar la columna «${name}»?`,
     removeColumnBody: 'Se borra lo que cada alumno tuviera en ella.',

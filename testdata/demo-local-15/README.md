@@ -5,7 +5,7 @@ local. Las respuestas están en las columnas p1–p5 de la clase. Hay entre cero
 repartidos entre los 15 alumnos. La aplicación presenta las notas según la
 escala y el umbral configurados en Ajustes.
 
-No ejecuta comandos ni conexiones SSH: `hosts: []` y comprobaciones `valor:`.
+No ejecuta comandos ni conexiones SSH: `hosts: []` y comprobaciones `value:`.
 La dirección y contraseña ficticias de la ficha son campos de demostración que
 la GUI conserva; no se utilizan para conectarse a ninguna máquina.
 

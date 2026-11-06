@@ -22,7 +22,7 @@ it.each(['active', 'between', 'copying', 'failure'])('closing waits for grades a
   state.data = join(root, 'profile')
   const project = join(root, 'project'), exam = join(project, 'examen.yaml')
   mkdirSync(state.data); mkdirSync(join(project, 'var'), { recursive: true })
-  writeFileSync(exam, 'examen: Ficticio\n')
+  writeFileSync(exam, 'exam: Ficticio\n')
   const run = validRun(), result = join(project, 'var', 'run-R1.json')
   const engine = join(root, 'engine.cjs')
   // Final grades appear only after SIGINT; the actual child then takes time

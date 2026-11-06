@@ -10,10 +10,10 @@ import { readSourceCopy, sourceCopiesSlot } from '../src/main/source-backup'
 const base = mkdtempSync(join(tmpdir(), 'heimdall-authoring-'))
 const profile = join(base, 'profile'), project = join(base, 'project')
 for (const path of [profile, project]) mkdirSync(path)
-const out = resolve('../docs/reviews/evidence/T203')
+const out = resolve(process.env.HEIMDALL_UI_EVIDENCE || '../docs/reviews/evidence/T203')
 mkdirSync(out, { recursive: true })
 const examPath = join(project, 'examen.yaml')
-const yaml = '# Comentario ficticio: conservar exactamente.\nexamen: "Examen original"\nversion: 1\nhosts: [host1]\npor_defecto: {peso: 1, sudo: true}\ngrupos:\n  - grupo: Red\n    comprobaciones:\n      - id: dominio\n        en: host1\n        cmd: ["echo", "${alumno.subdominio}"]\n        igual_a: "${host1.usuario}"\n'
+const yaml = '# Comentario ficticio: conservar exactamente.\nexam: "Examen original"\nversion: 1\nhosts: [host1]\ndefaults: {weight: 1, sudo: true}\ngroups:\n  - group: Red\n    checks:\n      - id: dominio\n        on: host1\n        cmd: ["echo", "${student.subdominio}"]\n        equals: "${host1.user}"\n'
 writeFileSync(examPath, yaml)
 writeFileSync(join(profile, 'settings.json'), JSON.stringify({ enginePath: resolve('../bin/heimdall') }))
 app.setPath('userData', profile)
@@ -37,14 +37,14 @@ void app.whenReady().then(async () => {
     }
     const typeYaml = async (text: string) => {
       win!.focus(); win!.webContents.focus()
-      const point = await js(`(()=>{const r=document.querySelector('.monaco-editor').getBoundingClientRect();return {x:Math.round(r.x+80),y:Math.round(r.y+10)}})()`)
+      const point = await js(`(()=>{const r=document.querySelector('.monaco-editor').getBoundingClientRect();return {x:Math.round(r.x+80),y:Math.round(r.y+30)}})()`)
       for (const type of ['mouseDown', 'mouseUp'] as const) win!.webContents.sendInputEvent({ type, ...point, button: 'left', clickCount: 1 })
       await pause()
       for (const type of ['keyDown', 'keyUp'] as const) win!.webContents.sendInputEvent({ type, keyCode: 'a', modifiers: ['control'] })
-      await js(`(()=>{const d=new DataTransfer();d.setData('text/plain',${JSON.stringify(text)});document.querySelector('.monaco-editor textarea').dispatchEvent(new ClipboardEvent('paste',{clipboardData:d,bubbles:true,cancelable:true}));})()`)
+      await js(`(()=>{const d=new DataTransfer();d.setData('text/plain',${JSON.stringify(text)});document.activeElement.dispatchEvent(new ClipboardEvent('paste',{clipboardData:d,bubbles:true,cancelable:true}));})()`)
       await wait(`document.body.innerText.includes('Sin guardar')`)
     }
-    const saved = () => wait(`document.querySelector('[role=status]')?.innerText.includes('Examen guardado.')`)
+    const saved = () => wait(`document.body.innerText.includes('Examen guardado.')`)
     await win.loadFile(resolve('out/renderer/index.html'))
     await wait(`!!document.body && [...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Abrir…')`)
     assert.deepEqual(await js('window.heimdall.listClasses()'), [])
@@ -53,7 +53,7 @@ void app.whenReady().then(async () => {
     await click('El examen')
     await wait(`!!document.querySelector('.monaco-editor textarea')`)
     await click('Validar')
-    await wait(`document.querySelector('[role=status]')?.innerText.includes('Examen válido.')`)
+    await wait(`document.body.innerText.includes('Examen válido.')`)
     assert.equal(readFileSync(examPath, 'utf8'), yaml, 'validation must not write')
     const renamed = yaml.replace('Examen original', 'Nombre nuevo sin clase')
     await typeYaml(renamed)
@@ -65,9 +65,9 @@ void app.whenReady().then(async () => {
     assert(copies.includes(yaml) && copies.includes(renamed), 'both source versions retained')
     await win.capturePage().then(image=>writeFileSync(join(out,'guardado-sin-clase.png'),image.toPNG()))
     // Structural errors are visible and must not replace the saved exam.
-    await typeYaml(renamed.replace('peso: 1', 'peso: -1'))
+    await typeYaml(renamed.replace('weight: 1', 'weight: -1'))
     await click('Guardar')
-    await wait(`document.querySelector('[role=status]')?.innerText.includes('peso negativo')`)
+    await wait(`document.body.innerText.includes('peso negativo')`)
     assert.equal(readFileSync(examPath, 'utf8'), renamed)
     await win.capturePage().then(image=>writeFileSync(join(out,'error-sin-clase.png'),image.toPNG()))
     // Ctrl+S follows the same class-independent save path.
@@ -86,7 +86,7 @@ void app.whenReady().then(async () => {
     await click('El examen')
     await wait(`!!document.querySelector('.monaco-editor textarea')`)
     await click('Validar')
-    await wait(`document.querySelector('[role=status]')?.innerText.includes('Examen válido.')`)
+    await wait(`document.body.innerText.includes('Examen válido.')`)
     assert.equal(await js(`document.querySelector('h1')?.textContent`),'El examen: Nombre nuevo sin clase')
     assert.equal(await js('window.heimdall.readExam('+JSON.stringify(examPath)+')'),final)
     console.log('T203 OK: no classes; real engine validation; rename/save/reopen; Ctrl+S; exact comments; retained versions; invalid draft preserved; corrupt classes ignored. Fictional data only.')

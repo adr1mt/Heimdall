@@ -23,7 +23,7 @@ function group(over: Partial<ClassGroup> = {}): ClassGroup {
     id: 'g1',
     name: '2SMX A',
     columns: [],
-    password: 'usuario',
+    password: 'user',
     students: [
       {
         id: 'alu1',
@@ -79,7 +79,7 @@ describe('el fichero de clases', () => {
     writeClasses(dir, [contaminated])
     const written = readFileSync(classesFile(dir), 'utf-8')
     expect(written).not.toContain('secreta')
-    expect(readClasses(dir)[0].password).toBe('usuario')
+    expect(readClasses(dir)[0].password).toBe('user')
   })
 
   it('descarta una contraseña por alumno escrita a mano en el fichero', () => {
@@ -106,7 +106,7 @@ describe('el fichero de clases', () => {
   })
 
   it('una copia conserva la contraseña', () => {
-    expect(duplicateOf(group(), [group()], 'g2').password).toBe('usuario')
+    expect(duplicateOf(group(), [group()], 'g2').password).toBe('user')
   })
 
   it('una clase sobrevive a cerrar la aplicación', () => {
@@ -147,20 +147,20 @@ describe('las columnas propias del profesor', () => {
   // Una columna con uno de estos nombres pisaría la identidad del alumno en
   // el aula sin que nadie lo dijera.
   it('no pueden llamarse como una clave que ya usa el aula', () => {
-    for (const name of ['id', 'nombre', 'moodle_id', 'excluido', 'hosts']) {
+    for (const name of ['id', 'name', 'moodle_id', 'excluded', 'hosts']) {
       expect(columnProblem(name, [])).not.toBeNull()
     }
   })
 
   it('una columna reservada no sobrevive a la lectura', () => {
-    const read = readGroup({ ...group(), columns: ['nombre', 'subdominio'] })
+    const read = readGroup({ ...group(), columns: ['name', 'subdominio'] })
     expect(read?.columns).toEqual(['subdominio'])
   })
 
   it('un campo reservado no sobrevive a la lectura', () => {
     const read = readGroup({
       ...group(),
-      students: [{ ...group().students[0], fields: { nombre: 'pisado', subdominio: 'ok' } }]
+      students: [{ ...group().students[0], fields: { name: 'pisado', subdominio: 'ok' } }]
     })
     expect(read?.students[0].fields).toEqual({ subdominio: 'ok' })
   })
@@ -276,7 +276,7 @@ describe('la clase que se ve', () => {
 it.each([
  {...group(),name:''},
  {...group(),students:[{name:'Missing id'}]},
- {...group(),columns:['nombre']},
+ {...group(),columns:['name']},
  {...group(),students:[{...group().students[0],fields:{subdominio:4}}]},
  {...group(),students:'invalid'}
 ])('blocks partial corruption without overwriting valid data',bad=> {

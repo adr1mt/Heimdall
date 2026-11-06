@@ -335,7 +335,7 @@ func TestExcludedStudentIsReportedWithoutGrade(t *testing.T) {
 
 	ex := find(t, run, "alu2")
 	if ex.Status != model.StudentExcluded || ex.Score.Status != model.ScoreExcluded {
-		t.Errorf("el alumno excluido: %q/%q", ex.Status, ex.Score.Status)
+		t.Errorf("el alumno excluded: %q/%q", ex.Status, ex.Score.Status)
 	}
 	if len(ex.Checks) != 0 || ex.Score.Final != nil {
 		t.Errorf("un alumno excluido no tiene comprobaciones ni nota: %+v", ex)

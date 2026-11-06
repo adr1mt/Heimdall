@@ -117,7 +117,7 @@ describe('parseEvent', () => {
 describe('secretRefsIn', () => {
   it('names each credential the classroom asks for, once and in order', () => {
     const inventory = [
-      'alumnos:',
+      'students:',
       '  - id: alu1',
       '    password_ref: "${AULA_PASSWORD}"',
       '  - id: alu2',
@@ -129,7 +129,7 @@ describe('secretRefsIn', () => {
   })
 
   it('asks for nothing when there is no reference', () => {
-    expect(secretRefsIn('alumnos: []\n')).toEqual([])
+    expect(secretRefsIn('students: []\n')).toEqual([])
   })
 })
 

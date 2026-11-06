@@ -1199,3 +1199,7 @@ el resto con criterios y dependencias. La auditoría está en
 `docs/research/AUTOCHECK-2026-11-05.md`. No se sustituye ningún ADR del motor:
 las fases de formato, correo y plugins requieren su decisión específica antes
 de implementarse. Escala UI única persistida 80–120 %, ahora incluyendo Monaco.
+
+## T229 · YAML en inglés (2026-11-06)
+
+El usuario descarta la compatibilidad española. ADR-0042 fija las claves y referencias inglesas tanto para el examen como para el inventario. Los nombres de archivo y la revisión del documento conservan su significado.

@@ -53,17 +53,17 @@ func init() {
 
 func Validate(args []string) error {
 	if len(args) != 6 || args[0] != "ra1-dhcp" {
-		return fmt.Errorf("comprobador: se esperan [ra1-dhcp, revisión, criterio, interfaz externa, interfaz interna, IP de examen]")
+		return fmt.Errorf("checker: se esperan [ra1-dhcp, revisión, criterio, interfaz externa, interfaz interna, IP de examen]")
 	}
 	if _, ok := sourceForRevision(args[1]); !ok {
-		return fmt.Errorf("comprobador: esta revisión requiere otra compilación de Heimdall; no se ejecutará ni calificará")
+		return fmt.Errorf("checker: esta revisión requiere otra compilación de Heimdall; no se ejecutará ni calificará")
 	}
 	if !criteria[args[2]] {
-		return fmt.Errorf("comprobador: criterio desconocido %q", args[2])
+		return fmt.Errorf("checker: criterio desconocido %q", args[2])
 	}
 	for _, arg := range args[3:] {
 		if arg == "" {
-			return fmt.Errorf("comprobador: faltan datos de interfaces o IP")
+			return fmt.Errorf("checker: faltan datos de interfaces o IP")
 		}
 	}
 	return nil

@@ -20,19 +20,19 @@ const sections = [
   ['informes-desktop', 'Abrir informes'],
   ['problemas', 'Problemas frecuentes']
 ] as const
-const example = `examen: "Servicios de red"
+const example = `exam: "Servicios de red"
 version: 1
 hosts: [host1]
-por_defecto: { peso: 1, timeout: 20s }
-grupos:
-  - grupo: "DNS"
-    comprobaciones:
+defaults: { weight: 1, timeout: 20s }
+groups:
+  - group: "DNS"
+    checks:
       - id: dns-activo
-        descripcion: "El servicio DNS está activo"
-        en: host1
-        peso: 2
+        description: "El servicio DNS está activo"
+        on: host1
+        weight: 2
         cmd: ["systemctl", "is-active", "named"]
-        igual_a: "active"`
+        equals: "active"`
 
 export default function HelpView() {
   return (
@@ -94,7 +94,7 @@ export default function HelpView() {
             </p>
             <p>
               La clase se guarda aparte y se reutiliza con distintos exámenes. No hace falta
-              preparar a mano el fichero de aula: Heimdall lo genera al corregir.
+              preparar a mano el fichero de classroom: Heimdall lo genera al corregir.
             </p>
           </Block>
           <Block id="yaml" title="Editor YAML">
@@ -120,7 +120,7 @@ export default function HelpView() {
             <p>
               Si un fichero o un comando solo lo puede leer el administrador (por ejemplo{' '}
               <code>/etc/kea</code> o <code>nft list ruleset</code>), añade{' '}
-              <code>sudo: true</code> a la comprobación, o a <code>por_defecto</code> para todas.
+              <code>sudo: true</code> a la comprobación, o a <code>defaults</code> para todas.
               Heimdall usa la contraseña de la clase; nunca la escribas en el examen. Si la máquina
               no la acepta, la comprobación queda sin evaluar, no suspendida.
             </p>
@@ -144,7 +144,7 @@ export default function HelpView() {
               El puerto SSH habitual es <strong>22</strong>. Activa «Puertos SSH» solo si necesitas
               otro; los puertos personalizados existentes se muestran al editar. Las columnas
               adicionales sirven para datos del examen, como el subdominio de cada alumno. En YAML
-              se usan con <code>{'${alumno.subdominio}'}</code>.
+              se usan con <code>{'${student.subdominio}'}</code>.
             </p>
           </Block>
           <Block id="conexion" title="Usuario y contraseña">

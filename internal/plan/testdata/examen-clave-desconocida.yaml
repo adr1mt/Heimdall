@@ -1,12 +1,12 @@
-examen: "Prueba"
+exam: "Prueba"
 version: 1
 hosts: [host1]
-grupos:
-  - grupo: "Uno"
-    comprobaciones:
+groups:
+  - group: "Uno"
+    checks:
       - id: c1
-        descripcion: "Una comprobación"
-        en: host1
+        description: "Una comprobación"
+        on: host1
         peligro: true
         cmd: ["true"]
-        contiene: "x"
+        contains: "x"

@@ -155,7 +155,7 @@ describe('student reports (T185)', () => {
   })
 
   it('takes the title only from the exam that was corrected', async () => {
-    const yaml = 'examen: "Examen RA2"\nversion: 1\nhosts: [h]\ngrupos: []\n'
+    const yaml = 'exam: "Examen RA2"\nversion: 1\nhosts: [h]\ngroups: []\n'
     const sha = createHash('sha256').update(yaml).digest('hex')
     expect(await examTitleOf(yaml, sha, 'carpeta')).toBe('Examen RA2')
     expect(await examTitleOf(yaml, 'f'.repeat(64), 'carpeta')).toBe('carpeta')

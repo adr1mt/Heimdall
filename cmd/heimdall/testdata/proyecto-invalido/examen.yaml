@@ -1,10 +1,10 @@
-examen: "Proyecto con errores"
+exam: "Proyecto con errores"
 version: 1
 hosts: [host1]
-grupos:
-  - grupo: "Base"
-    comprobaciones:
+groups:
+  - group: "Base"
+    checks:
       - id: p1
-        descripcion: "Sin aserción"
-        en: host1
+        description: "Sin aserción"
+        on: host1
         cmd: ["hostname"]

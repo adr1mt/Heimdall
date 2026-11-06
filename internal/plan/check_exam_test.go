@@ -14,8 +14,8 @@ func TestCheckExamWithoutStudentData(t *testing.T) {
 	}
 	// Missing columns and host data still prevent a complete PLAN.
 	for _, inventory := range []string{
-		strings.Replace(validInventory, `    usuario: "marc"`, "", 1),
-		strings.Replace(validInventory, `host1: { ip: "10.0.0.2" }`, `host1: { usuario: "marc" }`, 1),
+		strings.Replace(validInventory, `    user: "marc"`, "", 1),
+		strings.Replace(validInventory, `host1: { ip: "10.0.0.2" }`, `host1: { user: "marc" }`, 1),
 	} {
 		dir := project(t, validExam, inventory)
 		if err := CheckExam(filepath.Join(dir, ExamFile)); err != nil {
@@ -29,15 +29,15 @@ func TestCheckExamWithoutStudentData(t *testing.T) {
 
 func TestCheckExamRejectsOwnErrors(t *testing.T) {
 	for _, tc := range []struct{ name, yaml, want string }{
-		{"syntax", "examen: [", "examen.yaml:"},
+		{"syntax", "exam: [", "examen.yaml:"},
 		{"unknown key", validExam + "extra: yes\n", "desconocida"},
 		{"duplicate id", strings.Replace(validExam, "id: p2", "id: p1", 1), `id "p1" repetido`},
-		{"host", strings.ReplaceAll(validExam, "en: host1", "en: host9"), `usa el host "host9"`},
-		{"assertion", strings.Replace(validExam, `contiene: "alu"`, "", 1), "le falta la aserción"},
-		{"weight", strings.Replace(validExam, "peso: 2", "peso: -1", 1), "peso negativo"},
-		{"zero total", strings.ReplaceAll(strings.ReplaceAll(validExam, "peso: 1", "peso: 0"), "peso: 2", "peso: 0"), "peso positivo"},
-		{"infinite total", strings.ReplaceAll(strings.ReplaceAll(validExam, "peso: 1", "peso: 1e308"), "peso: 2", "peso: 1e308"), "suma de pesos"},
-		{"defaults", strings.Replace(validExam, "peso: 1", "peso: -1", 1), "por_defecto.peso"},
+		{"host", strings.ReplaceAll(validExam, "on: host1", "on: host9"), `usa el host "host9"`},
+		{"assertion", strings.Replace(validExam, `contains: "alu"`, "", 1), "le falta la aserción"},
+		{"weight", strings.Replace(validExam, "weight: 2", "weight: -1", 1), "peso negativo"},
+		{"zero total", strings.ReplaceAll(strings.ReplaceAll(validExam, "weight: 1", "weight: 0"), "weight: 2", "weight: 0"), "peso positivo"},
+		{"infinite total", strings.ReplaceAll(strings.ReplaceAll(validExam, "weight: 1", "weight: 1e308"), "weight: 2", "weight: 1e308"), "suma de pesos"},
+		{"defaults", strings.Replace(validExam, "weight: 1", "weight: -1", 1), "defaults.weight"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			dir := t.TempDir()
@@ -55,33 +55,33 @@ func TestCheckExamRejectsOwnErrors(t *testing.T) {
 
 func TestCheckExamReferencesAcrossAllInterpolatedFields(t *testing.T) {
 	for _, field := range []string{
-		`en: host1
+		`on: host1
         cmd: ["echo", "REF"]
         exit_code: 0`,
-		`valor: "REF"
-        igual_a: "ok"`,
-		`valor: ok
-        contiene: "REF"`,
-		`valor: ok
-        no_contiene: "REF"`,
-		`valor: ok
-        igual_a: "REF"`,
-		`valor: ok
-        cerca_de: {ancla: "REF", lineas: 0, contiene: ok}`,
-		`valor: ok
-        cerca_de: {ancla: ok, lineas: 0, contiene: "REF"}`,
+		`value: "REF"
+        equals: "ok"`,
+		`value: ok
+        contains: "REF"`,
+		`value: ok
+        not_contains: "REF"`,
+		`value: ok
+        equals: "REF"`,
+		`value: ok
+        near: {anchor: "REF", lines: 0, contains: ok}`,
+		`value: ok
+        near: {anchor: ok, lines: 0, contains: "REF"}`,
 	} {
 		for _, ref := range []struct{ text, want string }{
-			{"${alumno.campo_pendiente}", ""},
-			{"${host1.ip}:${host1.puerto} ${host1.usuario}", ""},
+			{"${student.campo_pendiente}", ""},
+			{"${host1.ip}:${host1.port} ${host1.user}", ""},
 			{"${AULA_PASSWORD}", "solo puede aparecer"},
-			{"${alumno.campo", "falta la llave final"},
-			{"${alumno.}", "inválida"},
+			{"${student.campo", "falta la llave final"},
+			{"${student.}", "inválida"},
 			{"${host9.ip}", "no está declarado"},
 			{"${host1.password}", "solo se puede usar"},
 		} {
 			t.Run(field+ref.text, func(t *testing.T) {
-				yaml := "examen: P\nversion: 1\nhosts: [host1]\ngrupos:\n  - grupo: G\n    comprobaciones:\n      - id: c\n        " + strings.ReplaceAll(field, "REF", ref.text) + "\n"
+				yaml := "exam: P\nversion: 1\nhosts: [host1]\ngroups:\n  - group: G\n    checks:\n      - id: c\n        " + strings.ReplaceAll(field, "REF", ref.text) + "\n"
 				dir := t.TempDir()
 				path := filepath.Join(dir, ExamFile)
 				if err := os.WriteFile(path, []byte(yaml), 0600); err != nil {

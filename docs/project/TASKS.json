@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated": "2026-11-05",
+  "updated": "2026-11-06",
   "status_values": [
     "BLOCKED",
     "READY",
@@ -5354,34 +5354,40 @@
     },
     {
       "id": "T229",
-      "title": "Formato YAML inglés versionado y conversión de exámenes",
+      "title": "YAML exclusivamente en inglés, sin compatibilidad española",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T228"
       ],
-      "goal": "Formato YAML inglés versionado y conversión de exámenes",
+      "goal": "Usar claves y referencias reservadas en inglés en motor, GUI, plantillas y documentación vigente.",
       "scope": [
-        "Propuesta autorizada por el usuario el 2026-11-05; detallar la fase antes de implementarla."
+        "Sustituir sintaxis del examen y del inventario; version conserva su significado de revisión del documento.",
+        "Actualizar lectores/escritores GUI, ayuda, ejemplos propios, fixtures y arneses.",
+        "Rechazar claves españolas sin conversión ni alias; conservar mensajes docentes en español."
       ],
       "acceptance": [
-        "Definir ADR y formato inglés coherente, manteniendo lectura explícita del formato español.",
-        "Conversión validada conserva significado y fuentes antiguas; no reescribe sesiones activas ni notas previas.",
-        "Editor, ayuda, ejemplos y pruebas de motor/GUI usan el formato versionado."
+        "Motor y GUI aceptan únicamente claves inglesas; rechazan claves españolas o mezcladas con fichero/línea en el motor.",
+        "Las referencias usan student y atributos de host en inglés; datos libres y textos pueden estar en cualquier idioma.",
+        "Nuevo examen e inventario generado usan inglés; se conserva evaluación, pesos, seguridad y evidencia.",
+        "Ayuda, especificación, exámenes mantenidos y pruebas usan la misma sintaxis; suites motor/GUI, build y arnés real correctos."
       ],
       "out_of_scope": [
-        "Publicación y push."
+        "Compatibilidad, conversión de archivos personales, instalación, publicación y push."
       ],
       "tests": [
-        "Pruebas específicas de los criterios y suites de las áreas afectadas."
-      ]
+        "make check gui-check gui-build docs-check tools-check",
+        "Pruebas de rechazo español y corrección local con el motor real"
+      ],
+      "completed": "2026-11-06",
+      "notes": "ADR-0042. Motor, inventario, editor, plantillas, ayuda y prácticas en inglés. 662 pruebas GUI, suite Go, build, herramientas y enlaces correctos. Editor Electron real validó, guardó y reabrió. Corrección local y cancelación con salida canónica verificadas. Sin instalación habitual."
     },
     {
       "id": "T230",
       "title": "Exportar informes individuales para Moodle",
       "phase": 9,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T229"
@@ -5431,7 +5437,7 @@
       "id": "T232",
       "title": "Validar un corrector especializado aislado",
       "phase": 9,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T229"

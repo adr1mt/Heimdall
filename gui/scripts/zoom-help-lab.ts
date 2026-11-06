@@ -10,7 +10,7 @@ const profile = join(base, 'profile')
 const project = join(base, 'exam')
 mkdirSync(profile)
 mkdirSync(project)
-const yaml = 'examen: Demo de zoom\nversion: 1\nhosts: []\ngrupos:\n  - grupo: Demo\n    comprobaciones:\n      - id: uno\n        descripcion: Respuesta\n        valor: "si"\n        igual_a: "si"\n'
+const yaml = 'exam: Demo de zoom\nversion: 1\nhosts: []\ngroups:\n  - group: Demo\n    checks:\n      - id: uno\n        description: Respuesta\n        value: "si"\n        equals: "si"\n'
 writeFileSync(join(project, 'examen.yaml'), yaml)
 writeFileSync(join(profile, 'projects.json'), JSON.stringify({ recent: [{ dir: project, name: 'Demo' }] }))
 app.setPath('userData', profile)

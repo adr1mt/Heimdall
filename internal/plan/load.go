@@ -13,7 +13,7 @@ import (
 )
 
 // LoadExam reads examen.yaml. Any key the schema does not know is an error
-// with file and line; por_defecto is applied so every check comes out with a
+// with file and line; defaults is applied so every check comes out with a
 // weight and a timeout.
 func LoadExam(path string) (*Exam, error) {
 	node, err := readDocument(path)
@@ -29,7 +29,7 @@ func LoadExam(path string) (*Exam, error) {
 	return &exam, nil
 }
 
-// LoadInventory reads aula.yaml and folds comun.hosts into every student.
+// LoadInventory reads aula.yaml and folds common.hosts into every student.
 func LoadInventory(path string) (*Inventory, error) {
 	node, err := readDocument(path)
 	if err != nil {
@@ -176,7 +176,7 @@ func checkKeys(node *yaml.Node, typ reflect.Type, what string, errs *[]error) {
 var unmarshalerType = reflect.TypeOf((*yaml.Unmarshaler)(nil)).Elem()
 
 // checkShape reports a value written with the wrong shape in the teacher's
-// own words: "la clave \"cerca_de\" debe ser un bloque de claves" instead of
+// own words: "la clave \"near\" debe ser un bloque de claves" instead of
 // yaml.v3's "cannot unmarshal !!int into plan.NearSpec".
 //
 // Types with their own UnmarshalYAML (una duración, un alumno) are left alone:
@@ -241,7 +241,7 @@ func yamlFields(typ reflect.Type) map[string]reflect.StructField {
 	return out
 }
 
-// applyDefaults resolves por_defecto into every check. After this, Weight and
+// applyDefaults resolves defaults into every check. After this, Weight and
 // Timeout are never nil and nothing downstream has to guess.
 func (e *Exam) applyDefaults() {
 	weight := DefaultWeight
@@ -255,7 +255,7 @@ func (e *Exam) applyDefaults() {
 	for g := range e.Groups {
 		for c := range e.Groups[g].Checks {
 			check := &e.Groups[g].Checks[c]
-			// A valor: check runs nothing, so a default sudo does not reach it;
+			// A value: check runs nothing, so a default sudo does not reach it;
 			// only one the teacher wrote on the check itself is an error.
 			if check.Sudo == nil && e.Defaults.Sudo != nil && (len(check.Cmd) > 0 || len(check.Probe) > 0) {
 				sudo := *e.Defaults.Sudo
@@ -276,12 +276,12 @@ func (e *Exam) applyDefaults() {
 // markLines walks the document again to remember where each check was
 // written. The teacher gets "examen.yaml:34" instead of "la comprobación 7".
 func (e *Exam) markLines(node *yaml.Node) {
-	groups := childValue(node, "grupos")
+	groups := childValue(node, "groups")
 	if groups == nil {
 		return
 	}
 	for g := 0; g < len(groups.Content) && g < len(e.Groups); g++ {
-		checks := childValue(groups.Content[g], "comprobaciones")
+		checks := childValue(groups.Content[g], "checks")
 		if checks == nil {
 			continue
 		}
@@ -303,8 +303,8 @@ func childValue(node *yaml.Node, key string) *yaml.Node {
 	return nil
 }
 
-// inheritHosts folds comun.hosts into each student's hosts, field by field.
-// What the student writes wins; what the student omits comes from comun.
+// inheritHosts folds common.hosts into each student's hosts, field by field.
+// What the student writes wins; what the student omits comes from common.
 func (inv *Inventory) inheritHosts() {
 	for s := range inv.Students {
 		student := &inv.Students[s]

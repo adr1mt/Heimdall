@@ -94,7 +94,7 @@ export function openProjectAt(dir: string): OpenProject {
   const examPath = join(root, EXAM_FILE)
   if (!existsSync(examPath)) {
     throw new Error(
-      `En «${basename(root)}» no hay ningún examen: falta el fichero «${EXAM_FILE}». Con «Nuevo» se crea uno.`
+      `En «${basename(root)}» no hay ningún exam: falta el fichero «${EXAM_FILE}». Con «Nuevo» se crea uno.`
     )
   }
   return { dir: root, name: nameOf(root, examPath), examPath }
@@ -107,16 +107,16 @@ export function openProjectAt(dir: string): OpenProject {
  */
 function starterExam(name: string): string {
   return [
-    `examen: "${name.replace(/"/g, "'")}"`,
+    `exam: "${name.replace(/"/g, "'")}"`,
     'version: 1',
     'hosts: [host1]',
-    'por_defecto: { peso: 1, timeout: 20s }',
-    'grupos:',
-    '  - grupo: "Primeras comprobaciones"',
-    '    comprobaciones:',
+    'defaults: { weight: 1, timeout: 20s }',
+    'groups:',
+    '  - group: "Primeras comprobaciones"',
+    '    checks:',
     '      - id: responde',
-    '        descripcion: "La máquina responde y se identifica"',
-    '        en: host1',
+    '        description: "La máquina responde y se identifica"',
+    '        on: host1',
     '        cmd: ["hostname"]',
     '        exit_code: 0',
     ''

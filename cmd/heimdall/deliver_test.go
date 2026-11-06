@@ -258,7 +258,7 @@ func TestDeliverOnlyRequestedStudent(t *testing.T) {
 		t.Fatalf("entrega individual: %+v", out)
 	}
 	if len(home.dialed) != 1 || home.dialed[0].Port != 2202 || len(home.written) != 1 {
-		t.Fatalf("se contactó con otro alumno: %d conexiones, %d escrituras", len(home.dialed), len(home.written))
+		t.Fatalf("se contactó con otro student: %d conexiones, %d escrituras", len(home.dialed), len(home.written))
 	}
 }
 
@@ -283,7 +283,7 @@ func TestDeliverUsesVerifiedSessionDefinitions(t *testing.T) {
 	if _, err := planOfSources(run, snapshot); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(snapshot, "examen.yaml"), []byte("examen: cambiado\n"), 0600); err != nil {
+	if err := os.WriteFile(filepath.Join(snapshot, "examen.yaml"), []byte("exam: cambiado\n"), 0600); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := planOfSources(run, snapshot); err == nil {

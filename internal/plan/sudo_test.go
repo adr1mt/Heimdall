@@ -6,31 +6,31 @@ import (
 )
 
 const sudoExam = `
-examen: "Sudo"
+exam: "Sudo"
 version: 1
 hosts: [host1]
-por_defecto: { peso: 1, timeout: 20s, sudo: true }
-grupos:
-  - grupo: "Base"
-    comprobaciones:
+defaults: { weight: 1, timeout: 20s, sudo: true }
+groups:
+  - group: "Base"
+    checks:
       - id: p1
-        en: host1
+        on: host1
         cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
-        contiene: "subnet"
+        contains: "subnet"
       - id: p2
-        en: host1
+        on: host1
         sudo: false
         cmd: ["hostname"]
-        contiene: "alu"
+        contains: "alu"
       - id: p3
-        valor: "${alumno.usuario}"
-        igual_a: "ana"
+        value: "${student.user}"
+        equals: "ana"
 `
 
 // TestSudoIsInheritedOnlyByCommands: por_defecto.sudo reaches the checks with
-// a command, a check can say no, and a valor: check runs nothing.
+// a command, a check can say no, and a value: check runs nothing.
 func TestSudoIsInheritedOnlyByCommands(t *testing.T) {
-	inv := strings.Replace(validInventory, `usuario: "marc"`, `usuario: "ana"`, 1)
+	inv := strings.Replace(validInventory, `user: "marc"`, `user: "ana"`, 1)
 	p, err := Load(project(t, sudoExam, inv))
 	if err != nil {
 		t.Fatalf("Load: %v", err)
@@ -89,7 +89,7 @@ func TestSudoPlanErrors(t *testing.T) {
 		},
 		{
 			name:      "sudo en una comprobación sin comando",
-			exam:      strings.Replace(sudoExam, `valor: "${alumno.usuario}"`, "valor: \"${alumno.usuario}\"\n        sudo: true", 1),
+			exam:      strings.Replace(sudoExam, `value: "${student.user}"`, "value: \"${student.user}\"\n        sudo: true", 1),
 			inventory: validInventory,
 			want:      `la comprobación "p3" pide sudo, pero no ejecuta ningún comando`,
 		},

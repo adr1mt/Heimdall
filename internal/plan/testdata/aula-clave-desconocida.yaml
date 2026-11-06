@@ -1,10 +1,10 @@
-aula: "Prueba"
+classroom: "Prueba"
 version: 1
-comun:
+common:
   hosts:
-    host1: { puerto: 22, usuario: "usuario", password_ref: "${AULA_PASSWORD}" }
-alumnos:
+    host1: { port: 22, user: "user", password_ref: "${AULA_PASSWORD}" }
+students:
   - id: alumne01
-    nombre: "Ana Ferrer"
+    name: "Ana Ferrer"
     hosts:
       host1: { ip: "10.0.0.1", protocolo: "telnet" }

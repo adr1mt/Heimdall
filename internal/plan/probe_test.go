@@ -8,31 +8,31 @@ import (
 )
 
 func probeExam() string {
-	return fmt.Sprintf(`examen: "RA1"
+	return fmt.Sprintf(`exam: "RA1"
 version: 1
 hosts: [host1]
-por_defecto: {sudo: true}
-grupos:
-- grupo: Xarxa
-  comprobaciones:
+defaults: {sudo: true}
+groups:
+- group: Xarxa
+  checks:
   - id: c1
-    descripcion: "Xarxa · 01"
-    en: host1
-    comprobador: [ra1-dhcp, "%s", net-externa-ip, "${alumno.if_ext}", lan0, "${host1.ip}"]
-    igual_a: OK
+    description: "Xarxa · 01"
+    on: host1
+    checker: [ra1-dhcp, "%s", net-externa-ip, "${student.if_ext}", lan0, "${host1.ip}"]
+    equals: OK
 `, probe.Revision())
 }
 
 func TestProbeResolutionAndVersionGate(t *testing.T) {
 	inv := validInventory
 	// Use an existing field to avoid depending on fixture display names.
-	exam := strings.ReplaceAll(probeExam(), "${alumno.if_ext}", "${alumno.id}")
+	exam := strings.ReplaceAll(probeExam(), "${student.if_ext}", "${student.id}")
 	p, err := Load(project(t, exam, inv))
 	if err != nil {
 		t.Fatal(err)
 	}
 	c := p.Students[0].Checks[0]
-	if !c.Probe || !c.Sudo || c.Cmd[0] != "heimdall:comprobador" || c.Cmd[4] != p.Students[0].ID {
+	if !c.Probe || !c.Sudo || c.Cmd[0] != "heimdall:checker" || c.Cmd[4] != p.Students[0].ID {
 		t.Fatalf("incorrect resolved probe: %+v", c)
 	}
 	if c.Cmd[6] != c.Target.IP {
@@ -46,9 +46,9 @@ func TestProbeResolutionAndVersionGate(t *testing.T) {
 	for _, change := range []struct{ from, to string }{
 		{probe.Revision(), "wrong-revision"},
 		{"net-externa-ip", "unknown-criterion"},
-		{"igual_a: OK", "igual_a: FAIL"},
-		{"    igual_a: OK", "    cmd: [hostname]\n    igual_a: OK"},
-		{"${alumno.id}", "${AULA_PASSWORD}"},
+		{"equals: OK", "equals: FAIL"},
+		{"    equals: OK", "    cmd: [hostname]\n    equals: OK"},
+		{"${student.id}", "${AULA_PASSWORD}"},
 	} {
 		_, err := Load(project(t, strings.ReplaceAll(exam, change.from, change.to), inv))
 		if err == nil {

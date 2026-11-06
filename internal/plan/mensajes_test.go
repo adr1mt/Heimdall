@@ -10,45 +10,45 @@ import (
 // A configuration error is read by the teacher, who does not read Go. These
 // tests check the wording of every message, not only that it fails (T014).
 
-const baseExam = `examen: "Prueba"
+const baseExam = `exam: "Prueba"
 version: 1
 hosts: [host1]
-por_defecto:
-  peso: 1
+defaults:
+  weight: 1
   timeout: 20s
-grupos:
-  - grupo: "Uno"
-    comprobaciones:
+groups:
+  - group: "Uno"
+    checks:
       - id: c1
-        descripcion: "Una comprobación"
-        en: host1
-        peso: 2
+        description: "Una comprobación"
+        on: host1
+        weight: 2
         timeout: 5s
         cmd: ["true"]
-        valor: "x"
-        contiene: "x"
-        no_contiene: "y"
-        igual_a: "x"
+        value: "x"
+        contains: "x"
+        not_contains: "y"
+        equals: "x"
         exit_code: 0
-        cerca_de:
-          ancla: "a"
-          lineas: 3
-          contiene: "b"
+        near:
+          anchor: "a"
+          lines: 3
+          contains: "b"
 `
 
-const baseInventory = `aula: "Prueba"
+const baseInventory = `classroom: "Prueba"
 version: 1
-comun:
+common:
   hosts:
-    host1: { ip: "10.0.0.1", puerto: 22, usuario: "usuario", password_ref: "${AULA_PASSWORD}" }
+    host1: { ip: "10.0.0.1", port: 22, user: "user", password_ref: "${AULA_PASSWORD}" }
   timeouts:
-    conexion: 5s
-    alumno: 10m
-alumnos:
+    connect: 5s
+    student: 10m
+students:
   - id: alumne01
-    nombre: "Ana Ferrer"
+    name: "Ana Ferrer"
     moodle_id: "1234"
-    excluido: false
+    excluded: false
     hosts:
       host1: { ip: "10.0.0.2" }
 `
@@ -68,30 +68,30 @@ func TestMensajesDeTipoEquivocado(t *testing.T) {
 		new  string
 	}{
 		// examen.yaml
-		{"examen", `examen: "Prueba"`, "examen: [uno]"},
+		{"exam", `exam: "Prueba"`, "exam: [uno]"},
 		{"version", "version: 1", "version: uno"},
 		{"hosts", "hosts: [host1]", "hosts: host1"},
-		{"por_defecto", "por_defecto:", "por_defecto: 3\nsobra:"},
-		{"peso por defecto", "  peso: 1", "  peso: [1]"},
+		{"defaults", "defaults:", "defaults: 3\nsobra:"},
+		{"peso por defecto", "  weight: 1", "  weight: [1]"},
 		{"timeout por defecto", "  timeout: 20s", "  timeout: 20"},
-		{"grupos", "grupos:", "grupos: 3\nsobra:"},
-		{"grupo", `- grupo: "Uno"`, "- grupo: [uno]"},
-		{"comprobaciones", "    comprobaciones:", "    comprobaciones: 3\n    sobra:"},
+		{"groups", "groups:", "groups: 3\nsobra:"},
+		{"group", `- group: "Uno"`, "- group: [uno]"},
+		{"checks", "    checks:", "    checks: 3\n    sobra:"},
 		{"id", "      - id: c1", "      - id: [c1]"},
-		{"descripcion", `descripcion: "Una comprobación"`, "descripcion: 3"},
-		{"en", "en: host1", "en: [host1]"},
-		{"peso", "peso: 2", "peso: hola"},
+		{"description", `description: "Una comprobación"`, "description: 3"},
+		{"on", "on: host1", "on: [host1]"},
+		{"weight", "weight: 2", "weight: hola"},
 		{"timeout", "timeout: 5s", "timeout: [5s]"},
 		{"cmd", `cmd: ["true"]`, "cmd: true"},
-		{"valor", `valor: "x"`, "valor: 3"},
-		{"contiene", `contiene: "x"`, "contiene: [x]"},
-		{"no_contiene", `no_contiene: "y"`, "no_contiene: [y]"},
-		{"igual_a", `igual_a: "x"`, "igual_a: [x]"},
+		{"value", `value: "x"`, "value: 3"},
+		{"contains", `contains: "x"`, "contains: [x]"},
+		{"not_contains", `not_contains: "y"`, "not_contains: [y]"},
+		{"equals", `equals: "x"`, "equals: [x]"},
 		{"exit_code", "exit_code: 0", "exit_code: cero"},
-		{"cerca_de", "cerca_de:", "cerca_de: 3\n        sobra:"},
-		{"ancla", `ancla: "a"`, "ancla: [a]"},
-		{"lineas", "lineas: 3", "lineas: tres"},
-		{"contiene de cerca_de", `contiene: "b"`, "contiene: [b]"},
+		{"near", "near:", "near: 3\n        sobra:"},
+		{"anchor", `anchor: "a"`, "anchor: [a]"},
+		{"lines", "lines: 3", "lines: tres"},
+		{"contiene de cerca_de", `contains: "b"`, "contains: [b]"},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -112,24 +112,24 @@ func TestMensajesDeTipoEquivocadoEnAula(t *testing.T) {
 		old  string
 		new  string
 	}{
-		{"aula", `aula: "Prueba"`, "aula: [uno]"},
+		{"aula", `classroom: "Prueba"`, "classroom: [uno]"},
 		{"version", "version: 1", "version: uno"},
-		{"comun", "comun:", "comun: 3\nsobra:"},
+		{"common", "common:", "common: 3\nsobra:"},
 		{"hosts de comun", "  hosts:", "  hosts: 3\n  sobra:"},
-		{"host", `host1: { ip: "10.0.0.1", puerto: 22, usuario: "usuario", password_ref: "${AULA_PASSWORD}" }`, "host1: 3"},
+		{"host", `host1: { ip: "10.0.0.1", port: 22, user: "user", password_ref: "${AULA_PASSWORD}" }`, "host1: 3"},
 		{"ip", `ip: "10.0.0.1"`, "ip: 10"},
-		{"puerto", "puerto: 22", "puerto: veintidós"},
-		{"usuario", `usuario: "usuario"`, "usuario: [usuario]"},
+		{"port", "port: 22", "port: veintidós"},
+		{"user", `user: "user"`, "user: [usuario]"},
 		{"password_ref", `password_ref: "${AULA_PASSWORD}"`, "password_ref: [x]"},
 		{"timeouts", "  timeouts:", "  timeouts: 3\n  sobra:"},
-		{"conexion", "conexion: 5s", "conexion: 5"},
-		{"alumno", "alumno: 10m", "alumno: [10m]"},
-		{"alumnos", "alumnos:", "alumnos: 3\nsobra:"},
+		{"connect", "connect: 5s", "connect: 5"},
+		{"alumno", "student: 10m", "student: [10m]"},
+		{"students", "students:", "students: 3\nsobra:"},
 		{"alumno suelto", "  - id: alumne01", "  - 3\n  - id: alumne01"},
 		{"id", "  - id: alumne01", "  - id: [alumne01]"},
-		{"nombre", `nombre: "Ana Ferrer"`, "nombre: [ana]"},
+		{"name", `name: "Ana Ferrer"`, "name: [ana]"},
 		{"moodle_id", `moodle_id: "1234"`, "moodle_id: [1234]"},
-		{"excluido", "excluido: false", "excluido: quizá"},
+		{"excluded", "excluded: false", "excluded: quizá"},
 		{"hosts del alumno", "    hosts:", "    hosts: 3\n    sobra:"},
 	}
 	for _, c := range cases {

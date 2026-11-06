@@ -686,7 +686,7 @@ function ClassEditor({
  * Una columna propia, por su nombre.
  *
  * El nombre viaja al aula como clave del alumno y de ahí lo alcanza
- * `${alumno.NOMBRE}` en el examen, así que se comprueba al teclearlo: un
+ * `${student.NOMBRE}` en el examen, así que se comprueba al teclearlo: un
  * nombre que no vale como clave rompería el examen a mitad de corrección.
  */
 function ColumnAdder({

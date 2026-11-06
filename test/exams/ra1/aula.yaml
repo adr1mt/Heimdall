@@ -1,17 +1,17 @@
-aula: Laboratorio ficticio RA1
+classroom: Laboratorio ficticio RA1
 version: 1
-comun:
+common:
   hosts:
     host1:
-      puerto: 2299
-      usuario: prueba
+      port: 2299
+      user: prueba
       password_ref: "${AULA_PASSWORD}"
   timeouts:
-    conexion: 10s
-    alumno: 2m
-alumnos:
+    connect: 10s
+    student: 2m
+students:
 - id: qa-ra1
-  nombre: Alumno ficticio RA1
+  name: Alumno ficticio RA1
   if_ext: enp1s0
   if_int: enp2s0
   hosts:

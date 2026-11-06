@@ -54,10 +54,10 @@ func resolveRef(ref string, sc scope) (string, error) {
 		return "", err
 	}
 
-	if kind == "alumno" {
+	if kind == "student" {
 		value, ok := sc.fields[name]
 		if !ok {
-			return "", fmt.Errorf("${alumno.%s}: el alumno %q no tiene el campo %q", name, sc.studentID, name)
+			return "", fmt.Errorf("${student.%s}: el alumno %q no tiene el campo %q", name, sc.studentID, name)
 		}
 		return value, nil
 	}
@@ -69,12 +69,12 @@ func resolveRef(ref string, sc scope) (string, error) {
 	switch name {
 	case "ip":
 		return host.IP, nil
-	case "puerto":
+	case "port":
 		return fmt.Sprint(host.Port), nil
-	case "usuario":
+	case "user":
 		return host.User, nil
 	default:
-		return "", fmt.Errorf("${%s}: de un host solo se puede usar ip, puerto o usuario", ref)
+		return "", fmt.Errorf("${%s}: de un host solo se puede usar ip, port o user", ref)
 	}
 }
 
@@ -86,7 +86,7 @@ func referenceParts(ref string) (kind, name string, err error) {
 	}
 	kind, name, ok := strings.Cut(ref, ".")
 	if !ok || kind == "" || name == "" {
-		return "", "", fmt.Errorf("referencia ${%s} inválida: se espera ${alumno.campo} o ${host.ip}", ref)
+		return "", "", fmt.Errorf("referencia ${%s} inválida: se espera ${student.campo} o ${host.ip}", ref)
 	}
 	return kind, name, nil
 }
@@ -114,7 +114,7 @@ func validateCheckReferences(check Check, declared map[string]bool) error {
 			if err != nil {
 				return "", err
 			}
-			if kind == "alumno" {
+			if kind == "student" {
 				return "", nil
 			}
 			return resolveRef(ref, scope{hosts: hosts})

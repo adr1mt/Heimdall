@@ -248,19 +248,19 @@ func validateExam(exam *Exam, errs *[]error) []Check {
 			hasCmd := len(check.Cmd) > 0 || len(check.Probe) > 0
 			if len(check.Probe) > 0 {
 				if len(check.Cmd) > 0 {
-					*errs = append(*errs, errf(check.Line, "comprobador y cmd no pueden aparecer juntos"))
+					*errs = append(*errs, errf(check.Line, "checker y cmd no pueden aparecer juntos"))
 				}
 				if err := probe.Validate(check.Probe); err != nil {
 					*errs = append(*errs, errf(check.Line, "%s", err))
 				}
 				if check.Equals == nil || *check.Equals != "OK" {
-					*errs = append(*errs, errf(check.Line, "comprobador requiere igual_a: OK"))
+					*errs = append(*errs, errf(check.Line, "checker requiere equals: OK"))
 				}
 			}
 			switch {
 			case hasCmd && check.Value != "":
 				*errs = append(*errs, errf(check.Line,
-					"la comprobación %q tiene cmd: y valor:, y solo puede tener uno", check.ID))
+					"la comprobación %q tiene cmd: y value:, y solo puede tener uno", check.ID))
 			case hasCmd && check.On == "":
 				*errs = append(*errs, errf(check.Line,
 					"la comprobación %q no dice en qué host se ejecuta", check.ID))
@@ -270,7 +270,7 @@ func validateExam(exam *Exam, errs *[]error) []Check {
 					check.ID, check.On))
 			case !hasCmd && check.Value == "":
 				*errs = append(*errs, errf(check.Line,
-					"la comprobación %q no tiene ni cmd: ni valor:", check.ID))
+					"la comprobación %q no tiene ni cmd: ni value:", check.ID))
 			case !hasCmd && check.On != "":
 				*errs = append(*errs, errf(check.Line,
 					"la comprobación %q no tiene cmd:, así que no puede decir en qué host se ejecuta",
@@ -291,19 +291,19 @@ func validateExam(exam *Exam, errs *[]error) []Check {
 					check.ID))
 			}
 
-			// cerca_de needs its three parts: an anchor to look for, a
+			// near needs its three parts: an anchor to look for, a
 			// window that is not negative, and something to find inside it.
 			if n := check.Near; n != nil {
 				switch {
 				case n.Anchor == "":
 					*errs = append(*errs, errf(check.Line,
-						"el cerca_de de %q no tiene ancla:", check.ID))
+						"el near de %q no tiene ancla (anchor):", check.ID))
 				case n.Contains == "":
 					*errs = append(*errs, errf(check.Line,
-						"el cerca_de de %q no dice qué debe contener", check.ID))
+						"el near de %q no dice qué debe contener", check.ID))
 				case n.Lines < 0:
 					*errs = append(*errs, errf(check.Line,
-						"el cerca_de de %q tiene lineas: %d, que no puede ser negativo",
+						"el near de %q tiene lines: %d, que no puede ser negativo",
 						check.ID, n.Lines))
 				}
 			}
@@ -329,7 +329,7 @@ func validateExam(exam *Exam, errs *[]error) []Check {
 		*errs = append(*errs, errf(1, "el examen debe tener al menos una comprobación con peso positivo"))
 	}
 	if exam.Defaults.Weight != nil && (math.IsNaN(*exam.Defaults.Weight) || math.IsInf(*exam.Defaults.Weight, 0) || *exam.Defaults.Weight < 0) {
-		*errs = append(*errs, errf(1, "por_defecto.peso debe ser finito y no negativo"))
+		*errs = append(*errs, errf(1, "defaults.weight debe ser finito y no negativo"))
 	}
 	return checks
 }
@@ -394,11 +394,11 @@ func validateInventory(inv *Inventory, errs *[]error) {
 	for name, host := range inv.Common.Hosts {
 		if containsSecretRef(host.IP) || containsSecretRef(host.User) {
 			*errs = append(*errs, errf(1,
-				"el host %q de comun: usa una referencia a un secreto fuera de password_ref", name))
+				"el host %q de common: usa una referencia a un secreto fuera de password_ref", name))
 		}
 		if host.Password != "" {
 			*errs = append(*errs, errf(1,
-				"el host %q de comun: lleva una contraseña escrita en el fichero: "+
+				"el host %q de common: lleva una contraseña escrita en el fichero: "+
 					"usa password_ref con una referencia como ${AULA_PASSWORD}", name))
 		}
 	}
@@ -469,7 +469,7 @@ func resolveStudents(exam *Exam, inv *Inventory, checks []Check, examPath, inven
 	return plans, join(errs)
 }
 
-// studentFields is what ${alumno.X} can see: the free fields the teacher
+// studentFields is what ${student.X} can see: the free fields the teacher
 // wrote plus the student's own identity. A field written by some students and
 // not by others is caught here, because the lookup fails for the one who
 // lacks it (rule 4 of §2).
@@ -478,7 +478,7 @@ func studentFields(s Student) map[string]string {
 	for k, v := range s.Fields {
 		fields[k] = v
 	}
-	for k, v := range map[string]string{"id": s.ID, "nombre": s.Name, "moodle_id": s.MoodleID} {
+	for k, v := range map[string]string{"id": s.ID, "name": s.Name, "moodle_id": s.MoodleID} {
 		if v != "" {
 			fields[k] = v
 		}
@@ -504,7 +504,7 @@ func resolveCheck(check Check, sc scope, exam *Exam) (ResolvedCheck, error) {
 
 	args := check.Cmd
 	if out.Probe {
-		args = append([]string{"heimdall:comprobador"}, check.Probe...)
+		args = append([]string{"heimdall:checker"}, check.Probe...)
 	}
 	for _, arg := range args {
 		value, err := substitute(arg, sc)
@@ -701,15 +701,15 @@ func hashPlan(p *Plan) string {
 func assertionOf(c ResolvedCheck) (string, string) {
 	switch {
 	case c.Contains != nil:
-		return "contiene", *c.Contains
+		return "contains", *c.Contains
 	case c.NotContains != nil:
-		return "no_contiene", *c.NotContains
+		return "not_contains", *c.NotContains
 	case c.Equals != nil:
-		return "igual_a", *c.Equals
+		return "equals", *c.Equals
 	case c.ExitCode != nil:
 		return "exit_code", strconv.Itoa(*c.ExitCode)
 	case c.Near != nil:
-		return "cerca_de", fmt.Sprintf("%s|%d|%s", c.Near.Anchor, c.Near.Lines, c.Near.Contains)
+		return "near", fmt.Sprintf("%s|%d|%s", c.Near.Anchor, c.Near.Lines, c.Near.Contains)
 	default:
 		return "", ""
 	}

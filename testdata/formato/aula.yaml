@@ -1,20 +1,20 @@
-aula: "SMX2C 2026-27"
+classroom: "SMX2C 2026-27"
 version: 2
 
 # Valores comunes. Los hosts de cada alumno los heredan si no los redefinen.
-comun:
+common:
   hosts:
     host1:
-      puerto: 22
-      usuario: "usuario"
+      port: 22
+      user: "usuario"
       password_ref: "${AULA_PASSWORD}"     # referencia, nunca el valor
   timeouts:
-    conexion: 10s
-    alumno: 10m
+    connect: 10s
+    student: 10m
 
-alumnos:
+students:
   - id: alumne01
-    nombre: "Ana Ferrer"
+    name: "Ana Ferrer"
     moodle_id: "ana.ferrer@elpuig.xeill.net"
     hosts:
       host1: { ip: "192.168.1.20" }
@@ -23,18 +23,18 @@ alumnos:
     p3: "255.255.255.0"
 
   - id: alumne02
-    nombre: "Marc Oliva"
+    name: "Marc Oliva"
     moodle_id: "marc.oliva@elpuig.xeill.net"
     hosts:
-      host1: { ip: "192.168.1.21", usuario: "marc" }
+      host1: { ip: "192.168.1.21", user: "marc" }
     subdominio: "marc"
     p1: "8443"
     p3: "255.255.255.0"
 
   - id: alumne03
-    nombre: "Laia Puig"
+    name: "Laia Puig"
     moodle_id: "laia.puig@elpuig.xeill.net"
-    excluido: true                          # no se evalúa en esta pasada
+    excluded: true                          # no se evalúa en esta pasada
     hosts:
       host1: { ip: "192.168.1.22" }
     subdominio: "laia"

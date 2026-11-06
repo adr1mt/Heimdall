@@ -112,7 +112,7 @@ function workspace(): { dataDir: string; examPath: string; varDir: string } {
   const project = join(root, '2smx-redes')
   const examPath = join(project, 'examen.yaml')
   mkdirSync(varDirOf(examPath), { recursive: true })
-  writeFileSync(examPath, 'examen: "Redes"\n', 'utf-8')
+  writeFileSync(examPath, 'exam: "Redes"\n', 'utf-8')
   return { dataDir: join(root, 'datos'), examPath, varDir: varDirOf(examPath) }
 }
 

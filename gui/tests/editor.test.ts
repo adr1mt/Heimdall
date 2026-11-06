@@ -27,17 +27,17 @@ function parse(yaml: string): Exam {
 describe('el examen de ida y vuelta', () => {
   it('lo editado en la vista visual sale en el YAML', () => {
     const exam = emptyExam('Prueba')
-    exam.grupos = [
+    exam.groups = [
       {
-        grupo: 'Red',
-        comprobaciones: [
+        group: 'Red',
+        checks: [
           {
             ...emptyCheck('host1'),
             id: 'dns-activo',
-            descripcion: 'named responde',
+            description: 'named responde',
             cmd: ['dig', '+short', '@127.0.0.1'],
-            assertion: { kind: 'igual_a', value: '10.1.1.100' },
-            peso: '2',
+            assertion: { kind: 'equals', value: '10.1.1.100' },
+            weight: '2',
             timeout: '10s'
           }
         ]
@@ -45,32 +45,32 @@ describe('el examen de ida y vuelta', () => {
     ]
     const yaml = examYaml(exam)
     expect(yaml).toContain('id: "dns-activo"')
-    expect(yaml).toContain('igual_a: "10.1.1.100"')
-    expect(yaml).toContain('peso: 2')
+    expect(yaml).toContain('equals: "10.1.1.100"')
+    expect(yaml).toContain('weight: 2')
     expect(yaml).toContain('timeout: "10s"')
   })
 
   it('lo escrito en el YAML sale en la vista visual', () => {
     const exam = parse(`
-examen: "Prueba"
+exam: "Prueba"
 version: 3
 hosts: [host1, host2]
-por_defecto: { peso: 1, timeout: 20s }
-grupos:
-  - grupo: "DNS"
-    comprobaciones:
+defaults: { weight: 1, timeout: 20s }
+groups:
+  - group: "DNS"
+    checks:
       - id: sin-recursion
-        descripcion: "No hay recursión abierta"
-        en: host2
+        description: "No hay recursión abierta"
+        on: host2
         cmd: ["cat", "/etc/bind/named.conf.options"]
-        no_contiene: "allow-recursion { any; }"
+        not_contains: "allow-recursion { any; }"
 `)
     expect(exam.version).toBe(3)
     expect(exam.hosts).toEqual(['host1', 'host2'])
     const [check] = allChecks(exam)
-    expect(check.en).toBe('host2')
+    expect(check.on).toBe('host2')
     expect(check.cmd).toEqual(['cat', '/etc/bind/named.conf.options'])
-    expect(check.assertion).toEqual({ kind: 'no_contiene', value: 'allow-recursion { any; }' })
+    expect(check.assertion).toEqual({ kind: 'not_contains', value: 'allow-recursion { any; }' })
   })
 
   it('el examen real del curso da la vuelta entera sin perder nada', () => {
@@ -84,26 +84,26 @@ grupos:
 
   it('conserva sudo en por_defecto y en cada comprobación (ADR-0032)', () => {
     const once = parse(`
-examen: "P"
+exam: "P"
 version: 1
 hosts: [host1]
-por_defecto: { peso: 1, timeout: 20s, sudo: true }
-grupos:
-  - grupo: "G"
-    comprobaciones:
+defaults: { weight: 1, timeout: 20s, sudo: true }
+groups:
+  - group: "G"
+    checks:
       - id: kea-conf
-        descripcion: "Lee la configuración de Kea"
-        en: host1
+        description: "Lee la configuración de Kea"
+        on: host1
         cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
-        contiene: "subnet4"
+        contains: "subnet4"
       - id: sin-sudo
-        descripcion: "El nombre de la máquina"
-        en: host1
+        description: "El nombre de la máquina"
+        on: host1
         sudo: false
         cmd: ["hostname"]
-        contiene: "srv"
+        contains: "srv"
 `)
-    expect(once.porDefecto.sudo).toBe(true)
+    expect(once.defaults.sudo).toBe(true)
     const [first, second] = allChecks(once)
     expect(first.sudo).toBeUndefined()
     expect(second.sudo).toBe(false)
@@ -117,51 +117,51 @@ grupos:
 
   it('conserva la aserción de cercanía con su ancla y sus líneas', () => {
     const exam = parse(`
-examen: "P"
+exam: "P"
 version: 1
 hosts: [host1]
-grupos:
-  - grupo: "G"
-    comprobaciones:
+groups:
+  - group: "G"
+    checks:
       - id: kea-red
-        descripcion: "KEA declara la subred"
-        en: host1
+        description: "KEA declara la subred"
+        on: host1
         cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
-        cerca_de: { ancla: '"subnet"', lineas: 5, contiene: "10.0.0.0/8" }
+        near: { anchor: '"subnet"', lines: 5, contains: "10.0.0.0/8" }
 `)
     expect(allChecks(exam)[0].assertion).toEqual({
-      kind: 'cerca_de',
+      kind: 'near',
       value: '10.0.0.0/8',
       anchor: '"subnet"',
       lines: '5'
     })
-    expect(examYaml(exam)).toContain('lineas: 5')
+    expect(examYaml(exam)).toContain('lines: 5')
   })
 
   it('una comprobación sin comando conserva su valor del alumno', () => {
     const exam = parse(`
-examen: "P"
+exam: "P"
 version: 1
 hosts: [host1]
-grupos:
-  - grupo: "Cuestionario"
-    comprobaciones:
+groups:
+  - group: "Cuestionario"
+    checks:
       - id: q-https
-        descripcion: "Puerto de HTTPS"
-        valor: "\${alumno.p1}"
-        igual_a: "443"
+        description: "Puerto de HTTPS"
+        value: "\${student.p1}"
+        equals: "443"
 `)
     const [check] = allChecks(exam)
-    expect(check.valor).toBe('${alumno.p1}')
+    expect(check.value).toBe('${student.p1}')
     expect(check.cmd).toEqual([])
     // Y al escribirlo no se inventa ningún host ni ningún comando.
     const yaml = examYaml(exam)
     expect(yaml).not.toMatch(/^\s+cmd:/m)
-    expect(yaml).not.toMatch(/^\s+en:/m)
+    expect(yaml).not.toMatch(/^\s+on:/m)
   })
 
   it('un YAML que no se puede leer se dice, no se vacía', () => {
-    const read = readExam('examen: "P"\n  mal: [')
+    const read = readExam('exam: "P"\n  mal: [')
     expect('problem' in read).toBe(true)
   })
 })
@@ -170,14 +170,14 @@ describe('el peso total', () => {
   it('es el denominador que comparten todos los alumnos', () => {
     const exam = parse(readFileSync(join(REPO, 'testdata', 'ra2', 'examen.yaml'), 'utf-8'))
     // Cada comprobación cuenta por su peso, y las que no lo dicen por el de
-    // por_defecto: nunca por cero.
+    // defaults: nunca por cero.
     expect(totalWeight(exam)).toBeGreaterThanOrEqual(checkCount(exam))
   })
 
   it('una comprobación sin peso vale lo que diga por_defecto', () => {
     const exam = emptyExam('P')
-    exam.porDefecto.peso = '3'
-    exam.grupos = [{ grupo: 'G', comprobaciones: [emptyCheck('host1'), emptyCheck('host1')] }]
+    exam.defaults.weight = '3'
+    exam.groups = [{ group: 'G', checks: [emptyCheck('host1'), emptyCheck('host1')] }]
     expect(totalWeight(exam)).toBe(6)
   })
 })
@@ -187,9 +187,9 @@ describe('lo que no se deja escribir', () => {
   const base = (over: Partial<Check> = {}): Check => ({
     ...emptyCheck('host1'),
     id: 'uno',
-    descripcion: 'algo',
+    description: 'algo',
     cmd: ['hostname'],
-    assertion: { kind: 'contiene', value: 'x' },
+    assertion: { kind: 'contains', value: 'x' },
     ...over
   })
 
@@ -199,7 +199,7 @@ describe('lo que no se deja escribir', () => {
 
   it('no deja una comprobación sin identificador ni sin descripción', () => {
     expect(checkProblem(base({ id: '' }), exam, [])).toMatch(/identificador/)
-    expect(checkProblem(base({ descripcion: '' }), exam, [])).toMatch(/descripción/)
+    expect(checkProblem(base({ description: '' }), exam, [])).toMatch(/descripción/)
   })
 
   it('no deja repetir un identificador: es lo que compara dos correcciones', () => {
@@ -208,27 +208,27 @@ describe('lo que no se deja escribir', () => {
   })
 
   it('no deja una máquina que el examen no declara', () => {
-    expect(checkProblem(base({ en: 'host9' }), exam, [])).toMatch(/host9/)
+    expect(checkProblem(base({ on: 'host9' }), exam, [])).toMatch(/host9/)
   })
 
   it('no deja una comprobación sin comando y sin valor', () => {
-    expect(checkProblem(base({ cmd: [], valor: '' }), exam, [])).toMatch(/comando/)
+    expect(checkProblem(base({ cmd: [], value: '' }), exam, [])).toMatch(/comando/)
   })
 
   it('exige un número en el código de salida y en el peso', () => {
     expect(checkProblem(base({ assertion: { kind: 'exit_code', value: 'cero' } }), exam, [])).toMatch(
       /número/
     )
-    expect(checkProblem(base({ peso: '-1' }), exam, [])).toMatch(/peso/)
-    expect(checkProblem(base({ peso: '2' }), exam, [])).toBeNull()
+    expect(checkProblem(base({ weight: '-1' }), exam, [])).toMatch(/peso/)
+    expect(checkProblem(base({ weight: '2' }), exam, [])).toBeNull()
   })
 
   it('exige ancla y líneas en la búsqueda por cercanía', () => {
-    const near = base({ assertion: { kind: 'cerca_de', value: 'x', anchor: '', lines: '5' } })
+    const near = base({ assertion: { kind: 'near', value: 'x', anchor: '', lines: '5' } })
     expect(checkProblem(near, exam, [])).toMatch(/anclaje/)
     expect(
       checkProblem(
-        base({ assertion: { kind: 'cerca_de', value: 'x', anchor: 'a', lines: '5' } }),
+        base({ assertion: { kind: 'near', value: 'x', anchor: 'a', lines: '5' } }),
         exam,
         []
       )
@@ -257,50 +257,50 @@ describe('el comando como una línea', () => {
 })
 
 describe('original YAML format is never silently normalized',()=> {
- const valid='examen: P\nversion: 1\nhosts: [host1]\npor_defecto: {peso: 1}\ngrupos:\n- grupo: G\n  comprobaciones:\n  - id: c\n    descripcion: C\n    en: host1\n    cmd: ["true"]\n    contiene: yes\n'
+ const valid='exam: P\nversion: 1\nhosts: [host1]\ndefaults: {weight: 1}\ngroups:\n- group: G\n  checks:\n  - id: c\n    description: C\n    on: host1\n    cmd: ["true"]\n    contains: yes\n'
  it.each([
   valid+'unknown: x\n',
-  valid.replace('peso: 1','peso: 1, unknown: x'),
-  valid.replace('grupo: G','grupo: G\n  unknown: x'),
+  valid.replace('weight: 1','weight: 1, unknown: x'),
+  valid.replace('group: G','group: G\n  unknown: x'),
   valid+'    unknown: x\n',
-  valid+'    no_contiene: no\n',
-  valid.replace('contiene: yes','cerca_de: {ancla: a, contiene: b, lineas: 0, unknown: x}'),
+  valid+'    not_contains: no\n',
+  valid.replace('contains: yes','near: {anchor: a, contains: b, lines: 0, unknown: x}'),
   valid.replace('cmd: ["true"]','cmd: false'),
-  valid.replace('peso: 1','peso: "1"'),
-  valid.replace('descripcion: C','descripcion: [C]')
+  valid.replace('weight: 1','weight: "1"'),
+  valid.replace('description: C','description: [C]')
  ])('refuses unrepresentable data: %s',(yaml)=>expect(readExam(yaml)).toHaveProperty('problem'))
  it('preserves valid meaning',()=>expect(parse(examYaml(parse(valid)))).toEqual(parse(valid)))
 })
 
 
 it.each(['0','0.5','1'])('preserves numeric weight %s in open/save cycle',(peso)=> {
- const exam=emptyExam('P');exam.porDefecto.peso=peso
- const check={...emptyCheck('host1'),id:'c',descripcion:'C',cmd:['true'],peso,assertion:{kind:'cerca_de' as const,value:'yes',anchor:'yes',lines:'0'}}
- exam.grupos=[{grupo:'G',comprobaciones:[check]}]
+ const exam=emptyExam('P');exam.defaults.weight=peso
+ const check={...emptyCheck('host1'),id:'c',description:'C',cmd:['true'],weight:peso,assertion:{kind:'near' as const,value:'yes',anchor:'yes',lines:'0'}}
+ exam.groups=[{group:'G',checks:[check]}]
  expect(checkProblem(check,exam,[])).toBeNull()
  expect(parse(examYaml(exam))).toEqual(exam)
- expect(examYaml(exam)).toContain(`peso: ${peso}`)
+ expect(examYaml(exam)).toContain(`weight: ${peso}`)
 })
 
 it('preserves bounded checker profiles through the visual editor', () => {
-  const yaml = `examen: RA1
+  const yaml = `exam: RA1
 version: 1
 hosts: [host1]
-grupos:
-- grupo: DHCP
-  comprobaciones:
+groups:
+- group: DHCP
+  checks:
   - id: reserva
-    descripcion: DHCP · 01
-    en: host1
+    description: DHCP · 01
+    on: host1
     sudo: true
-    comprobador: [ra1-dhcp, revision, kea-reserva-mail, wan0, lan0, "192.168.236.60"]
-    igual_a: OK
+    checker: [ra1-dhcp, revision, kea-reserva-mail, wan0, lan0, "192.168.236.60"]
+    equals: OK
 `
   const exam = parse(yaml)
-  expect(exam.grupos[0].comprobaciones[0].cmd[0]).toBe('heimdall:comprobador')
+  expect(exam.groups[0].checks[0].cmd[0]).toBe('heimdall:checker')
   const written = examYaml(exam)
-  expect(written).toContain('comprobador:')
+  expect(written).toContain('checker:')
   expect(written).not.toContain('cmd:')
   expect(parse(written)).toEqual(exam)
-  expect(readExam(yaml.replace('    igual_a:', '    cmd: [hostname]\n    igual_a:'))).toHaveProperty('problem')
+  expect(readExam(yaml.replace('    equals:', '    cmd: [hostname]\n    equals:'))).toHaveProperty('problem')
 })

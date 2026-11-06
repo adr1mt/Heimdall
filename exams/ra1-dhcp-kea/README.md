@@ -35,7 +35,7 @@ No distribuir este directorio como material de examen.
 
 ## Cómo se corrige
 
-`comprobador:` identifica un programa fijo incluido en el motor por su SHA-256.
+`checker:` identifica un programa fijo incluido en el motor por su SHA-256.
 No contiene Python escrito por el profesor. Una versión incompatible del motor
 rechaza el examen antes de conectar: no permite una corrección parcial accidental.
 Se necesita esta compilación local de Heimdall; no basta con editar el YAML en

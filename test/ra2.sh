@@ -60,7 +60,7 @@ expect sin-tecnicos "ningún fallo técnico enmascarado de suspenso" \
 
 # Every result explainable from the JSON: what was run and what was compared.
 expect explicable-cmd "cada resultado dice qué se ejecutó" \
-  "$(jq -r '[.students[].checks[]|select((.execution.command|length)==0 and .valor==null)]|length' "$ART")" "0"
+  "$(jq -r '[.students[].checks[]|select((.execution.command|length)==0 and .value==null)]|length' "$ART")" "0"
 expect explicable-fallo "cada suspenso dice qué se esperaba y qué se encontró" \
   "$(jq -r '[.students[].checks[]|select(.status=="FAIL")|select((.assertion.expected|length)==0 or (.assertion|has("found")|not) and (.assertion.where//"")=="")]|length' "$ART")" "0"
 

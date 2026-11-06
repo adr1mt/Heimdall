@@ -63,11 +63,11 @@ writeFileSync(
   JSON.stringify({ enginePath: resolve(process.env.HEIMDALL_ENGINE || '../bin/heimdall') })
 )
 const yaml =
-  '# Demo ficticia: conservar este comentario.\nexamen: Redes de prueba\nversion: 1\nhosts: [host1]\npor_defecto: { peso: 1, timeout: 10s }\ngrupos:\n  - grupo: Fundamentos de redes\n    comprobaciones:\n' +
+  '# Demo ficticia: conservar este comentario.\nexam: Redes de prueba\nversion: 1\nhosts: [host1]\ndefaults: { weight: 1, timeout: 10s }\ngroups:\n  - group: Fundamentos de redes\n    checks:\n' +
   expected
     .map(
       (value, i) =>
-        `      - id: p${i + 1}\n        descripcion: ${labels[i]}\n        en: host1\n        cmd: ["echo", "\u0024{alumno.p${i + 1}}"]\n        igual_a: "${value}"\n`
+        `      - id: p${i + 1}\n        description: ${labels[i]}\n        on: host1\n        cmd: ["echo", "\u0024{student.p${i + 1}}"]\n        equals: "${value}"\n`
     )
     .join('')
 writeFileSync(join(project, 'examen.yaml'), yaml)
@@ -193,7 +193,7 @@ app
     await click('Guardar')
     await until("!!document.querySelector('[role=status]')", 'syntax error verdict')
     assert.equal(readFileSync(join(project, 'examen.yaml'), 'utf8'), changed)
-    await typeYaml(changed.replace('peso: 1', 'peso: -1'))
+    await typeYaml(changed.replace('weight: 1', 'weight: -1'))
     await click('Guardar')
     await until("!!document.querySelector('[role=status]')", 'invalid YAML verdict')
     assert.equal(readFileSync(join(project, 'examen.yaml'), 'utf8'), changed)

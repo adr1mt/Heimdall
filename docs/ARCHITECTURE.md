@@ -68,7 +68,7 @@ La fase PLAN es anterior a cualquier conexión y no puede alterarse después.
 | `internal/model` | Tipos canónicos, `Classify`, `ComputeScore` | Red, disco, reloj |
 | `internal/ssh` | Sesión por alumno/host, `exec`, límites de salida, timeouts, `timeout` remoto | Interpretar resultados |
 | `internal/engine` | Worker pool, presupuesto por alumno, aislamiento, cancelación | Decidir notas |
-| `internal/assert` | `contiene`, `igual_a`, `no_contiene`, `exit_code`, `cerca_de` | Saber de notas |
+| `internal/assert` | `contains`, `equals`, `not_contains`, `exit_code`, `near` | Saber de notas |
 | `internal/report` | Escritura atómica, artefacto parcial, redacción de secretos | Calcular nada |
 | `internal/events` | Contrato nativo: eventos NDJSON por `stdout` (ADR-0017) | Llevar salida de las máquinas, ser fuente de verdad |
 | `gui/` | Heimdall GUI: Electron sobre el contrato nativo | Calcular notas, hablar con SSH |

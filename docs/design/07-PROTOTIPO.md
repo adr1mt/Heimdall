@@ -46,9 +46,9 @@ Dependencias externas permitidas: `golang.org/x/crypto/ssh`, un parser YAML
 | Pieza | Detalle |
 |---|---|
 | `examen.yaml` | 5 comprobaciones, 1 grupo, pesos 1/1/2/1/1 (total 6) |
-| `aula.yaml` | 2 alumnos: `alumne01` → `127.1.2.3:2201`, `alumne02` → `127.1.2.3:2299` |
-| Aserciones | `contiene`, `igual_a`, `exit_code`. **`cerca_de` y `no_contiene` no**, y `valor:` tampoco |
-| Sustitución | `${alumno.<campo>}` en argumentos y valores esperados. Solo esa forma |
+| `aula.yaml` | 2 students: `alumne01` → `127.1.2.3:2201`, `alumne02` → `127.1.2.3:2299` |
+| Aserciones | `contains`, `equals`, `exit_code`. **`near` y `not_contains` no**, y `value:` tampoco |
+| Sustitución | `${student.<campo>}` en argumentos y valores esperados. Solo esa forma |
 | PLAN | Valida los 9 puntos de `02-FORMATO.md` §5 y publica `check_count`, `total_weight`, `check_ids`, hashes |
 | `check` | Subcomando que ejecuta solo el PLAN y no toca ninguna máquina |
 | Transporte | SSH nativo, **una sesión por alumno y host**, reutilizada (K-6) |
@@ -67,8 +67,8 @@ Dependencias externas permitidas: `golang.org/x/crypto/ssh`, un parser YAML
 ### No entra
 
 NDJSON, HTML, Moodle, SQLite, editor GUI, migrador, Starlark, telnet,
-`ProxyJump`, SFTP, monitorización, detección de copias, `--case`, `excluido`,
-variantes de examen, `cerca_de`, `valor:`, autenticación por clave, más de un
+`ProxyJump`, SFTP, monitorización, detección de copias, `--case`, `excluded`,
+variantes de examen, `near`, `value:`, autenticación por clave, más de un
 host lógico, resolución manual de incompletos.
 
 ## 4. Flujo que debe quedar visible en el código
@@ -102,37 +102,37 @@ donde se comprueba que un error técnico no tiene camino hacia un `FAIL`.
 ## 5. `examen.yaml` del prototipo
 
 ```yaml
-examen: "Prototipo vertical"
+exam: "Prototipo vertical"
 version: 1
 hosts: [host1]
-por_defecto: { peso: 1, timeout: 20s }
-grupos:
-  - grupo: "Base"
-    comprobaciones:
+defaults: { weight: 1, timeout: 20s }
+groups:
+  - group: "Base"
+    checks:
       - id: p1-hostname
-        descripcion: "El host responde y se identifica"
-        en: host1
+        description: "El host responde y se identifica"
+        on: host1
         cmd: ["hostname"]
-        contiene: "alu"
+        contains: "alu"
       - id: p2-usuario
-        descripcion: "La cuenta del alumno existe"
-        en: host1
+        description: "La cuenta del alumno existe"
+        on: host1
         cmd: ["id", "-un"]
-        igual_a: "${alumno.usuario}"
+        equals: "${student.user}"
       - id: p3-fichero
-        descripcion: "Existe /etc/os-release"
-        en: host1
-        peso: 2
+        description: "Existe /etc/os-release"
+        on: host1
+        weight: 2
         cmd: ["test", "-f", "/etc/os-release"]
         exit_code: 0
       - id: p4-ausente
-        descripcion: "Un comando que no existe suspende, no avería"
-        en: host1
+        description: "Un comando que no existe suspende, no avería"
+        on: host1
         cmd: ["comando_que_no_existe"]
         exit_code: 0
       - id: p5-lento
-        descripcion: "Comprobación con timeout corto"
-        en: host1
+        description: "Comprobación con timeout corto"
+        on: host1
         timeout: 3s
         cmd: ["sleep", "30"]
         exit_code: 0
@@ -179,5 +179,5 @@ alguno de esos cinco falla, no se sigue adelante con nada más.
 3. Un `var/run-<id>.json` real del laboratorio, guardado en `docs/design/` como
    ejemplo verificado (sustituyendo al ejemplo redactado a mano de
    `04-MODELO-RESULTADO.md`).
-4. Las mediciones de `PERFORMANCE.md` §6 que ya se puedan hacer con 2 alumnos:
+4. Las mediciones de `PERFORMANCE.md` §6 que ya se puedan hacer con 2 students:
    RSS con salida grande y tiempo hasta el artefacto.

@@ -66,7 +66,7 @@ func TestSessionLeavesTheFinishedStudentOut(t *testing.T) {
 		t.Errorf("nota = %v: una vuelta que no lo corrige no le pone ningún número", done.Score.Final)
 	}
 	if len(done.Checks) != 0 {
-		t.Errorf("tiene %d comprobaciones: no se ejecutó ninguna", len(done.Checks))
+		t.Errorf("tiene %d checks: no se ejecutó ninguna", len(done.Checks))
 	}
 
 	// The whole acceptance criterion: not one connection against their machine.

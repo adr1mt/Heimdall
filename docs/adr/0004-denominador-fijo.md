@@ -1,6 +1,7 @@
 # ADR-0004 · Denominador fijo y parametrización sin decisión
 
 - Estado: **aceptada** · 2026-09-19
+- Sintaxis de referencias sustituida por [ADR-0042](0042-yaml-en-ingles.md); garantías de nota vigentes.
 - Contexto: `02-FORMATO.md` §2, `c14-check`
 
 ## Contexto

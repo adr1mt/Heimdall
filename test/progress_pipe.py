@@ -19,13 +19,13 @@ BIN = ROOT / "bin/heimdall"
 def project(parent):
     folder = parent / "exam"
     folder.mkdir(parents=True)
-    exam = "examen: Prueba de tuberia\nversion: 1\nhosts: []\ngrupos:\n  - grupo: G\n    comprobaciones:\n"
+    exam = "exam: Prueba de tuberia\nversion: 1\nhosts: []\ngroups:\n  - group: G\n    checks:\n"
     for index in range(20):
-        exam += f"      - id: c{index}\n        descripcion: C\n        valor: \"${{alumno.respuesta}}\"\n        contiene: x\n"
+        exam += f"      - id: c{index}\n        description: C\n        value: \"${{student.respuesta}}\"\n        contains: x\n"
     (folder / "examen.yaml").write_text(exam)
-    classroom = "aula: Prueba de tuberia\nversion: 1\nalumnos:\n"
+    classroom = "classroom: Prueba de tuberia\nversion: 1\nstudents:\n"
     for index in range(100):
-        classroom += f'  - id: ficticio{index}\n    nombre: Ficticio {index}\n    respuesta: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"\n'
+        classroom += f'  - id: ficticio{index}\n    name: Ficticio {index}\n    respuesta: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"\n'
     (folder / "aula.yaml").write_text(classroom)
     return folder
 

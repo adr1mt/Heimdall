@@ -26,7 +26,7 @@ func TestProbeTechnicalFailuresNeverBecomeGrades(t *testing.T) {
 			c.Probe = true
 			c.Contains = nil
 			c.Equals = str("OK")
-			c.Cmd = []string{"heimdall:comprobador", "ra1-dhcp", probe.Revision(), "kea-reserva-mail", "wan0", "lan0", "192.168.236.60"}
+			c.Cmd = []string{"heimdall:checker", "ra1-dhcp", probe.Revision(), "kea-reserva-mail", "wan0", "lan0", "192.168.236.60"}
 			sess := &fakeSession{run: func(_ context.Context, argv []string, _ time.Duration) *model.ExecutionResult {
 				if argv[0] == "python3" {
 					if argv[1] != "-I" || !strings.Contains(argv[3], "def evaluate") || argv[4] != "kea-reserva-mail" {
@@ -45,7 +45,7 @@ func TestProbeTechnicalFailuresNeverBecomeGrades(t *testing.T) {
 			if check.Status != tc.status {
 				t.Fatalf("%s: %s %s", tc.name, check.Status, check.Detail)
 			}
-			if check.Execution.Command[0] != "heimdall:comprobador" {
+			if check.Execution.Command[0] != "heimdall:checker" {
 				t.Fatal("missing source identity")
 			}
 			if tc.status == model.Unevaluated {

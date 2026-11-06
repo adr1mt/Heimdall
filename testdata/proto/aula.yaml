@@ -3,28 +3,28 @@
 #
 # alumne02 apunta a un puerto cerrado a propósito: es el alumno roto que
 # demuestra que nadie puede tumbar la evaluación de los demás.
-aula: "Prototipo vertical"
+classroom: "Prototipo vertical"
 version: 1
 
-comun:
+common:
   hosts:
     host1:
-      puerto: 2201
-      usuario: "alumno"
+      port: 2201
+      user: "alumno"
       password_ref: "${AULA_PASSWORD}"
   timeouts:
-    conexion: 10s
-    alumno: 2m
+    connect: 10s
+    student: 2m
 
-alumnos:
+students:
   - id: alumne01
-    nombre: "Alumna Uno"
+    name: "Alumna Uno"
     hosts:
-      host1: { ip: "127.1.2.3", puerto: 2201 }
-    usuario: "alumno"
+      host1: { ip: "127.1.2.3", port: 2201 }
+    user: "alumno"
 
   - id: alumne02
-    nombre: "Alumne Dos"
+    name: "Alumne Dos"
     hosts:
-      host1: { ip: "127.1.2.3", puerto: 2299 }
-    usuario: "alumno"
+      host1: { ip: "127.1.2.3", port: 2299 }
+    user: "alumno"

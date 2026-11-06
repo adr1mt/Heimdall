@@ -27,11 +27,11 @@ function text(value: unknown): string | null {
 export function describeExam(path: string): ExamDescription | null {
   const doc = read(path)
   if (!doc) return null
-  const groups = Array.isArray(doc.grupos) ? doc.grupos : []
+  const groups = Array.isArray(doc.groups) ? doc.groups : []
   let checks = 0
   for (const group of groups) {
-    const list = (group as Record<string, unknown>)?.comprobaciones
+    const list = (group as Record<string, unknown>)?.checks
     if (Array.isArray(list)) checks += list.length
   }
-  return { name: text(doc.examen), checks: groups.length > 0 ? checks : null }
+  return { name: text(doc.exam), checks: groups.length > 0 ? checks : null }
 }

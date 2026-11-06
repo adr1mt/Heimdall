@@ -85,7 +85,7 @@ func TestParseExamExample(t *testing.T) {
 						Description: "El alumno tiene su registro A en la zona directa",
 						Weight:      f(1), Timeout: d(20 * time.Second),
 						Cmd:      []string{"cat", "/etc/bind/forward.examen.local"},
-						Contains: s("${alumno.subdominio}"),
+						Contains: s("${student.subdominio}"),
 					},
 					{
 						ID: "dns-sin-recursion-abierta", On: "host1", Line: 54,
@@ -110,14 +110,14 @@ func TestParseExamExample(t *testing.T) {
 						ID: "q-puerto-https", Line: 69,
 						Description: "Puerto por defecto de HTTPS",
 						Weight:      f(1), Timeout: d(20 * time.Second),
-						Value:  "${alumno.p1}",
+						Value:  "${student.p1}",
 						Equals: s("443"),
 					},
 					{
 						ID: "q-mascara-24", Line: 74,
 						Description: "Máscara /24 en decimal",
 						Weight:      f(1), Timeout: d(20 * time.Second),
-						Value:  "${alumno.p3}",
+						Value:  "${student.p3}",
 						Equals: s("255.255.255.0"),
 					},
 				},
@@ -221,7 +221,7 @@ func TestExamDefaults(t *testing.T) {
 	}
 	inherited := exam.Groups[0].Checks[0]
 	if *inherited.Weight != DefaultWeight || *inherited.Timeout != DefaultTimeout {
-		t.Errorf("sin por_defecto: peso=%v timeout=%v, se esperaba %v y %v",
+		t.Errorf("sin defaults: peso=%v timeout=%v, se esperaba %v y %v",
 			*inherited.Weight, inherited.Timeout, DefaultWeight, DefaultTimeout)
 	}
 	own := exam.Groups[0].Checks[1]
@@ -317,7 +317,7 @@ func itoa(n int) string {
 
 func TestYAMLRequiresExactlyOneDocument(t *testing.T) {
 	for _, name := range []string{ExamFile, InventoryFile} {
-		for _, extra := range []string{"---\nexamen: Otro\n", "---\nesto_no_es_un_examen: true\n", "---\n", "---\ninvalid: [unterminated\n", "...\nmalformed trailing text\n"} {
+		for _, extra := range []string{"---\nexam: Otro\n", "---\nesto_no_es_un_examen: true\n", "---\n", "---\ninvalid: [unterminated\n", "...\nmalformed trailing text\n"} {
 			exam, inv := validExam, validInventory
 			if name == ExamFile {
 				exam += extra
@@ -341,8 +341,8 @@ func TestYAMLRequiresExactlyOneDocument(t *testing.T) {
 }
 
 func TestStudentRejectsEveryDuplicateKeyWithBothLocations(t *testing.T) {
-	for _, entry := range []struct{ key, value string }{{"id", "fake"}, {"nombre", "Ficticio"}, {"moodle_id", "'123'"}, {"excluido", "false"}, {"hosts", "{}"}, {"respuesta", "yes"}} {
-		body := "aula: Ficticia\nversion: 1\nalumnos:\n  - " + entry.key + ": " + entry.value + "\n    " + entry.key + ": " + entry.value + "\n"
+	for _, entry := range []struct{ key, value string }{{"id", "fake"}, {"name", "Ficticio"}, {"moodle_id", "'123'"}, {"excluded", "false"}, {"hosts", "{}"}, {"respuesta", "yes"}} {
+		body := "classroom: Ficticia\nversion: 1\nstudents:\n  - " + entry.key + ": " + entry.value + "\n    " + entry.key + ": " + entry.value + "\n"
 		dir := project(t, validExam, body)
 		_, err := LoadInventory(filepath.Join(dir, InventoryFile))
 		if err == nil {

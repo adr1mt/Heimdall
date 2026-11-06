@@ -118,5 +118,6 @@ un 0», no «A-3 en verde». El detalle técnico va al repositorio.
 
 ## Idioma
 
-Documentación y claves del YAML de examen: español. Código, comentarios,
-nombres de campo JSON y commits: inglés.
+Documentación y mensajes docentes: español. Claves del YAML de examen e
+inventario, referencias reservadas, código, comentarios, campos JSON y commits:
+inglés (ADR-0042). Sin alias ni conversión del formato español.

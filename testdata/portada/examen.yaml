@@ -5,51 +5,51 @@
 # La clase que lo acompaña la escribe gui/scripts/lab-flow.ts con CLASS_SIZE,
 # y su último alumno apunta a un puerto cerrado: la captura tiene que enseñar
 # también qué pasa con una máquina que no responde.
-examen: "Servicios básicos"
+exam: "Servicios básicos"
 version: 1
 hosts: [host1]
-por_defecto: { peso: 1, timeout: 20s }
-grupos:
-  - grupo: "La máquina"
-    comprobaciones:
+defaults: { weight: 1, timeout: 20s }
+groups:
+  - group: "La máquina"
+    checks:
       - id: hostname
-        descripcion: "La máquina se identifica"
-        en: host1
+        description: "La máquina se identifica"
+        on: host1
         cmd: ["hostname"]
-        contiene: "alu"
+        contains: "alu"
       - id: usuario
-        descripcion: "La cuenta del alumno existe"
-        en: host1
+        description: "La cuenta del alumno existe"
+        on: host1
         cmd: ["id", "-un"]
-        igual_a: "${alumno.usuario}"
+        equals: "${student.user}"
       - id: sistema
-        descripcion: "El sistema es el que se pidió"
-        en: host1
-        peso: 2
+        description: "El sistema es el que se pidió"
+        on: host1
+        weight: 2
         cmd: ["test", "-f", "/etc/os-release"]
         exit_code: 0
-  - grupo: "Servicio web"
-    comprobaciones:
+  - group: "Servicio web"
+    checks:
       - id: web-instalado
-        descripcion: "El servidor web está instalado"
-        en: host1
+        description: "El servidor web está instalado"
+        on: host1
         cmd: ["test", "-x", "/usr/sbin/nginx"]
         exit_code: 0
       - id: web-raiz
-        descripcion: "La raíz del sitio existe"
-        en: host1
+        description: "La raíz del sitio existe"
+        on: host1
         cmd: ["test", "-d", "/var/www/html"]
         exit_code: 0
-  - grupo: "SSH"
-    comprobaciones:
+  - group: "SSH"
+    checks:
       - id: ssh-activo
-        descripcion: "El servidor SSH está escuchando"
-        en: host1
+        description: "El servidor SSH está escuchando"
+        on: host1
         cmd: ["test", "-d", "/etc/ssh"]
         exit_code: 0
       - id: ssh-sin-root
-        descripcion: "No se entra como root por SSH"
-        en: host1
-        peso: 2
+        description: "No se entra como root por SSH"
+        on: host1
+        weight: 2
         cmd: ["grep", "-c", "PermitRootLogin no", "/etc/ssh/sshd_config"]
         exit_code: 0

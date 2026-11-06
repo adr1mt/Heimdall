@@ -13,7 +13,7 @@ const profile = join(base, 'profile'), project = join(base, 'redes-demo')
 for (const dir of [profile, project]) mkdirSync(dir)
 const out = resolve('../docs/reviews/evidence/T200'); mkdirSync(out, { recursive: true })
 const exam = join(project, 'examen.yaml')
-const initialExam = 'examen: "Primera versión ficticia"\nversion: 1\nhosts: [host1]\ngrupos: []\n'
+const initialExam = 'exam: "Primera versión ficticia"\nversion: 1\nhosts: [host1]\ngroups: []\n'
 const currentExam = initialExam.replace('Primera', 'Segunda')
 const group = { id: 'demo', name: 'Clase primera ficticia', columns: [], password: 'HEIMDALL_FICTIONAL_SOURCE_TEST', students: [] }
 writeClasses(profile, [group])

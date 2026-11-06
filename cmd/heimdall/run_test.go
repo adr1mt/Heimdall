@@ -203,15 +203,15 @@ func TestRunRejectsAnUnknownEventFormat(t *testing.T) {
 func TestZeroWeightExamStopsBeforeWritingAndMixedExamIsReadable(t *testing.T) {
 	dir := t.TempDir()
 	out := t.TempDir()
-	exam := "examen: Ficticio\nversion: 1\nhosts: []\npor_defecto: {peso: 0}\ngrupos:\n  - grupo: G\n    comprobaciones:\n      - id: zero\n        valor: yes\n        contiene: yes\n"
+	exam := "exam: Ficticio\nversion: 1\nhosts: []\ndefaults: {weight: 0}\ngroups:\n  - group: G\n    checks:\n      - id: zero\n        value: yes\n        contains: yes\n"
 	os.WriteFile(filepath.Join(dir, "examen.yaml"), []byte(exam), 0600)
-	os.WriteFile(filepath.Join(dir, "aula.yaml"), []byte("aula: Ficticia\nversion: 1\nalumnos:\n  - id: fake\n    nombre: Ficticio\n"), 0600)
+	os.WriteFile(filepath.Join(dir, "aula.yaml"), []byte("classroom: Ficticia\nversion: 1\nstudents:\n  - id: fake\n    name: Ficticio\n"), 0600)
 	var stdout, stderr bytes.Buffer
 	if code := run([]string{"run", "--secrets=env", "--var=" + out, dir}, &stdout, &stderr); code != exitInvalidConfig {
 		t.Fatalf("zero exam exit %d: %s", code, stderr.String())
 	}
 	assertEmptyDir(t, out)
-	exam += "      - id: positive\n        peso: 1\n        valor: yes\n        contiene: yes\n"
+	exam += "      - id: positive\n        weight: 1\n        value: yes\n        contains: yes\n"
 	os.WriteFile(filepath.Join(dir, "examen.yaml"), []byte(exam), 0600)
 	stdout.Reset()
 	stderr.Reset()

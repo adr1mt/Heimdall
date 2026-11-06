@@ -1,28 +1,28 @@
 # Demostración local: alumnado ficticio, sin SSH ni comandos.
-examen: "Prueba sencilla · 15 alumnos"
+exam: "Prueba sencilla · 15 alumnos"
 version: 1
 hosts: []
-por_defecto: { peso: 1 }
-grupos:
-  - grupo: "Cinco preguntas de redes"
-    comprobaciones:
+defaults: { weight: 1 }
+groups:
+  - group: "Cinco preguntas de redes"
+    checks:
       - id: p1
-        descripcion: "Puerto de HTTPS"
-        valor: "${alumno.p1}"
-        igual_a: "443"
+        description: "Puerto de HTTPS"
+        value: "${student.p1}"
+        equals: "443"
       - id: p2
-        descripcion: "Puerto de SSH"
-        valor: "${alumno.p2}"
-        igual_a: "22"
+        description: "Puerto de SSH"
+        value: "${student.p2}"
+        equals: "22"
       - id: p3
-        descripcion: "Puerto de DNS"
-        valor: "${alumno.p3}"
-        igual_a: "53"
+        description: "Puerto de DNS"
+        value: "${student.p3}"
+        equals: "53"
       - id: p4
-        descripcion: "Protocolo que reparte direcciones IP"
-        valor: "${alumno.p4}"
-        igual_a: "DHCP"
+        description: "Protocolo que reparte direcciones IP"
+        value: "${student.p4}"
+        equals: "DHCP"
       - id: p5
-        descripcion: "Dirección de bucle local"
-        valor: "${alumno.p5}"
-        igual_a: "127.0.0.1"
+        description: "Dirección de bucle local"
+        value: "${student.p5}"
+        equals: "127.0.0.1"

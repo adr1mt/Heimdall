@@ -118,30 +118,30 @@ agrupadas. Cada una dice en qué máquina se ejecuta, qué **comando** se lanza 
 qué tiene que aparecer en lo que contesta.
 
 ```yaml
-examen: "RA1 · Servidor DHCP con KEA"
+exam: "RA1 · Servidor DHCP con KEA"
 version: 1
 hosts: [host1]
 
-por_defecto:
-  peso: 1
+defaults:
+  weight: 1
   timeout: 20s
 
-grupos:
-  - grupo: "KEA"
-    comprobaciones:
+groups:
+  - group: "KEA"
+    checks:
       - id: kea-subred
-        descripcion: "KEA declara la subred 10.0.0.0/8"
-        en: host1
+        description: "KEA declara la subred 10.0.0.0/8"
+        on: host1
         sudo: true          # /etc/kea solo lo lee el administrador
         cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
-        cerca_de: { ancla: '"subnet"', lineas: 0, contiene: "10.0.0.0/8" }
+        near: { anchor: '"subnet"', lines: 0, contains: "10.0.0.0/8" }
 
       - id: kea-activo
-        descripcion: "El servicio kea-dhcp4-server está activo"
-        en: host1
-        peso: 2
+        description: "El servicio kea-dhcp4-server está activo"
+        on: host1
+        weight: 2
         cmd: ["systemctl", "is-active", "kea-dhcp4-server"]
-        igual_a: "active"
+        equals: "active"
 ```
 
 Lo que hay que saber:
@@ -153,21 +153,21 @@ Lo que hay que saber:
 
   | Clave | Aprueba si la respuesta… |
   |---|---|
-  | `contiene: "texto"` | contiene ese texto |
-  | `no_contiene: "texto"` | no lo contiene |
-  | `igual_a: "texto"` | es exactamente ese texto |
+  | `contains: "texto"` | contiene ese texto |
+  | `not_contains: "texto"` | no lo contiene |
+  | `equals: "texto"` | es exactamente ese texto |
   | `exit_code: 0` | el comando termina con ese código |
-  | `cerca_de: { ancla, lineas, contiene }` | contiene el texto como mucho N líneas después de la línea que tiene el ancla (como `grep -A N`) |
+  | `near: { ancla, lineas, contiene }` | contiene el texto como mucho N líneas después de la línea que tiene el ancla (como `grep -A N`) |
 
 - `sudo: true` ejecuta el comando como administrador, para lo que el usuario de
   la conexión no puede leer (`/etc/kea` en Ubuntu 26.04, `nft list ruleset`).
   Usa la contraseña de la clase, la misma de la conexión: nunca la escribas en
-  el examen. Va en la comprobación o en `por_defecto` para todas. Si la
+  el examen. Va en la comprobación o en `defaults` para todas. Si la
   máquina no la acepta, la comprobación sale *sin evaluar*, no suspendida.
-- `peso` es lo que vale cada comprobación (por defecto, el de `por_defecto`).
+- `weight` es lo que vale cada comprobación (por defecto, el de `defaults`).
   La nota es la suma de lo aprobado sobre la suma total, y el total es el
   mismo para todos.
-- `${alumno.campo}` usa un dato propio de cada alumno que hayas añadido a la
+- `${student.campo}` usa un dato propio de cada alumno que hayas añadido a la
   clase (su subdominio, su puerto…).
 - No hay expresiones regulares, bucles ni condicionales. Las contraseñas nunca
   van en el examen.
@@ -182,16 +182,16 @@ editor. Revísalo antes de corregir: la IA puede inventarse rutas o servicios.
 ```text
 Escríbeme un examen para Heimdall en YAML con este formato exacto:
 
-examen: "<título>"
+exam: "<título>"
 version: 1
 hosts: [host1]
-por_defecto: { peso: 1, timeout: 20s }
-grupos:
-  - grupo: "<nombre del grupo>"
-    comprobaciones:
+defaults: { weight: 1, timeout: 20s }
+groups:
+  - group: "<nombre del grupo>"
+    checks:
       - id: <identificador-corto-sin-espacios>
-        descripcion: "<qué se comprueba, en una frase>"
-        en: host1
+        description: "<qué se comprueba, en una frase>"
+        on: host1
         cmd: ["comando", "argumento", "argumento"]
         <UNA sola aserción>
 
@@ -199,13 +199,13 @@ Reglas:
 - cmd es una lista de palabras. Sin tuberías, sin grep, sin ; ni redirecciones.
 - Si el comando necesita ser administrador (leer /etc/kea, nft list ruleset...),
   añade sudo: true a esa comprobación. Nunca escribas sudo ni contraseñas en cmd.
-- Aserciones posibles (una por comprobación): contiene: "x", no_contiene: "x",
-  igual_a: "x", exit_code: 0, o cerca_de: { ancla: "x", lineas: N, contiene: "y" }
+- Aserciones posibles (una por comprobación): contains: "x", not_contains: "x",
+  equals: "x", exit_code: 0, o near: { anchor: "x", lines: N, contains: "y" }
   (busca "y" en las N líneas siguientes a la que contiene "x").
 - Nada de expresiones regulares, bucles ni condicionales.
 - Compara datos estables (ficheros de configuración, systemctl is-active,
   ip address), nunca mensajes que dependan del idioma del sistema.
-- peso: N solo si una comprobación vale más que las demás.
+- weight: N solo si una comprobación vale más que las demás.
 - Devuélveme solo el YAML.
 
 La práctica: <describe aquí lo que tiene que haber configurado el alumno>.

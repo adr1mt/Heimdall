@@ -16,22 +16,22 @@ import (
 )
 
 // Kind is the assertion the teacher wrote, named as it appears in the
-// artifact. The Spanish keys of examen.yaml are mapped to these by the caller.
+// artifact. The English keys of examen.yaml are mapped to these by the caller.
 type Kind string
 
 const (
-	// KindContains is `contiene`: the expected text appears in stdout.
+	// KindContains is `contains`: the expected text appears in stdout.
 	KindContains Kind = "contains"
-	// KindEquals is `igual_a`: stdout, trimmed of surrounding blanks, is the
+	// KindEquals is `equals`: stdout, trimmed of surrounding blanks, is the
 	// expected text.
 	KindEquals Kind = "equals"
 	// KindExitCode is `exit_code`: the process ended with that status.
 	KindExitCode Kind = "exit_code"
-	// KindNotContains is `no_contiene`: the forbidden text is nowhere in
+	// KindNotContains is `not_contains`: the forbidden text is nowhere in
 	// stdout. It is an anti-check: it passes by absence, which is why it
 	// may never be evaluated without a complete execution (K-7).
 	KindNotContains Kind = "not_contains"
-	// KindNear is `cerca_de`: the expected text appears within the N lines
+	// KindNear is `near`: the expected text appears within the N lines
 	// that follow an anchor line. It replaces `grep -A N`.
 	KindNear Kind = "near"
 )

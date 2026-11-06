@@ -44,7 +44,7 @@ const classId = 'clase-de-prueba'
 const otherId = 'clase-sin-contrasena'
 
 beforeAll(() => {
-  writeFileSync(examPath, 'examen: "Prueba"\n', 'utf-8')
+  writeFileSync(examPath, 'exam: "Prueba"\n', 'utf-8')
   writeFileSync(
     join(userData, 'classes.json'),
     JSON.stringify({

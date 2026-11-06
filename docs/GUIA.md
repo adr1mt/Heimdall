@@ -65,9 +65,9 @@ funciona en un equipo sin nada instalado.
 | Nombre | el suyo, para leerlo en pantalla | `Alumna Primera` |
 | Contacto | correo o identificador de Moodle | `alu1@centro.cat` |
 | Máquina | dónde está su equipo | `10.0.2.31` |
-| Usuario | con qué cuenta se entra | `alumno` |
+| Usuario | con qué cuenta se entra | `student` |
 
-El usuario inicial es `usuario`. Puedes cambiar **Usuario común** y pulsar
+El usuario inicial es `user`. Puedes cambiar **Usuario común** y pulsar
 **Aplicar a todos**, o activar **Usuario por alumno** para las excepciones.
 El puerto habitual, 22, queda oculto: activa **Puertos SSH** para otro puerto.
 Los valores personalizados se conservan al ocultar la columna.
@@ -79,7 +79,7 @@ exámenes del curso.
 
 Si el examen necesita un dato propio de cada alumno —su subdominio, el puerto
 que le tocó—, añade una columna tuya y rellénala. El examen la lee con
-`${alumno.subdominio}`.
+`${student.subdominio}`.
 
 ### 4.2 Abre o escribe el examen
 
@@ -351,7 +351,7 @@ con su cuenta SSH; para impedir que otro alumno entre en ella, la cuenta o
 máquina necesita credenciales propias. Una contraseña común de aula conocida
 por todos no protege frente al acceso a máquinas ajenas (ADR-0037).
 
-Documentación de referencia: [conectar con Archivos de Ubuntu](https://help.ubuntu.com/stable/ubuntu-help/nautilus-connect.html.en) y [opciones de SCP de OpenSSH](https://man.openbsd.org/scp).
+Documentación de referencia: [conectar con Archivos de Ubuntu](https://help.ubuntu.com/stable/ubuntu-help/nautilus-connect.html.on) y [opciones de SCP de OpenSSH](https://man.openbsd.org/scp).
 
 
 ## Pausar, reanudar y finalizar el examen

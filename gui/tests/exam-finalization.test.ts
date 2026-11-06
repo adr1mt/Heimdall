@@ -20,7 +20,7 @@ it.each([{ changed: false, pause: false }, { changed: true, pause: false }, { ch
   root = mkdtempSync(join(tmpdir(), 'heimdall-finalize-'))
   state.data = join(root, 'profile'); mkdirSync(state.data); mkdirSync(join(root, 'var'))
   const exam = join(root, 'examen.yaml'), gate = join(root, 'continue'), engine = join(root, 'engine'), path = join(root, 'var', 'run-R1.json')
-  writeFileSync(exam, 'examen: Ficticio\n')
+  writeFileSync(exam, 'exam: Ficticio\n')
   const group: ClassGroup = { id: 'fake', name: 'Ficticia', password: '', columns: [], students: [{ id: 'fake', name: 'Ficticio', host: '192.0.2.1', user: 'alumno', port: '22', contact: '', fields: {} }] }
   writeFileSync(join(state.data, 'classes.json'), JSON.stringify({ classes: [group] }))
   const run = validRun(); run.exam.path = exam; run.exam.sha256 = digest(readFileSync(exam)); run.inventory.path = join(root, aulaFileName(group)); run.inventory.sha256 = digest(aulaYaml(group))
@@ -48,7 +48,7 @@ it.each([{ changed: false, pause: false }, { changed: true, pause: false }, { ch
     expect(paused.record.finalOrigins).toBeUndefined()
     expect(paused.record.delivery).toEqual({})
   }
-  if (changed) writeFileSync(exam, 'examen: Criterios nuevos\n')
+  if (changed) writeFileSync(exam, 'exam: Criterios nuevos\n')
   let ended = false
   const first = state.handlers.get(IPC.finishExam)!(null, exam, group.id) as Promise<any>
   first.then(() => { ended = true })

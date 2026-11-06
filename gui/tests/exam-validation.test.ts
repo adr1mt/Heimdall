@@ -29,20 +29,20 @@ const { registerIpc } = await import('../src/main/ipc')
 beforeAll(() => { registerIpc() })
 beforeEach(() => {
   accepted = true
-  writeFileSync(join(profile, 'examen.yaml'), 'examen: Anterior\n')
+  writeFileSync(join(profile, 'examen.yaml'), 'exam: Anterior\n')
 })
 afterAll(() => { rmSync(profile, { recursive: true, force: true }) })
 
 it('validates without classes, even if their file is corrupt, and saves the exact renamed YAML', async () => {
   writeFileSync(join(profile, 'classes.json'), '[corrupt')
   const examPath = join(profile, 'examen.yaml')
-  const yaml = '# Conservar comentario\nexamen: "Nombre nuevo"\n'
-  writeFileSync(examPath, 'examen: Anterior\n')
+  const yaml = '# Conservar comentario\nexam: "Nombre nuevo"\n'
+  writeFileSync(examPath, 'exam: Anterior\n')
   const verdict = await handlers.get(IPC.validateExam)!(null, { examPath, yaml })
   expect(verdict).toEqual({ ok: true, message: 'Examen válido.' })
   expect(source).toBe(yaml)
   expect(existsSync(temporary)).toBe(false)
-  expect(readFileSync(examPath, 'utf8')).toBe('examen: Anterior\n')
+  expect(readFileSync(examPath, 'utf8')).toBe('exam: Anterior\n')
   handlers.get(IPC.writeExam)!(null, examPath, yaml)
   expect(readFileSync(examPath, 'utf8')).toBe(yaml)
 })

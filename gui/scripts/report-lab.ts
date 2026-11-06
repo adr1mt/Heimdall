@@ -64,12 +64,12 @@ writeFileSync(
   JSON.stringify({ enginePath: resolve(process.env.HEIMDALL_ENGINE || '../bin/heimdall') })
 )
 const check = (i: number) =>
-  `      - id: p${i + 1}\n        descripcion: ${labels[i]}\n        en: host1\n        cmd: ["echo", "\u0024{alumno.p${i + 1}}"]\n        igual_a: "${expected[i]}"\n`
+  `      - id: p${i + 1}\n        description: ${labels[i]}\n        on: host1\n        cmd: ["echo", "\u0024{student.p${i + 1}}"]\n        equals: "${expected[i]}"\n`
 writeFileSync(
   join(project, 'examen.yaml'),
-  'examen: "Práctica 3 · Servicios de red"\nversion: 1\nhosts: [host1]\npor_defecto: { peso: 1, timeout: 10s }\ngrupos:\n' +
-    '  - grupo: Puertos de servicio\n    comprobaciones:\n' + [0, 1, 2].map(check).join('') +
-    '  - grupo: DHCP y DNS\n    comprobaciones:\n' + [3, 4].map(check).join('')
+  'exam: "Práctica 3 · Servicios de red"\nversion: 1\nhosts: [host1]\ndefaults: { weight: 1, timeout: 10s }\ngroups:\n' +
+    '  - group: Puertos de servicio\n    checks:\n' + [0, 1, 2].map(check).join('') +
+    '  - group: DHCP y DNS\n    checks:\n' + [3, 4].map(check).join('')
 )
 
 app.setPath('userData', profile)

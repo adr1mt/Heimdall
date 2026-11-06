@@ -1,8 +1,8 @@
 // Package plan reads the two declarative files the teacher writes,
 // examen.yaml and aula.yaml, and turns them into Go values.
 //
-// The YAML keys are Spanish because the teacher reads and writes them; the Go
-// field names are English like the rest of the engine. See
+// YAML keys and Go field names are English. Teacher-facing messages remain
+// Spanish. See ADR-0042 and
 // docs/design/02-FORMATO.md.
 //
 // This package only parses. The nine semantic validations of the PLAN, the
@@ -17,7 +17,7 @@ import (
 	"go.yaml.in/yaml/v3"
 )
 
-// Defaults used when the exam does not set por_defecto. Both are explicit
+// Defaults used when the exam does not set defaults. Both are explicit
 // values, never silent: a malformed timeout is an error, not a fallback.
 const (
 	DefaultWeight  = 1.0
@@ -49,73 +49,73 @@ func (d *Duration) UnmarshalYAML(node *yaml.Node) error {
 
 // Exam is examen.yaml.
 type Exam struct {
-	Name     string   `yaml:"examen"`
+	Name     string   `yaml:"exam"`
 	Version  int      `yaml:"version"`
 	Hosts    []string `yaml:"hosts"`
-	Defaults Defaults `yaml:"por_defecto"`
-	Groups   []Group  `yaml:"grupos"`
+	Defaults Defaults `yaml:"defaults"`
+	Groups   []Group  `yaml:"groups"`
 }
 
-// Defaults is por_defecto: the values a check inherits when it says nothing.
+// Defaults is defaults: the values a check inherits when it says nothing.
 type Defaults struct {
-	Weight  *float64  `yaml:"peso"`
+	Weight  *float64  `yaml:"weight"`
 	Timeout *Duration `yaml:"timeout"`
 	Sudo    *bool     `yaml:"sudo"`
 }
 
 // Group is a titled block of checks. The GUI shows the title (M-3).
 type Group struct {
-	Name   string  `yaml:"grupo"`
-	Checks []Check `yaml:"comprobaciones"`
+	Name   string  `yaml:"group"`
+	Checks []Check `yaml:"checks"`
 }
 
-// Check is one check. Weight and Timeout are resolved against por_defecto at
+// Check is one check. Weight and Timeout are resolved against defaults at
 // load time, so they are never nil once LoadExam returns.
 type Check struct {
 	ID          string    `yaml:"id"`
-	Description string    `yaml:"descripcion"`
-	On          string    `yaml:"en"` // logical host, empty for a valor: check
-	Weight      *float64  `yaml:"peso"`
+	Description string    `yaml:"description"`
+	On          string    `yaml:"on"` // logical host, empty for a value: check
+	Weight      *float64  `yaml:"weight"`
 	Timeout     *Duration `yaml:"timeout"`
 
-	Cmd   []string `yaml:"cmd"`         // argument vector, never a shell string
-	Probe []string `yaml:"comprobador"` // bounded built-in, never teacher-supplied code
-	Value string   `yaml:"valor"`       // check without a command (M-11)
+	Cmd   []string `yaml:"cmd"`     // argument vector, never a shell string
+	Probe []string `yaml:"checker"` // bounded built-in, never teacher-supplied code
+	Value string   `yaml:"value"`   // check without a command (M-11)
 
 	// Sudo runs Cmd through sudo with the host's own password on stdin
-	// (ADR-0032). Nil means "not said"; por_defecto only fills it in for a
+	// (ADR-0032). Nil means "not said"; defaults only fills it in for a
 	// check that has a command.
 	Sudo *bool `yaml:"sudo"`
 
 	// Assertions. A pointer distinguishes "absent" from "expects the empty
 	// string"; a check with none or with two incompatible ones is a PLAN
 	// error, detected in T005.
-	Contains    *string   `yaml:"contiene"`
-	NotContains *string   `yaml:"no_contiene"`
-	Equals      *string   `yaml:"igual_a"`
+	Contains    *string   `yaml:"contains"`
+	NotContains *string   `yaml:"not_contains"`
+	Equals      *string   `yaml:"equals"`
 	ExitCode    *int      `yaml:"exit_code"`
-	Near        *NearSpec `yaml:"cerca_de"`
+	Near        *NearSpec `yaml:"near"`
 
 	// Line of the check in examen.yaml, for the PLAN error messages.
 	Line int `yaml:"-"`
 }
 
-// NearSpec is cerca_de: what grep -A N used to do (M-10).
+// NearSpec is near: what grep -A N used to do (M-10).
 type NearSpec struct {
-	Anchor   string `yaml:"ancla"`
-	Lines    int    `yaml:"lineas"`
-	Contains string `yaml:"contiene"`
+	Anchor   string `yaml:"anchor"`
+	Lines    int    `yaml:"lines"`
+	Contains string `yaml:"contains"`
 }
 
 // Inventory is aula.yaml.
 type Inventory struct {
-	Name     string    `yaml:"aula"`
+	Name     string    `yaml:"classroom"`
 	Version  int       `yaml:"version"`
-	Common   Common    `yaml:"comun"`
-	Students []Student `yaml:"alumnos"`
+	Common   Common    `yaml:"common"`
+	Students []Student `yaml:"students"`
 }
 
-// Common is comun: what every student's hosts inherit.
+// Common is common: what every student's hosts inherit.
 type Common struct {
 	Hosts    map[string]Host `yaml:"hosts"`
 	Timeouts Timeouts        `yaml:"timeouts"`
@@ -123,16 +123,16 @@ type Common struct {
 
 // Timeouts are the run-wide budgets.
 type Timeouts struct {
-	Connect *Duration `yaml:"conexion"`
-	Student *Duration `yaml:"alumno"`
+	Connect *Duration `yaml:"connect"`
+	Student *Duration `yaml:"student"`
 }
 
 // Host is where one logical host of one student lives. A zero field means
-// "not set here": it is filled from comun.
+// "not set here": it is filled from common.
 type Host struct {
 	IP          string `yaml:"ip"`
-	Port        int    `yaml:"puerto"`
-	User        string `yaml:"usuario"`
+	Port        int    `yaml:"port"`
+	User        string `yaml:"user"`
 	PasswordRef string `yaml:"password_ref"` // "${AULA_PASSWORD}", never a value
 
 	// Password exists in the schema only so a literal password can be
@@ -141,14 +141,14 @@ type Host struct {
 	Password string `yaml:"password"`
 }
 
-// Student is one row of alumnos:. Everything outside the known keys is a free
+// Student is one row of students:. Everything outside the known keys is a free
 // field of the teacher's own (subdominio, p1, p3...) and is reachable only
 // through substitution.
 type Student struct {
 	ID       string          `yaml:"id"`
-	Name     string          `yaml:"nombre"`
+	Name     string          `yaml:"name"`
 	MoodleID string          `yaml:"moodle_id"`
-	Excluded bool            `yaml:"excluido"`
+	Excluded bool            `yaml:"excluded"`
 	Hosts    map[string]Host `yaml:"hosts"`
 
 	Fields map[string]string `yaml:"-"`
@@ -160,7 +160,7 @@ type Student struct {
 
 // studentKnownKeys is the set the walker and UnmarshalYAML agree on.
 var studentKnownKeys = map[string]bool{
-	"id": true, "nombre": true, "moodle_id": true, "excluido": true, "hosts": true,
+	"id": true, "name": true, "moodle_id": true, "excluded": true, "hosts": true,
 }
 
 // UnmarshalYAML decodes the known keys and keeps every other scalar as a free
@@ -181,6 +181,11 @@ func (s *Student) UnmarshalYAML(node *yaml.Node) error {
 			continue
 		}
 		seen[key.Value] = key.Line
+		// Former identity keys must not silently become teacher-defined data.
+		if key.Value == "nombre" || key.Value == "excluido" {
+			errs = append(errs, errf(key.Line, "clave desconocida %q: usa name o excluded en inglés", key.Value))
+			continue
+		}
 		if !studentKnownKeys[key.Value] {
 			if val.Kind != yaml.ScalarNode {
 				errs = append(errs, errf(val.Line,
@@ -194,11 +199,11 @@ func (s *Student) UnmarshalYAML(node *yaml.Node) error {
 		switch key.Value {
 		case "id":
 			target = &s.ID
-		case "nombre":
+		case "name":
 			target = &s.Name
 		case "moodle_id":
 			target = &s.MoodleID
-		case "excluido":
+		case "excluded":
 			target = &s.Excluded
 		case "hosts":
 			target = &s.Hosts

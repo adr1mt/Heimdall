@@ -1,8 +1,8 @@
-aula: "Prueba"
+classroom: "Prueba"
 version: 1
-comun:
+common:
   timeouts:
-    conexion: diez
-alumnos:
+    connect: diez
+students:
   - id: alumne01
-    nombre: "Ana Ferrer"
+    name: "Ana Ferrer"

@@ -1,7 +1,9 @@
 # Formato declarativo: `examen.yaml` y `aula.yaml`
 
-Idioma: **las claves del YAML van en español** (las lee el profesor, como
-`alumnos:` o `peso:`). El JSON canónico y el código Go van en inglés.
+Idioma: **las claves del YAML y las referencias reservadas van en inglés**
+(ADR-0042). No se admiten claves españolas ni mezclas. Los textos, los campos
+libres del alumno y la ayuda docente pueden estar en español. `version` conserva
+su función de revisión del documento; no selecciona un dialecto anterior.
 
 ---
 
@@ -11,20 +13,20 @@ Derivadas de E1 y E2 (`01-TRADUCCION-EXAMENES.md`), no de un catálogo teórico.
 
 | # | Capacidad | Justificación |
 |---|---|---|
-| M-1 | Metadatos: `nombre`, `version` | Auditoría y hash del examen |
+| M-1 | Metadatos: `exam`, `version` | Auditoría y hash del examen |
 | M-2 | Declarar los **hosts lógicos** que el examen usa (`host1`, `host2`) | E2 y el examen de DHCP |
 | M-3 | **Grupos** de comprobaciones con título | K-4; la GUI los usa |
-| M-4 | Comprobación con `id` estable, `descripcion` y `peso` | K-3; el `id` permite comparar ejecuciones |
+| M-4 | Comprobación con `id` estable, `description` y `weight` | K-3; el `id` permite comparar ejecuciones |
 | M-5 | Comando como **vector de argumentos** + host lógico | C-1, elimina inyección y exit codes erráticos |
-| M-6 | Aserción `contiene` (subcadena en stdout) | Es el 80 % del material real |
-| M-7 | Aserción `igual_a` (stdout completo, recortado de espacios) | E1 y `systemctl is-active` |
-| M-8 | Aserción `no_contiene` | K-7: la anticomprobación debe existir y no puede aprobar por avería |
+| M-6 | Aserción `contains` (subcadena en stdout) | Es el 80 % del material real |
+| M-7 | Aserción `equals` (stdout completo, recortado de espacios) | E1 y `systemctl is-active` |
+| M-8 | Aserción `not_contains` | K-7: la anticomprobación debe existir y no puede aprobar por avería |
 | M-9 | Aserción `exit_code` | `ping`, `systemctl`, `dpkg-query` |
-| M-10 | Aserción `cerca_de` (ancla + N líneas + contenido) | Sustituye `grep -A N`; 3 de 16 en E2 |
-| M-11 | Comprobación **sin comando**: `valor:` contra un campo del inventario | E1 entero, sin shell |
-| M-12 | **Sustitución** `${alumno.campo}` y `${host1.ip}` en argumentos y valores esperados | Cuestionarios y exámenes con datos por alumno |
+| M-10 | Aserción `near` (ancla + N líneas + contenido) | Sustituye `grep -A N`; 3 de 16 en E2 |
+| M-11 | Comprobación **sin comando**: `value:` contra un campo del inventario | E1 entero, sin shell |
+| M-12 | **Sustitución** `${student.campo}` y `${host1.ip}` en argumentos y valores esperados | Cuestionarios y exámenes con datos por alumno |
 | M-13 | `timeout` por comprobación (opcional, con valor por defecto) | C-3 |
-| M-14 | Valores por defecto del examen (`por_defecto:`) para peso, timeout y sudo | Evita repetir 16 veces lo mismo |
+| M-14 | Valores por defecto del examen (`defaults:`) para peso, timeout y sudo | Evita repetir 16 veces lo mismo |
 | M-15 | `sudo: true` por comprobación: el comando se ejecuta como administrador con la contraseña de la clase | Kea 3 en Ubuntu 26.04 deja `/etc/kea` solo a root; `nft list ruleset` también (ADR-0032) |
 
 Y **nada más**. No hay `if`, ni bucles, ni expresiones, ni inclusión de ficheros
@@ -56,21 +58,21 @@ ninguna máquina.
 ### No puede variar por alumno
 
 - qué comprobaciones existen;
-- su `id`, su `grupo` ni su `peso`;
+- su `id`, su `group` ni su `weight`;
 - el **denominador total**;
 - el orden.
 
 ### Sintaxis: una sola forma
 
 ```yaml
-cmd: ["getent", "passwd", "${alumno.usuario}"]
-contiene: "${alumno.usuario}:x:"
+cmd: ["getent", "passwd", "${student.user}"]
+contains: "${student.user}:x:"
 ```
 
 Reglas de la sustitución, todas verificables en el PLAN:
 
-1. Ámbitos válidos: `${alumno.<campo>}` (campos libres del inventario) y
-   `${<host>.<ip|puerto|usuario>}` para los hosts declarados en M-2.
+1. Ámbitos válidos: `${student.<campo>}` (campos libres del inventario) y
+   `${<host>.<ip|port|user>}` para los hosts declarados en M-2.
 2. La sustitución ocurre **en un elemento del vector de argumentos o en un valor
    esperado, nunca en una cadena que vaya a un shell** — porque no hay shell.
 3. **Referencia inexistente = error de validación**, no cadena vacía. Es la
@@ -96,83 +98,83 @@ No está en el MVP: el MVP acepta **un examen por ejecución**.
 ## 3. `examen.yaml` — ejemplo definitivo del MVP
 
 ```yaml
-examen: "SMX2C · RA2 · Servicios de red (KEA + BIND)"
+exam: "SMX2C · RA2 · Servicios de red (KEA + BIND)"
 version: 3
 hosts: [host1]
 
-por_defecto:
-  peso: 1
+defaults:
+  weight: 1
   timeout: 20s
 
-grupos:
-  - grupo: "Red y DHCP"
-    comprobaciones:
+groups:
+  - group: "Red y DHCP"
+    checks:
       - id: red-ip-servidor
-        descripcion: "El servidor tiene 10.0.0.1/8 en enp2s0"
-        en: host1
+        description: "El servidor tiene 10.0.0.1/8 en enp2s0"
+        on: host1
         cmd: ["ip", "address", "show", "dev", "enp2s0"]
-        contiene: "10.0.0.1/8"
+        contains: "10.0.0.1/8"
 
       - id: kea-subnet
-        descripcion: "KEA declara la subred 10.0.0.0/8"
-        en: host1
+        description: "KEA declara la subred 10.0.0.0/8"
+        on: host1
         cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
-        cerca_de:
-          ancla: '"subnet"'
-          lineas: 5
-          contiene: "10.0.0.0/8"
+        near:
+          anchor: '"subnet"'
+          lines: 5
+          contains: "10.0.0.0/8"
 
       - id: kea-interfaz
-        descripcion: "KEA escucha en enp2s0"
-        en: host1
+        description: "KEA escucha en enp2s0"
+        on: host1
         cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
-        contiene: "enp2s0"
+        contains: "enp2s0"
 
       - id: kea-servicio
-        descripcion: "El servicio kea-dhcp4 está activo"
-        en: host1
-        peso: 2
+        description: "El servicio kea-dhcp4 está activo"
+        on: host1
+        weight: 2
         cmd: ["systemctl", "is-active", "kea-dhcp4-server"]
-        igual_a: "active"
+        equals: "active"
 
-  - grupo: "DNS"
-    comprobaciones:
+  - group: "DNS"
+    checks:
       - id: dns-forwarder
-        descripcion: "Reenviador 9.9.9.9 configurado"
-        en: host1
+        description: "Reenviador 9.9.9.9 configurado"
+        on: host1
         cmd: ["cat", "/etc/bind/named.conf.options"]
-        cerca_de: { ancla: "forwarders", lineas: 5, contiene: "9.9.9.9" }
+        near: { anchor: "forwarders", lines: 5, contains: "9.9.9.9" }
 
       - id: dns-registro-alumno
-        descripcion: "El alumno tiene su registro A en la zona directa"
-        en: host1
+        description: "El alumno tiene su registro A en la zona directa"
+        on: host1
         cmd: ["cat", "/etc/bind/forward.examen.local"]
-        contiene: "${alumno.subdominio}"
+        contains: "${student.subdominio}"
 
       - id: dns-sin-recursion-abierta
-        descripcion: "No se permite recursión desde cualquier origen"
-        en: host1
+        description: "No se permite recursión desde cualquier origen"
+        on: host1
         cmd: ["cat", "/etc/bind/named.conf.options"]
-        no_contiene: "allow-recursion { any; }"
+        not_contains: "allow-recursion { any; }"
 
       - id: dns-activo
-        descripcion: "named responde"
-        en: host1
+        description: "named responde"
+        on: host1
         timeout: 10s
         cmd: ["dig", "+short", "+time=3", "@127.0.0.1", "pc1.examen.local"]
-        igual_a: "10.1.1.100"
+        equals: "10.1.1.100"
 
-  - grupo: "Cuestionario"
-    comprobaciones:
+  - group: "Cuestionario"
+    checks:
       - id: q-puerto-https
-        descripcion: "Puerto por defecto de HTTPS"
-        valor: "${alumno.p1}"
-        igual_a: "443"
+        description: "Puerto por defecto de HTTPS"
+        value: "${student.p1}"
+        equals: "443"
 
       - id: q-mascara-24
-        descripcion: "Máscara /24 en decimal"
-        valor: "${alumno.p3}"
-        igual_a: "255.255.255.0"
+        description: "Máscara /24 en decimal"
+        value: "${student.p3}"
+        equals: "255.255.255.0"
 ```
 
 En Ubuntu 26.04 con Kea 3, `/etc/kea` solo lo lee root: las dos comprobaciones
@@ -185,13 +187,13 @@ encender nada.
 
 ```yaml
       - id: kea-subnet
-        en: host1
+        on: host1
         sudo: true
         cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
-        contiene: "10.0.0.0/8"
+        contains: "10.0.0.0/8"
 ```
 
-- `sudo: true` o `sudo: false`, en la comprobación o en `por_defecto:` (lo
+- `sudo: true` o `sudo: false`, en la comprobación o en `defaults:` (lo
   heredan solo las comprobaciones con `cmd:`; una puede decir `sudo: false`).
 - El motor ejecuta `sudo -S -p '' -- <cmd…>` y escribe por la entrada estándar
   la contraseña de ese host (la de su `password_ref`), la misma de la conexión.
@@ -211,23 +213,23 @@ encender nada.
 ## 4. `aula.yaml` — ejemplo definitivo del MVP
 
 ```yaml
-aula: "SMX2C 2026-27"
+classroom: "SMX2C 2026-27"
 version: 2
 
 # Valores comunes. Los hosts de cada alumno los heredan si no los redefinen.
-comun:
+common:
   hosts:
     host1:
-      puerto: 22
-      usuario: "usuario"
+      port: 22
+      user: "usuario"
       password_ref: "${AULA_PASSWORD}"     # referencia, nunca el valor
   timeouts:
-    conexion: 10s
-    alumno: 10m
+    connect: 10s
+    student: 10m
 
-alumnos:
+students:
   - id: alumne01
-    nombre: "Ana Ferrer"
+    name: "Ana Ferrer"
     moodle_id: "ana.ferrer@elpuig.xeill.net"
     hosts:
       host1: { ip: "192.168.1.20" }
@@ -236,18 +238,18 @@ alumnos:
     p3: "255.255.255.0"
 
   - id: alumne02
-    nombre: "Marc Oliva"
+    name: "Marc Oliva"
     moodle_id: "marc.oliva@elpuig.xeill.net"
     hosts:
-      host1: { ip: "192.168.1.21", usuario: "marc" }
+      host1: { ip: "192.168.1.21", user: "marc" }
     subdominio: "marc"
     p1: "8443"
     p3: "255.255.255.0"
 
   - id: alumne03
-    nombre: "Laia Puig"
+    name: "Laia Puig"
     moodle_id: "laia.puig@elpuig.xeill.net"
-    excluido: true                          # no se evalúa en esta pasada
+    excluded: true                          # no se evalúa en esta pasada
     hosts:
       host1: { ip: "192.168.1.22" }
     subdominio: "laia"
@@ -257,7 +259,7 @@ alumnos:
 
 Notas de diseño:
 
-- `excluido: true` sustituye a `tt_skip`. El alumno aparece en el informe con
+- `excluded: true` sustituye a `tt_skip`. El alumno aparece en el informe con
   estado `EXCLUDED`, sin nota y **sin alterar el denominador de los demás**.
 - Los campos libres (`subdominio`, `p1`, `p3`) son datos del alumno y solo se
   usan por sustitución. K-1 intacto.
@@ -276,9 +278,9 @@ inválida** (F-02, F-06, C-14):
 2. `id` de comprobación duplicado o ausente.
 3. Host lógico usado en una comprobación pero no declarado en `hosts:`.
 4. Host lógico declarado en el examen sin datos para algún alumno.
-5. Referencia `${alumno.X}` a un campo que falta en algún alumno.
+5. Referencia `${student.X}` a un campo que falta en algún alumno.
 6. Comprobación sin ninguna aserción, o con dos aserciones incompatibles.
-7. `peso` negativo. (`peso: 0` es legal: la comprobación se ejecuta, se informa
+7. `weight` negativo. (`weight: 0` es legal: la comprobación se ejecuta, se informa
    y no entra en la nota.)
 8. Contraseña literal en el inventario.
 9. Inventario sin alumnos evaluables.
@@ -291,22 +293,22 @@ ya no tendrá que adivinar (`c14-check`).
 
 ## Comprobador cerrado del examen RA1 (ADR-0036)
 
-`comprobador:` es alternativa a `cmd:` y `valor:`. Su lista contiene exactamente
+`checker:` es alternativa a `cmd:` y `value:`. Su lista contiene exactamente
 seis textos: `ra1-dhcp`, SHA-256 de la revisión del programa fijo del motor,
 criterio conocido, interfaz externa, interfaz interna e IP de examen. No hay
 código del profesor, rutas de scripts ni expresiones en ese campo. El examen
 mantenido en [exams/ra1-dhcp-kea](../../exams/ra1-dhcp-kea/README.md) contiene la
 revisión correcta. El PLAN rechaza otra revisión antes de abrir conexiones.
 
-Se aplican `en:`, `sudo:`, `peso:` y `timeout:` como en un comando. Las tres
+Se aplican `on:`, `sudo:`, `weight:` y `timeout:` como en un comando. Las tres
 últimas posiciones permiten las referencias habituales del alumnado y hosts.
-La aserción es obligatoriamente `igual_a: OK`; una respuesta académica del
+La aserción es obligatoriamente `equals: OK`; una respuesta académica del
 programa es OK o FAIL. Cualquier otra respuesta, dependencia o permiso ausente
 es un error técnico sin nota final, no un suspenso. Los comandos ordinarios
 conservan sus reglas, sin códigos de salida técnicos añadidos de forma global.
 
 El artefacto registra el perfil, la revisión y argumentos con el identificador
-`heimdall:comprobador`. Esa revisión identifica el programa incorporado sin
+`heimdall:checker`. Esa revisión identifica el programa incorporado sin
 repetir su fuente por alumno. El informe individual sigue publicando solo la
 descripción y el resultado. El alcance semántico y sus límites están en la
 documentación privada del examen.

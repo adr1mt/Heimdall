@@ -1,14 +1,14 @@
 # Estado del proyecto
 
-**Actualizado**: 2026-11-05 · **Fase**: 9 — Endurecimiento y publicación
+**Actualizado**: 2026-11-06 · **Fase**: 9 — Endurecimiento y publicación
 
 ## Última sesión
-**T228 terminado:** zoom Ctrl + más/menos/cero, escala única persistida que
-incluye Monaco; ayuda de las cinco aserciones desde editor y manual, sin perder
-borradores. 648 pruebas GUI y arnés Electron real correctos.
-[Evidencia](../reviews/evidence/T228/RESULTADOS.md). Compilado, sin instalar.
-Propuesta AutoCheck autorizada, fases T229–T234; siguiente: YAML inglés T229.
-[Auditoría](../research/AUTOCHECK-2026-11-05.md).
+**T229:** YAML de examen e inventario en inglés. Editor, ayuda, referencias y
+plantillas actualizados. El motor rechaza claves antiguas antes de corregir.
+662 pruebas GUI, suite del motor y corrección local correctas.
+[Formato y decisión](../adr/0042-yaml-en-ingles.md). Compilado, pendiente de instalación.
+**T228:** zoom y ayuda desde el editor. [Evidencia](../reviews/evidence/T228/RESULTADOS.md).
+[Auditoría AutoCheck](../research/AUTOCHECK-2026-11-05.md).
 
 **T227 terminado:** controles de aula simplificados, ocultación compartida y
 preparación de otro examen con histórico conservado; pendiente de instalación.
@@ -55,6 +55,6 @@ por alumno, sin afectar notas por SSH. Exportación CSV/Moodle conservada.
 
 ## Siguiente trabajo
 
-T229 READY priorizado por el usuario; T070, T023 y T186 siguen READY. T084 espera aula.
-T223/T224/T225 instalados (T226); T227/T228 compilados, pendientes de instalación.
+T230 y T232 READY; T070, T023 y T186 siguen READY. T084 espera aula.
+T223/T224/T225 instalados (T226); T227–T229 compilados, pendientes de instalación.
 Sin publicación nueva autorizada.

@@ -13,78 +13,78 @@ import { dump, load } from 'js-yaml'
  */
 
 /** The assertions of the format (02-FORMATO.md, M-6…M-10). */
-export type AssertionKind = 'contiene' | 'igual_a' | 'no_contiene' | 'exit_code' | 'cerca_de'
+export type AssertionKind = 'contains' | 'equals' | 'not_contains' | 'exit_code' | 'near'
 
 export const ASSERTIONS: AssertionKind[] = [
-  'contiene',
-  'igual_a',
-  'no_contiene',
+  'contains',
+  'equals',
+  'not_contains',
   'exit_code',
-  'cerca_de'
+  'near'
 ]
 
 export interface Assertion {
   kind: AssertionKind
   /** What is expected: the substring, the whole output, the exit code. */
   value: string
-  /** `cerca_de` only: the line the search starts from. */
+  /** `near` only: the line the search starts from. */
   anchor?: string
-  /** `cerca_de` only: how many lines after the anchor are looked at. */
+  /** `near` only: how many lines after the anchor are looked at. */
   lines?: string
 }
 
 export interface Check {
   id: string
-  descripcion: string
-  /** Logical host the command runs on. Empty for a `valor:` check. */
-  en: string
+  description: string
+  /** Logical host the command runs on. Empty for a `value:` check. */
+  on: string
   /** The command, as a vector of arguments. There is no shell, ever. */
   cmd: string[]
   /**
    * A check with no command: the expected value is compared against a field
-   * of the inventory, e.g. `${alumno.p1}` (M-11). Empty when there is a cmd.
+   * of the inventory, e.g. `${student.p1}` (M-11). Empty when there is a cmd.
    */
-  valor: string
+  value: string
   assertion: Assertion
   /** Empty means the exam's default. */
-  peso: string
+  weight: string
   timeout: string
   /** Run the command through sudo (ADR-0032). Absent means the exam's default. */
   sudo?: boolean
 }
 
 export interface Group {
-  grupo: string
-  comprobaciones: Check[]
+  group: string
+  checks: Check[]
 }
 
 export interface Exam {
-  examen: string
+  exam: string
   version: number
   hosts: string[]
-  porDefecto: { peso: string; timeout: string; sudo?: boolean }
-  grupos: Group[]
+  defaults: { weight: string; timeout: string; sudo?: boolean }
+  groups: Group[]
 }
 
 export function emptyExam(name: string): Exam {
   return {
-    examen: name,
+    exam: name,
     version: 1,
     hosts: ['host1'],
-    porDefecto: { peso: '1', timeout: '20s' },
-    grupos: []
+    defaults: { weight: '1', timeout: '20s' },
+    groups: []
   }
 }
 
 export function emptyCheck(host: string): Check {
   return {
     id: '',
-    descripcion: '',
-    en: host,
+    description: '',
+    on: host,
     cmd: [],
-    valor: '',
-    assertion: { kind: 'contiene', value: '' },
-    peso: '',
+    value: '',
+    assertion: { kind: 'contains', value: '' },
+    weight: '',
     timeout: ''
   }
 }
@@ -96,33 +96,33 @@ function text(value: unknown): string {
 }
 
 function readAssertion(raw: Record<string, unknown>): Assertion {
-  if (raw.cerca_de && typeof raw.cerca_de === 'object') {
-    const near = raw.cerca_de as Record<string, unknown>
+  if (raw.near && typeof raw.near === 'object') {
+    const near = raw.near as Record<string, unknown>
     return {
-      kind: 'cerca_de',
-      value: text(near.contiene),
-      anchor: text(near.ancla),
-      lines: text(near.lineas ?? 0)
+      kind: 'near',
+      value: text(near.contains),
+      anchor: text(near.anchor),
+      lines: text(near.lines ?? 0)
     }
   }
-  for (const kind of ['contiene', 'igual_a', 'no_contiene', 'exit_code'] as const) {
+  for (const kind of ['contains', 'equals', 'not_contains', 'exit_code'] as const) {
     if (raw[kind] !== undefined) return { kind, value: text(raw[kind]) }
   }
-  return { kind: 'contiene', value: '' }
+  return { kind: 'contains', value: '' }
 }
 
 function readCheck(value: unknown): Check {
   const raw = (value ?? {}) as Record<string, unknown>
   return {
     id: text(raw.id),
-    descripcion: text(raw.descripcion),
-    en: text(raw.en),
-    cmd: Array.isArray(raw.comprobador)
-      ? ['heimdall:comprobador', ...raw.comprobador.map(text)]
+    description: text(raw.description),
+    on: text(raw.on),
+    cmd: Array.isArray(raw.checker)
+      ? ['heimdall:checker', ...raw.checker.map(text)]
       : Array.isArray(raw.cmd) ? raw.cmd.map(text) : [],
-    valor: text(raw.valor),
+    value: text(raw.value),
     assertion: readAssertion(raw),
-    peso: text(raw.peso),
+    weight: text(raw.weight),
     timeout: text(raw.timeout),
     ...(typeof raw.sudo === 'boolean' ? { sudo: raw.sudo } : {})
   }
@@ -144,29 +144,29 @@ function formatProblem(doc: unknown): string | null {
   }
   const array=(value:unknown,path:string):unknown[]=> { if(value===undefined) return []; if(!Array.isArray(value)) throw new Error(`${path}: se esperaba una lista.`);return value }
   try {
-    const raw=object(doc,'examen',['examen','version','hosts','por_defecto','grupos'])
-    field(raw,'examen','examen','string');field(raw,'version','examen','integer')
+    const raw=object(doc,'exam',['exam','version','hosts','defaults','groups'])
+    field(raw,'exam','exam','string');field(raw,'version','exam','integer')
     for(const host of array(raw.hosts,'hosts')) if(typeof host!=='string') throw new Error('hosts: cada máquina debe ser texto.')
-    if(raw.por_defecto!==undefined) {
-      const defaults=object(raw.por_defecto,'por_defecto',['peso','timeout','sudo'])
-      field(defaults,'peso','por_defecto','number');field(defaults,'timeout','por_defecto','string');field(defaults,'sudo','por_defecto','boolean')
+    if(raw.defaults!==undefined) {
+      const defaults=object(raw.defaults,'defaults',['weight','timeout','sudo'])
+      field(defaults,'weight','defaults','number');field(defaults,'timeout','defaults','string');field(defaults,'sudo','defaults','boolean')
     }
-    for(const [i,value] of array(raw.grupos,'grupos').entries()) {
-      const path=`grupos[${i+1}]`
-      const group=object(value,path,['grupo','comprobaciones']);field(group,'grupo',path,'string')
-      for(const [j,value] of array(group.comprobaciones,`${path}.comprobaciones`).entries()) {
-        const at=`${path}.comprobaciones[${j+1}]`
-        const c=object(value,at,['id','descripcion','en','cmd','comprobador','valor','peso','timeout','sudo',...ASSERTIONS])
-        for(const key of ['id','descripcion','en','valor','timeout','contiene','igual_a','no_contiene']) field(c,key,at,'string')
-        field(c,'peso',at,'number');field(c,'exit_code',at,'integer');field(c,'sudo',at,'boolean')
+    for(const [i,value] of array(raw.groups,'groups').entries()) {
+      const path=`groups[${i+1}]`
+      const group=object(value,path,['group','checks']);field(group,'group',path,'string')
+      for(const [j,value] of array(group.checks,`${path}.checks`).entries()) {
+        const at=`${path}.checks[${j+1}]`
+        const c=object(value,at,['id','description','on','cmd','checker','value','weight','timeout','sudo',...ASSERTIONS])
+        for(const key of ['id','description','on','value','timeout','contains','equals','not_contains']) field(c,key,at,'string')
+        field(c,'weight',at,'number');field(c,'exit_code',at,'integer');field(c,'sudo',at,'boolean')
         for(const arg of array(c.cmd,`${at}.cmd`)) if(typeof arg!=='string') throw new Error(`${at}.cmd: cada argumento debe ser texto.`)
-        for(const arg of array(c.comprobador,`${at}.comprobador`)) if(typeof arg!=='string') throw new Error(`${at}.comprobador: cada argumento debe ser texto.`)
+        for(const arg of array(c.checker,`${at}.checker`)) if(typeof arg!=='string') throw new Error(`${at}.checker: cada argumento debe ser texto.`)
         if(ASSERTIONS.filter(key=>c[key]!==undefined).length!==1) throw new Error(`${at}: debe tener exactamente una aserción.`)
-        if(c.cmd!==undefined && c.valor!==undefined) throw new Error(`${at}: cmd y valor no pueden aparecer juntos.`)
-        if(c.comprobador!==undefined && (c.cmd!==undefined || c.valor!==undefined)) throw new Error(`${at}: comprobador no puede combinarse con cmd ni valor.`)
-        if(c.cerca_de!==undefined) {
-          const near=object(c.cerca_de,`${at}.cerca_de`,['ancla','lineas','contiene'])
-          field(near,'ancla',`${at}.cerca_de`,'string');field(near,'contiene',`${at}.cerca_de`,'string');field(near,'lineas',`${at}.cerca_de`,'integer')
+        if(c.cmd!==undefined && c.value!==undefined) throw new Error(`${at}: cmd y value no pueden aparecer juntos.`)
+        if(c.checker!==undefined && (c.cmd!==undefined || c.value!==undefined)) throw new Error(`${at}: checker no puede combinarse con cmd ni value.`)
+        if(c.near!==undefined) {
+          const near=object(c.near,`${at}.near`,['anchor','lines','contains'])
+          field(near,'anchor',`${at}.near`,'string');field(near,'contains',`${at}.near`,'string');field(near,'lines',`${at}.near`,'integer')
         }
       }
     }
@@ -192,23 +192,23 @@ export function readExam(yaml: string): { exam: Exam } | { problem: string } {
   const problem=formatProblem(doc)
   if(problem) return {problem}
   const raw = doc as Record<string, unknown>
-  const defaults = (raw.por_defecto ?? {}) as Record<string, unknown>
-  const groups = Array.isArray(raw.grupos) ? raw.grupos : []
+  const defaults = (raw.defaults ?? {}) as Record<string, unknown>
+  const groups = Array.isArray(raw.groups) ? raw.groups : []
   return {
     exam: {
-      examen: text(raw.examen),
+      exam: text(raw.exam),
       version: typeof raw.version === 'number' ? raw.version : 1,
       hosts: Array.isArray(raw.hosts) ? raw.hosts.map(text).filter(Boolean) : [],
-      porDefecto: {
-        peso: text(defaults.peso),
+      defaults: {
+        weight: text(defaults.weight),
         timeout: text(defaults.timeout),
         ...(typeof defaults.sudo === 'boolean' ? { sudo: defaults.sudo } : {})
       },
-      grupos: groups.map((group) => {
+      groups: groups.map((group) => {
         const g = (group ?? {}) as Record<string, unknown>
         return {
-          grupo: text(g.grupo),
-          comprobaciones: Array.isArray(g.comprobaciones) ? g.comprobaciones.map(readCheck) : []
+          group: text(g.group),
+          checks: Array.isArray(g.checks) ? g.checks.map(readCheck) : []
         }
       })
     }
@@ -233,24 +233,24 @@ function count(value: string): number | string {
 }
 
 function writeCheck(check: Check): Record<string, unknown> {
-  const out: Record<string, unknown> = { id: check.id, descripcion: check.descripcion }
+  const out: Record<string, unknown> = { id: check.id, description: check.description }
   if (check.cmd.length > 0) {
-    if (check.en) out.en = check.en
-    if (check.peso.trim()) out.peso = weight(check.peso)
+    if (check.on) out.on = check.on
+    if (check.weight.trim()) out.weight = weight(check.weight)
     if (check.timeout.trim()) out.timeout = check.timeout.trim()
     if (check.sudo !== undefined) out.sudo = check.sudo
-    if (check.cmd[0] === 'heimdall:comprobador') out.comprobador = check.cmd.slice(1)
+    if (check.cmd[0] === 'heimdall:checker') out.checker = check.cmd.slice(1)
     else out.cmd = check.cmd
   } else {
-    if (check.peso.trim()) out.peso = weight(check.peso)
-    out.valor = check.valor
+    if (check.weight.trim()) out.weight = weight(check.weight)
+    out.value = check.value
     // Invalid without a command, and the engine says so: kept, never dropped.
     if (check.sudo !== undefined) out.sudo = check.sudo
   }
   if (check.timeout.trim()) out.timeout=check.timeout.trim()
   const { kind, value, anchor, lines } = check.assertion
-  if (kind === 'cerca_de') {
-    out.cerca_de = { ancla: anchor ?? '', lineas: count(lines ?? ''), contiene: value }
+  if (kind === 'near') {
+    out.near = { anchor: anchor ?? '', lines: count(lines ?? ''), contains: value }
   } else {
     out[kind] = kind === 'exit_code' ? count(value) : value
   }
@@ -266,18 +266,18 @@ function writeCheck(check: Check): Record<string, unknown> {
  */
 export function examYaml(exam: Exam): string {
   const doc: Record<string, unknown> = {
-    examen: exam.examen,
+    exam: exam.exam,
     version: exam.version,
     hosts: exam.hosts
   }
   const defaults: Record<string, unknown> = {}
-  if (exam.porDefecto.peso.trim()) defaults.peso = weight(exam.porDefecto.peso)
-  if (exam.porDefecto.timeout.trim()) defaults.timeout = exam.porDefecto.timeout.trim()
-  if (exam.porDefecto.sudo !== undefined) defaults.sudo = exam.porDefecto.sudo
-  if (Object.keys(defaults).length > 0) doc.por_defecto = defaults
-  doc.grupos = exam.grupos.map((group) => ({
-    grupo: group.grupo,
-    comprobaciones: group.comprobaciones.map(writeCheck)
+  if (exam.defaults.weight.trim()) defaults.weight = weight(exam.defaults.weight)
+  if (exam.defaults.timeout.trim()) defaults.timeout = exam.defaults.timeout.trim()
+  if (exam.defaults.sudo !== undefined) defaults.sudo = exam.defaults.sudo
+  if (Object.keys(defaults).length > 0) doc.defaults = defaults
+  doc.groups = exam.groups.map((group) => ({
+    group: group.group,
+    checks: group.checks.map(writeCheck)
   }))
   // Every string is quoted on purpose. An expected value of `yes`, `on` or
   // `no` written bare is a boolean in YAML, and the check would compare the
@@ -287,19 +287,19 @@ export function examYaml(exam: Exam): string {
 
 /** The total weight of the exam, the denominator every student shares. */
 export function totalWeight(exam: Exam): number {
-  const fallback = Number(exam.porDefecto.peso.trim() || '1')
+  const fallback = Number(exam.defaults.weight.trim() || '1')
   let total = 0
-  for (const group of exam.grupos) {
-    for (const check of group.comprobaciones) {
-      const own = Number(check.peso.trim())
-      total += Number.isFinite(own) && check.peso.trim() !== '' ? own : fallback
+  for (const group of exam.groups) {
+    for (const check of group.checks) {
+      const own = Number(check.weight.trim())
+      total += Number.isFinite(own) && check.weight.trim() !== '' ? own : fallback
     }
   }
   return total
 }
 
 export function checkCount(exam: Exam): number {
-  return exam.grupos.reduce((count, group) => count + group.comprobaciones.length, 0)
+  return exam.groups.reduce((count, group) => count + group.checks.length, 0)
 }
 
 /**
@@ -318,14 +318,14 @@ export function checkProblem(check: Check, exam: Exam, others: Check[]): string 
   if (others.some((other) => other !== check && other.id.trim() === check.id.trim())) {
     return `Ya hay una comprobación que se llama «${check.id.trim()}».`
   }
-  if (!check.descripcion.trim()) return 'La comprobación necesita una descripción.'
-  if (check.cmd.length === 0 && !check.valor.trim()) {
+  if (!check.description.trim()) return 'La comprobación necesita una descripción.'
+  if (check.cmd.length === 0 && !check.value.trim()) {
     return 'Pon un comando, o un valor del alumno que comparar.'
   }
   if (check.cmd.length > 0) {
-    if (!check.en.trim()) return 'Di en qué máquina se ejecuta.'
-    if (!exam.hosts.includes(check.en.trim())) {
-      return `El examen no declara la máquina «${check.en.trim()}».`
+    if (!check.on.trim()) return 'Di en qué máquina se ejecuta.'
+    if (!exam.hosts.includes(check.on.trim())) {
+      return `El examen no declara la máquina «${check.on.trim()}».`
     }
   }
   const { kind, value, anchor, lines } = check.assertion
@@ -334,13 +334,13 @@ export function checkProblem(check: Check, exam: Exam, others: Check[]): string 
   } else if (!value.trim()) {
     return 'Di qué se espera encontrar.'
   }
-  if (kind === 'cerca_de') {
+  if (kind === 'near') {
     if (!anchor?.trim()) return 'La búsqueda por cercanía necesita una línea de anclaje.'
     if (!/^\d+$/.test((lines ?? '').trim())) {
       return 'Di cuántas líneas después del anclaje se miran.'
     }
   }
-  if (check.peso.trim() && (typeof weight(check.peso)!=='number' || Number(check.peso)<0)) {
+  if (check.weight.trim() && (typeof weight(check.weight)!=='number' || Number(check.weight)<0)) {
     return 'El peso debe ser un número finito mayor o igual que cero.'
   }
   if (check.timeout.trim() && !/^\d+(s|m|h)$/.test(check.timeout.trim())) {
@@ -351,7 +351,7 @@ export function checkProblem(check: Check, exam: Exam, others: Check[]): string 
 
 /** Every check of the exam, in order. */
 export function allChecks(exam: Exam): Check[] {
-  return exam.grupos.flatMap((group) => group.comprobaciones)
+  return exam.groups.flatMap((group) => group.checks)
 }
 
 /**

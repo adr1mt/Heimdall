@@ -72,42 +72,42 @@ export function aulaYaml(group: ClassGroup): string {
     '#',
     '# La clase se edita en la pantalla «Clases» de la aplicación.',
     '',
-    `aula: ${quote(group.name)}`,
+    `classroom: ${quote(group.name)}`,
     'version: 1',
     '',
-    'comun:',
+    'common:',
     '  hosts:',
     '    host1:',
-    `      puerto: ${DEFAULT_PORT}`,
+    `      port: ${DEFAULT_PORT}`,
     '      password_ref: "${AULA_PASSWORD}"',
     '  timeouts:',
-    '    conexion: 10s',
-    '    alumno: 5m',
+    '    connect: 10s',
+    '    student: 5m',
     '',
-    'alumnos:'
+    'students:'
   ]
   for (const student of group.students) lines.push(...studentLines(student, group.columns))
   return `${lines.join('\n')}\n`
 }
 
 function studentLines(student: ClassStudent, columns: string[]): string[] {
-  const lines = [`  - id: ${quote(student.id)}`, `    nombre: ${quote(student.name)}`]
+  const lines = [`  - id: ${quote(student.id)}`, `    name: ${quote(student.name)}`]
   // The contact is the teacher's own: it travels so the artifact can carry it
   // to Moodle, and it is not a credential.
   if (student.contact) lines.push(`    moodle_id: ${quote(student.contact)}`)
   // The user is written twice on purpose: the host connects with it, and
-  // `${alumno.usuario}` in an exam reads it off the student. Both are the
+  // `${student.user}` in an exam reads it off the student. Both are the
   // same value, the one the teacher wrote down in the class.
-  lines.push(`    usuario: ${quote(student.user)}`)
+  lines.push(`    user: ${quote(student.user)}`)
   lines.push('    hosts:')
   lines.push('      host1:')
   lines.push(`        ip: ${quote(student.host)}`)
   // Only when it differs: an empty port in the class means the usual one, and
   // writing it out anyway would hide which students really are special.
-  if (student.port) lines.push(`        puerto: ${student.port}`)
-  lines.push(`        usuario: ${quote(student.user)}`)
+  if (student.port) lines.push(`        port: ${student.port}`)
+  lines.push(`        user: ${quote(student.user)}`)
   // The teacher's own columns, as free keys of the student. That is what
-  // `${alumno.subdominio}` in an exam reaches, and it is why a class with
+  // `${student.subdominio}` in an exam reaches, and it is why a class with
   // columns can correct an exam that asks for more than a machine.
   for (const column of columns) {
     const value = student.fields[column]

@@ -46,7 +46,7 @@ export async function examTitleOf(yaml: string | null, sha256: string, fallback:
   const hex = Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('')
   if (hex !== sha256) return fallback
   const read = readExam(yaml)
-  return 'exam' in read && read.exam.examen.trim() ? read.exam.examen.trim() : fallback
+  return 'exam' in read && read.exam.exam.trim() ? read.exam.exam.trim() : fallback
 }
 
 /** What the teacher is told before the reports are sent. */

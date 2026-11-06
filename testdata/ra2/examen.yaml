@@ -1,113 +1,113 @@
 # Examen RA2 del curso, traducido del original de Teuton
 # (docs/design/01-TRADUCCION-EXAMENES.md). Son las mismas 16 comprobaciones,
 # con el mismo peso, sin tuberías y sin depender del idioma del sistema.
-examen: "Examen RA2 · Servicios de red (KEA + BIND)"
+exam: "Examen RA2 · Servicios de red (KEA + BIND)"
 version: 3
 hosts: [host1]
 
-por_defecto:
-  peso: 1
+defaults:
+  weight: 1
   timeout: 20s
 
-grupos:
-  - grupo: "Red"
-    comprobaciones:
+groups:
+  - group: "Red"
+    checks:
       - id: netplan
-        descripcion: "El servidor tiene 10.0.0.1/8 en enp2s0"
-        en: host1
+        description: "El servidor tiene 10.0.0.1/8 en enp2s0"
+        on: host1
         cmd: ["ip", "address", "show", "dev", "enp2s0"]
-        contiene: "10.0.0.1/8"
+        contains: "10.0.0.1/8"
 
-  - grupo: "KEA"
-    comprobaciones:
+  - group: "KEA"
+    checks:
       - id: kea-red
-        descripcion: "KEA declara la subred 10.0.0.0/8"
-        en: host1
+        description: "KEA declara la subred 10.0.0.0/8"
+        on: host1
         cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
-        cerca_de: { ancla: '"subnet"', lineas: 5, contiene: "10.0.0.0/8" }
+        near: { anchor: '"subnet"', lines: 5, contains: "10.0.0.0/8" }
 
       - id: kea-tarjeta
-        descripcion: "KEA sirve por la tarjeta enp2s0"
-        en: host1
+        description: "KEA sirve por la tarjeta enp2s0"
+        on: host1
         cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
-        contiene: "enp2s0"
+        contains: "enp2s0"
 
       - id: kea-puerta-enlace
-        descripcion: "KEA reparte 10.0.0.1 como puerta de enlace"
-        en: host1
+        description: "KEA reparte 10.0.0.1 como puerta de enlace"
+        on: host1
         cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
-        cerca_de: { ancla: '"name": "routers"', lineas: 5, contiene: "10.0.0.1" }
+        near: { anchor: '"name": "routers"', lines: 5, contains: "10.0.0.1" }
 
       - id: kea-dns
-        descripcion: "KEA reparte 10.0.0.1 como servidor DNS"
-        en: host1
+        description: "KEA reparte 10.0.0.1 como servidor DNS"
+        on: host1
         cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
-        cerca_de: { ancla: '"name": "domain-name-servers"', lineas: 5, contiene: "10.0.0.1" }
+        near: { anchor: '"name": "domain-name-servers"', lines: 5, contains: "10.0.0.1" }
 
-  - grupo: "DNS"
-    comprobaciones:
+  - group: "DNS"
+    checks:
       - id: dns-forwarder
-        descripcion: "Reenviador 9.9.9.9 configurado"
-        en: host1
+        description: "Reenviador 9.9.9.9 configurado"
+        on: host1
         cmd: ["cat", "/etc/bind/named.conf.options"]
-        cerca_de: { ancla: "forwarders", lineas: 5, contiene: "9.9.9.9" }
+        near: { anchor: "forwarders", lines: 5, contains: "9.9.9.9" }
 
       - id: dns-red-trabajo
-        descripcion: "La red 10.0.0.0/8 está autorizada en las opciones"
-        en: host1
+        description: "La red 10.0.0.0/8 está autorizada en las opciones"
+        on: host1
         cmd: ["cat", "/etc/bind/named.conf.options"]
-        contiene: "10.0.0.0/8;"
+        contains: "10.0.0.0/8;"
 
       - id: dns-zonas
-        descripcion: "La zona inversa 10.in-addr.arpa está declarada"
-        en: host1
+        description: "La zona inversa 10.in-addr.arpa está declarada"
+        on: host1
         cmd: ["cat", "/etc/bind/named.conf.local"]
-        contiene: "10.in-addr.arpa"
+        contains: "10.in-addr.arpa"
 
       - id: dns-pc1
-        descripcion: "pc1 resuelve a 10.1.1.100 en la zona directa"
-        en: host1
+        description: "pc1 resuelve a 10.1.1.100 en la zona directa"
+        on: host1
         cmd: ["cat", "/etc/bind/forward.examen.local"]
-        cerca_de: { ancla: "pc1", lineas: 0, contiene: "10.1.1.100" }
+        near: { anchor: "pc1", lines: 0, contains: "10.1.1.100" }
 
       - id: dns-servidorweb
-        descripcion: "servidorweb resuelve a 10.2.0.1 en la zona directa"
-        en: host1
+        description: "servidorweb resuelve a 10.2.0.1 en la zona directa"
+        on: host1
         cmd: ["cat", "/etc/bind/forward.examen.local"]
-        cerca_de: { ancla: "servidorweb", lineas: 0, contiene: "10.2.0.1" }
+        near: { anchor: "servidorweb", lines: 0, contains: "10.2.0.1" }
 
       - id: dns-alias
-        descripcion: "blog es un alias de pc1.examen.local"
-        en: host1
+        description: "blog es un alias de pc1.examen.local"
+        on: host1
         cmd: ["cat", "/etc/bind/forward.examen.local"]
-        cerca_de: { ancla: "blog", lineas: 0, contiene: "pc1.examen.local" }
+        near: { anchor: "blog", lines: 0, contains: "pc1.examen.local" }
 
       - id: dns-texto
-        descripcion: "La zona directa tiene un registro TXT con «hola»"
-        en: host1
+        description: "La zona directa tiene un registro TXT con «hola»"
+        on: host1
         cmd: ["cat", "/etc/bind/forward.examen.local"]
-        cerca_de: { ancla: "TXT", lineas: 3, contiene: "hola" }
+        near: { anchor: "TXT", lines: 3, contains: "hola" }
 
       - id: dns-inversa-servidor
-        descripcion: "La zona inversa resuelve 10.0.0.1"
-        en: host1
+        description: "La zona inversa resuelve 10.0.0.1"
+        on: host1
         cmd: ["cat", "/etc/bind/reverse.examen.local"]
-        contiene: "1.0.0"
+        contains: "1.0.0"
 
       - id: dns-inversa-pc1
-        descripcion: "La zona inversa resuelve 10.1.1.100"
-        en: host1
+        description: "La zona inversa resuelve 10.1.1.100"
+        on: host1
         cmd: ["cat", "/etc/bind/reverse.examen.local"]
-        contiene: "100.1.1"
+        contains: "100.1.1"
 
       - id: dns-inversa-servidorweb
-        descripcion: "La zona inversa resuelve 10.2.0.1"
-        en: host1
+        description: "La zona inversa resuelve 10.2.0.1"
+        on: host1
         cmd: ["cat", "/etc/bind/reverse.examen.local"]
-        contiene: "1.0.2"
+        contains: "1.0.2"
 
       - id: dns-activo
-        descripcion: "El servicio named está activo"
-        en: host1
+        description: "El servicio named está activo"
+        on: host1
         cmd: ["systemctl", "is-active", "named"]
-        igual_a: "active"
+        equals: "active"

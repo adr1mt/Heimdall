@@ -17,11 +17,11 @@ function fixture() {
 describe('source versions', () => {
   it('keeps first, previous and current bytes privately, deduplicating unchanged saves', () => {
     const f = fixture()
-    writeSourceFile(f.data, f.source, 'exam', 'examen: "áéí"\n')
-    writeSourceFile(f.data, f.source, 'exam', 'examen: nuevo\n')
-    writeSourceFile(f.data, f.source, 'exam', 'examen: nuevo\n')
+    writeSourceFile(f.data, f.source, 'exam', 'exam: "áéí"\n')
+    writeSourceFile(f.data, f.source, 'exam', 'exam: nuevo\n')
+    writeSourceFile(f.data, f.source, 'exam', 'exam: nuevo\n')
     expect(f.copies()).toHaveLength(2)
-    expect(f.copies().map(path => readSourceCopy(f.data, path, 'exam')).sort()).toEqual(['examen: "áéí"\n', 'examen: nuevo\n'].sort())
+    expect(f.copies().map(path => readSourceCopy(f.data, path, 'exam')).sort()).toEqual(['exam: "áéí"\n', 'exam: nuevo\n'].sort())
     for (const path of [f.data, sourceCopiesRoot(f.data), f.slot]) expect(statSync(path).mode & 0o777).toBe(0o700)
     for (const path of [...f.copies(), f.source]) expect(statSync(path).mode & 0o777).toBe(0o600)
   })

@@ -6,29 +6,29 @@ quieres es corregir, la guía es [GUIA.md](GUIA.md).
 ## La definición
 
 ```yaml
-examen: "Servidor DHCP y DNS"
+exam: "Servidor DHCP y DNS"
 version: 1
 hosts: [servidor]
-por_defecto: { peso: 1, timeout: 20s }
+defaults: { weight: 1, timeout: 20s }
 
-grupos:
-  - grupo: "DHCP"
-    comprobaciones:
+groups:
+  - group: "DHCP"
+    checks:
       - id: kea-activo
-        descripcion: "El servicio de DHCP está levantado"
-        en: servidor
+        description: "El servicio de DHCP está levantado"
+        on: servidor
         cmd: ["systemctl", "is-active", "kea-dhcp4-server"]
-        igual_a: "active"
+        equals: "active"
 
       - id: kea-rango
-        descripcion: "El rango es el que se pidió"
-        en: servidor
-        peso: 2
+        description: "El rango es el que se pidió"
+        on: servidor
+        weight: 2
         cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
-        cerca_de:
-          ancla: "pools"
-          lineas: 3
-          contiene: "${alumno.rango}"
+        near:
+          anchor: "pools"
+          lines: 3
+          contains: "${student.rango}"
 ```
 
 Declarativo y nada más: sin condicionales, sin bucles, sin expresiones

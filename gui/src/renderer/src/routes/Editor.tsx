@@ -86,7 +86,7 @@ export default function EditorView() {
       </div>
     )
   const parsed = readExam(draft.text)
-  const name = 'exam' in parsed ? parsed.exam.examen : project.name
+  const name = 'exam' in parsed ? parsed.exam.exam : project.name
   const dirty = draft.text !== draft.savedText
   return (
     <div className="flex h-full flex-col">

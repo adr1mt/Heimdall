@@ -1,11 +1,11 @@
-aula: "Prueba"
+classroom: "Prueba"
 version: 1
-comun:
+common:
   hosts:
-    host1: { puerto: 22 }
-alumnos:
+    host1: { port: 22 }
+students:
   - id: alumne01
-    nombre: "Ana Ferrer"
+    name: "Ana Ferrer"
     preguntas:
       - "443"
     hosts:

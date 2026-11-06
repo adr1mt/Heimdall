@@ -60,7 +60,7 @@ profesor.
 ### El caso frontera que conviene dejar escrito
 
 Un comando que devuelve exit 127 «command not found» es un resultado académico:
-la máquina respondió. `no_contiene` con cualquier exit distinto de 0 es FAIL;
+la máquina respondió. `not_contains` con cualquier exit distinto de 0 es FAIL;
 no prueba ausencia. Una aserción `exit_code: 127` puede aprobar porque exige ese
 código explícitamente. La falta de evidencia por recorte sigue siendo técnica.
 Es justo lo contrario de F-09, donde el exit code dependía del shell del
@@ -76,7 +76,7 @@ No se almacena, se calcula:
 | `OK` | Ninguna comprobación `UNEVALUATED` de peso > 0 |
 | `PARTIAL` | Alguna, pero no todas |
 | `NOT_EVALUATED` | Todas las de peso > 0 son `UNEVALUATED` |
-| `EXCLUDED` | `excluido: true` en el inventario: no se ejecutó nada, no hay nota |
+| `EXCLUDED` | `excluded: true` en el inventario: no se ejecutó nada, no hay nota |
 
 Las comprobaciones de peso 0 se informan pero **no degradan el estado**: son
 diagnóstico, no nota.

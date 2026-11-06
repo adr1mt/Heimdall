@@ -3,17 +3,17 @@
 #
 # Las respuestas son campos libres del alumno. Un cuestionario no necesita
 # hosts: ninguna comprobación ejecuta nada.
-aula: "Aula de prueba · cuestionario"
+classroom: "Aula de prueba · cuestionario"
 version: 1
 
-comun:
+common:
   timeouts:
-    conexion: 10s
-    alumno: 1m
+    connect: 10s
+    student: 1m
 
-alumnos:
+students:
   - id: alumne01
-    nombre: "Alumna Uno"
+    name: "Alumna Uno"
     p1: "443"
     p2: "22"
     p3: "255.255.255.0"
@@ -26,7 +26,7 @@ alumnos:
     p10: "ip route show"
 
   - id: alumne02
-    nombre: "Alumne Dos"
+    name: "Alumne Dos"
     p1: "443"
     p2: "23"
     p3: "255.255.0.0"
@@ -39,8 +39,8 @@ alumnos:
     p10: "route -n"
 
   - id: alumne03
-    nombre: "Alumna Tres"
-    excluido: true
+    name: "Alumna Tres"
+    excluded: true
     p1: "443"
     p2: "22"
     p3: "255.255.255.0"

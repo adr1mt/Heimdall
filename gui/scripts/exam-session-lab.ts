@@ -14,7 +14,7 @@ import { studentReport } from '../src/renderer/src/lib/report'
 
 const root = mkdtempSync(join(tmpdir(), 'heimdall-native-session-'))
 const engine = resolve('../bin/heimdall'), exam = join(root, 'examen.yaml'), data = join(root, 'data')
-writeFileSync(exam, 'examen: Ficticio\n')
+writeFileSync(exam, 'exam: Ficticio\n')
 mkdirSync(join(root, 'var'))
 const group: ClassGroup = { id: 'fiction', name: 'Ficticia', password: 'never-copy-this', columns: [],
   students: ['first', 'second', 'missing'].map(id => ({ id, name: `Ficticio ${id}`, contact: `${id}@example.invalid`, user: 'alumno', host: '192.0.2.1', port: '22', fields: {} })) }
@@ -75,7 +75,7 @@ assert.ok(!report.includes('Ficticio second')); assert.ok(!report.includes(group
 const afterRestart = await new ExamRecords(data, engine).view(new ExamRecords(data, engine).get(exam, group.id)!)
 assert.equal(afterRestart.session!.students[0].score.final_score, 100)
 assert.equal(afterRestart.record.closedAt, final.record.closedAt)
-writeFileSync(exam, 'examen: Otros criterios\n')
+writeFileSync(exam, 'exam: Otros criterios\n')
 const next = reopened.prepare(exam, group)
 assert.notEqual(next.id, record.id); assert.equal(next.rounds.length, 0)
 assert.equal(reopened.list(exam, group.id).length, 2)

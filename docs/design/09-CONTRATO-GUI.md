@@ -58,7 +58,7 @@ Códigos de salida, sin cambios: `0` todo evaluado · `2` configuración inváli
 `heimdall check --exam-only <directorio>` valida únicamente `examen.yaml`, sin
 leer ni generar un aula. Reutiliza las reglas del examen del PLAN: YAML,
 claves, comprobaciones, aserciones, pesos y referencias. Admite referencias
-`${alumno.campo}` sin resolver sus valores; rechaza referencias mal formadas,
+`${student.campo}` sin resolver sus valores; rechaza referencias mal formadas,
 hosts no declarados y referencias a secretos. Sale con 0 si el examen es válido
 y con 2 si hay errores, indicando fichero y línea. No crea un PLAN ni publica
 su hash; no se combina con `--cname`.

@@ -20,7 +20,7 @@ function dataDir(): string {
 }
 
 /** A project folder, with an exam in it unless asked otherwise. */
-function projectDir(exam: string | null = 'examen: "Examen de prueba"\n'): string {
+function projectDir(exam: string | null = 'exam: "Examen de prueba"\n'): string {
   const dir = mkdtempSync(join(tmpdir(), 'heimdall-project-'))
   if (exam !== null) writeFileSync(join(dir, EXAM_FILE), exam, 'utf-8')
   return dir
@@ -34,7 +34,7 @@ describe('abrir un proyecto', () => {
   })
 
   it('lo llama como el profesor llamó al examen', () => {
-    expect(openProjectAt(projectDir('examen: "RA2 · Servicios de red"\n')).name).toBe(
+    expect(openProjectAt(projectDir('exam: "RA2 · Servicios de red"\n')).name).toBe(
       'RA2 · Servicios de red'
     )
   })
@@ -56,15 +56,15 @@ describe('crear un proyecto', () => {
     const dir = projectDir(null)
     const project = createProjectAt(dir)
     const exam = readFileSync(project.examPath, 'utf-8')
-    expect(exam).toContain('examen:')
-    expect(exam).toContain('grupos:')
-    expect(exam).toContain('comprobaciones:')
+    expect(exam).toContain('exam:')
+    expect(exam).toContain('groups:')
+    expect(exam).toContain('checks:')
     // Y se abre como cualquier otro: crear y abrir dan lo mismo.
     expect(openProjectAt(dir).examPath).toBe(project.examPath)
   })
 
   it('nunca pisa el examen que ya estaba', () => {
-    const dir = projectDir('examen: "El de verdad"\n')
+    const dir = projectDir('exam: "El de verdad"\n')
     expect(() => createProjectAt(dir)).toThrow(/ya tiene un examen/)
     expect(readFileSync(join(dir, EXAM_FILE), 'utf-8')).toContain('El de verdad')
   })
@@ -93,14 +93,14 @@ describe('la lista de exámenes recientes', () => {
     const data = dataDir()
     const dir = projectDir()
     rememberProject(data, openProjectAt(dir))
-    writeFileSync(join(dir, EXAM_FILE), 'examen: "Nombre nuevo"\n')
+    writeFileSync(join(dir, EXAM_FILE), 'exam: "Nombre nuevo"\n')
     expect(readRecents(data)).toEqual([{ dir, name: 'Nombre nuevo' }])
   })
 
   it('pone el último arriba y no repite el mismo proyecto', () => {
     const data = dataDir()
-    const uno = openProjectAt(projectDir('examen: "Uno"\n'))
-    const dos = openProjectAt(projectDir('examen: "Dos"\n'))
+    const uno = openProjectAt(projectDir('exam: "Uno"\n'))
+    const dos = openProjectAt(projectDir('exam: "Dos"\n'))
     rememberProject(data, uno)
     rememberProject(data, dos)
     rememberProject(data, uno)

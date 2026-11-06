@@ -69,24 +69,24 @@ describe('el aula generada', () => {
 
   it('nombra la clase y a cada alumno con su máquina', () => {
     const yaml = aulaYaml(group())
-    expect(yaml).toContain('aula: "2SMX C"')
+    expect(yaml).toContain('classroom: "2SMX C"')
     expect(yaml).toContain('id: "alu1"')
     expect(yaml).toContain('ip: "10.0.0.11"')
-    expect(yaml).toContain('usuario: "alumno"')
+    expect(yaml).toContain('user: "alumno"')
   })
 
-  it('deja el usuario también en el alumno, para «${alumno.usuario}»', () => {
+  it('deja el usuario también en el alumno, para «${student.user}»', () => {
     // Un examen que compara con el usuario del alumno es de lo más corriente:
     // si el usuario solo estuviera en el host, ese examen no se podría
     // corregir desde una clase.
     const yaml = aulaYaml(group())
-    expect(yaml).toMatch(/^ {4}usuario: "alumno"$/m)
+    expect(yaml).toMatch(/^ {4}user: "alumno"$/m)
   })
 
   it('solo escribe el puerto del alumno que no usa el de siempre', () => {
     const yaml = aulaYaml(group())
-    expect(yaml).toContain('puerto: 2222')
-    expect(yaml.match(/puerto: /g)).toHaveLength(2) // el común y el del alumno
+    expect(yaml).toContain('port: 2222')
+    expect(yaml.match(/port: /g)).toHaveLength(2) // el común y el del alumno
   })
 
   // ADR-0009: el aula nombra la credencial, nunca la lleva.
@@ -98,7 +98,7 @@ describe('el aula generada', () => {
 
   it('entrecomilla un nombre que cambiaría lo que significa el fichero', () => {
     const yaml = aulaYaml(group({ name: 'Grupo: el de las 8 # turno' }))
-    expect(yaml).toContain('aula: "Grupo: el de las 8 # turno"')
+    expect(yaml).toContain('classroom: "Grupo: el de las 8 # turno"')
   })
 
   it('el contacto viaja solo cuando lo hay', () => {
@@ -116,7 +116,7 @@ describe('las columnas propias del profesor', () => {
     return g
   }
 
-  // Es lo que alcanza ${alumno.subdominio} en el examen.
+  // Es lo que alcanza ${student.subdominio} en el examen.
   it('viajan al aula como campos del alumno', () => {
     const yaml = aulaYaml(withColumns())
     expect(yaml).toContain('    subdominio: "uno.example"')
@@ -134,14 +134,14 @@ describe('escribir el aula en la carpeta del examen', () => {
     const dir = project()
     const name = writeGeneratedAula(dir, group())
     expect(name).toBe(aulaFileName(group()))
-    expect(readFileSync(join(dir, name), 'utf-8')).toContain('aula: "2SMX C"')
+    expect(readFileSync(join(dir, name), 'utf-8')).toContain('classroom: "2SMX C"')
   })
 
   it('no toca un aula escrita a mano que esté en la misma carpeta', () => {
     const dir = project()
-    writeFileSync(join(dir, 'aula.yaml'), 'aula: "la mía"\n', 'utf-8')
+    writeFileSync(join(dir, 'aula.yaml'), 'classroom: "la mía"\n', 'utf-8')
     writeGeneratedAula(dir, group())
-    expect(readFileSync(join(dir, 'aula.yaml'), 'utf-8')).toBe('aula: "la mía"\n')
+    expect(readFileSync(join(dir, 'aula.yaml'), 'utf-8')).toBe('classroom: "la mía"\n')
   })
 
   it('se rehace cuando la clase cambia', () => {
@@ -158,14 +158,14 @@ describe('escribir el aula en la carpeta del examen', () => {
     const c = writeGeneratedAula(dir, group())
     const d = writeGeneratedAula(dir, group({ id: 'c-2smxd', name: '2SMX D' }))
     expect(c).not.toBe(d)
-    expect(readFileSync(join(dir, c), 'utf-8')).toContain('aula: "2SMX C"')
-    expect(readFileSync(join(dir, d), 'utf-8')).toContain('aula: "2SMX D"')
+    expect(readFileSync(join(dir, c), 'utf-8')).toContain('classroom: "2SMX C"')
+    expect(readFileSync(join(dir, d), 'utf-8')).toContain('classroom: "2SMX D"')
   })
 
   it('se niega antes que pisar un fichero con su nombre que no escribió', () => {
     const dir = project()
-    writeFileSync(join(dir, aulaFileName(group())), 'aula: "escrita a mano"\n', 'utf-8')
+    writeFileSync(join(dir, aulaFileName(group())), 'classroom: "escrita a mano"\n', 'utf-8')
     expect(() => writeGeneratedAula(dir, group())).toThrow(/no lo escribió Heimdall/i)
-    expect(readFileSync(join(dir, aulaFileName(group())), 'utf-8')).toBe('aula: "escrita a mano"\n')
+    expect(readFileSync(join(dir, aulaFileName(group())), 'utf-8')).toBe('classroom: "escrita a mano"\n')
   })
 })

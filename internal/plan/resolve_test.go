@@ -29,46 +29,46 @@ func project(t *testing.T, exam, inventory string) string {
 }
 
 const validExam = `
-examen: "Prueba"
+exam: "Prueba"
 version: 1
 hosts: [host1]
-por_defecto: { peso: 1, timeout: 20s }
-grupos:
-  - grupo: "Base"
-    comprobaciones:
+defaults: { weight: 1, timeout: 20s }
+groups:
+  - group: "Base"
+    checks:
       - id: p1
-        descripcion: "Se identifica"
-        en: host1
+        description: "Se identifica"
+        on: host1
         cmd: ["hostname"]
-        contiene: "alu"
+        contains: "alu"
       - id: p2
-        descripcion: "La cuenta existe"
-        en: host1
-        peso: 2
+        description: "La cuenta existe"
+        on: host1
+        weight: 2
         cmd: ["id", "-un"]
-        igual_a: "${alumno.usuario}"
+        equals: "${student.user}"
 `
 
 const validInventory = `
-aula: "Prueba"
+classroom: "Prueba"
 version: 1
-comun:
+common:
   hosts:
     host1:
-      puerto: 22
-      usuario: "alumno"
+      port: 22
+      user: "alumno"
       password_ref: "${AULA_PASSWORD}"
-alumnos:
+students:
   - id: alumne01
-    nombre: "Alumna Uno"
+    name: "Alumna Uno"
     hosts:
       host1: { ip: "10.0.0.1" }
-    usuario: "ana"
+    user: "ana"
   - id: alumne02
-    nombre: "Alumne Dos"
+    name: "Alumne Dos"
     hosts:
       host1: { ip: "10.0.0.2" }
-    usuario: "marc"
+    user: "marc"
 `
 
 func TestResolveValidProject(t *testing.T) {
@@ -105,12 +105,12 @@ func TestPlanIsIdenticalForEveryStudent(t *testing.T) {
 	for i := range first.Checks {
 		a, b := first.Checks[i], second.Checks[i]
 		if a.ID != b.ID || a.Weight != b.Weight || a.Group != b.Group {
-			t.Errorf("comprobación %d difiere entre alumnos: %+v vs %+v", i, a, b)
+			t.Errorf("comprobación %d difiere entre students: %+v vs %+v", i, a, b)
 		}
 	}
 	// What may differ is the expected value, and it did.
 	if *first.Checks[1].Equals == *second.Checks[1].Equals {
-		t.Error("los dos alumnos esperan el mismo usuario: la sustitución no se aplicó")
+		t.Error("los dos alumnos esperan el mismo user: la sustitución no se aplicó")
 	}
 	if *first.Checks[1].Equals != "ana" || *second.Checks[1].Equals != "marc" {
 		t.Errorf("valores esperados = %q y %q", *first.Checks[1].Equals, *second.Checks[1].Equals)
@@ -121,11 +121,11 @@ func TestPlanIsIdenticalForEveryStudent(t *testing.T) {
 // weight, and no checks of their own.
 func TestExcludedStudentDoesNotMoveTheDenominator(t *testing.T) {
 	withExcluded := validInventory + `  - id: alumne03
-    nombre: "Alumne Tres"
-    excluido: true
+    name: "Alumne Tres"
+    excluded: true
     hosts:
       host1: { ip: "10.0.0.3" }
-    usuario: "laia"
+    user: "laia"
 `
 	base, err := Load(project(t, validExam, validInventory))
 	if err != nil {
@@ -133,7 +133,7 @@ func TestExcludedStudentDoesNotMoveTheDenominator(t *testing.T) {
 	}
 	got, err := Load(project(t, validExam, withExcluded))
 	if err != nil {
-		t.Fatalf("Load con excluido: %v", err)
+		t.Fatalf("Load con excluded: %v", err)
 	}
 	if got.Summary.TotalWeight != base.Summary.TotalWeight || got.Summary.CheckCount != base.Summary.CheckCount {
 		t.Errorf("el alumno excluido movió el plan: %+v vs %+v", got.Summary, base.Summary)
@@ -148,30 +148,30 @@ func TestExcludedStudentDoesNotMoveTheDenominator(t *testing.T) {
 // contains. This is where the injection vector dies.
 func TestSubstitutedValueIsOneArgumentAndIsNeverReinterpreted(t *testing.T) {
 	exam := `
-examen: "Prueba"
+exam: "Prueba"
 version: 1
 hosts: [host1]
-grupos:
-  - grupo: "Base"
-    comprobaciones:
+groups:
+  - group: "Base"
+    checks:
       - id: p1
-        descripcion: "Argumento hostil"
-        en: host1
-        cmd: ["getent", "passwd", "${alumno.usuario}"]
-        contiene: "x"
+        description: "Argumento hostil"
+        on: host1
+        cmd: ["getent", "passwd", "${student.user}"]
+        contains: "x"
 `
 	inventory := `
-aula: "Prueba"
+classroom: "Prueba"
 version: 1
-comun:
+common:
   hosts:
-    host1: { puerto: 22, usuario: "alumno" }
-alumnos:
+    host1: { port: 22, user: "alumno" }
+students:
   - id: alumne01
-    nombre: "Alumna Uno"
+    name: "Alumna Uno"
     hosts:
       host1: { ip: "10.0.0.1" }
-    usuario: "ana; rm -rf / 'x' \"y\""
+    user: "ana; rm -rf / 'x' \"y\""
 `
 	p, err := Load(project(t, exam, inventory))
 	if err != nil {
@@ -192,8 +192,8 @@ alumnos:
 // Substitution happens inside an element, not only as the whole of it.
 func TestSubstitutionInsideAnArgument(t *testing.T) {
 	exam := strings.Replace(validExam,
-		`        igual_a: "${alumno.usuario}"`,
-		`        igual_a: "${alumno.usuario}:x:"`, 1)
+		`        equals: "${student.user}"`,
+		`        equals: "${student.user}:x:"`, 1)
 	p, err := Load(project(t, exam, validInventory))
 	if err != nil {
 		t.Fatalf("Load: %v", err)
@@ -221,63 +221,63 @@ func TestPlanValidations(t *testing.T) {
 		},
 		{
 			name: "2 · id ausente",
-			exam: strings.Replace(validExam, "      - id: p2\n        descripcion:", "      - descripcion:", 1),
+			exam: strings.Replace(validExam, "      - id: p2\n        description:", "      - description:", 1),
 			want: "no tiene id", where: "examen.yaml:13",
 		},
 		{
 			name: "3 · host no declarado",
-			exam: strings.Replace(validExam, "        en: host1\n        peso: 2", "        en: host2\n        peso: 2", 1),
+			exam: strings.Replace(validExam, "        on: host1\n        weight: 2", "        on: host2\n        weight: 2", 1),
 			want: `usa el host "host2"`, where: "examen.yaml:13",
 		},
 		{
 			name:      "4 · host sin datos para un alumno",
-			inventory: strings.Replace(validInventory, "      host1: { ip: \"10.0.0.2\" }\n", "      host1: { usuario: \"marc\" }\n", 1),
+			inventory: strings.Replace(validInventory, "      host1: { ip: \"10.0.0.2\" }\n", "      host1: { user: \"marc\" }\n", 1),
 			want:      `no tiene la ip del host "host1"`, where: "aula.yaml:15",
 		},
 		{
 			name:      "5 · campo que falta en un solo alumno",
-			inventory: strings.Replace(validInventory, "    usuario: \"marc\"\n", "", 1),
-			want:      `el alumno "alumne02" no tiene el campo "usuario"`, where: "examen.yaml:13",
+			inventory: strings.Replace(validInventory, "    user: \"marc\"\n", "", 1),
+			want:      `el alumno "alumne02" no tiene el campo "user"`, where: "examen.yaml:13",
 		},
 		{
 			name: "6 · comprobación sin aserción",
-			exam: strings.Replace(validExam, "        igual_a: \"${alumno.usuario}\"\n", "", 1),
+			exam: strings.Replace(validExam, "        equals: \"${student.user}\"\n", "", 1),
 			want: "no comprueba nada", where: "examen.yaml:13",
 		},
 		{
 			name: "6 · dos aserciones",
-			exam: strings.Replace(validExam, "        igual_a: \"${alumno.usuario}\"",
-				"        igual_a: \"x\"\n        contiene: \"y\"", 1),
+			exam: strings.Replace(validExam, "        equals: \"${student.user}\"",
+				"        equals: \"x\"\n        contains: \"y\"", 1),
 			want: "tiene 2 aserciones", where: "examen.yaml:13",
 		},
 		{
-			name: "valor: comparando el código de salida",
+			name: "value: comparando el código de salida",
 			exam: strings.Replace(validExam,
-				"        en: host1\n        cmd: [\"hostname\"]\n        contiene: \"alu\"",
-				"        valor: \"${alumno.usuario}\"\n        exit_code: 0", 1),
+				"        on: host1\n        cmd: [\"hostname\"]\n        contains: \"alu\"",
+				"        value: \"${student.user}\"\n        exit_code: 0", 1),
 			want: "no ejecuta ningún comando", where: "examen.yaml:8",
 		},
 		{
 			name: "cerca_de sin ancla",
-			exam: strings.Replace(validExam, "        contiene: \"alu\"",
-				"        cerca_de: { lineas: 5, contiene: \"alu\" }", 1),
+			exam: strings.Replace(validExam, "        contains: \"alu\"",
+				"        near: { lines: 5, contains: \"alu\" }", 1),
 			want: "no tiene ancla", where: "examen.yaml:8",
 		},
 		{
 			name: "cerca_de sin nada que buscar",
-			exam: strings.Replace(validExam, "        contiene: \"alu\"",
-				"        cerca_de: { ancla: \"subnet\", lineas: 5 }", 1),
+			exam: strings.Replace(validExam, "        contains: \"alu\"",
+				"        near: { anchor: \"subnet\", lines: 5 }", 1),
 			want: "no dice qué debe contener", where: "examen.yaml:8",
 		},
 		{
 			name: "cerca_de con una ventana negativa",
-			exam: strings.Replace(validExam, "        contiene: \"alu\"",
-				"        cerca_de: { ancla: \"subnet\", lineas: -1, contiene: \"alu\" }", 1),
+			exam: strings.Replace(validExam, "        contains: \"alu\"",
+				"        near: { anchor: \"subnet\", lines: -1, contains: \"alu\" }", 1),
 			want: "no puede ser negativo", where: "examen.yaml:8",
 		},
 		{
 			name: "7 · peso negativo",
-			exam: strings.Replace(validExam, "        peso: 2", "        peso: -1", 1),
+			exam: strings.Replace(validExam, "        weight: 2", "        weight: -1", 1),
 			want: "peso negativo", where: "examen.yaml:13",
 		},
 		{
@@ -288,39 +288,39 @@ func TestPlanValidations(t *testing.T) {
 		{
 			name: "9 · aula sin alumnos evaluables",
 			inventory: strings.ReplaceAll(
-				strings.Replace(validInventory, "  - id: alumne01", "  - id: alumne01\n    excluido: true", 1),
-				"  - id: alumne02", "  - id: alumne02\n    excluido: true"),
+				strings.Replace(validInventory, "  - id: alumne01", "  - id: alumne01\n    excluded: true", 1),
+				"  - id: alumne02", "  - id: alumne02\n    excluded: true"),
 			want: "ningún alumno evaluable", where: "aula.yaml:",
 		},
 		{
 			name:      "secreto en un campo libre del alumno",
-			inventory: strings.Replace(validInventory, `    usuario: "ana"`, `    usuario: "${AULA_PASSWORD}"`, 1),
+			inventory: strings.Replace(validInventory, `    user: "ana"`, `    user: "${AULA_PASSWORD}"`, 1),
 			want:      "referencia a un secreto", where: "aula.yaml:10",
 		},
 		{
 			name:      "secreto en un campo de host del alumno",
-			inventory: strings.Replace(validInventory, `      host1: { ip: "10.0.0.1" }`, `      host1: { ip: "10.0.0.1", usuario: "${AULA_PASSWORD}" }`, 1),
+			inventory: strings.Replace(validInventory, `      host1: { ip: "10.0.0.1" }`, `      host1: { ip: "10.0.0.1", user: "${AULA_PASSWORD}" }`, 1),
 			want:      "referencia a un secreto fuera de password_ref", where: "aula.yaml:10",
 		},
 		{
 			name: "secreto en el examen",
-			exam: strings.Replace(validExam, "        contiene: \"alu\"", "        contiene: \"${AULA_PASSWORD}\"", 1),
+			exam: strings.Replace(validExam, "        contains: \"alu\"", "        contains: \"${AULA_PASSWORD}\"", 1),
 			want: "solo puede aparecer", where: "examen.yaml:8",
 		},
 		{
 			name: "host inexistente en una sustitución",
-			exam: strings.Replace(validExam, "        contiene: \"alu\"", "        contiene: \"${host9.ip}\"", 1),
+			exam: strings.Replace(validExam, "        contains: \"alu\"", "        contains: \"${host9.ip}\"", 1),
 			want: `el host "host9" no está declarado`, where: "examen.yaml:8",
 		},
 		{
 			name: "campo de host que no existe",
-			exam: strings.Replace(validExam, "        contiene: \"alu\"", "        contiene: \"${host1.mac}\"", 1),
-			want: "solo se puede usar ip, puerto o usuario", where: "examen.yaml:8",
+			exam: strings.Replace(validExam, "        contains: \"alu\"", "        contains: \"${host1.mac}\"", 1),
+			want: "solo se puede usar ip, port o user", where: "examen.yaml:8",
 		},
 		{
 			name: "comprobación sin cmd ni valor",
 			exam: strings.Replace(validExam, "        cmd: [\"hostname\"]\n", "", 1),
-			want: "no tiene ni cmd: ni valor:", where: "examen.yaml:8",
+			want: "no tiene ni cmd: ni value:", where: "examen.yaml:8",
 		},
 	}
 
@@ -354,7 +354,7 @@ func TestPlanValidations(t *testing.T) {
 
 // Weight 0 is legal: the check runs, it is reported and it does not grade.
 func TestZeroWeightIsLegal(t *testing.T) {
-	exam := strings.Replace(validExam, "        peso: 2", "        peso: 0", 1)
+	exam := strings.Replace(validExam, "        weight: 2", "        weight: 0", 1)
 	p, err := Load(project(t, exam, validInventory))
 	if err != nil {
 		t.Fatalf("un peso 0 debe aceptarse: %v", err)
@@ -379,7 +379,7 @@ func TestPlanHashChangesWithTheQuestionsAndNotWithTheRun(t *testing.T) {
 		t.Errorf("dos lecturas del mismo proyecto dan hashes distintos: %s y %s", first.Hash, again.Hash)
 	}
 
-	changed, err := Load(project(t, strings.Replace(validExam, `contiene: "alu"`, `contiene: "otro"`, 1), validInventory))
+	changed, err := Load(project(t, strings.Replace(validExam, `contains: "alu"`, `contains: "otro"`, 1), validInventory))
 	if err != nil {
 		t.Fatalf("Load: %v", err)
 	}
@@ -388,20 +388,20 @@ func TestPlanHashChangesWithTheQuestionsAndNotWithTheRun(t *testing.T) {
 	}
 }
 
-func TestPlanHashPreservesExistingBytes(t *testing.T) {
+func TestEnglishPlanHashStable(t *testing.T) {
 	p, err := Load(project(t, validExam, validInventory))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if p.Hash != "fe3096e5ebd136f025a7800080ac16fadab5886b89fdec44656c3294ee8033a9" {
-		t.Fatalf("existing project hash changed: %s", p.Hash)
+	if p.Hash != "721d69c3eacafc29bc440ea776c65476c6551b740274a95932f6b5349ad3703f" {
+		t.Fatalf("English project hash changed: %s", p.Hash)
 	}
 	expected := "a<&\n"
 	other := &Plan{Exam: model.SourceRef{SHA256: "exam"}, Inventory: model.SourceRef{SHA256: "inventory"}, Summary: model.PlanSummary{TotalWeight: 1}, Students: []StudentPlan{
 		{ID: "z", Excluded: true},
 		{ID: "a", Checks: []ResolvedCheck{{ID: "c", Group: "G", Weight: 1, Timeout: time.Second, Value: "a<&\n", Contains: &expected}}},
 	}}
-	if got := hashPlan(other); got != "a1f6a06ea54206d028a033c958df93583ca0ac05475c9db4491c45f7123607d7" {
+	if got := hashPlan(other); got != "1fd0a0929f89cccccf0c09f6d5be3113e812e0a9048e39591c1df45671a766a5" {
 		t.Fatalf("sorted, excluded, escaped plan hash changed: %s", got)
 	}
 }
@@ -437,14 +437,14 @@ func TestMissingProjectFiles(t *testing.T) {
 
 func TestNonfiniteWeightsRejected(t *testing.T) {
 	for _, weight := range []string{".nan", ".inf", "-.inf"} {
-		for _, exam := range []string{strings.Replace(validExam, "peso: 2", "peso: "+weight, 1), strings.Replace(validExam, "peso: 1", "peso: "+weight, 1)} {
+		for _, exam := range []string{strings.Replace(validExam, "weight: 2", "weight: "+weight, 1), strings.Replace(validExam, "weight: 1", "weight: "+weight, 1)} {
 			_, err := Load(project(t, exam, validInventory))
 			if err == nil || !strings.Contains(err.Error(), "finito") {
 				t.Fatalf("%s: %v", weight, err)
 			}
 		}
 	}
-	exam := strings.ReplaceAll(strings.Replace(validExam, "peso: 1", "peso: 1e308", 1), "peso: 2", "peso: 1e308")
+	exam := strings.ReplaceAll(strings.Replace(validExam, "weight: 1", "weight: 1e308", 1), "weight: 2", "weight: 1e308")
 	if _, err := Load(project(t, exam, validInventory)); err == nil {
 		t.Fatal("nonfinite sum accepted")
 	}
@@ -468,22 +468,22 @@ func TestResultBudgetRejectsUnsupportedConfiguration(t *testing.T) {
 }
 
 func TestZeroTotalWeightRejectedButDiagnosticChecksAllowed(t *testing.T) {
-	exam := `examen: Diagnóstico ficticio
+	exam := `exam: Diagnóstico ficticio
 version: 1
 hosts: []
-por_defecto: {peso: 0}
-grupos:
-  - grupo: G
-    comprobaciones:
+defaults: {weight: 0}
+groups:
+  - group: G
+    checks:
       - id: zero
-        valor: yes
-        contiene: yes
+        value: yes
+        contains: yes
 `
-	inventory := "aula: Ficticia\nversion: 1\nalumnos:\n  - id: fake\n    nombre: Ficticio\n"
+	inventory := "classroom: Ficticia\nversion: 1\nstudents:\n  - id: fake\n    name: Ficticio\n"
 	if _, err := Load(project(t, exam, inventory)); err == nil || !strings.Contains(err.Error(), "peso positivo") {
 		t.Fatalf("zero total: %v", err)
 	}
-	mixed := exam + "      - id: positive\n        peso: 1\n        valor: yes\n        contiene: yes\n"
+	mixed := exam + "      - id: positive\n        weight: 1\n        value: yes\n        contains: yes\n"
 	p, err := Load(project(t, mixed, inventory))
 	if err != nil {
 		t.Fatal(err)
@@ -500,17 +500,17 @@ func TestResolvedInventoryValuesRespectByteLimit(t *testing.T) {
 			if utf {
 				value = strings.Repeat("é", size/2) + strings.Repeat("x", size%2)
 			}
-			exam := `examen: Ficticio
+			exam := `exam: Ficticio
 version: 1
 hosts: []
-grupos:
-  - grupo: G
-    comprobaciones:
+groups:
+  - group: G
+    checks:
       - id: c
-        valor: "${alumno.answer}"
-        contiene: x
+        value: "${student.answer}"
+        contains: x
 `
-			inventory := fmt.Sprintf("aula: Ficticia\nversion: 1\nalumnos:\n  - id: fake\n    nombre: Ficticio\n    answer: %q\n", value)
+			inventory := fmt.Sprintf("classroom: Ficticia\nversion: 1\nstudents:\n  - id: fake\n    name: Ficticio\n    answer: %q\n", value)
 			p, err := Load(project(t, exam, inventory))
 			if size > model.MaxStreamBytes {
 				if err == nil || !strings.Contains(err.Error(), "65536 bytes") {

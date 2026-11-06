@@ -102,8 +102,8 @@ comando del alumno, se sustituye por `«[oculto]»` y se añade un `Warning`.
 
 Los 64 KiB son evidencia conservada, no la salida completa. Si el prefijo no
 prueba la aserción, queda UNEVALUATED / OUTPUT_OVERFLOW. Una coincidencia de
-`contiene`/`cerca_de` o el texto prohibido de `no_contiene` sí permiten decidir.
-`igual_a` no se decide sobre un flujo recortado (ADR-0025).
+`contains`/`near` o el texto prohibido de `not_contains` sí permiten decidir.
+`equals` no se decide sobre un flujo recortado (ADR-0025).
 `bytes_total` cuenta lo recibido hasta EOF o hasta el corte duro, no los bytes
 que el proceso pueda seguir generando después del cierre.
 

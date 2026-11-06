@@ -1,231 +1,231 @@
 # Encaminament: només ip_forward actiu. Sense comprovacions de NAT ni nftables.
 # Comprobador fijo y versionado. Véase README.md.
-examen: 0227 · RA1 · DHCP amb Kea per a 250 equips
+exam: 0227 · RA1 · DHCP amb Kea per a 250 equips
 version: 1
 hosts:
 - host1
-por_defecto:
-  peso: 1
+defaults:
+  weight: 1
   timeout: 20s
   sudo: true
-grupos:
-- grupo: Xarxa
-  comprobaciones:
+groups:
+- group: Xarxa
+  checks:
   - id: net-externa-ip
-    descripcion: Adreça de la xarxa d'examen
-    en: host1
-    comprobador:
+    description: Adreça de la xarxa d'examen
+    on: host1
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-externa-ip
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
+    equals: OK
   - id: net-externa-estatica
-    descripcion: Adreçament estàtic del servidor
-    en: host1
-    comprobador:
+    description: Adreçament estàtic del servidor
+    on: host1
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-externa-estatica
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
+    equals: OK
   - id: net-externa-netplan
-    descripcion: Netplan de la xarxa d'examen
-    en: host1
-    comprobador:
+    description: Netplan de la xarxa d'examen
+    on: host1
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-externa-netplan
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
+    equals: OK
   - id: net-externa-gw
-    descripcion: Porta d'enllaç del servidor
-    en: host1
-    comprobador:
+    description: Porta d'enllaç del servidor
+    on: host1
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-externa-gw
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
+    equals: OK
   - id: net-externa-dns
-    descripcion: DNS del servidor
-    en: host1
-    comprobador:
+    description: DNS del servidor
+    on: host1
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-externa-dns
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
+    equals: OK
   - id: net-interna-ip
-    descripcion: Adreça de la xarxa de treball DHCP
-    en: host1
-    comprobador:
+    description: Adreça de la xarxa de treball DHCP
+    on: host1
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-interna-ip
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
+    equals: OK
   - id: net-interna-netplan
-    descripcion: Xarxa de treball DHCP
-    en: host1
-    comprobador:
+    description: Xarxa de treball DHCP
+    on: host1
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-interna-netplan
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
+    equals: OK
   - id: net-interna-sense-gw
-    descripcion: Configuració de la xarxa de treball
-    en: host1
-    comprobador:
+    description: Configuració de la xarxa de treball
+    on: host1
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-interna-sense-gw
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
+    equals: OK
   - id: net-sortida
-    descripcion: Sortida del servidor
-    en: host1
-    comprobador:
+    description: Sortida del servidor
+    on: host1
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-sortida
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
+    equals: OK
   - id: net-resolucio
-    descripcion: Resolució de noms del servidor
-    en: host1
-    comprobador:
+    description: Resolució de noms del servidor
+    on: host1
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - net-resolucio
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
-- grupo: DHCP
-  comprobaciones:
+    equals: OK
+- group: DHCP
+  checks:
   - id: kea-interficie
-    descripcion: Interfície del servei DHCP
-    en: host1
-    comprobador:
+    description: Interfície del servei DHCP
+    on: host1
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - kea-interficie
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
+    equals: OK
   - id: kea-subxarxa
-    descripcion: Xarxa DHCP a KEA
-    en: host1
-    comprobador:
+    description: Xarxa DHCP a KEA
+    on: host1
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - kea-subxarxa
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
+    equals: OK
   - id: kea-rang-inici
-    descripcion: Rang KEA · inici
-    en: host1
-    comprobador:
+    description: Rang KEA · inici
+    on: host1
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - kea-rang-inici
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
+    equals: OK
   - id: kea-rang-final
-    descripcion: Rang KEA · capacitat
-    en: host1
-    peso: 2
-    comprobador:
+    description: Rang KEA · capacitat
+    on: host1
+    weight: 2
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - kea-rang-final
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
+    equals: OK
   - id: kea-porta-enllac
-    descripcion: Porta d'enllaç DHCP
-    en: host1
-    comprobador:
+    description: Porta d'enllaç DHCP
+    on: host1
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - kea-porta-enllac
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
-    peso: 2
+    equals: OK
+    weight: 2
   - id: kea-dns
-    descripcion: DNS DHCP
-    en: host1
-    comprobador:
+    description: DNS DHCP
+    on: host1
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - kea-dns
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
-    peso: 2
+    equals: OK
+    weight: 2
   - id: kea-reserves
-    descripcion: Reserves KEA
-    en: host1
-    comprobador:
+    description: Reserves KEA
+    on: host1
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - kea-reserves
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
-    peso: 2
+    equals: OK
+    weight: 2
   - id: kea-actiu
-    descripcion: Servei KEA
-    en: host1
-    peso: 2
-    comprobador:
+    description: Servei KEA
+    on: host1
+    weight: 2
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - kea-actiu
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
-- grupo: Encaminament
-  comprobaciones:
+    equals: OK
+- group: Encaminament
+  checks:
   - id: fwd-actiu
-    descripcion: IP forwarding
-    en: host1
-    comprobador:
+    description: IP forwarding
+    on: host1
+    checker:
     - ra1-dhcp
     - e832a93079d00ac294308ad40c3fc7cca140fbdc2d2ec6ef345a82f30fb91862
     - fwd-actiu
-    - ${alumno.if_ext}
-    - ${alumno.if_int}
+    - ${student.if_ext}
+    - ${student.if_int}
     - ${host1.ip}
-    igual_a: OK
+    equals: OK

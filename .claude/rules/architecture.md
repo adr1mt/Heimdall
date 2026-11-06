@@ -33,7 +33,7 @@ que describe el sistema; esto describe **qué no se puede hacer**.
    SSH entrecomilla cada argumento para el shell del servidor. Excepciones
    remotas: los textos fijos del supervisor de ADR-0024 y de sudo de ADR-0032,
    que invocan `"$@"` sin interpolar los argumentos del examen en el programa.
-   `comprobador:` (ADR-0036) selecciona un programa fijo del motor y argumentos
+   `checker:` (ADR-0036) selecciona un programa fijo del motor y argumentos
    literales; no acepta fuente ejecutable del profesor ni modifica `cmd:`.
 
 8. **El motor no convierte la nota a la escala del profesor.** Publica 0-100

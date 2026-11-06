@@ -28,7 +28,7 @@ func questionnairePlan(students ...plan.StudentPlan) *plan.Plan {
 	return p
 }
 
-// TestInventoryCheckNeedsNoMachine is the whole point of the valor:
+// TestInventoryCheckNeedsNoMachine is the whole point of the value:
 // primitive. The original questionnaire ran ten `echo` with the student's
 // answers interpolated into a shell string on the teacher's computer.
 func TestInventoryCheckNeedsNoMachine(t *testing.T) {
@@ -82,7 +82,7 @@ func TestInventoryCheckNeedsNoMachine(t *testing.T) {
 }
 
 // TestExcludedStudentDoesNotMoveTheOthersDenominator is the acceptance of
-// excluido: true. The excluded student appears in the report with no grade,
+// excluded: true. The excluded student appears in the report with no grade,
 // and everybody else is measured against the same total as always.
 func TestExcludedStudentDoesNotMoveTheOthersDenominator(t *testing.T) {
 	present := plan.StudentPlan{ID: "alu1", Name: "alu1", Checks: questionChecks("443", "10.0.0.0/8")}
@@ -96,7 +96,7 @@ func TestExcludedStudentDoesNotMoveTheOthersDenominator(t *testing.T) {
 	})
 
 	if a, b := find(t, alone, "alu1").Score, find(t, together, "alu1").Score; !reflect.DeepEqual(a, b) {
-		t.Errorf("la nota de alu1 cambió con un compañero excluido: %s vs %s", show(b), show(a))
+		t.Errorf("la nota de alu1 cambió con un compañero excluded: %s vs %s", show(b), show(a))
 	}
 
 	out := find(t, together, "alu2")

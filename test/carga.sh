@@ -35,39 +35,39 @@ command -v jq >/dev/null || die "hace falta jq"
 EXAM="$WORK/examen"
 mkdir -p "$EXAM"
 cat > "$EXAM/examen.yaml" <<'YAML'
-examen: "Carga: una máquina, toda la clase"
+exam: "Carga: una máquina, toda la clase"
 version: 1
 hosts: [host1]
-por_defecto: { peso: 1, timeout: 20s }
-grupos:
-  - grupo: "Base"
-    comprobaciones:
+defaults: { weight: 1, timeout: 20s }
+groups:
+  - group: "Base"
+    checks:
       - id: c1-usuario
-        descripcion: "La cuenta del alumno existe"
-        en: host1
+        description: "La cuenta del alumno existe"
+        on: host1
         cmd: ["id", "-un"]
-        igual_a: "alumno"
+        equals: "alumno"
 YAML
 
 {
   cat <<'YAML'
-aula: "Carga"
+classroom: "Carga"
 version: 1
 
-comun:
+common:
   hosts:
     host1:
-      puerto: 2201
-      usuario: "alumno"
+      port: 2201
+      user: "alumno"
       password_ref: "${AULA_PASSWORD}"
   timeouts:
-    conexion: 10s
-    alumno: 5m
+    connect: 10s
+    student: 5m
 
-alumnos:
+students:
 YAML
   for i in $(seq -w 1 $STUDENTS); do
-    printf -- '  - id: alu%s\n    nombre: "Alumna %s"\n    hosts:\n      host1: { ip: "127.1.2.3", puerto: 2201 }\n    usuario: "alumno"\n' "$i" "$i"
+    printf -- '  - id: alu%s\n    name: "Alumna %s"\n    hosts:\n      host1: { ip: "127.1.2.3", port: 2201 }\n    user: "alumno"\n' "$i" "$i"
   done
 } > "$EXAM/aula.yaml"
 

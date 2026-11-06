@@ -34,23 +34,23 @@ command -v jq >/dev/null || die "hace falta jq"
 
 # class_exam <dir> <students> <cmd-json> <timeout> [assertion] [checks]
 class_exam() {
-  local dir="$1" n="$2" cmd="$3" to="$4" assertion="${5:-contiene: \"1\"}" checks="${6:-1}"
+  local dir="$1" n="$2" cmd="$3" to="$4" assertion="${5:-contains: \"1\"}" checks="${6:-1}"
   mkdir -p "$dir"
   {
     cat <<YAML
-examen: "Medición de rendimiento"
+exam: "Medición de rendimiento"
 version: 1
 hosts: [host1]
-por_defecto: { peso: 1, timeout: $to }
-grupos:
-  - grupo: "Base"
-    comprobaciones:
+defaults: { weight: 1, timeout: $to }
+groups:
+  - group: "Base"
+    checks:
 YAML
     for k in $(seq 1 "$checks"); do
       cat <<YAML
       - id: c$k
-        descripcion: "La máquina responde ($k)"
-        en: host1
+        description: "La máquina responde ($k)"
+        on: host1
         cmd: $cmd
         $assertion
 YAML
@@ -58,23 +58,23 @@ YAML
   } > "$dir/examen.yaml"
   {
     cat <<'YAML'
-aula: "Medición"
+classroom: "Medición"
 version: 1
 
-comun:
+common:
   hosts:
     host1:
-      puerto: 2201
-      usuario: "alumno"
+      port: 2201
+      user: "alumno"
       password_ref: "${AULA_PASSWORD}"
   timeouts:
-    conexion: 10s
-    alumno: 10m
+    connect: 10s
+    student: 10m
 
-alumnos:
+students:
 YAML
     for i in $(seq -w 1 "$n"); do
-      printf -- '  - id: alu%s\n    nombre: "Alumna %s"\n    hosts:\n      host1: { ip: "127.1.2.3", puerto: 2201 }\n' "$i" "$i"
+      printf -- '  - id: alu%s\n    name: "Alumna %s"\n    hosts:\n      host1: { ip: "127.1.2.3", port: 2201 }\n' "$i" "$i"
     done
   } > "$dir/aula.yaml"
 }

@@ -74,11 +74,11 @@ export class ExamRecords {
       return previous
     }
     if (previous?.state === 'ACTIVE') this.pause(previous)
-    const parsed = load(exam) as { examen?: string } | null
+    const parsed = load(exam) as { exam?: string } | null
     const record: ExamRecord = {
       version: 1, id: randomUUID(), examPath: resolve(examPath), classId: group.id, className: group.name,
       roster: group.students.map(student => ({ id: student.id, name: student.name, moodleId: student.contact })),
-      title: typeof parsed?.examen === 'string' && parsed.examen.trim() ? parsed.examen : basename(dirname(examPath)), createdAt: new Date(Math.max(Date.now(), previous ? Date.parse(previous.createdAt) + 1 : 0)).toISOString(), state: 'ACTIVE',
+      title: typeof parsed?.exam === 'string' && parsed.exam.trim() ? parsed.exam : basename(dirname(examPath)), createdAt: new Date(Math.max(Date.now(), previous ? Date.parse(previous.createdAt) + 1 : 0)).toISOString(), state: 'ACTIVE',
       passMark, examHash: digest(exam), inventoryHash: digest(inventory), inventoryName: aulaFileName(group), rounds: [], delivery: {}
     }
     // Save non-secret definitions once, for reproducible final delivery after edits.
