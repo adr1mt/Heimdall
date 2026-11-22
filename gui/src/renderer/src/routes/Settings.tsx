@@ -167,7 +167,6 @@ export default function SettingsView() {
         <section className="max-w-2xl">
           <SectionTitle>{t.settings.aboutSection}</SectionTitle>
           <p className="text-sm text-muted-foreground">{t.settings.about}</p>
-          <p className="mt-2 text-xs text-muted-foreground">{t.settings.author}</p>
         </section>
       </div>
 

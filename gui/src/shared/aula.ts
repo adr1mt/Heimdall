@@ -27,7 +27,7 @@ export const GENERATED_MARK = '# Generado por Heimdall. No editar:'
 /**
  * The file name of a class's classroom, always the same for the same class.
  *
- * It hangs off the identifier and not the name: the teacher can rename «2SMX
+ * It hangs off the identifier and not the name: the teacher can rename «Grupo
  * A» and the file stays the one it was, instead of leaving a stray copy
  * behind at every rename.
  */

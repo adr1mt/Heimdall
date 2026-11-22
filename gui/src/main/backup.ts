@@ -46,7 +46,7 @@ export function backupsRoot(dataDir: string): string {
 /**
  * The folder of one exam's copies. Named after the exam's folder so it can be
  * recognised by hand, and closed with a digest of the full path so two
- * «2smx-redes» in different places never share a slot.
+ * «group-a» in different places never share a slot.
  */
 export function slotFor(dataDir: string, examPath: string): string {
   const dir = varDirOf(examPath)

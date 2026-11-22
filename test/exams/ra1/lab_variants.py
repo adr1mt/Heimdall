@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import yaml
 
-source = Path('/work/internal/probe/ra1.py').read_text()
+source = Path('/work/exams/ra1-dhcp-kea/checker.py').read_text()
 kea = Path('/etc/kea/kea-dhcp4.conf')
 nft = Path('/etc/nftables.conf')
 original_kea, original_nft = kea.read_text(), nft.read_text()

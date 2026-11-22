@@ -291,29 +291,16 @@ Cuando todo pasa, el PLAN publica: número de comprobaciones, peso total, hash
 del examen, hash del inventario y lista de alumnos. Ese número es el que la GUI
 ya no tendrá que adivinar (`c14-check`).
 
-## Comprobador cerrado del examen RA1 (ADR-0036)
+## Comprobadores externos del profesor
 
-`checker:` es alternativa a `cmd:` y `value:`. Su lista contiene exactamente
-seis textos: `ra1-dhcp`, SHA-256 de la revisión del programa fijo del motor,
-criterio conocido, interfaz externa, interfaz interna e IP de examen. No hay
-código del profesor, rutas de scripts ni expresiones en ese campo. El examen
-mantenido en [exams/ra1-dhcp-kea](../../exams/ra1-dhcp-kea/README.md) contiene la
-revisión correcta. El PLAN rechaza otra revisión antes de abrir conexiones.
+Un examen puede usar `checker: [perfil, revisión, criterio, ...argumentos]`.
+El profesor instala el perfil por separado. La revisión es el SHA-256 del
+programa. El motor comprueba el perfil, la huella, el criterio y el número de
+argumentos antes de abrir conexiones. Los argumentos admiten las referencias
+habituales del examen. La ejecución conserva los límites de tiempo y permisos
+de la comprobación.
 
-Se aplican `on:`, `sudo:`, `weight:` y `timeout:` como en un comando. Las tres
-últimas posiciones permiten las referencias habituales del alumnado y hosts.
-La aserción es obligatoriamente `equals: OK`; una respuesta académica del
-programa es OK o FAIL. Cualquier otra respuesta, dependencia o permiso ausente
-es un error técnico sin nota final, no un suspenso. Los comandos ordinarios
-conservan sus reglas, sin códigos de salida técnicos añadidos de forma global.
-
-El artefacto registra el perfil, la revisión y argumentos con el identificador
-`heimdall:checker`. Esa revisión identifica el programa incorporado sin
-repetir su fuente por alumno. El informe individual sigue publicando solo la
-descripción y el resultado. El alcance semántico y sus límites están en la
-documentación privada del examen.
-
-T207 amplía únicamente la lista cerrada de criterios con `kea-reserves`:
-comprueba conjuntamente las cuatro parejas MAC/IP del examen. Es una única
-aserción; si falta o es incorrecta alguna reserva, no obtiene el peso del criterio.
-Los criterios individuales históricos siguen disponibles en el programa fijo.
+La aserción es `equals: OK`. Con salida cero, `OK` aprueba y `FAIL` suspende.
+Otra respuesta o un error de ejecución deja el criterio sin evaluar. El
+resultado registra perfil, huella y argumentos para identificar lo ejecutado.
+El formato de instalación figura en [ADR-0043](../adr/0043-aplicacion-generica.md).

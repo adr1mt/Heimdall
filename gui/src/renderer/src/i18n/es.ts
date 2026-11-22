@@ -104,7 +104,7 @@ export const t = {
     groups: 'Grupos de comprobaciones',
     addGroup: 'Añadir grupo',
     groupName: 'Nombre del grupo',
-    groupPlaceholder: 'Red y DHCP',
+    groupPlaceholder: 'Sistema',
     removeGroup: (name: string) => `Quitar el grupo «${name}»`,
     removeGroupTitle: (name: string) => `¿Quitar el grupo «${name}»?`,
     removeGroupBody: 'Se quitan también sus comprobaciones. Las correcciones ya guardadas no se tocan.',
@@ -116,7 +116,7 @@ export const t = {
     checkId: 'Identificador',
     checkIdHint: 'Lo que compara dos correcciones del mismo examen. No se cambia a mitad de curso.',
     checkDescription: 'Qué se comprueba',
-    checkDescriptionPlaceholder: 'El servicio kea-dhcp4 está activo',
+    checkDescriptionPlaceholder: 'El sistema es Linux',
     where: 'Dónde',
     onHost: 'En una máquina, con un comando',
     onValue: 'Sobre un dato del alumno, sin comando',
@@ -124,7 +124,7 @@ export const t = {
     command: 'Comando',
     commandHint:
       'El comando y sus argumentos, separados por espacios. No hay intérprete: un ; o un | son un argumento más. Entre comillas lo que lleve espacios.',
-    commandPlaceholder: 'systemctl is-active kea-dhcp4-server',
+    commandPlaceholder: 'uname -s',
     value: 'Dato del alumno',
     valueHint: 'De la clase, por ejemplo ${student.p1}.',
     assertion: 'Qué se espera',
@@ -207,7 +207,7 @@ export const t = {
     removeBody:
       'Se borra la lista de alumnos de esta clase. Las correcciones ya guardadas y sus notas no se tocan.',
     nameLabel: 'Nombre de la clase',
-    namePlaceholder: '2SMX A',
+    namePlaceholder: 'Grupo A',
     students: 'Alumnos',
     addStudent: 'Añadir alumno',
     removeStudent: 'Quitar este alumno',
@@ -518,7 +518,6 @@ export const t = {
     aboutSection: 'Acerca de',
     about:
       'Heimdall corrige prácticas de sistemas y redes conectándose por SSH a las máquinas del alumnado.',
-    author: 'Adrià Muñoz · Institut El Puig'
   },
   help: {
     title: 'Ayuda',

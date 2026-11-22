@@ -100,7 +100,7 @@ async function summarise(
       status: run.status,
       exam: baseName(run.exam?.path),
       // The class by its name, never «aula-heimdall-<id>.yaml»: the teacher
-      // corrected «2SMX A», and the file is an artifact of ours (ADR-0022).
+      // corrected «Grupo A», and the file is an artifact of ours (ADR-0022).
       classroom: classNameOf(baseName(run.inventory?.path), classes),
       students: run.students.length,
       checks: run.plan.check_count,

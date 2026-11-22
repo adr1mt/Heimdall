@@ -3,8 +3,7 @@ package engine
 import (
 	"context"
 	"heimdall/internal/model"
-	"heimdall/internal/probe"
-	"strings"
+
 	"testing"
 	"time"
 )
@@ -26,10 +25,11 @@ func TestProbeTechnicalFailuresNeverBecomeGrades(t *testing.T) {
 			c.Probe = true
 			c.Contains = nil
 			c.Equals = str("OK")
-			c.Cmd = []string{"heimdall:checker", "ra1-dhcp", probe.Revision(), "kea-reserva-mail", "wan0", "lan0", "192.168.236.60"}
+			c.Program = "print('OK')"
+			c.Cmd = []string{"heimdall:checker", "example", "revision", "criterion"}
 			sess := &fakeSession{run: func(_ context.Context, argv []string, _ time.Duration) *model.ExecutionResult {
 				if argv[0] == "python3" {
-					if argv[1] != "-I" || !strings.Contains(argv[3], "def evaluate") || argv[4] != "kea-reserva-mail" {
+					if argv[1] != "-I" || argv[3] != c.Program || argv[4] != "criterion" {
 						t.Fatal("wrong fixed program or args")
 					}
 					out := okExec(tc.output)

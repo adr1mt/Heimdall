@@ -1,80 +1,80 @@
-// Package probe owns the fixed, versioned RA1 checker (ADR-0036). It never
-// executes locally. The only remote program is embedded at build time; the
-// declarative exam supplies a known criterion and three literal arguments.
+// Package probe resolves teacher-installed checkers before any SSH connection.
 package probe
 
 import (
 	"crypto/sha256"
-	_ "embed"
+	"encoding/json"
 	"fmt"
-	"strings"
+	"os"
+	"path/filepath"
+	"regexp"
+	"slices"
 )
 
-//go:embed ra1.py
-var source string
+var profileName = regexp.MustCompile(`^[a-z0-9][a-z0-9_-]{0,63}$`)
+var revisionID = regexp.MustCompile(`^[0-9a-f]{64}$`)
 
-func Revision() string { return fmt.Sprintf("%x", sha256.Sum256([]byte(source))) }
-
-// RA1 v2 differs only in its required DHCP DNS. Keep the original program and
-// its revision intact so existing exams still grade against their own rubric.
-const originalDNS = "return option(root, parent, subnet, 'domain-name-servers', 6) == ['9.9.9.9']"
-const v2DNS = "return option(root, parent, subnet, 'domain-name-servers', 6) == ['8.8.8.8']"
-
-var sourceV2 = strings.Replace(source, originalDNS, v2DNS, 1)
-
-func RevisionV2() string { return fmt.Sprintf("%x", sha256.Sum256([]byte(sourceV2))) }
-
-func sourceForRevision(revision string) (string, bool) {
-	switch revision {
-	case Revision():
-		return source, true
-	case RevisionV2():
-		return sourceV2, true
-	default:
-		return "", false
-	}
+type profile struct {
+	Arguments int      `json:"arguments"`
+	Criteria  []string `json:"criteria"`
+	source    string
 }
 
-var criteria = map[string]bool{}
+// Registry is scoped to one plan. Each revision is read once and its verified
+// bytes stay with that plan throughout execution.
+type Registry map[string]*profile
 
-func init() {
-	for _, id := range []string{
-		"net-externa-ip", "net-externa-estatica", "net-externa-netplan", "net-externa-gw", "net-externa-dns",
-		"net-interna-ip", "net-interna-netplan", "net-interna-sense-gw", "net-sortida", "net-resolucio",
-		"kea-interficie", "kea-subxarxa", "kea-rang-inici", "kea-rang-final", "kea-porta-enllac", "kea-dns",
-		"kea-reserva-mail", "kea-reserva-web", "kea-reserva-impressora1", "kea-reserva-impressora2", "kea-actiu",
-		"kea-reserves",
-		"fwd-actiu", "fwd-persistent", "nft-anada", "nft-retorn", "nft-masquerade", "nft-carregat-masquerade",
-		"nft-carregat-anada", "nft-actiu", "nft-habilitat", "client-concessio",
-	} {
-		criteria[id] = true
+func (r Registry) Resolve(args []string) (string, error) {
+	if len(args) < 3 || !profileName.MatchString(args[0]) || !revisionID.MatchString(args[1]) {
+		return "", fmt.Errorf("checker requiere un perfil, una revisión SHA-256 y un criterio")
 	}
-}
-
-func Validate(args []string) error {
-	if len(args) != 6 || args[0] != "ra1-dhcp" {
-		return fmt.Errorf("checker: se esperan [ra1-dhcp, revisión, criterio, interfaz externa, interfaz interna, IP de examen]")
+	key := filepath.Join(args[0], args[1])
+	p := r[key]
+	if p == nil {
+		var err error
+		p, err = loadProfile(key, args[1])
+		if err != nil {
+			return "", err
+		}
+		r[key] = p
 	}
-	if _, ok := sourceForRevision(args[1]); !ok {
-		return fmt.Errorf("checker: esta revisión requiere otra compilación de Heimdall; no se ejecutará ni calificará")
+	if len(args)-3 != p.Arguments || !slices.Contains(p.Criteria, args[2]) {
+		return "", fmt.Errorf("criterio o número de argumentos inválido para el perfil %s", args[0])
 	}
-	if !criteria[args[2]] {
-		return fmt.Errorf("checker: criterio desconocido %q", args[2])
-	}
-	for _, arg := range args[3:] {
-		if arg == "" {
-			return fmt.Errorf("checker: faltan datos de interfaces o IP")
+	for _, v := range args[3:] {
+		if v == "" {
+			return "", fmt.Errorf("checker: argumento vacío")
 		}
 	}
-	return nil
+	return p.source, nil
 }
 
-// Command is called only after full PLAN validation and substitution. -I
-// prevents student-controlled Python modules, PYTHONPATH and user site hooks.
-func Command(args []string) []string {
-	program, ok := sourceForRevision(args[1])
-	if !ok {
-		return nil
+func loadProfile(key, revision string) (*profile, error) {
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		return nil, err
 	}
-	return append([]string{"python3", "-I", "-c", program}, args[2:]...)
+	// Only explicitly installed profiles can be selected by a portable exam.
+	root, err := os.OpenRoot(filepath.Join(dir, "heimdall", "checkers"))
+	if err != nil {
+		return nil, fmt.Errorf("no se puede abrir el directorio de comprobadores instalados: %w", err)
+	}
+	defer root.Close()
+	spec, err := root.ReadFile(filepath.Join(key, "criteria.json"))
+	if err != nil {
+		return nil, fmt.Errorf("no se puede leer el perfil instalado %s: %w", key, err)
+	}
+	p := &profile{Arguments: -1}
+	if err := json.Unmarshal(spec, p); err != nil || p.Arguments < 0 || len(p.Criteria) == 0 {
+		return nil, fmt.Errorf("descripción inválida del perfil %s", key)
+	}
+	source, err := root.ReadFile(filepath.Join(key, "checker.py"))
+	if err != nil {
+		return nil, fmt.Errorf("no se puede leer el comprobador %s: %w", key, err)
+	}
+	if fmt.Sprintf("%x", sha256.Sum256(source)) != revision {
+		return nil, fmt.Errorf("el contenido del comprobador %s no coincide con su revisión", key)
+	}
+	p.source = string(source)
+	return p, nil
 }

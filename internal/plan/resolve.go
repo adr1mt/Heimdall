@@ -90,10 +90,11 @@ type ResolvedCheck struct {
 	Host   string // logical host, empty for a check without a command
 	Target Host   // where to connect, empty for a check without a command
 
-	Cmd   []string
-	Probe bool
-	Value string
-	Sudo  bool // run Cmd through sudo with the host's password (ADR-0032)
+	Cmd     []string
+	Probe   bool
+	Program string `json:"-"`
+	Value   string
+	Sudo    bool // run Cmd through sudo with the host's password (ADR-0032)
 
 	Contains    *string
 	NotContains *string
@@ -216,11 +217,11 @@ func validateExam(exam *Exam, errs *[]error) []Check {
 	}
 
 	var checks []Check
+	installed := probe.Registry{}
 	seen := map[string]int{}
 
 	for _, group := range exam.Groups {
 		for _, check := range group.Checks {
-			checks = append(checks, check)
 			if err := validateCheckReferences(check, declared); err != nil {
 				*errs = append(*errs, errf(check.Line, "%s", err))
 			}
@@ -250,13 +251,16 @@ func validateExam(exam *Exam, errs *[]error) []Check {
 				if len(check.Cmd) > 0 {
 					*errs = append(*errs, errf(check.Line, "checker y cmd no pueden aparecer juntos"))
 				}
-				if err := probe.Validate(check.Probe); err != nil {
+				program, err := installed.Resolve(check.Probe)
+				check.program = program
+				if err != nil {
 					*errs = append(*errs, errf(check.Line, "%s", err))
 				}
 				if check.Equals == nil || *check.Equals != "OK" {
 					*errs = append(*errs, errf(check.Line, "checker requiere equals: OK"))
 				}
 			}
+			checks = append(checks, check)
 			switch {
 			case hasCmd && check.Value != "":
 				*errs = append(*errs, errf(check.Line,
@@ -496,6 +500,7 @@ func resolveCheck(check Check, sc scope, exam *Exam) (ResolvedCheck, error) {
 		ExitCode:    check.ExitCode,
 		Sudo:        check.Sudo != nil && *check.Sudo,
 		Probe:       len(check.Probe) > 0,
+		Program:     check.program,
 	}
 	out.Group = groupOf(exam, check.ID)
 	if check.On != "" {

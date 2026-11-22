@@ -53,3 +53,5 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 - [ADR-0040 · Pausa explícita y lista final de notas](0040-pausa-explicita-y-lista-final.md).
 
 - [ADR-0041 · Dependencias mantenidas y empaquetado Linux verificable](0041-dependencias-y-empaquetado-mantenidos.md).
+
+- [ADR-0043 · Aplicación genérica y criterios propios del examen](0043-aplicacion-generica.md).

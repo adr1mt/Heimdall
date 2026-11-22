@@ -32,7 +32,7 @@ export interface ClassStudent {
 export interface ClassGroup {
   /** Stable internal identifier. The teacher never sees it. */
   id: string
-  /** The logical name, e.g. «2SMX A». */
+  /** The logical name, e.g. «Grupo A». */
   name: string
   /**
    * The teacher's own columns, in the order they are shown.
@@ -197,7 +197,7 @@ export function problemWith(group: ClassGroup, others: ClassGroup[]): string | n
   return null
 }
 
-/** «2SMX A · 15 alumnos», the one line that says which class is chosen. */
+/** «Grupo A · 15 alumnos», the one line that says which class is chosen. */
 export function groupLine(group: ClassGroup): string {
   const count = group.students.length
   return `${group.name} · ${count === 1 ? '1 alumno' : `${count} alumnos`}`

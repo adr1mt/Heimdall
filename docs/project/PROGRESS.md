@@ -3,8 +3,8 @@
 **Actualizado**: 2026-11-22 · **Fase**: 9 — Endurecimiento y publicación
 
 ## Última sesión
-**T228:** búsqueda manual y reintento de actualizaciones publicados en 1.0.2.
-[Evidencia](../reviews/evidence/T228/RESULTADOS.md). Integrados con el zoom local (T235).
+**Aplicación genérica:** los dos perfiles RA1 se instalan aparte. [Decisión](../adr/0043-aplicacion-generica.md).
+**T228:** actualizaciones publicadas en 1.0.2. [Evidencia](../reviews/evidence/T228/RESULTADOS.md).
 **T229:** YAML de examen e inventario en inglés. Las clases antiguas conservan sus columnas propias.
 El editor permite renombrar las que coinciden con claves del aula antes de corregir.
 Auditoría: 671 pruebas GUI correctas; guías de descarga y desarrollo identificadas.

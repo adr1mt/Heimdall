@@ -35,11 +35,10 @@ No distribuir este directorio como material de examen.
 
 ## Cómo se corrige
 
-`checker:` identifica un programa fijo incluido en el motor por su SHA-256.
-No contiene Python escrito por el profesor. Una versión incompatible del motor
-rechaza el examen antes de conectar: no permite una corrección parcial accidental.
-Se necesita esta compilación local de Heimdall; no basta con editar el YAML en
-la versión pública anterior.
+Este directorio conserva el programa y los criterios de la práctica. Desde
+la raíz de este repositorio, el profesor puede instalar ambos perfiles de RA1
+en su cuenta con `sh exams/install-ra1-checkers.sh`. La instalación es local
+al equipo del profesor. El examen selecciona la revisión por su SHA-256.
 
 Los argumentos externos siguen siendo las columnas `if_ext`, `if_int` y la IP
 SSH de `host1`. No se cambian las clases ni sus contraseñas. Todos los criterios
@@ -76,12 +75,12 @@ examen no crea espacios de red de prueba al corregir.
 
 ## Mantenimiento y validación
 
-Programa: [ra1.py](../../internal/probe/ra1.py).
+Programa: [checker.py](checker.py).
 Decisión: [ADR-0036](../../docs/adr/0036-comprobador-acotado-ra1.md).
 Pruebas: [test/exams/ra1](../../test/exams/ra1).
 
 Cuando cambie el programa, hay que actualizar en todos los criterios del YAML
-su SHA-256 y volver a compilar el motor. Se mantienen los IDs para auditoría,
+su SHA-256 e instalar esa revisión del perfil. Se mantienen los IDs para auditoría,
 pero el hash del PLAN cambia: no consolidar correcciones del examen anterior
 como si fueran de los mismos criterios.
 

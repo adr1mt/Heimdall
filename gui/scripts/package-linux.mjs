@@ -59,7 +59,7 @@ try {
     platform: 'linux', arch: 'x64', electronVersion: pkg.devDependencies.electron,
     appVersion: pkg.version, appBundleId: 'net.xeill.elpuig.heimdall',
     asar: true, overwrite: true,
-    ignore: [/^\/(src|scripts|tests|build|dist)(\/|$)/, /^\/(tsconfig.*|.*\.config\..*|README\.md|\.npmrc)$/],
+    ignore: [/^\/(?!out(?:\/|$)|node_modules(?:\/|$)|package\.json$)/],
     extraResource: [join(repo, 'bin/heimdall'), join(root, 'build/icon.png')]
   })
   await rm(unpacked, { recursive: true, force: true })

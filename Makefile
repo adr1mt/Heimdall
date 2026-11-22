@@ -23,6 +23,7 @@ tools-check:
 ## ra1-check: semantic checker regressions, without SSH or classroom data.
 .PHONY: ra1-check
 ra1-check:
+	$(GO) test -tags=examtest ./test/exams/ra1
 	$(PYTHON) -B -m unittest discover -s test/exams/ra1 -p 'test_*.py'
 
 ## check: fast suite. No network, no disk. Must stay under 10 s.
@@ -50,7 +51,7 @@ rendimiento: build
 
 ## build: single binary in bin/heimdall, stamped with VERSION.
 build:
-	$(GO) build -ldflags "-X main.version=$(VERSION)" -o $(BIN) ./cmd/heimdall
+	$(GO) build -trimpath -ldflags "-X main.version=$(VERSION)" -o $(BIN) ./cmd/heimdall
 
 ## version: what engine and application say they are.
 version: build

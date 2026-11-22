@@ -15,7 +15,7 @@ import type { RecentProject } from '../../../shared/types'
  * teacher recognises is the name they gave the exam.
  *
  * Correcting is the next step and lives in «Corregir», with the class: the
- * same exam is corrected with 2SMX C and with 2SMX D and belongs to neither.
+ * same exam is corrected with group A and with group B and belongs to neither.
  */
 export default function HomeView() {
   const setProject = useApp((s) => s.setProject)
@@ -189,7 +189,7 @@ async function stopCorrection(): Promise<void> {
 
 /**
  * One exam in the list, by the name the teacher gave it. The folder it lives
- * in is not on screen: a path is what the computer needs, and «/home/…/2smx/
+ * in is not on screen: a path is what the computer needs, and «/home/…/class/
  * examen.yaml» in front of a class says nothing about which exam it is.
  */
 function RecentRow({

@@ -25,9 +25,9 @@ No se consulta el valor activo, no se reinicia y no se corrige NAT ni nftables.
 Se admiten los archivos sysctl que se aplican al arranque, respetando precedencia.
 
 La revisión fija `cc653e10b6087ad31ce72344a361f53599376188cfef6aea560d67f2fb8f9811`
-difiere del corrector original únicamente en el DNS DHCP esperado. El motor
-conserva ambas revisiones, seleccionadas por su huella; el examen original y
-su corrector siguen intactos. Un motor anterior rechaza v2 antes de conectar.
+difiere del corrector original únicamente en el DNS DHCP esperado. Cada examen lleva su propio `checker.py`.
+Desde la raíz del repositorio, `sh exams/install-ra1-checkers.sh` instala ambos
+perfiles en la cuenta del profesor. El examen selecciona el suyo por su huella.
 Los argumentos siguen siendo `if_ext`, `if_int` e IP de `host1` de la clase.
 
 Los límites de lectura de Netplan/Kea y de configuración declarada frente a

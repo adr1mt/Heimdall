@@ -118,8 +118,7 @@ export default function HelpView() {
               operadores de shell. Usa espacios para indentar, no tabuladores.
             </p>
             <p>
-              Si un fichero o un comando solo lo puede leer el administrador (por ejemplo{' '}
-              <code>/etc/kea</code> o <code>nft list ruleset</code>), añade{' '}
+              Si la comprobación requiere permisos de administrador, añade{' '}
               <code>sudo: true</code> a la comprobación, o a <code>defaults</code> para todas.
               Heimdall usa la contraseña de la clase; nunca la escribas en el examen. Si la máquina
               no la acepta, la comprobación queda sin evaluar, no suspendida.

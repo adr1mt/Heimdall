@@ -120,7 +120,7 @@ agrupadas. Cada una dice en qué máquina se ejecuta, qué **comando** se lanza 
 qué tiene que aparecer en lo que contesta.
 
 ```yaml
-exam: "RA1 · Servidor DHCP con KEA"
+exam: "Sistema Linux"
 version: 1
 hosts: [host1]
 
@@ -129,21 +129,20 @@ defaults:
   timeout: 20s
 
 groups:
-  - group: "KEA"
+  - group: "Sistema"
     checks:
-      - id: kea-subred
-        description: "KEA declara la subred 10.0.0.0/8"
+      - id: sistema
+        description: "El sistema es Linux"
         on: host1
-        sudo: true          # /etc/kea solo lo lee el administrador
-        cmd: ["cat", "/etc/kea/kea-dhcp4.conf"]
-        near: { anchor: '"subnet"', lines: 0, contains: "10.0.0.0/8" }
+        cmd: ["uname", "-s"]
+        equals: "Linux"
 
-      - id: kea-activo
-        description: "El servicio kea-dhcp4-server está activo"
+      - id: directorio
+        description: "Existe el directorio de la práctica"
         on: host1
         weight: 2
-        cmd: ["systemctl", "is-active", "kea-dhcp4-server"]
-        equals: "active"
+        cmd: ["test", "-d", "/srv/practica"]
+        exit_code: 0
 ```
 
 Lo que hay que saber:
@@ -162,7 +161,7 @@ Lo que hay que saber:
   | `near: { anchor, lines, contains }` | contiene el texto como mucho N líneas después de la línea que tiene el ancla (como `grep -A N`) |
 
 - `sudo: true` ejecuta el comando como administrador, para lo que el usuario de
-  la conexión no puede leer (`/etc/kea` en Ubuntu 26.04, `nft list ruleset`).
+  la conexión no puede leer (por ejemplo, un directorio privado de la práctica).
   Usa la contraseña de la clase, la misma de la conexión: nunca la escribas en
   el examen. Va en la comprobación o en `defaults` para todas. Si la
   máquina no la acepta, la comprobación sale *sin evaluar*, no suspendida.
@@ -199,7 +198,7 @@ groups:
 
 Reglas:
 - cmd es una lista de palabras. Sin tuberías, sin grep, sin ; ni redirecciones.
-- Si el comando necesita ser administrador (leer /etc/kea, nft list ruleset...),
+- Si el comando necesita ser administrador,
   añade sudo: true a esa comprobación. Nunca escribas sudo ni contraseñas en cmd.
 - Aserciones posibles (una por comprobación): contains: "x", not_contains: "x",
   equals: "x", exit_code: 0, o near: { anchor: "x", lines: N, contains: "y" }

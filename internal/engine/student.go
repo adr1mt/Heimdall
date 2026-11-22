@@ -12,7 +12,6 @@ import (
 	"heimdall/internal/assert"
 	"heimdall/internal/model"
 	"heimdall/internal/plan"
-	"heimdall/internal/probe"
 	"heimdall/internal/ssh"
 )
 
@@ -170,7 +169,7 @@ func (r *runner) runCheck(runCtx, studentCtx context.Context, sp plan.StudentPla
 	var refused *ssh.SudoRefused
 	command := c.Cmd
 	if c.Probe {
-		command = probe.Command(c.Cmd[1:])
+		command = append([]string{"python3", "-I", "-c", c.Program}, c.Cmd[3:]...)
 	}
 	if c.Sudo {
 		exec, refused = sess.RunSudo(studentCtx, command, timeout)

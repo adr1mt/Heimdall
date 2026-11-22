@@ -4,7 +4,7 @@ import subprocess
 import sys
 import yaml
 
-source = Path('/work/internal/probe/ra1.py').read_text()
+source = Path('/work/exams/ra1-dhcp-kea/checker.py').read_text()
 exam = yaml.safe_load(Path('/work/exams/ra1-dhcp-kea/examen.yaml').read_text())
 failed = []
 for group in exam['grupos']:

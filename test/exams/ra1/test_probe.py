@@ -9,7 +9,7 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
 
-SPEC = importlib.util.spec_from_file_location('ra1', Path(__file__).resolve().parents[3] / 'internal/probe/ra1.py')
+SPEC = importlib.util.spec_from_file_location('ra1', Path(__file__).resolve().parents[3] / 'exams/ra1-dhcp-kea/checker.py')
 p = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(p)
 
