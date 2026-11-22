@@ -588,6 +588,20 @@ export const t = {
     toDark: 'Tema oscuro'
   },
   update: {
+    section: 'Actualizaciones',
+    check: 'Buscar actualizaciones',
+    installed: (version: string) => `Versión instalada · ${version}`,
+    latest: (version: string) => `Última versión publicada · ${version}`,
+    failed: 'No se pudo comprobar si hay actualizaciones.',
+    status: {
+      idle: '',
+      checking: 'Buscando actualizaciones…',
+      busy: 'La búsqueda se reanudará cuando termine la corrección o se pause o finalice el modo examen.',
+      current: 'Tienes la última versión disponible.',
+      ready: '',
+      failed: 'No se pudo comprobar si hay actualizaciones. Puedes volver a intentarlo.',
+      unsupported: 'La búsqueda desde Heimdall está disponible en la edición AppImage.'
+    },
     ready: (version: string): string =>
       `Heimdall ${version} está descargada. Se instalará sola al cerrar la aplicación.`,
     dismiss: 'Cerrar aviso'

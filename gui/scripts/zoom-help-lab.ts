@@ -93,7 +93,7 @@ async function run() {
   await click('El examen')
   await until("!!document.querySelector('.monaco-editor textarea')")
   await click('Comprobaciones disponibles')
-  const out = resolve('../docs/reviews/evidence/T228')
+  const out = resolve('../docs/reviews/evidence/T235')
   mkdirSync(out, { recursive: true })
   for (const width of [1024, 1280]) {
     win.setSize(width, 820)

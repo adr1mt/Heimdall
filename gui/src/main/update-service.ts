@@ -6,14 +6,15 @@
  * tests can drive it. This is only the wiring.
  */
 
-import { app, net, type BrowserWindow } from 'electron'
+import { app, ipcMain, net, type BrowserWindow } from 'electron'
 import { appendFileSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { IPC } from '../shared/ipc'
-import { isExamModeActive, isRunActive } from './ipc'
+import { isUpdateBlocked } from './ipc'
 import { downloadUpdate } from './update-download'
-import { onCorrectionStarting } from './activity'
+import { onCorrectionSettled, onCorrectionStarting } from './activity'
 import { Updater } from './updater'
+import type { UpdateStatus } from '../shared/types'
 
 /**
  * How long after opening the check waits.
@@ -30,6 +31,13 @@ const CHECK_DELAY_MS = 10_000
 const FEED_TIMEOUT_MS = 15_000
 
 let updater: Updater | null = null
+let checkForUpdates: (() => Promise<void>) | null = null
+let status: UpdateStatus
+
+export function registerUpdateIpc(): void {
+  ipcMain.handle(IPC.getUpdateStatus, () => status)
+  ipcMain.handle(IPC.checkForUpdates, () => checkForUpdates?.())
+}
 
 /** Past this the log keeps only its newer half. */
 const LOG_MAX_BYTES = 256 * 1024
@@ -70,18 +78,17 @@ async function fetchText(url: string, signal: AbortSignal): Promise<string> {
   return await response.text()
 }
 
-/**
- * Starts watching for new versions. Never throws and never opens a dialog:
- * the worst that an update can do to a lesson is a line in the log.
- */
+/** Checks at startup and resumes a check deferred by classroom activity. */
 export function startUpdates(win: BrowserWindow): void {
-  updater = new Updater({
-    currentVersion: app.getVersion(),
-    // Only the AppImage replaces itself. A `.deb` is apt's business and
-    // during development there is nothing to update.
-    appImagePath: app.isPackaged ? (process.env['APPIMAGE'] ?? null) : null,
+  const installedVersion = app.getVersion()
+  const appImagePath = app.isPackaged ? (process.env['APPIMAGE'] ?? null) : null
+  status = { installedVersion, latestVersion: null, state: appImagePath ? 'idle' : 'unsupported' }
+
+  const windowUpdater = new Updater({
+    currentVersion: installedVersion,
+    appImagePath,
     downloadDir: join(app.getPath('userData'), 'updates'),
-    busy: () => isRunActive() || isExamModeActive(),
+    busy: isUpdateBlocked,
     fetchText,
     // Keep untrusted HTTP responses out of Node's TLS/HTTP/Brotli stack.
     download: (url, file, signal) => downloadUpdate(url, file, signal, (url, init) => net.fetch(url, init)),
@@ -91,13 +98,51 @@ export function startUpdates(win: BrowserWindow): void {
     },
     log
   })
+  updater = windowUpdater
+  if (!appImagePath) return
 
-  const timer = setTimeout(() => {
-    updater?.check().catch((error) => log(String(error)))
-  }, CHECK_DELAY_MS)
-  // An application closed in the first minute leaves nothing running behind.
+  function publish(state: UpdateStatus['state']): void {
+    status = { installedVersion, latestVersion: windowUpdater.latestVersion, state }
+    if (!win.isDestroyed()) win.webContents.send(IPC.updateStatus, status)
+  }
+
+  let closed = false
+  let inFlight: Promise<void> | null = null
+  function retryIfIdle(): void {
+    if (!closed && status.state === 'busy' && !isUpdateBlocked()) void check()
+  }
+  function check(): Promise<void> {
+    clearTimeout(timer)
+    if (closed) return Promise.resolve()
+    if (inFlight) return inFlight
+    if (isUpdateBlocked()) {
+      publish('busy')
+      return Promise.resolve()
+    }
+    publish('checking')
+    inFlight = windowUpdater.check().then(
+      (outcome) => { if (!closed) publish(outcome) },
+      (error) => {
+        log(String(error))
+        if (!closed) publish('failed')
+      }
+    ).finally(() => {
+      inFlight = null
+      // The correction may have finished while its abort was still settling.
+      retryIfIdle()
+    })
+    return inFlight
+  }
+  const timer = setTimeout(() => void check(), CHECK_DELAY_MS)
   timer.unref?.()
-  win.on('closed', () => clearTimeout(timer))
+  const unsubscribe = onCorrectionSettled(retryIfIdle)
+  checkForUpdates = check
+  win.on('closed', () => {
+    closed = true
+    checkForUpdates = null
+    clearTimeout(timer)
+    unsubscribe()
+  })
 }
 
 /** Installs what was waiting. The application is already on its way out. */

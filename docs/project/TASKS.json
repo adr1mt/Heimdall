@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated": "2026-11-06",
+  "updated": "2026-11-22",
   "status_values": [
     "BLOCKED",
     "READY",
@@ -5324,6 +5324,33 @@
     },
     {
       "id": "T228",
+      "title": "Buscar actualizaciones y reintentar al terminar la actividad de aula",
+      "phase": 9,
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "T227"
+      ],
+      "goal": "Hacer visible el estado de las actualizaciones y retomar las búsquedas aplazadas.",
+      "scope": [
+        "Ajustes, actualizador AppImage y publicación 1.0.2."
+      ],
+      "acceptance": [
+        "Ajustes muestra la versión instalada, la última publicada consultada y el resultado de la búsqueda manual.",
+        "Una corrección o el modo examen interrumpen la búsqueda y la descarga. Se reintenta una vez al quedar libre, incluso si la actividad termina antes de resolverse la cancelación.",
+        "La descarga verificada se instala al cerrar. La versión declarada en el motor, la GUI y el lock es 1.0.2."
+      ],
+      "tests": [
+        "Pruebas del servicio y actualizador, make check gui-check gui-build docs-check tools-check y Release validation."
+      ],
+      "completed": "2026-11-03",
+      "notes": "654 pruebas GUI y validación local de versiones, herramientas, Go y documentación. Evidencia en docs/reviews/evidence/T228/RESULTADOS.md. Validación remota antes de publicar.",
+      "out_of_scope": [
+        "Recuperación de la AppImage anterior y cambios en la corrección."
+      ]
+    },
+    {
+      "id": "T235",
       "title": "Zoom por teclado y ayuda de comprobaciones en el editor",
       "phase": 9,
       "status": "DONE",
@@ -5350,7 +5377,7 @@
         "Arnés Electron scripts/zoom-help-lab.ts con perfil temporal"
       ],
       "completed": "2026-11-05",
-      "notes": "648 pruebas GUI, tipos, build/preload y motor correctos. Pruebas de procesos hijos requieren ejecución fuera del sandbox de Codex. Arnés real con zoom 80–120 %, Ctrl + más/igual/menos/cero, Monaco enfocado, persistencia al recargar, ayuda y borrador conservado; capturas 1024/1280 a 120 %. Evidencia docs/reviews/evidence/T228/RESULTADOS.md. Sin instalación habitual ni publicación. Node disponible 24.22.1; no se ha validado toolchain Node 26 en esta sesión."
+      "notes": "648 pruebas GUI, tipos, build/preload y motor correctos. Pruebas de procesos hijos requieren ejecución fuera del sandbox de Codex. Arnés real con zoom 80–120 %, Ctrl + más/igual/menos/cero, Monaco enfocado, persistencia al recargar, ayuda y borrador conservado; capturas 1024/1280 a 120 %. Evidencia docs/reviews/evidence/T235/RESULTADOS.md. Sin instalación habitual ni publicación. Node disponible 24.22.1; no se ha validado toolchain Node 26 en esta sesión."
     },
     {
       "id": "T229",
@@ -5359,7 +5386,7 @@
       "status": "DONE",
       "priority": "P1",
       "depends_on": [
-        "T228"
+        "T235"
       ],
       "goal": "Usar claves y referencias reservadas en inglés en motor, GUI, plantillas y documentación vigente.",
       "scope": [

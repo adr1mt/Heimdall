@@ -11,6 +11,7 @@ import {
 import { useApp, noticeFrom } from '@/stores/app'
 import { SCALES, scaleOf, toScale, type ScaleId } from '@/lib/scale'
 import { t } from '@/i18n/es'
+import type { UpdateStatus } from '../../../shared/types'
 
 export default function SettingsView() {
   const engine = useApp((s) => s.engine)
@@ -86,6 +87,8 @@ export default function SettingsView() {
             </p>
           )}
         </section>
+
+        <Updates />
 
         {/* The scale is the teacher's: it decides how a grade is written down
             when it leaves the application, and nothing else. */}
@@ -169,5 +172,52 @@ export default function SettingsView() {
       </div>
 
     </div>
+  )
+}
+
+function Updates() {
+  const setNotice = useApp((s) => s.setNotice)
+  const [update, setUpdate] = useState<UpdateStatus | null>(null)
+  useEffect(() => {
+    let active = true
+    let received = false
+    const unsubscribe = window.heimdall.onUpdateStatus((status) => {
+      received = true
+      setUpdate(status)
+    })
+    window.heimdall.getUpdateStatus().then((status) => {
+      if (active && !received) setUpdate(status)
+    }).catch((error) => {
+      if (active) setNotice(noticeFrom(t.update.failed, error))
+    })
+    return () => {
+      active = false
+      unsubscribe()
+    }
+  }, [setNotice])
+
+  if (!update) return null
+  const { installedVersion, latestVersion, state } = update
+  const message = state === 'ready' && latestVersion ? t.update.ready(latestVersion) : t.update.status[state]
+
+  return (
+    <section className="max-w-2xl">
+      <SectionTitle>{t.update.section}</SectionTitle>
+      <div className="flex flex-wrap items-center gap-3">
+        <p className="text-sm">{t.update.installed(installedVersion)}</p>
+        {latestVersion && <p className="text-sm">{t.update.latest(latestVersion)}</p>}
+      </div>
+      {state !== 'unsupported' && (
+        <Button
+          className="mt-3"
+          variant="outline"
+          disabled={state === 'checking' || state === 'busy' || state === 'ready'}
+          onClick={() => void window.heimdall.checkForUpdates().catch((error) => setNotice(noticeFrom(t.update.failed, error)))}
+        >
+          {t.update.check}
+        </Button>
+      )}
+      <p role="status" className="mt-2 text-sm text-muted-foreground">{message}</p>
+    </section>
   )
 }

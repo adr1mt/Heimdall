@@ -1,22 +1,22 @@
 # Estado del proyecto
 
-**Actualizado**: 2026-11-06 · **Fase**: 9 — Endurecimiento y publicación
+**Actualizado**: 2026-11-22 · **Fase**: 9 — Endurecimiento y publicación
 
 ## Última sesión
+**T228:** búsqueda manual y reintento de actualizaciones publicados en 1.0.2.
+[Evidencia](../reviews/evidence/T228/RESULTADOS.md). Integrados con el zoom local (T235).
 **T229:** YAML de examen e inventario en inglés. Editor, ayuda, referencias y
 plantillas actualizados. El motor rechaza claves antiguas antes de corregir.
 662 pruebas GUI, suite del motor y corrección local correctas.
 [Formato y decisión](../adr/0042-yaml-en-ingles.md). Compilado, pendiente de instalación.
-**T228:** zoom y ayuda desde el editor. [Evidencia](../reviews/evidence/T228/RESULTADOS.md).
+**T235:** zoom y ayuda desde el editor. [Evidencia](../reviews/evidence/T235/RESULTADOS.md).
 [Auditoría AutoCheck](../research/AUTOCHECK-2026-11-05.md).
 
 **T227 terminado:** controles de aula simplificados, ocultación compartida y
 preparación de otro examen con histórico conservado; pendiente de instalación.
 
 **T226 instalado y abierto desde el menú de Zorin:** T225 con motor embebido.
-Rutas antiguas reparadas; respaldo privado y clase anterior conservada.
-Demo local de 15 alumnos ficticios, cinco preguntas, 75 comprobaciones correctas.
-Examen/clase seleccionados, sin SSH. [Evidencia](../reviews/evidence/T226/RESULTADOS.md).
+Rutas y clase conservadas. Demo local sin SSH: 15 alumnos ficticios, 75 comprobaciones correctas. [Evidencia](../reviews/evidence/T226/RESULTADOS.md).
 
 **T225 terminado:** dependencias y empaquetado Linux actualizados, sin avisos
 npm; 643 pruebas GUI, motor/SSH y editor real correctos. [Evidencia](../reviews/evidence/T225/RESULTADOS.md).
@@ -56,5 +56,5 @@ por alumno, sin afectar notas por SSH. Exportación CSV/Moodle conservada.
 ## Siguiente trabajo
 
 T230 y T232 READY; T070, T023 y T186 siguen READY. T084 espera aula.
-T223/T224/T225 instalados (T226); T227–T229 compilados, pendientes de instalación.
+T223/T224/T225 instalados (T226); T227, T229 y T235 compilados, pendientes de instalación.
 Sin publicación nueva autorizada.

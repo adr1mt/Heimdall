@@ -1,56 +1,34 @@
-# T228 · Zoom y ayuda de comprobaciones
+# T228 · Búsqueda y reintento de actualizaciones
 
-Fecha: 2026-11-05. Base: `88e5ad6`. Implementación local, sin instalación,
-publicación ni cambios en notas. Propuesta autorizada por el usuario.
+- Ajustes muestra la versión instalada, la última publicada que pudo consultar
+  y el resultado de la búsqueda. La búsqueda manual comparte la descarga con
+  la automática.
+- Si empieza una corrección, se cancela la petición. Se reintenta una vez al
+  terminar la actividad, también si termina antes de completarse la
+  cancelación. Durante el modo examen se espera a pausarlo o finalizarlo.
+- La descarga sigue verificándose antes de sustituir la AppImage al cerrar.
+- Validación local del cambio con 654 pruebas GUI, tipos, Go, herramientas,
+  documentación y coherencia de versión.
+- Como evidencia de aula previa se comprobaron copias locales de correcciones
+  RA1 del curso con 14 notas completas en un solo recorrido. Esta evidencia
+  corresponde a una compilación anterior. Se conserva en el equipo del
+  profesor y el repositorio solo recoge el recuento.
+- La auditoría de la primera candidata detectó avisos nuevos en las
+  dependencias de empaquetado glob y minimatch. Se fijaron las versiones
+  corregidas 14.0.3 y 11.0.4 para @electron/asar. La auditoría de npm vuelve a
+  dar cero vulnerabilidades y cero dependencias obsoletas.
+  [Glob](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4) · [Minimatch](https://github.com/advisories/GHSA-g3hv-75wg-m249)
 
-## Resultado
+## Publicación
 
-- Ctrl + más (también igual), menos y cero controlan la escala guardada entre
-  80 y 120 %. El selector existente de Resultados usa el mismo estado.
-- Escala CSS completa, incluido Monaco, en lugar de cambiar solo la fuente
-  raíz. El menú nativo no aplica un segundo zoom a estos atajos.
-- Panel «Comprobaciones disponibles» en el editor y sección equivalente en el
-  manual. Describe las cinco aserciones, ejemplos, normalización, stdout,
-  texto literal, una aserción por comprobación y ausencia segura.
-- El panel conserva el borrador y no escribe el examen.
-- Auditoría AutoCheck conservada en `docs/research/AUTOCHECK-2026-11-05.md`;
-  siguientes fases autorizadas T229–T234 en TASKS, aún sin implementar.
-
-## Verificación
-
-- `GOCACHE=/tmp/heimdall-go-cache make check`: correcto.
-- `npm run typecheck`: correcto.
-- `npm test -- --maxWorkers=2`: 47 archivos, 648 pruebas correctas fuera del
-  sandbox. Dentro del sandbox fallaron cuatro pruebas de procesos hijos
-  (backup-recovery y shutdown) por timeout; repetir con menos trabajadores no
-  lo corrigió. No se modificaron pruebas ni sus límites.
-- `make gui-build`: compilación y verificación de preload correctas.
-- `make docs-check tools-check`: enlaces correctos y 11 pruebas de herramientas.
-- Arnés `gui/scripts/zoom-help-lab.ts`: proceso principal real, menú nativo,
-  preload, renderer y Monaco con perfil/examen temporales. Verifica atajos con
-  foco real de edición, extremos 80/120, reset, ausencia de zoom nativo doble,
-  persistencia tras recarga, cinco aserciones, borrador y fuente conservados.
-  Sin SSH ni alumnado real. El primer intento del arnés necesitó corregir su
-  simulación de foco/pegado; el segundo completó todos los criterios.
-- Capturas inspeccionadas a 120 % en ventanas de 1024 y 1280 px.
-
-![Editor y ayuda a 1024 px](editor-1024.png)
-
-## Repetir el arnés
-
-Desde `gui/`, después de compilar:
-
-```bash
-node_modules/.bin/esbuild scripts/zoom-help-lab.ts --bundle --platform=node --format=cjs --outfile=out/main/zoom-help-lab.cjs --external:electron
-node_modules/electron/dist/electron out/main/zoom-help-lab.cjs --no-sandbox
-```
-
-Electron no arranca dentro del sandbox de herramientas de Codex: falla con
-`sandbox_host_linux.cc: Operation not permitted`. El arnés se ejecutó fuera
-de ese aislamiento; `--no-sandbox` solo pertenece a esta prueba local.
-
-Node disponible en esta sesión: 24.22.1; la toolchain Node 26 documentada no
-se ha reproducido. No se ha instalado el paquete habitual ni realizado una
-corrección de aula. El teclado numérico comparte las teclas lógicas admitidas,
-pero no se ha probado un teclado físico numérico. El proyector conserva su
-escala propia y sus pruebas existentes; no se repitió un laboratorio de aula.
+- La versión 1.0.2 se publicó el 3 de noviembre de 2026. La etiqueta apunta a
+  `739e3df723167eaaf91da236c16ebc79069bea66`. La AppImage, el paquete Debian
+  y SHA256SUMS publicados coinciden con los archivos verificados.
+  [Publicación](https://github.com/adr1mt/Heimdall/releases/tag/v1.0.2)
+- Checks y Release validation pasaron para esa revisión, incluidos los
+  laboratorios SSH, la auditoría y las pruebas de los paquetes.
+  [Checks](https://github.com/adr1mt/Heimdall/actions/runs/41670807603) · [Release validation](https://github.com/adr1mt/Heimdall/actions/runs/41670807266)
+- La AppImage 1.0.2 mostró la versión en Ajustes y reintentó la búsqueda al
+  desactivar el modo examen. Una copia temporal de la AppImage 1.0.1 descargó
+  la versión pública y la instaló al cerrar. Su SHA-256 coincidió con el
+  de la publicación. El motor de 1.0.2 superó las tres comprobaciones de DEMO en Isard.

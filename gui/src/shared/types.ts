@@ -95,7 +95,16 @@ export interface ExamCheck {
   message: string
 }
 
+export interface UpdateStatus {
+  installedVersion: string
+  latestVersion: string | null
+  state: 'unsupported' | 'idle' | 'checking' | 'busy' | 'current' | 'ready' | 'failed'
+}
+
 export interface HeimdallApi {
+  getUpdateStatus: () => Promise<UpdateStatus>
+  checkForUpdates: () => Promise<void>
+  onUpdateStatus: (listener: (status: UpdateStatus) => void) => () => void
   detectEngine: () => Promise<EngineStatus>
   getEnginePath: () => Promise<string>
   setEnginePath: (path: string) => Promise<EngineStatus>
