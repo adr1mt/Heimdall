@@ -7,6 +7,7 @@ import { scoreView } from '@/lib/results'
 import { pauseExam, resumeExam, prepareAnotherExam } from '@/lib/exam-actions'
 import { savedExamCsv, savedExamCsvName, savedExamRows } from '@/lib/export'
 import { MoodleExportButton } from './MoodleExport'
+import { ExportFinalReports } from './ExportFinalReports'
 import { ReportAccessHelp } from './ReportAccessHelp'
 import type { SavedExam } from '../../../shared/exam-record'
 
@@ -61,6 +62,7 @@ export function FinalGrades({ saved }: { saved: SavedExam }) {
   return <div className="flex h-full flex-col" data-testid="final-grades">
     <ViewHeader title="Notas finales" actions={<>
       <Button size="sm" variant="outline" onClick={prepareAnotherExam}>Preparar otro examen</Button>
+      <ExportFinalReports key={saved.record.id} record={saved.record} />
       <FinalReports />
       <Button size="sm" variant="outline" onClick={() => setExporting(true)}>Exportar notas</Button>
     </>} />

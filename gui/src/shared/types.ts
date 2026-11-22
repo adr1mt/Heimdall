@@ -163,6 +163,8 @@ export interface HeimdallApi {
   savedExam: (examPath: string, classId: string, id?: string) => Promise<SavedExam | null>
   examRecords: (examPath: string, classId: string) => Promise<ExamRecord[]>
   finishExam: (examPath: string, classId: string, passMark?: number, id?: string) => Promise<SavedExam>
+  moodleParticipants: () => Promise<{ id: string; name: string }[] | null>
+  exportFinalReports: (path: string, classId: string, id: string, scale: string, mapping?: Record<string, string>) => Promise<import('./exam-record').ReportExport | null>
   sendFinalReports: (examPath: string, classId: string, id: string, scale: { id: 'ten' | 'hundred'; passMark: number }) => Promise<Delivery>
   /** The past runs of the project the exam belongs to, newest first. */
   listRuns: (examPath: string) => Promise<RunSummary[]>

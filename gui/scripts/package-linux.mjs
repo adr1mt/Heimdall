@@ -111,7 +111,7 @@ Maintainer: Adria Munoz <adriamt@elpuig.xeill.net>
 Section: education
 Priority: optional
 Homepage: ${pkg.homepage}
-Depends: libgtk-3-0 | libgtk-3-0t64, libnotify4, xdg-utils, libnss3, libasound2 | libasound2t64, libgbm1, libxss1, libxtst6, libatk-bridge2.0-0 | libatk-bridge2.0-0t64, libdrm2, libxkbcommon0, libx11-xcb1, libxcb-dri3-0, libsecret-1-0
+Depends: python3, libgtk-3-0 | libgtk-3-0t64, libnotify4, xdg-utils, libnss3, libasound2 | libasound2t64, libgbm1, libxss1, libxtst6, libatk-bridge2.0-0 | libatk-bridge2.0-0t64, libdrm2, libxkbcommon0, libx11-xcb1, libxcb-dri3-0, libsecret-1-0
 Description: Evaluacion de practicas de sistemas y redes por SSH
  Corrige las practicas del alumnado con el motor Heimdall incluido.
 `)

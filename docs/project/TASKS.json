@@ -5414,14 +5414,16 @@
       "id": "T230",
       "title": "Exportar informes individuales para Moodle",
       "phase": 9,
-      "status": "READY",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "T229"
       ],
+      "completed": "2026-11-22",
+      "notes": "Exportación local y ZIP importado en una tarea individual de Moodle 4.5.16+ con alumnos ficticios. Evidencia en docs/reviews/evidence/T230/RESULTADOS.md.",
       "goal": "Exportar informes individuales para Moodle",
       "scope": [
-        "Propuesta autorizada por el usuario el 2026-11-05; detallar la fase antes de implementarla."
+        "Exportar desde Notas finales e Histórico los HTML de la mejor vuelta a una carpeta privada, con incidencias por alumno. Preparar un ZIP para tareas individuales con asignación revisable a los participantes de la tarea."
       ],
       "acceptance": [
         "Producir paquete de feedback y mapeo de participantes verificable para una tarea Moodle.",
@@ -5439,7 +5441,7 @@
       "id": "T231",
       "title": "Enviar informes individuales por correo",
       "phase": 9,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T230"
@@ -5516,7 +5518,7 @@
       "id": "T234",
       "title": "Publicar notas e informes directamente en Moodle",
       "phase": 9,
-      "status": "BLOCKED",
+      "status": "READY",
       "priority": "P1",
       "depends_on": [
         "T230"

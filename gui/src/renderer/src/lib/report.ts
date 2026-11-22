@@ -221,6 +221,8 @@ ${sections}
 }
 
 /** Text as it goes into the page: whatever the classroom wrote is data. */
+export { esc as escapeReportText }
+
 function esc(text: string): string {
   return text
     .replace(/&/g, '&amp;')

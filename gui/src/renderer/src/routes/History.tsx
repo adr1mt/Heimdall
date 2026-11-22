@@ -1,3 +1,4 @@
+import { ExportFinalReports } from '@/components/ExportFinalReports'
 import { useCallback, useEffect, useState } from 'react'
 import { AlertTriangle, FolderOpen, RefreshCw, RotateCcw, ShieldCheck } from 'lucide-react'
 import { Badge, Button, Spinner, ViewHeader } from '@/components/ui'
@@ -163,6 +164,7 @@ export default function HistoryView() {
               </div>
               <div className="flex items-center gap-3">
                 <Badge variant={record.state === 'FINALIZED' ? 'success' : 'outline'}>{record.state === 'FINALIZED' ? 'Finalizado' : record.state === 'FINALIZING' ? 'Finalizando' : record.state === 'PAUSED' ? 'Pausado' : 'En curso'}</Badge>
+                {record.state === 'FINALIZED' && <ExportFinalReports record={record} />}
                 <Button size="sm" variant="outline" disabled={busy || opening !== null} onClick={() => void openSession(record)}>{opening === record.id && <Spinner />}Abrir sesión</Button>
               </div>
             </div>

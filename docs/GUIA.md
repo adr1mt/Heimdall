@@ -397,6 +397,30 @@ confirmación y conserva los éxitos, también después de reiniciar Heimdall.
 Los informes tienen nombre por sesión y no sustituyen los anteriores.
 **Exportar notas** ofrece CSV y Moodle con las notas definitivas.
 
+**Exportar informes… → Guardar en una carpeta…** guarda un HTML por alumno en
+tu ordenador. Está en Notas finales y junto a cada sesión finalizada del
+Histórico. Elige la carpeta de destino. Cada exportación crea una subcarpeta
+propia con el examen, la clase y la fecha. **Abrir carpeta** muestra los
+archivos. El resumen identifica a los alumnos sin nota y las incidencias con
+las correcciones originales. Puedes exportar con las máquinas del aula apagadas.
+
+**Preparar para Moodle…** crea un ZIP para una tarea **individual**. En la tarea,
+activa los archivos de retroalimentación y descarga las entregas con una carpeta
+por participante. Descomprime la descarga y selecciona en Heimdall la carpeta
+que contiene esas carpetas. Revisa los nombres y números de participante de esa
+misma tarea. Si dos alumnos se llaman igual, usa sus identificadores para elegir
+o deja pendiente la asignación. Cada participante recibe como máximo un archivo.
+Pulsa **Crear ZIP de Moodle**, abre la carpeta y selecciona `feedback.zip` en la
+opción de la tarea para subir varios archivos de retroalimentación. Revisa los
+destinatarios en Moodle antes de confirmar. El ZIP contiene exclusivamente los
+HTML seleccionados. Las notas se importan por separado con **Exportar notas**.
+
+Este recorrido requiere las carpetas individuales de Moodle y Python 3 en
+Linux (incluido como dependencia del paquete .deb). En tareas sin archivos
+entregados, cuando falte la carpeta de un participante o en tareas de grupo,
+usa la exportación local y adjunta cada HTML a la retroalimentación individual
+cuando la actividad lo permita.
+
 El **Histórico** muestra las sesiones del examen y la clase seleccionados,
 diferenciando **Pausado** y **Finalizado**. Al abrir una finalizada se muestra
 directamente su lista de notas. **Consultar correcciones** permite abrir sus

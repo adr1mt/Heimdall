@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { tmpdir } from 'node:os'
+import { exportReports } from '../src/main/report-export'
 import { ExamRecords, digest } from '../src/main/exam-record'
 import { validRun } from '../tests/fixtures/valid-run'
 import { aulaFileName, aulaYaml } from '../src/shared/aula'
@@ -75,11 +76,18 @@ assert.ok(!report.includes('Ficticio second')); assert.ok(!report.includes(group
 const afterRestart = await new ExamRecords(data, engine).view(new ExamRecords(data, engine).get(exam, group.id)!)
 assert.equal(afterRestart.session!.students[0].score.final_score, 100)
 assert.equal(afterRestart.record.closedAt, final.record.closedAt)
+const exported = await exportReports(afterRestart.record, root, 'ten')
+assert.equal(exported.written, 2)
+assert.deepEqual(exported.issues, ['Ficticio missing (missing) · Sin nota final.'])
+assert.equal(readFileSync(join(exported.folder!, 'first.html'), 'utf8'), report)
+assert.equal(readFileSync(join(exported.folder!, 'second.html'), 'utf8'), studentReport(last.run, last.run.students[1], SCALES.ten, final.record.title, 2))
+const feedback = await exportReports(afterRestart.record, root, 'ten', { first: '312', second: '409' })
+assert.equal(feedback.written, 2)
 writeFileSync(exam, 'exam: Otros criterios\n')
 const next = reopened.prepare(exam, group)
 assert.notEqual(next.id, record.id); assert.equal(next.rounds.length, 0)
 assert.equal(reopened.list(exam, group.id).length, 2)
 assert.equal(readFileSync(first.path, 'utf8'), JSON.stringify(first.run))
-console.log(JSON.stringify({ root, finalGrades: afterRestart.session!.students.map(s => ({ student: s.student_id, score: s.score.final_score, round: s.from_round })), closedAt: final.record.closedAt, nativeEngine: engine, csv: 'verified', moodle: 'verified', recovery: 'verified', preservedTenAfterSeven: true, preservedBestAfterSshFailure: true, pausedRestartAndResume: true, historicalBytes: 'unchanged' }, null, 2))
+console.log(JSON.stringify({ root, finalGrades: afterRestart.session!.students.map(s => ({ student: s.student_id, score: s.score.final_score, round: s.from_round })), closedAt: final.record.closedAt, nativeEngine: engine, csv: 'verified', moodle: 'verified', feedbackFolder: feedback.folder, recovery: 'verified', preservedTenAfterSeven: true, preservedBestAfterSshFailure: true, pausedRestartAndResume: true, historicalBytes: 'unchanged' }, null, 2))
 
 export { root, engine, group, final }

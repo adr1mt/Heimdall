@@ -14,6 +14,7 @@ import { readArtifact, readArtifactAsync } from './artifact'
 import { consolidateChain } from './consolidate'
 import { readExamSession } from './session'
 import { ExamRecords } from './exam-record'
+import { exportReports, participantsFromFolder } from './report-export'
 import { sendFinalReports } from './final-reports'
 import type { ExamRecord } from '../shared/exam-record'
 import { markOf, scaleOf } from '../renderer/src/lib/scale'
@@ -498,6 +499,22 @@ export function registerIpc(): void {
       correctionSettled()
     })
     return finalizing
+  })
+
+  ipcMain.handle(IPC.moodleParticipants, async () => {
+    const choice = await dialog.showOpenDialog({ title: 'Carpeta de entregas individuales descomprimida', properties: ['openDirectory'] })
+    return choice.canceled ? null : participantsFromFolder(choice.filePaths[0])
+  })
+
+  ipcMain.handle(IPC.exportFinalReports, async (_e, path: unknown, classId: unknown, id: unknown, scale: string, mapping?: Record<string, string>) => {
+    context(path, classId)
+    if (typeof id !== 'string' || !id) throw new Error('Falta la sesión finalizada.')
+    const record = records().get(path, classId as string, id)
+    if (!record) throw new Error('No se encuentra la sesión.')
+    const choice = await dialog.showOpenDialog({ title: 'Guardar los informes de la clase en…', properties: ['openDirectory', 'createDirectory'] })
+    if (choice.canceled) return null
+    const password = readClasses(settingsDir()).find(group => group.id === classId)?.password
+    return exportReports(record, choice.filePaths[0], scale, mapping, password)
   })
 
   ipcMain.handle(IPC.sendFinalReports, async (_e, path: unknown, classId: unknown, id: unknown, rawScale: unknown) => {

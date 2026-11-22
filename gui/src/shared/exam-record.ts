@@ -27,3 +27,9 @@ export interface SavedExam {
   record: ExamRecord
   session: Session | null
 }
+
+export interface ReportExport {
+  folder: string | null
+  written: number
+  issues: string[]
+}

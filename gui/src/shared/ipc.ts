@@ -26,6 +26,8 @@ export const IPC = {
   savedExam: 'exam:saved',
   examRecords: 'exam:records',
   finishExam: 'exam:finish',
+  exportFinalReports: 'exam:exportFinalReports',
+  moodleParticipants: 'exam:moodleParticipants',
   sendFinalReports: 'exam:sendFinalReports',
   listRuns: 'history:list',
   listBackups: 'backups:list',
