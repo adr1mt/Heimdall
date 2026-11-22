@@ -11,7 +11,7 @@
 
 <p align="center">
   <img alt="Go 1.26+" src="https://img.shields.io/badge/Go-1.26%2B-00ADD8?logo=go&logoColor=white">
-  <img alt="Versión 1.0.1" src="https://img.shields.io/badge/versi%C3%B3n-1.0.1-blue">
+  <img alt="Versión 1.0.2" src="https://img.shields.io/badge/versi%C3%B3n-1.0.2-blue">
   <img alt="Linux x64" src="https://img.shields.io/badge/Linux-x64-brightgreen?logo=linux&logoColor=white">
 </p>
 
@@ -34,18 +34,18 @@ descanso.
 ## Empezar en cinco pasos
 
 **Instalar.** Descarga el `.deb` o el AppImage de la
-[última versión](https://github.com/adr1mt/Heimdall/releases/latest). Linux de
-64 bits. El motor de corrección va dentro: no hay nada más que instalar.
+[versión 1.0.2](https://github.com/adr1mt/Heimdall/releases/tag/v1.0.2). Linux de
+64 bits. Para esa descarga, sigue la [guía de uso de 1.0.2](https://github.com/adr1mt/Heimdall/blob/v1.0.2/docs/GUIA.md) y sus [ejemplos de examen en español](https://github.com/adr1mt/Heimdall/blob/v1.0.2/README.md#el-examen-qué-es-ese-yaml). El motor de corrección va dentro: no hay nada más que instalar.
 
 ```bash
-sudo apt install ./Heimdall-1.0.1.deb
+sudo apt install ./Heimdall-1.0.2.deb
 ```
 
 Si prefieres el AppImage, dale permiso de ejecución y ábrelo:
 
 ```bash
-chmod +x Heimdall-1.0.1.AppImage
-./Heimdall-1.0.1.AppImage
+chmod +x Heimdall-1.0.2.AppImage
+./Heimdall-1.0.2.AppImage
 ```
 
 El AppImage publicado no necesita `libfuse2`.
@@ -113,6 +113,8 @@ falla más la clase y cómo se reparten las notas.
 
 ## El examen: qué es ese YAML
 
+Los ejemplos siguientes usan las claves inglesas de la rama de desarrollo posterior a 1.0.2.
+
 Un examen es un fichero `examen.yaml`: una lista de **comprobaciones**
 agrupadas. Cada una dice en qué máquina se ejecuta, qué **comando** se lanza y
 qué tiene que aparecer en lo que contesta.
@@ -157,7 +159,7 @@ Lo que hay que saber:
   | `not_contains: "texto"` | no lo contiene |
   | `equals: "texto"` | es exactamente ese texto |
   | `exit_code: 0` | el comando termina con ese código |
-  | `near: { ancla, lineas, contiene }` | contiene el texto como mucho N líneas después de la línea que tiene el ancla (como `grep -A N`) |
+  | `near: { anchor, lines, contains }` | contiene el texto como mucho N líneas después de la línea que tiene el ancla (como `grep -A N`) |
 
 - `sudo: true` ejecuta el comando como administrador, para lo que el usuario de
   la conexión no puede leer (`/etc/kea` en Ubuntu 26.04, `nft list ruleset`).
@@ -239,7 +241,7 @@ y su [impresión en PDF](docs/reviews/evidence/T193/corto.pdf), con datos fictic
 
 ## Estado
 
-**Versión 1.0.1**: completa y empaquetada en `.deb` y AppImage con el motor
+**Versión 1.0.2**: completa y empaquetada en `.deb` y AppImage con el motor
 dentro. Queda pendiente corregir con ella un examen real de aula de principio
 a fin.
 

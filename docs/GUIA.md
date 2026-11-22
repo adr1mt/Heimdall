@@ -3,7 +3,7 @@
 Para el profesor que va a corregir con Heimdall. No hace falta programar ni
 saber Go. Del cero a la primera nota, en unos veinte minutos.
 
-Versión de esta guía: **1.0.1**.
+Esta guía describe la rama de desarrollo posterior a 1.0.2, con las claves del examen en inglés. Para los paquetes publicados de 1.0.2, consulta la [guía de esa versión](https://github.com/adr1mt/Heimdall/blob/v1.0.2/docs/GUIA.md).
 
 ---
 
@@ -34,20 +34,20 @@ Nada más: el motor de corrección viaja dentro de la aplicación.
 ## 3. Instalar
 
 Descarga uno de los dos paquetes de la
-[última versión](https://github.com/adr1mt/Heimdall/releases/latest):
+[versión 1.0.2](https://github.com/adr1mt/Heimdall/releases/tag/v1.0.2):
 
 ```bash
-sudo apt install ./Heimdall-1.0.1.deb
+sudo apt install ./Heimdall-1.0.2.deb
 ```
 
 o, si prefieres no instalar nada:
 
 ```bash
-chmod +x Heimdall-1.0.1.AppImage
-./Heimdall-1.0.1.AppImage
+chmod +x Heimdall-1.0.2.AppImage
+./Heimdall-1.0.2.AppImage
 ```
 
-Desde el repositorio clonado, `make gui-dist` construye los mismos dos
+Desde el repositorio clonado, `make gui-dist` construye los dos
 paquetes en `gui/dist/`.
 
 El `.deb` deja Heimdall en el menú de aplicaciones. Comprobado: el paquete
@@ -80,6 +80,11 @@ exámenes del curso.
 Si el examen necesita un dato propio de cada alumno —su subdominio, el puerto
 que le tocó—, añade una columna tuya y rellénala. El examen la lee con
 `${student.subdominio}`.
+
+Si una clase guardada tenía una columna propia llamada `name`, `user` o
+`excluded`, abre **Clases → Editar**, pulsa **Renombrar** y guarda. La pantalla
+indica el nuevo nombre y conserva los valores de cada alumno. Usa ese nombre
+en los exámenes que consulten la columna.
 
 ### 4.2 Abre o escribe el examen
 
@@ -239,9 +244,6 @@ Los códigos de salida discriminan: `0` todo evaluado · `2` configuración
 inválida · `3` ejecución parcial · `4` cancelado.
 
 ---
-
-¿Algo no encaja con lo que ves en pantalla? Es un fallo de esta guía: está
-escrita sobre la versión 1.0.1.
 
 
 ## Recuperar clases o una versión del examen

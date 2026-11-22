@@ -5,9 +5,9 @@
 ## Última sesión
 **T228:** búsqueda manual y reintento de actualizaciones publicados en 1.0.2.
 [Evidencia](../reviews/evidence/T228/RESULTADOS.md). Integrados con el zoom local (T235).
-**T229:** YAML de examen e inventario en inglés. Editor, ayuda, referencias y
-plantillas actualizados. El motor rechaza claves antiguas antes de corregir.
-662 pruebas GUI, suite del motor y corrección local correctas.
+**T229:** YAML de examen e inventario en inglés. Las clases antiguas conservan sus columnas propias.
+El editor permite renombrar las que coinciden con claves del aula antes de corregir.
+Auditoría: 671 pruebas GUI correctas; guías de descarga y desarrollo identificadas.
 [Formato y decisión](../adr/0042-yaml-en-ingles.md). Compilado, pendiente de instalación.
 **T235:** zoom y ayuda desde el editor. [Evidencia](../reviews/evidence/T235/RESULTADOS.md).
 [Auditoría AutoCheck](../research/AUTOCHECK-2026-11-05.md).
