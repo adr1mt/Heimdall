@@ -7,8 +7,7 @@ del valor activo. DNS DHCP `8.8.8.8`.
 
 ## Resultado
 
-- [Examen mantenido](../../../../exams/ra1-v2/examen.yaml) y tabla privada
-  de criterios en su [README](../../../../exams/ra1-v2/README.md).
+- El examen y la tabla de criterios se retiraron del proyecto en ADR-0044.
 - Copia de uso en `/home/adr1/apps/0227/heimdall/ra1-v2/examen.yaml`.
   Registrada en primer lugar en los recientes de Heimdall con nombre «RA1 v2».
   Registro y guardado mediante las funciones nativas de proyectos y copias

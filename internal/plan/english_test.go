@@ -31,7 +31,7 @@ groups:
 			}
 		})
 	}
-	for _, assertion := range []string{"igual_a: host", "no_contiene: nope", "valor: host", "comprobador: [ra1-dhcp]"} {
+	for _, assertion := range []string{"igual_a: host", "no_contiene: nope", "valor: host"} {
 		if err := CheckExam(write(t, "examen.yaml", source+"        "+assertion+"\n")); err == nil {
 			t.Fatalf("mixed syntax accepted: %s", assertion)
 		}

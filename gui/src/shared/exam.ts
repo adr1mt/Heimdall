@@ -117,9 +117,7 @@ function readCheck(value: unknown): Check {
     id: text(raw.id),
     description: text(raw.description),
     on: text(raw.on),
-    cmd: Array.isArray(raw.checker)
-      ? ['heimdall:checker', ...raw.checker.map(text)]
-      : Array.isArray(raw.cmd) ? raw.cmd.map(text) : [],
+    cmd: Array.isArray(raw.cmd) ? raw.cmd.map(text) : [],
     value: text(raw.value),
     assertion: readAssertion(raw),
     weight: text(raw.weight),
@@ -156,14 +154,12 @@ function formatProblem(doc: unknown): string | null {
       const group=object(value,path,['group','checks']);field(group,'group',path,'string')
       for(const [j,value] of array(group.checks,`${path}.checks`).entries()) {
         const at=`${path}.checks[${j+1}]`
-        const c=object(value,at,['id','description','on','cmd','checker','value','weight','timeout','sudo',...ASSERTIONS])
+        const c=object(value,at,['id','description','on','cmd','value','weight','timeout','sudo',...ASSERTIONS])
         for(const key of ['id','description','on','value','timeout','contains','equals','not_contains']) field(c,key,at,'string')
         field(c,'weight',at,'number');field(c,'exit_code',at,'integer');field(c,'sudo',at,'boolean')
         for(const arg of array(c.cmd,`${at}.cmd`)) if(typeof arg!=='string') throw new Error(`${at}.cmd: cada argumento debe ser texto.`)
-        for(const arg of array(c.checker,`${at}.checker`)) if(typeof arg!=='string') throw new Error(`${at}.checker: cada argumento debe ser texto.`)
         if(ASSERTIONS.filter(key=>c[key]!==undefined).length!==1) throw new Error(`${at}: debe tener exactamente una aserción.`)
         if(c.cmd!==undefined && c.value!==undefined) throw new Error(`${at}: cmd y value no pueden aparecer juntos.`)
-        if(c.checker!==undefined && (c.cmd!==undefined || c.value!==undefined)) throw new Error(`${at}: checker no puede combinarse con cmd ni value.`)
         if(c.near!==undefined) {
           const near=object(c.near,`${at}.near`,['anchor','lines','contains'])
           field(near,'anchor',`${at}.near`,'string');field(near,'contains',`${at}.near`,'string');field(near,'lines',`${at}.near`,'integer')
@@ -239,8 +235,7 @@ function writeCheck(check: Check): Record<string, unknown> {
     if (check.weight.trim()) out.weight = weight(check.weight)
     if (check.timeout.trim()) out.timeout = check.timeout.trim()
     if (check.sudo !== undefined) out.sudo = check.sudo
-    if (check.cmd[0] === 'heimdall:checker') out.checker = check.cmd.slice(1)
-    else out.cmd = check.cmd
+    out.cmd = check.cmd
   } else {
     if (check.weight.trim()) out.weight = weight(check.weight)
     out.value = check.value

@@ -3,7 +3,7 @@
 **Actualizado**: 2026-11-22 · **Fase**: 9 — Endurecimiento y publicación
 
 ## Última sesión
-**Aplicación genérica:** los dos perfiles RA1 se instalan aparte. [Decisión](../adr/0043-aplicacion-generica.md).
+**Aplicación genérica:** exámenes YAML con comandos o valores y aserciones. [Decisión](../adr/0044-examen-declarativo.md).
 **T228:** actualizaciones publicadas en 1.0.2. [Evidencia](../reviews/evidence/T228/RESULTADOS.md).
 **T229:** YAML de examen e inventario en inglés. Las clases antiguas conservan sus columnas propias.
 El editor permite renombrar las que coinciden con claves del aula antes de corregir.
@@ -37,8 +37,6 @@ por alumno, sin afectar notas por SSH. Exportación CSV/Moodle conservada.
   necesarios para reconstruir; no protege frente a pérdida del disco.
 - Informes finales privados por sesión; Desktop los recupera por SFTP/SSH.
   La privacidad entre alumnos exige credenciales propias; contraseña común no aísla.
-- RA1 no evalúa el cliente ni su registro. Kea valida archivo guardado;
-  gateway/DNS son opciones declaradas, no configuración efectiva del cliente.
 - Si faltan eventos, el resultado se recupera mediante la intención guardada.
 - Copias de notas: 128 MB es heap V8 probado, no RSS ni cualquier examen.
 - Fuentes: 50 versiones/origen, 4 MiB, privadas. Clases guardan contraseña.
@@ -55,6 +53,6 @@ por alumno, sin afectar notas por SSH. Exportación CSV/Moodle conservada.
 
 ## Siguiente trabajo
 
-T230 y T232 READY; T070, T023 y T186 siguen READY. T084 espera aula.
+T230 READY; T070, T023 y T186 siguen READY. T084 espera aula.
 T223/T224/T225 instalados (T226); T227, T229 y T235 compilados, pendientes de instalación.
 Sin publicación nueva autorizada.

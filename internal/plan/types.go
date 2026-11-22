@@ -78,10 +78,8 @@ type Check struct {
 	Weight      *float64  `yaml:"weight"`
 	Timeout     *Duration `yaml:"timeout"`
 
-	Cmd     []string `yaml:"cmd"` // argument vector, never a shell string
-	Probe   []string `yaml:"checker"`
-	program string   // verified once while building the plan
-	Value   string   `yaml:"value"` // check without a command (M-11)
+	Cmd   []string `yaml:"cmd"`   // argument vector, never a shell string
+	Value string   `yaml:"value"` // check without a command (M-11)
 
 	// Sudo runs Cmd through sudo with the host's own password on stdin
 	// (ADR-0032). Nil means "not said"; defaults only fills it in for a

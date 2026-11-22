@@ -290,17 +290,3 @@ inválida** (F-02, F-06, C-14):
 Cuando todo pasa, el PLAN publica: número de comprobaciones, peso total, hash
 del examen, hash del inventario y lista de alumnos. Ese número es el que la GUI
 ya no tendrá que adivinar (`c14-check`).
-
-## Comprobadores externos del profesor
-
-Un examen puede usar `checker: [perfil, revisión, criterio, ...argumentos]`.
-El profesor instala el perfil por separado. La revisión es el SHA-256 del
-programa. El motor comprueba el perfil, la huella, el criterio y el número de
-argumentos antes de abrir conexiones. Los argumentos admiten las referencias
-habituales del examen. La ejecución conserva los límites de tiempo y permisos
-de la comprobación.
-
-La aserción es `equals: OK`. Con salida cero, `OK` aprueba y `FAIL` suspende.
-Otra respuesta o un error de ejecución deja el criterio sin evaluar. El
-resultado registra perfil, huella y argumentos para identificar lo ejecutado.
-El formato de instalación figura en [ADR-0043](../adr/0043-aplicacion-generica.md).

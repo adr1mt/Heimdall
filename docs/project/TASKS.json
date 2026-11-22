@@ -5464,7 +5464,8 @@
       "id": "T232",
       "title": "Validar un corrector especializado aislado",
       "phase": 9,
-      "status": "READY",
+      "status": "DROPPED",
+      "dropped_reason": "Retirada por decisión del profesor. ADR-0044 conserva el examen declarativo.",
       "priority": "P1",
       "depends_on": [
         "T229"
@@ -5489,7 +5490,8 @@
       "id": "T233",
       "title": "Paquetes instalables de correctores para profesores",
       "phase": 9,
-      "status": "BLOCKED",
+      "status": "DROPPED",
+      "dropped_reason": "Retirada por decisión del profesor. ADR-0044 conserva el examen declarativo.",
       "priority": "P1",
       "depends_on": [
         "T232"

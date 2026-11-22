@@ -20,12 +20,6 @@ docs-check:
 tools-check:
 	$(PYTHON) -B -m unittest discover -s test/tools -p 'test_*.py'
 
-## ra1-check: semantic checker regressions, without SSH or classroom data.
-.PHONY: ra1-check
-ra1-check:
-	$(GO) test -tags=examtest ./test/exams/ra1
-	$(PYTHON) -B -m unittest discover -s test/exams/ra1 -p 'test_*.py'
-
 ## check: fast suite. No network, no disk. Must stay under 10 s.
 check:
 	$(GO) vet ./...

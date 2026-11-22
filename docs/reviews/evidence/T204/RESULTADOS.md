@@ -69,8 +69,6 @@ mismo puente nativo de guardado con el contenido intacto.
 
 - [Correcto por SSH](correcto-ssh.json), [sin Python por SSH](sin-python-ssh.json).
 - [31 criterios](laboratorio-31.txt), [variantes](variantes.txt), [editor](editor.txt).
-- [Tabla privada de criterios y límites](../../../../exams/ra1-dhcp-kea/README.md).
-- [Montaje reproducible y datos ficticios](../../../../test/exams/ra1/README.md).
 
 Fuentes primarias consultadas para las diferencias de formato:
 [Netplan get](https://netplan.readthedocs.io/en/1.1.1/netplan-get/),

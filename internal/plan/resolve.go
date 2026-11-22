@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"heimdall/internal/model"
-	"heimdall/internal/probe"
 )
 
 // File names of a project directory. Two files, as the editor of the GUI
@@ -90,11 +89,9 @@ type ResolvedCheck struct {
 	Host   string // logical host, empty for a check without a command
 	Target Host   // where to connect, empty for a check without a command
 
-	Cmd     []string
-	Probe   bool
-	Program string `json:"-"`
-	Value   string
-	Sudo    bool // run Cmd through sudo with the host's password (ADR-0032)
+	Cmd   []string
+	Value string
+	Sudo  bool // run Cmd through sudo with the host's password (ADR-0032)
 
 	Contains    *string
 	NotContains *string
@@ -217,7 +214,6 @@ func validateExam(exam *Exam, errs *[]error) []Check {
 	}
 
 	var checks []Check
-	installed := probe.Registry{}
 	seen := map[string]int{}
 
 	for _, group := range exam.Groups {
@@ -246,20 +242,7 @@ func validateExam(exam *Exam, errs *[]error) []Check {
 
 			// 3. logical host used but not declared. A check without a
 			// command runs nowhere and needs no host.
-			hasCmd := len(check.Cmd) > 0 || len(check.Probe) > 0
-			if len(check.Probe) > 0 {
-				if len(check.Cmd) > 0 {
-					*errs = append(*errs, errf(check.Line, "checker y cmd no pueden aparecer juntos"))
-				}
-				program, err := installed.Resolve(check.Probe)
-				check.program = program
-				if err != nil {
-					*errs = append(*errs, errf(check.Line, "%s", err))
-				}
-				if check.Equals == nil || *check.Equals != "OK" {
-					*errs = append(*errs, errf(check.Line, "checker requiere equals: OK"))
-				}
-			}
+			hasCmd := len(check.Cmd) > 0
 			checks = append(checks, check)
 			switch {
 			case hasCmd && check.Value != "":
@@ -499,19 +482,13 @@ func resolveCheck(check Check, sc scope, exam *Exam) (ResolvedCheck, error) {
 		Host:        check.On,
 		ExitCode:    check.ExitCode,
 		Sudo:        check.Sudo != nil && *check.Sudo,
-		Probe:       len(check.Probe) > 0,
-		Program:     check.program,
 	}
 	out.Group = groupOf(exam, check.ID)
 	if check.On != "" {
 		out.Target = sc.hosts[check.On]
 	}
 
-	args := check.Cmd
-	if out.Probe {
-		args = append([]string{"heimdall:checker"}, check.Probe...)
-	}
-	for _, arg := range args {
+	for _, arg := range check.Cmd {
 		value, err := substitute(arg, sc)
 		if err != nil {
 			return ResolvedCheck{}, err
@@ -621,7 +598,6 @@ func hashPlan(p *Plan) string {
 		User     string   `json:"user"`
 		Cmd      []string `json:"cmd"`
 		Sudo     bool     `json:"sudo,omitempty"` // omitted when false: older plans keep their hash
-		Probe    bool     `json:"probe,omitempty"`
 		Value    string   `json:"value"`
 		Assert   string   `json:"assert"`
 		Expected string   `json:"expected"`
@@ -690,7 +666,7 @@ func hashPlan(p *Plan) string {
 				Host:    c.Host,
 				Address: fmt.Sprintf("%s:%d", c.Target.IP, c.Target.Port),
 				User:    c.Target.User,
-				Cmd:     c.Cmd, Sudo: c.Sudo, Probe: c.Probe, Value: c.Value,
+				Cmd:     c.Cmd, Sudo: c.Sudo, Value: c.Value,
 				Assert: kind, Expected: expected,
 			}) {
 				return ""

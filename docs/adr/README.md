@@ -55,3 +55,5 @@ Solo decisiones **cerradas**. Lo que sigue abierto está en
 - [ADR-0041 · Dependencias mantenidas y empaquetado Linux verificable](0041-dependencias-y-empaquetado-mantenidos.md).
 
 - [ADR-0043 · Aplicación genérica y criterios propios del examen](0043-aplicacion-generica.md).
+
+- [ADR-0044 · Exámenes declarativos](0044-examen-declarativo.md).

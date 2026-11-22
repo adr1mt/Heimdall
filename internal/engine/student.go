@@ -167,17 +167,10 @@ func (r *runner) runCheck(runCtx, studentCtx context.Context, sp plan.StudentPla
 
 	var exec *model.ExecutionResult
 	var refused *ssh.SudoRefused
-	command := c.Cmd
-	if c.Probe {
-		command = append([]string{"python3", "-I", "-c", c.Program}, c.Cmd[3:]...)
-	}
 	if c.Sudo {
-		exec, refused = sess.RunSudo(studentCtx, command, timeout)
+		exec, refused = sess.RunSudo(studentCtx, c.Cmd, timeout)
 	} else {
-		exec = sess.Run(studentCtx, command, timeout)
-	}
-	if c.Probe {
-		exec.Command = c.Cmd // bounded profile and source digest identify the fixed program
+		exec = sess.Run(studentCtx, c.Cmd, timeout)
 	}
 	if refused != nil {
 		// sudo answered, not the student's machine: what it printed stays as
@@ -190,11 +183,6 @@ func (r *runner) runCheck(runCtx, studentCtx context.Context, sp plan.StudentPla
 		return out
 	}
 	cause, detail := causeOf(runCtx, studentCtx, sp, r.plan.StudentBudget, exec, c)
-	if cause == model.CauseNone && c.Probe && (exec.ExitCode == nil || *exec.ExitCode != 0 ||
-		(strings.TrimSpace(exec.Stdout.Text) != "OK" && strings.TrimSpace(exec.Stdout.Text) != "FAIL")) {
-		cause = model.CauseEngineError
-		detail = "el comprobador no pudo evaluar este criterio; consulta su salida técnica (Python, permisos o capacidad no disponible)"
-	}
 
 	out := skeleton(c, model.CauseNone, "")
 	out.Execution = exec
