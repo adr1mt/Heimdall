@@ -13,6 +13,10 @@ import { useApp, noticeFrom } from '@/stores/app'
 import { useClasses } from '@/stores/classes'
 import {
   columnProblem,
+  conflictingColumn,
+  columnConflictMessage,
+  renameFormerColumn,
+  replacementColumnName,
   duplicateOf,
   emptyStudent,
   problemWith,
@@ -251,8 +255,10 @@ function ClassDetail({
   onDuplicate: () => void
   onRemove: () => void
 }) {
+  const conflict = conflictingColumn(group)
   return (
     <div className="space-y-4 p-6">
+      {conflict && <p role="status">{columnConflictMessage(group, conflict)}</p>}
       <SectionTitle
         // Tailwind v4 lets this margin beat the parent space-y-4: keep the 16px gap.
         className="mb-4"
@@ -365,6 +371,7 @@ function ClassEditor({
   const [showUsers, setShowUsers] = useState(
     () => new Set(draft.students.map((student) => student.user)).size > 1
   )
+  const conflict = conflictingColumn(draft)
   const [addingColumn, setAddingColumn] = useState(false)
   const [removingColumn, setRemovingColumn] = useState<string | null>(null)
   const [pasting, setPasting] = useState(false)
@@ -488,6 +495,14 @@ function ClassEditor({
         {/* Una columna propia se declara en la clase, no se deduce de los
             alumnos: una que todos tengan vacía tiene que seguir en pantalla o
             nadie puede rellenarla. */}
+        {conflict && (
+          <div className="space-y-2">
+            <p>{columnConflictMessage(draft, conflict)}</p>
+            <Button variant="outline" size="sm" onClick={() => onChange(renameFormerColumn(draft, conflict))}>
+              Renombrar «{conflict}» a «{replacementColumnName(draft, conflict)}»
+            </Button>
+          </div>
+        )}
         {addingColumn && (
           <ColumnAdder
             columns={draft.columns}

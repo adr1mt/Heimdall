@@ -1,7 +1,7 @@
 import { chmodSync, existsSync, lstatSync, mkdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { writeSourceFile } from './source-backup'
-import { readGroup, isColumnName, type ClassGroup } from '../shared/classes'
+import { readGroup, isStoredColumnName, type ClassGroup } from '../shared/classes'
 
 /**
  * Where the teacher's classes live (ADR-0021): one JSON file in the
@@ -120,7 +120,7 @@ function validateClasses(list: unknown[]): void {
   string(g,'id',at,true);string(g,'name',at,true);string(g,'password',at)
   if(groupIds.has(g.id as string)) throw new Error(`${at}.id: identificador repetido`)
   groupIds.add(g.id as string)
-  if(g.columns!==undefined && (!Array.isArray(g.columns) || g.columns.some(c=>typeof c!=='string' || !isColumnName(c)) || new Set(g.columns).size!==g.columns.length)) throw new Error(`${at}.columns: columnas inválidas`)
+  if(g.columns!==undefined && (!Array.isArray(g.columns) || g.columns.some(c=>typeof c!=='string' || !isStoredColumnName(c)) || new Set(g.columns).size!==g.columns.length)) throw new Error(`${at}.columns: columnas inválidas`)
   if(!Array.isArray(g.students)) throw new Error(`${at}.students: se esperaba una lista`)
   const ids=new Set<string>()
   for(const [j,value] of g.students.entries()) {
@@ -128,7 +128,7 @@ function validateClasses(list: unknown[]): void {
    for(const key of ['id','name','contact','host','port','user']) string(student,key,where,key==='id')
    if(ids.has((student.id as string).trim())) throw new Error(`${where}.id: identificador repetido`)
    ids.add((student.id as string).trim())
-   if(student.fields!==undefined) for(const [key,v] of Object.entries(object(student.fields,`${where}.fields`))) if(!isColumnName(key) || typeof v!=='string') throw new Error(`${where}.fields.${key}: campo inválido`)
+   if(student.fields!==undefined) for(const [key,v] of Object.entries(object(student.fields,`${where}.fields`))) if(!isStoredColumnName(key) || typeof v!=='string') throw new Error(`${where}.fields.${key}: campo inválido`)
   }
  }
 }

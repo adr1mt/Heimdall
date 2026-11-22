@@ -87,7 +87,7 @@ export function readGroup(value: unknown): ClassGroup | null {
     ? raw.students.map(readStudent).filter((s): s is ClassStudent => s !== null)
     : []
   const columns = Array.isArray(raw.columns)
-    ? raw.columns.map(text).filter((column) => isColumnName(column))
+    ? raw.columns.map(text).filter(isStoredColumnName)
     : []
   return { id, name, columns, password: typeof raw.password === 'string' ? raw.password : '', students }
 }
@@ -96,7 +96,7 @@ export function readGroup(value: unknown): ClassGroup | null {
 function readFields(value: unknown): Record<string, string> {
   const fields: Record<string, string> = {}
   for (const [name, raw] of Object.entries((value ?? {}) as Record<string, unknown>)) {
-    if (isColumnName(name) && typeof raw === 'string') fields[name] = raw.trim()
+    if (isStoredColumnName(name) && typeof raw === 'string') fields[name] = raw.trim()
   }
   return fields
 }
@@ -111,6 +111,44 @@ const RESERVED_COLUMNS = new Set(['id', 'name', 'moodle_id', 'excluded', 'hosts'
 /** Whether a name can be a column: it travels into the classroom as a key. */
 export function isColumnName(name: string): boolean {
   return /^[a-z][a-z0-9_]*$/.test(name) && !RESERVED_COLUMNS.has(name)
+}
+
+// These names were valid custom columns in address books saved by 1.0.2.
+const formerColumnNames = new Set(['name', 'excluded', 'user'])
+
+export function isStoredColumnName(name: string): boolean {
+  return isColumnName(name) || formerColumnNames.has(name)
+}
+
+export function conflictingColumn(group: ClassGroup): string | undefined {
+  return group.columns.find((name) => formerColumnNames.has(name))
+}
+
+export function columnConflictMessage(group: ClassGroup, column: string): string {
+  return `En la clase «${group.name}», «${column}» es ahora un nombre reservado. Renombra esa columna en Clases antes de corregir.`
+}
+
+export function replacementColumnName(group: ClassGroup, column: string): string {
+  const base = `dato_${column}`
+  let name = base
+  for (let n = 2; group.columns.includes(name) || group.students.some(s => Object.hasOwn(s.fields, name)); n++) {
+    name = `${base}_${n}`
+  }
+  return name
+}
+
+export function renameFormerColumn(group: ClassGroup, column: string): ClassGroup {
+  const name = replacementColumnName(group, column)
+  return {
+    ...group,
+    columns: group.columns.map(key => key === column ? name : key),
+    students: group.students.map(student => {
+      if (!Object.hasOwn(student.fields, column)) return student
+      const fields = { ...student.fields, [name]: student.fields[column] }
+      delete fields[column]
+      return { ...student, fields }
+    })
+  }
 }
 
 /** Why this column name cannot be used, or null. */

@@ -1,4 +1,4 @@
-import type { ClassGroup, ClassStudent } from './classes'
+import { conflictingColumn, columnConflictMessage, type ClassGroup, type ClassStudent } from './classes'
 
 /**
  * The classroom file the application writes for a class (ADR-0022).
@@ -66,6 +66,8 @@ const DEFAULT_PORT = 22
  * because the application wrote the inventory.
  */
 export function aulaYaml(group: ClassGroup): string {
+  const conflict = conflictingColumn(group)
+  if (conflict) throw new Error(columnConflictMessage(group, conflict))
   const lines = [
     `${GENERATED_MARK} se rehace a partir de la clase «${group.name}»`,
     '# cada vez que se corrige. Los cambios que escribas aquí se pierden.',

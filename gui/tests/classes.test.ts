@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { chmodSync, mkdtempSync, readFileSync, readdirSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { aulaYaml } from '../src/shared/aula'
 import { classesFile, readClasses, restoreClasses, writeClasses } from '../src/main/classes'
 import { readSourceCopy, sourceCopiesSlot } from '../src/main/source-backup'
 import {
@@ -10,6 +11,7 @@ import {
   groupLine,
   problemWith,
   readGroup,
+  renameFormerColumn,
   shownGroup,
   type ClassGroup
 } from '../src/shared/classes'
@@ -144,6 +146,29 @@ describe('las columnas propias del profesor', () => {
     expect(readClasses(dir)[0].students[0].fields).toEqual({ subdominio: 'uno.example' })
   })
 
+  it.each(['name', 'user', 'excluded'])('preserves the former custom column %s until renamed', column => {
+    const dir = emptyDir()
+    const old = group({ columns: [column, `dato_${column}`] })
+    old.students[0].fields = { [column]: 'anterior', [`dato_${column}`]: 'otro' }
+    const other = group({ id: 'g2', name: 'B' })
+    const original = JSON.stringify({ classes: [old, other] })
+    writeFileSync(classesFile(dir), original)
+    const [loaded, editable] = readClasses(dir)
+    expect(readFileSync(classesFile(dir), 'utf8')).toBe(original)
+    expect(() => aulaYaml(loaded)).toThrow(column)
+    expect(aulaYaml(editable)).toContain('classroom:')
+    writeClasses(dir, [loaded, { ...editable, name: 'C' }])
+    expect(readClasses(dir)[0]).toEqual(old)
+    const renamed = renameFormerColumn(loaded, column)
+    writeClasses(dir, [renamed, editable])
+    expect(readClasses(dir)[0].students[0].fields).toEqual({
+      [`dato_${column}_2`]: 'anterior', [`dato_${column}`]: 'otro'
+    })
+    expect(aulaYaml(renamed)).toContain(`dato_${column}_2:`)
+    restoreClasses(dir, original)
+    expect(readClasses(dir)[0]).toEqual(old)
+  })
+
   // Una columna con uno de estos nombres pisaría la identidad del alumno en
   // el aula sin que nadie lo dijera.
   it('no pueden llamarse como una clave que ya usa el aula', () => {
@@ -153,14 +178,14 @@ describe('las columnas propias del profesor', () => {
   })
 
   it('una columna reservada no sobrevive a la lectura', () => {
-    const read = readGroup({ ...group(), columns: ['name', 'subdominio'] })
+    const read = readGroup({ ...group(), columns: ['id', 'subdominio'] })
     expect(read?.columns).toEqual(['subdominio'])
   })
 
   it('un campo reservado no sobrevive a la lectura', () => {
     const read = readGroup({
       ...group(),
-      students: [{ ...group().students[0], fields: { name: 'pisado', subdominio: 'ok' } }]
+      students: [{ ...group().students[0], fields: { id: 'pisado', subdominio: 'ok' } }]
     })
     expect(read?.students[0].fields).toEqual({ subdominio: 'ok' })
   })
@@ -276,7 +301,7 @@ describe('la clase que se ve', () => {
 it.each([
  {...group(),name:''},
  {...group(),students:[{name:'Missing id'}]},
- {...group(),columns:['name']},
+ {...group(),columns:['id']},
  {...group(),students:[{...group().students[0],fields:{subdominio:4}}]},
  {...group(),students:'invalid'}
 ])('blocks partial corruption without overwriting valid data',bad=> {
