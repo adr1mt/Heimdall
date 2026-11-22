@@ -11,7 +11,7 @@
 
 <p align="center">
   <img alt="Go 1.26+" src="https://img.shields.io/badge/Go-1.26%2B-00ADD8?logo=go&logoColor=white">
-  <img alt="Versión 1.0.2" src="https://img.shields.io/badge/versi%C3%B3n-1.0.2-blue">
+  <img alt="Versión 2.0.0" src="https://img.shields.io/badge/versi%C3%B3n-2.0.0-blue">
   <img alt="Linux x64" src="https://img.shields.io/badge/Linux-x64-brightgreen?logo=linux&logoColor=white">
 </p>
 
@@ -34,18 +34,18 @@ descanso.
 ## Empezar en cinco pasos
 
 **Instalar.** Descarga el `.deb` o el AppImage de la
-[versión 1.0.2](https://github.com/adr1mt/Heimdall/releases/tag/v1.0.2). Linux de
-64 bits. Para esa descarga, sigue la [guía de uso de 1.0.2](https://github.com/adr1mt/Heimdall/blob/v1.0.2/docs/GUIA.md) y sus [ejemplos de examen en español](https://github.com/adr1mt/Heimdall/blob/v1.0.2/README.md#el-examen-qué-es-ese-yaml). El motor de corrección va dentro: no hay nada más que instalar.
+[versión 2.0.0](https://github.com/adr1mt/Heimdall/releases/tag/v2.0.0). Linux de
+64 bits. Para esa descarga, sigue la [guía de uso de 2.0.0](https://github.com/adr1mt/Heimdall/blob/v2.0.0/docs/GUIA.md) y sus [ejemplos de examen en inglés](https://github.com/adr1mt/Heimdall/blob/v2.0.0/README.md#el-examen-qué-es-ese-yaml). El motor de corrección va dentro: no hay nada más que instalar.
 
 ```bash
-sudo apt install ./Heimdall-1.0.2.deb
+sudo apt install ./Heimdall-2.0.0.deb
 ```
 
 Si prefieres el AppImage, dale permiso de ejecución y ábrelo:
 
 ```bash
-chmod +x Heimdall-1.0.2.AppImage
-./Heimdall-1.0.2.AppImage
+chmod +x Heimdall-2.0.0.AppImage
+./Heimdall-2.0.0.AppImage
 ```
 
 El AppImage publicado no necesita `libfuse2`.
@@ -113,7 +113,7 @@ falla más la clase y cómo se reparten las notas.
 
 ## El examen: qué es ese YAML
 
-Los ejemplos siguientes usan las claves inglesas de la rama de desarrollo posterior a 1.0.2.
+Los ejemplos usan las claves inglesas de Heimdall 2. Si vienes de 1.0.2, adapta el YAML del examen y del inventario antes de corregir.
 
 Un examen es un fichero `examen.yaml`: una lista de **comprobaciones**
 agrupadas. Cada una dice en qué máquina se ejecuta, qué **comando** se lanza y
@@ -240,7 +240,7 @@ y su [impresión en PDF](docs/reviews/evidence/T193/corto.pdf), con datos fictic
 
 ## Estado
 
-**Versión 1.0.2**: completa y empaquetada en `.deb` y AppImage con el motor
+**Versión 2.0.0**: completa y empaquetada en `.deb` y AppImage con el motor
 dentro. Queda pendiente corregir con ella un examen real de aula de principio
 a fin.
 

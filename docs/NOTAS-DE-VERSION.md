@@ -8,6 +8,10 @@ El número es uno solo para todo el producto: lo dice el fichero `VERSION` de
 la raíz, el motor se sella con él al compilar y la aplicación lo lleva en su
 paquete. `test/version.sh` comprueba que no se separan.
 
+## 2.0.0 — 22-11-2026
+
+Exportación de informes definitivos a carpeta y a Moodle, ayuda en el editor y cambio del YAML del examen e inventario a inglés. [Cambios y actualización desde 1.0.2](releases/2.0.0/NOTAS.md).
+
 ## 1.0.0 — 22-10-2026
 
 Primera versión estable. Sustituye a las publicaciones anteriores (0.9.1,

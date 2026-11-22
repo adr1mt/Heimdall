@@ -3,7 +3,7 @@
 Para el profesor que va a corregir con Heimdall. No hace falta programar ni
 saber Go. Del cero a la primera nota, en unos veinte minutos.
 
-Esta guía describe la rama de desarrollo posterior a 1.0.2, con las claves del examen en inglés. Para los paquetes publicados de 1.0.2, consulta la [guía de esa versión](https://github.com/adr1mt/Heimdall/blob/v1.0.2/docs/GUIA.md).
+Esta guía describe Heimdall 2.0.0. Si vienes de 1.0.2, adapta las claves del YAML del examen y del inventario al inglés y valida el examen antes de corregir.
 
 ---
 
@@ -34,17 +34,17 @@ Nada más: el motor de corrección viaja dentro de la aplicación.
 ## 3. Instalar
 
 Descarga uno de los dos paquetes de la
-[versión 1.0.2](https://github.com/adr1mt/Heimdall/releases/tag/v1.0.2):
+[versión 2.0.0](https://github.com/adr1mt/Heimdall/releases/tag/v2.0.0):
 
 ```bash
-sudo apt install ./Heimdall-1.0.2.deb
+sudo apt install ./Heimdall-2.0.0.deb
 ```
 
 o, si prefieres no instalar nada:
 
 ```bash
-chmod +x Heimdall-1.0.2.AppImage
-./Heimdall-1.0.2.AppImage
+chmod +x Heimdall-2.0.0.AppImage
+./Heimdall-2.0.0.AppImage
 ```
 
 Desde el repositorio clonado, `make gui-dist` construye los dos
